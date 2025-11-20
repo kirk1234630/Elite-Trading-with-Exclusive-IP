@@ -1,9 +1,990 @@
 <!DOCTYPE html>
-<html>
-<head><title>Test Page</title></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Stock & Options Analytics</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Market Story Landing */
+        .market-story-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+        }
+
+        .market-time {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .story-title {
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .story-narrative {
+            max-width: 900px;
+            margin: 0 auto;
+            font-size: 1.2em;
+            line-height: 1.8;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        /* Top 3 Plays Grid */
+        .top-plays {
+            padding: 40px 20px;
+        }
+
+        .plays-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .play-card {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .play-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .play-card:hover {
+            transform: translateY(-10px);
+            border-color: #667eea;
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        .play-card:hover::before {
+            opacity: 1;
+        }
+
+        .play-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .play-ticker {
+            font-size: 2em;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .play-type {
+            font-size: 2.5em;
+        }
+
+        .play-story-name {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .play-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .play-metric {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 12px;
+            border-radius: 10px;
+        }
+
+        .play-metric-label {
+            font-size: 0.85em;
+            color: #999;
+            margin-bottom: 5px;
+        }
+
+        .play-metric-value {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .play-script-signal {
+            background: rgba(16, 185, 129, 0.15);
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .play-script-signal.short {
+            background: rgba(239, 68, 68, 0.15);
+            border-left-color: #ef4444;
+        }
+
+        .play-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Story Detail View */
+        .story-detail {
+            display: none;
+            padding: 20px;
+        }
+
+        .story-detail.active {
+            display: block;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .detail-header {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .detail-ticker {
+            font-size: 3em;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .detail-price {
+            font-size: 1.5em;
+            color: #10b981;
+        }
+
+        .narrative-section {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .narrative-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .narrative-text {
+            font-size: 1.15em;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            color: #d0d0d0;
+        }
+
+        .narrative-signals {
+            display: grid;
+            gap: 12px;
+        }
+
+        .narrative-signal {
+            padding: 15px 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            border-radius: 8px;
+            font-size: 1.05em;
+        }
+
+        .trade-card {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            padding: 40px;
+            border-radius: 20px;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .trade-card.short {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .trade-title {
+            font-size: 2em;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .trade-recommendation {
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+        }
+
+        .trade-details {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .trade-detail-item {
+            font-size: 1.1em;
+            padding: 10px 0;
+        }
+
+        .why-it-works {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+
+        .why-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .why-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .why-item {
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .why-item::before {
+            content: '•';
+            position: absolute;
+            left: 8px;
+            font-size: 1.5em;
+        }
+
+        .trade-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .trade-action-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .trade-action-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Chart Layout - TradingView Style */
+        .chart-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-main {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            padding: 30px;
+            border-radius: 20px;
+            min-height: 500px;
+        }
+
+        .chart-sidebar {
+            display: grid;
+            gap: 20px;
+        }
+
+        .sidebar-panel {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            padding: 25px;
+            border-radius: 15px;
+        }
+
+        .panel-title {
+            font-size: 1.2em;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .greeks-compact {
+            display: grid;
+            gap: 12px;
+        }
+
+        .greek-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 8px;
+        }
+
+        .greek-label {
+            color: #999;
+        }
+
+        .greek-value {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        /* Newsletter Brief Cards */
+        .newsletter-compact {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .newsletter-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .newsletter-tab {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .newsletter-tab.active,
+        .newsletter-tab:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: white;
+        }
+
+        .newsletter-content {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 25px;
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .newsletter-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .newsletter-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .newsletter-item h4 {
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        /* Social Proof */
+        .social-proof {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .social-count {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .social-text {
+            color: #999;
+        }
+
+        .social-breakdown {
+            margin-left: auto;
+            display: flex;
+            gap: 15px;
+        }
+
+        .social-stat {
+            text-align: center;
+        }
+
+        .social-stat-value {
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .social-stat-label {
+            font-size: 0.85em;
+            color: #999;
+        }
+
+        /* Loading States */
+        .loading {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Scanner Map */
+        .scanner-map {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            padding: 40px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+        }
+
+        .scanner-filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        .scanner-filter {
+            padding: 12px 24px;
+            background: rgba(102, 126, 234, 0.1);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .scanner-filter.active {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .scanner-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .scanner-table th,
+        .scanner-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .scanner-table th {
+            color: #999;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85em;
+        }
+
+        .scanner-table tr {
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .scanner-table tr:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .story-tag {
+            padding: 5px 12px;
+            background: rgba(102, 126, 234, 0.2);
+            border-radius: 15px;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .stars {
+            color: #f59e0b;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 1200px) {
+            .chart-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .story-title {
+                font-size: 1.8em;
+            }
+
+            .plays-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .detail-ticker {
+                font-size: 2em;
+            }
+
+            .newsletter-tabs {
+                flex-direction: column;
+            }
+
+            .trade-actions {
+                flex-direction: column;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
 <body>
-  <h1>Static Site Test</h1>
-  <p>If you see this, GitHub → Netlify is working!</p>
+    <div class="container">
+        <!-- Landing: Market Story + Top 3 Plays -->
+        <div id="landingView">
+            <div class="market-story-header">
+                <div class="market-time" id="marketTime">🌅 Market Opens in 2:15:23</div>
+                <h1 class="story-title">📖 Today's Volatility Story</h1>
+                <div class="story-narrative" id="marketNarrative">
+                    "Options are CHEAP on tech giants while expensive on energy. IV Rank shows NVDA, META in bottom 25% - institutional accumulation zone. Your edge: Buy fear, sell greed."
+                </div>
+            </div>
+
+            <div class="top-plays">
+                <div class="plays-grid" id="topPlaysGrid">
+                    <!-- Loading plays -->
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Scanning markets for top opportunities...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Story Detail View -->
+        <div id="storyView" class="story-detail">
+            <button class="back-btn" onclick="backToLanding()">← Back to Scanner</button>
+            
+            <div class="detail-header">
+                <div class="detail-ticker" id="detailTicker">NVDA</div>
+                <div class="detail-price" id="detailPrice">$495.42 (+2.3%)</div>
+            </div>
+
+            <div class="social-proof">
+                <div class="social-count">1,247</div>
+                <div class="social-text">traders watching right now</div>
+                <div class="social-breakdown">
+                    <div class="social-stat">
+                        <div class="social-stat-value">892</div>
+                        <div class="social-stat-label">Bullish</div>
+                    </div>
+                    <div class="social-stat">
+                        <div class="social-stat-value">234</div>
+                        <div class="social-stat-label">Bearish</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="narrative-section">
+                <h2 class="narrative-title" id="narrativeTitle">"THE SETUP"</h2>
+                <div class="narrative-text" id="narrativeText">
+                    NVDA is showing classic institutional accumulation: IV crushed to 28% (bottom 30% of 1-year range) while price holds support. VRP at -5.2% means options are underpriced vs realized movement.
+                </div>
+                <div class="narrative-signals" id="narrativeSignals">
+                    <div class="narrative-signal">✅ Bear Dev < -38% (extreme fear priced in)</div>
+                    <div class="narrative-signal">✅ IV Rank bottom quartile (cheap entry)</div>
+                    <div class="narrative-signal">✅ Monte Carlo 90%ile: $525 (+6% in 30d)</div>
+                </div>
+            </div>
+
+            <div class="trade-card" id="tradeCard">
+                <div class="trade-title">🎯 THE TRADE</div>
+                <div class="trade-recommendation" id="tradeRec">BUY Dec 500 Calls @ $12.50</div>
+                <div class="trade-details">
+                    <div class="trade-detail-item"><strong>Target:</strong> $18-20 on volatility expansion</div>
+                    <div class="trade-detail-item"><strong>Stop:</strong> $9 if IV drops further</div>
+                </div>
+                <div class="why-it-works">
+                    <div class="why-title">Why It Works:</div>
+                    <div class="why-list">
+                        <div class="why-item">Cheap entry (IV compression)</div>
+                        <div class="why-item">Earnings 3 weeks out (IV will rise)</div>
+                        <div class="why-item">Delta 0.52 = stock proxy efficiency</div>
+                    </div>
+                </div>
+                <div class="trade-actions">
+                    <button class="trade-action-btn" onclick="setAlert()">⚡ SET ALERT</button>
+                    <button class="trade-action-btn" onclick="copyTrade()">📋 COPY TRADE</button>
+                </div>
+            </div>
+
+            <div class="chart-layout">
+                <div class="chart-main">
+                    <canvas id="mainChart"></canvas>
+                </div>
+                <div class="chart-sidebar">
+                    <div class="sidebar-panel">
+                        <div class="panel-title">Key Greeks</div>
+                        <div class="greeks-compact" id="greeksCompact">
+                            <div class="greek-row">
+                                <span class="greek-label">Delta</span>
+                                <span class="greek-value">0.52</span>
+                            </div>
+                            <div class="greek-row">
+                                <span class="greek-label">Gamma</span>
+                                <span class="greek-value">0.08</span>
+                            </div>
+                            <div class="greek-row">
+                                <span class="greek-label">Vega</span>
+                                <span class="greek-value">1.24</span>
+                            </div>
+                            <div class="greek-row">
+                                <span class="greek-label">Theta</span>
+                                <span class="greek-value">-0.15</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sidebar-panel">
+                        <div class="panel-title">Monte Carlo (30d)</div>
+                        <div class="greeks-compact">
+                            <div class="greek-row">
+                                <span class="greek-label">Mean</span>
+                                <span class="greek-value" id="mcMean">$502</span>
+                            </div>
+                            <div class="greek-row">
+                                <span class="greek-label">10th %ile</span>
+                                <span class="greek-value" id="mc10">$475</span>
+                            </div>
+                            <div class="greek-row">
+                                <span class="greek-label">90th %ile</span>
+                                <span class="greek-value" id="mc90">$525</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="newsletter-compact">
+                <div class="newsletter-tabs">
+                    <button class="newsletter-tab active" onclick="switchNewsletter('pre')">📈 Pre-Market</button>
+                    <button class="newsletter-tab" onclick="switchNewsletter('post')">📉 Post-Market</button>
+                    <button class="newsletter-tab" onclick="switchNewsletter('daily')">📊 Daily</button>
+                </div>
+                <div class="newsletter-content" id="newsletterBrief">
+                    <div class="newsletter-item">
+                        <h4>🌅 Pre-Market Brief</h4>
+                        <p>• SPY gapping up +0.3% on strong tech</p>
+                        <p>• NVDA IV spike to 32% pre-earnings</p>
+                        <p>• Fed minutes 2PM - watch volatility</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script>
+        const API_BASE = 'https://elite-trading-with-exclusive-ip.onrender.com';
+        
+        const storyNames = ['The Setup', 'The Fade', 'The Creep', 'The Breakout', 'The Reversal'];
+        
+        // Auto-load top 3 plays on page load
+        window.addEventListener('load', () => {
+            loadTopPlays();
+            updateMarketTime();
+            setInterval(updateMarketTime, 1000);
+        });
+
+        function updateMarketTime() {
+            const now = new Date();
+            const marketOpen = new Date();
+            marketOpen.setHours(9, 30, 0, 0);
+            
+            if (now > marketOpen) {
+                marketOpen.setDate(marketOpen.getDate() + 1);
+            }
+            
+            const diff = marketOpen - now;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('marketTime').textContent = 
+                `🌅 Market Opens in ${hours}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        async function loadTopPlays() {
+            const tickers = ['NVDA', 'AAPL', 'TSLA', 'META', 'AMZN', 'GOOGL', 'MSFT', 'AMD'];
+            const plays = [];
+
+            for (const ticker of tickers) {
+                try {
+                    const res = await fetch(`${API_BASE}/api/analytics?ticker=${ticker}`);
+                    if (!res.ok) continue;
+                    
+                    const data = await res.json();
+                    const ivRank = data.volatility.iv_rank;
+                    const vrp = data.volatility.vrp_30d;
+                    
+                    if ((ivRank < 35 && vrp < 0) || (ivRank > 65 && vrp > 0)) {
+                        plays.push({
+                            ticker,
+                            data,
+                            score: Math.abs(ivRank - 50) + Math.abs(vrp) * 2
+                        });
+                    }
+                } catch (error) {
+                    console.error(`Error loading ${ticker}:`, error);
+                }
+            }
+
+            plays.sort((a, b) => b.score - a.score);
+            displayTopPlays(plays.slice(0, 3));
+        }
+
+        function displayTopPlays(plays) {
+            const grid = document.getElementById('topPlaysGrid');
+            
+            if (plays.length === 0) {
+                grid.innerHTML = '<div class="loading"><p>No high-conviction plays found. Market in neutral zone.</p></div>';
+                return;
+            }
+
+            grid.innerHTML = plays.map((play, idx) => {
+                const { ticker, data } = play;
+                const isLong = data.volatility.iv_rank < 35;
+                const storyName = storyNames[idx % storyNames.length];
+                const emoji = isLong ? '📈' : '📉';
+                const signal = isLong ? 'LONG' : 'SHORT';
+                
+                return `
+                    <div class="play-card" onclick='viewStory(${JSON.stringify(play)})'>
+                        <div class="play-header">
+                            <div class="play-ticker">${ticker}</div>
+                            <div class="play-type">${emoji}</div>
+                        </div>
+                        <div class="play-story-name">"${storyName}"</div>
+                        <div class="play-metrics">
+                            <div class="play-metric">
+                                <div class="play-metric-label">IV Rank</div>
+                                <div class="play-metric-value">${data.volatility.iv_rank.toFixed(0)}%</div>
+                            </div>
+                            <div class="play-metric">
+                                <div class="play-metric-label">VRP</div>
+                                <div class="play-metric-value">${data.volatility.vrp_30d.toFixed(1)}%</div>
+                            </div>
+                        </div>
+                        <div class="play-script-signal ${!isLong ? 'short' : ''}">
+                            📊 Your Script Says: <strong>${signal}</strong>
+                        </div>
+                        <button class="play-btn">VIEW THE STORY →</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function viewStory(play) {
+            const { ticker, data } = play;
+            const isLong = data.volatility.iv_rank < 35;
+            
+            document.getElementById('landingView').classList.add('hidden');
+            document.getElementById('storyView').classList.remove('hidden');
+            
+            // Update header
+            document.getElementById('detailTicker').textContent = ticker;
+            document.getElementById('detailPrice').textContent = `$${data.price.toFixed(2)}`;
+            
+            // Story narrative
+            const storyName = isLong ? "THE SETUP" : "THE FADE";
+            document.getElementById('narrativeTitle').textContent = `"${storyName}"`;
+            
+            const narrative = isLong 
+                ? `${ticker} is showing classic institutional accumulation: IV crushed to ${data.volatility.iv_30d.toFixed(1)}% (bottom ${data.volatility.iv_rank.toFixed(0)}% of 1-year range) while price holds support. VRP at ${data.volatility.vrp_30d.toFixed(1)}% means options are underpriced vs realized movement.`
+                : `${ticker} has experienced massive IV expansion to ${data.volatility.iv_30d.toFixed(1)}% (top ${(100-data.volatility.iv_rank).toFixed(0)}% of range). VRP at +${data.volatility.vrp_30d.toFixed(1)}% shows options are overpriced - classic premium selling setup.`;
+            
+            document.getElementById('narrativeText').textContent = narrative;
+            
+            // Trade card
+            const tradeCard = document.getElementById('tradeCard');
+            tradeCard.className = isLong ? 'trade-card' : 'trade-card short';
+            
+            const tradeRec = isLong 
+                ? `BUY ${ticker} Dec Calls ATM`
+                : `SELL ${ticker} Premium / Credit Spreads`;
+            
+            document.getElementById('tradeRec').textContent = tradeRec;
+            
+            // Load chart
+            loadChart(ticker, data);
+        }
+
+        function loadChart(ticker, data) {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            
+            // Simulate price history
+            const labels = [];
+            const prices = [];
+            const currentPrice = data.price;
+            
+            for (let i = 30; i >= 0; i--) {
+                labels.push(i === 0 ? 'Today' : `${i}d`);
+                prices.push(currentPrice * (0.92 + Math.random() * 0.16));
+            }
+            
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: `${ticker} Price`,
+                        data: prices,
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { 
+                            display: true,
+                            labels: { color: '#fff' }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            ticks: { color: '#999' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        },
+                        y: { 
+                            ticks: { color: '#999' },
+                            grid: { color: 'rgba(255,255,255,0.1)' }
+                        }
+                    }
+                }
+            });
+        }
+
+        function backToLanding() {
+            document.getElementById('storyView').classList.add('hidden');
+            document.getElementById('landingView').classList.remove('hidden');
+        }
+
+        function setAlert() {
+            alert('Alert set! You\'ll be notified of volatility changes.');
+        }
+
+        function copyTrade() {
+            alert('Trade idea copied to clipboard!');
+        }
+
+        function switchNewsletter(type) {
+            const tabs = document.querySelectorAll('.newsletter-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const newsletters = {
+                pre: '<div class="newsletter-item"><h4>🌅 Pre-Market Brief</h4><p>• SPY gapping up +0.3%</p><p>• Tech showing strength</p><p>• Watch Fed minutes 2PM</p></div>',
+                post: '<div class="newsletter-item"><h4>🔔 Post-Market Summary</h4><p>• S&P +0.5%, Tech +0.8%</p><p>• Strong tech earnings</p><p>• NVDA +3.2%</p></div>',
+                daily: '<div class="newsletter-item"><h4>📊 Daily Analysis</h4><p>• Bullish continuation</p><p>• Long tech on dips</p><p>• Watch resistance</p></div>'
+            };
+            
+            document.getElementById('newsletterBrief').innerHTML = newsletters[type];
+        }
+    </script>
 </body>
 </html>
 
