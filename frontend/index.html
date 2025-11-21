@@ -535,3 +535,11 @@
         document.addEventListener('click', function(event) {
             const modal = document.getElementById('newsletterModal');
             const content = document.querySelector('.newsletter-content');
+            
+            if (event.target === modal && !modal.classList.contains('hidden')) {
+                closeNewsletter();
+            }
+        });
+    </script>
+</body>
+</html>
