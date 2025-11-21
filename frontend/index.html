@@ -71,46 +71,6 @@
             transform: translateY(-2px);
         }
 
-        .api-config-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-
-        .modal-content {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 600px;
-            width: 90%;
-            border: 2px solid #667eea;
-        }
-
-        .modal-title {
-            font-size: 2em;
-            color: #667eea;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .api-input {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            color: white;
-            font-size: 1em;
-        }
-
         .ai-chat-bar {
             position: fixed;
             bottom: 30px;
@@ -331,7 +291,6 @@
             font-weight: 700;
             cursor: pointer;
             position: relative;
-            overflow: hidden;
         }
 
         .analyze-btn::before {
@@ -357,6 +316,12 @@
             font-weight: 700;
             cursor: pointer;
             font-size: 1.05em;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         .btn-scanner {
@@ -665,44 +630,20 @@
     </style>
 </head>
 <body>
-    <!-- API CONFIG MODAL -->
-    <div class="api-config-modal hidden" id="apiModal">
-        <div class="modal-content">
-            <div class="modal-title">🤖 AI Configuration</div>
-            <p style="text-align: center; color: #aaa; margin-bottom: 20px;">
-                Optional: Enter Perplexity API key for enhanced AI features
-            </p>
-            <input 
-                type="password" 
-                id="perplexityKeyInput" 
-                class="api-input" 
-                placeholder="pplx-xxxxxxxx (or press Skip to use basic mode)"
-            />
-            <p style="color: #666; font-size: 0.9em; margin: 10px 0;">
-                Get key: <a href="https://www.perplexity.ai/settings/api" target="_blank" style="color: #667eea;">perplexity.ai/settings/api</a>
-            </p>
-            <div style="display: flex; gap: 15px; margin-top: 30px;">
-                <button onclick="saveApiKey()" class="btn btn-ai" style="flex: 1; padding: 15px;">
-                    💾 Save
-                </button>
-                <button onclick="skipAI()" class="btn" style="flex: 1; padding: 15px; background: #666;">
-                    Skip (Basic Mode)
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- AI CHAT -->
     <div class="ai-chat-bar">
         <div class="chat-panel" id="chatPanel">
             <div class="chat-header">
-                <div class="chat-title">🤖 AI Trading Assistant</div>
+                <div class="chat-title">🤖 AI Assistant</div>
                 <button class="chat-close" onclick="toggleChat()">×</button>
             </div>
             <div class="chat-messages" id="chatMessages">
                 <div class="chat-message ai">
-                    👋 Hi! I'm your AI assistant. Ask me about any stock!<br><br>
-                    <strong>Try:</strong> "Latest RIVN news?" or "Analyze MU"
+                    👋 Hi! I'm your AI trading assistant powered by Perplexity.<br><br>
+                    <strong>Ask me anything:</strong><br>
+                    • "Latest RIVN news?"<br>
+                    • "Analyze MU fundamentals"<br>
+                    • "Should I buy SNOW?"
                 </div>
             </div>
             <div class="chat-input-area">
@@ -718,7 +659,7 @@
         </div>
         <button class="chat-toggle-btn" onclick="toggleChat()">
             🤖
-            <span class="ai-pulse" id="aiPulse"></span>
+            <span class="ai-pulse"></span>
         </button>
     </div>
 
@@ -730,7 +671,7 @@
         <div class="nav-actions">
             <button class="nav-btn" onclick="goToHome()">🏠 Home</button>
             <button class="nav-btn" onclick="viewNewsletter()">📰 Newsletter</button>
-            <button class="nav-btn" onclick="showApiModal()">⚙️ AI Config</button>
+            <button class="nav-btn" onclick="toggleChat()">🤖 AI Chat</button>
         </div>
     </div>
 
@@ -741,12 +682,12 @@
                 "AI-Powered Analysis + Your Proprietary ThinkScript Edge"
             </div>
             <div>
-                <span class="proprietary-badge" onclick="alert('Mean Reversion: Identifies extreme oversold/overbought conditions. < -2.0 = Strong Buy signal')">Mean Reversion</span>
-                <span class="proprietary-badge" onclick="alert('Inst 33: Institutional flow indicator. > 55 = Smart money accumulation')">Inst 33 Flow</span>
-                <span class="proprietary-badge" onclick="alert('Regime Detection: Trend strength 0-100%. > 70% = Strong established trend')">Regime Detection</span>
-                <span class="proprietary-badge" id="aiBadge">🤖 AI: Loading...</span>
+                <span class="proprietary-badge" onclick="alert('Mean Reversion: < -2.0 = Extreme oversold, Strong Buy signal')">Mean Reversion</span>
+                <span class="proprietary-badge" onclick="alert('Inst 33: > 55 = Institutional accumulation, Smart money buying')">Inst 33 Flow</span>
+                <span class="proprietary-badge" onclick="alert('Regime Detection: > 70% = Strong trend, High conviction zone')">Regime Detection</span>
+                <span class="proprietary-badge" style="border-color: #8b5cf6; color: #8b5cf6;">🤖 AI Active</span>
             </div>
-            <div class="api-status" id="apiStatus">Ready • Click any stock for AI analysis</div>
+            <div class="api-status" id="apiStatus">✅ Ready • AI powered by Perplexity • Click any stock for deep analysis</div>
         </div>
 
         <div class="search-section" id="searchSection">
@@ -755,7 +696,7 @@
                     type="text" 
                     id="tickerInput" 
                     class="search-input"
-                    placeholder="Enter ANY ticker (AAPL, TSLA, etc.)..." 
+                    placeholder="Enter ANY ticker (AAPL, TSLA, NVDA...)..." 
                     onkeypress="if(event.key==='Enter') analyzeStock()"
                 />
                 <button onclick="analyzeStock()" class="analyze-btn" id="analyzeBtn">
@@ -789,11 +730,10 @@
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 
     <script>
-        // CONFIG
-        let PERPLEXITY_API_KEY = localStorage.getItem('pplx_key') || '';
-        let AI_ENABLED = !!PERPLEXITY_API_KEY;
+        // CONFIG - Backend URL
+        const BACKEND_URL = 'https://elite-trading-with-exclusive-ip.onrender.com';
 
-        // CSV WATCHLIST
+        // CSV WATCHLIST DATA
         const WATCHLIST = [
             {symbol:'MU',price:201.37,change:-10.87,meanRev:-2.47,rsi:41.24,sellPct:94.29,volatility:60.0,regime:75.6,inst33:53,signal:"STRONG BUY",target1:220,target2:235,stop:190},
             {symbol:'SE',price:130.99,change:-8.74,meanRev:-2.46,rsi:27.72,volatility:42.0,regime:51.7,inst33:38,signal:"ACCUMULATE",target1:150,target2:165,stop:120},
@@ -806,56 +746,21 @@
         let stocks = [...WATCHLIST];
 
         window.addEventListener('load', () => {
-            updateAIBadge(AI_ENABLED);
-            if (!localStorage.getItem('api_shown')) {
-                setTimeout(() => {
-                    document.getElementById('apiModal').classList.remove('hidden');
-                    localStorage.setItem('api_shown', 'true');
-                }, 1000);
-            }
+            checkBackendStatus();
             loadStocks();
         });
 
-        function showApiModal() {
-            document.getElementById('apiModal').classList.remove('hidden');
-        }
-
-        function saveApiKey() {
-            const key = document.getElementById('perplexityKeyInput').value.trim();
-            if (key && key.startsWith('pplx-')) {
-                PERPLEXITY_API_KEY = key;
-                localStorage.setItem('pplx_key', key);
-                AI_ENABLED = true;
-                updateAIBadge(true);
-                document.getElementById('apiModal').classList.add('hidden');
-                alert('✅ AI Enabled!\n\n🤖 Chat assistant active\n📊 Deep analysis on every stock\n📰 Enhanced newsletter');
-            } else if (key) {
-                alert('Invalid key format. Should start with "pplx-"');
-            } else {
-                skipAI();
-            }
-        }
-
-        function skipAI() {
-            document.getElementById('apiModal').classList.add('hidden');
-            AI_ENABLED = false;
-            updateAIBadge(false);
-            alert('📊 Basic Mode Active\n\nUsing your proprietary indicators only.\nAdd API key later for AI features.');
-        }
-
-        function updateAIBadge(enabled) {
-            const badge = document.getElementById('aiBadge');
-            const pulse = document.getElementById('aiPulse');
-            if (enabled) {
-                badge.textContent = '🤖 AI: Active';
-                badge.style.borderColor = '#8b5cf6';
-                badge.style.color = '#8b5cf6';
-                if (pulse) pulse.style.display = 'block';
-            } else {
-                badge.textContent = '📊 Basic Mode';
-                badge.style.borderColor = '#666';
-                badge.style.color = '#999';
-                if (pulse) pulse.style.display = 'none';
+        async function checkBackendStatus() {
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/config`);
+                const data = await res.json();
+                if (data.perplexity_enabled) {
+                    updateStatus('✅ AI Active via Secure Backend');
+                } else {
+                    updateStatus('⚠️ AI disabled - configure key in Render');
+                }
+            } catch {
+                updateStatus('⚠️ Backend unavailable - using basic mode');
             }
         }
 
@@ -868,12 +773,6 @@
             const msg = input.value.trim();
             if (!msg) return;
 
-            if (!AI_ENABLED) {
-                alert('Enable AI in settings to use chat!');
-                showApiModal();
-                return;
-            }
-
             const msgs = document.getElementById('chatMessages');
             msgs.innerHTML += `<div class="chat-message user">${msg}</div>`;
             input.value = '';
@@ -882,12 +781,9 @@
             msgs.scrollTop = msgs.scrollHeight;
 
             try {
-                const res = await fetch('https://api.perplexity.ai/chat/completions', {
+                const res = await fetch(`${BACKEND_URL}/api/perplexity`, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         model: 'llama-3.1-sonar-large-128k-online',
                         messages: [{role: 'user', content: msg}],
@@ -901,30 +797,26 @@
                 msgs.innerHTML += `<div class="chat-message ai">${data.choices[0].message.content.replace(/\n/g, '<br>')}</div>`;
                 msgs.scrollTop = msgs.scrollHeight;
             } catch (err) {
-                document.getElementById('thinking').innerHTML = '❌ Error: ' + err.message;
+                document.getElementById('thinking').innerHTML = '❌ ' + err.message;
             }
         }
 
         async function getAI(ticker, stock) {
-            if (!AI_ENABLED) return null;
-
             try {
-                const res = await fetch('https://api.perplexity.ai/chat/completions', {
+                updateStatus('🤖 Running AI analysis via secure backend...');
+                
+                const res = await fetch(`${BACKEND_URL}/api/perplexity`, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
-                        'Content-Type': 'application/json'
-                    },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
                         model: 'llama-3.1-sonar-large-128k-online',
                         messages: [{
                             role: 'user',
-                            content: `Deep trading analysis for ${ticker}:
-
+                            content: `Deep analysis for ${ticker}:
 Price: $${stock.price} (${stock.change}%)
-Mean Reversion: ${stock.meanRev} (< -2.0 = extreme)
+Mean Reversion: ${stock.meanRev}
 RSI: ${stock.rsi}
-Inst 33: ${stock.inst33} (> 55 = bullish)
+Inst 33: ${stock.inst33}
 Regime: ${stock.regime}%
 Volatility: ${stock.volatility}%
 
@@ -940,8 +832,10 @@ Provide:
                 });
 
                 const data = await res.json();
+                updateStatus('✅ AI analysis complete');
                 return data.choices[0].message.content;
             } catch {
+                updateStatus('⚠️ AI unavailable');
                 return null;
             }
         }
@@ -956,6 +850,11 @@ Provide:
                 d5: p + (m * v * 0.3 * p),
                 d10: p + (m * v * 0.5 * r * p)
             };
+        }
+
+        function updateStatus(msg) {
+            const el = document.getElementById('apiStatus');
+            if (el) el.textContent = msg;
         }
 
         async function loadStocks() {
@@ -974,7 +873,7 @@ Provide:
                         </div>
                         <div style="margin-bottom: 10px;">
                             <span style="font-size: 1.4em;">$${s.price.toFixed(2)}</span>
-                            ${AI_ENABLED ? '<span style="color: #8b5cf6; font-size: 0.8em; margin-left: 8px;">🤖 AI</span>' : ''}
+                            <span style="color: #8b5cf6; font-size: 0.8em; margin-left: 8px;">🤖 AI Ready</span>
                         </div>
                         <span class="signal-badge ${cls}">
                             ${s.signal === 'STRONG BUY' ? '🔥 ' : '📈 '}${s.signal}
@@ -1000,8 +899,9 @@ Provide:
                         </div>
                         
                         <div class="proprietary-insight">
-                            <strong>⬆️ ENTRY:</strong> $${s.price.toFixed(2)}<br>
-                            <strong>🎯 TARGETS:</strong> $${s.target1} → $${s.target2}
+                            <strong>⬆️ ENTRY:</strong> $${s.price.toFixed(2)} (Live)<br>
+                            <strong>🎯 TARGETS:</strong> $${s.target1} → $${s.target2}<br>
+                            <strong style="color: #8b5cf6;">🤖 Click for AI Deep Dive</strong>
                         </div>
                     </div>
                 `;
@@ -1025,29 +925,16 @@ Provide:
             document.getElementById('searchSection').classList.add('hidden');
             document.getElementById('playsGrid').classList.add('hidden');
             document.getElementById('detailedView').classList.remove('hidden');
-            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div><p>Running ' + (AI_ENABLED ? 'AI ' : '') + 'analysis...</p></div>';
+            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div><p>Running AI analysis...</p></div>';
             
-            // Find in watchlist or create basic entry
             let stock = WATCHLIST.find(s => s.symbol === ticker);
             if (!stock) {
-                // Allow ANY ticker - create basic entry with live price
                 stock = {
-                    symbol: ticker,
-                    price: 0,
-                    change: 0,
-                    meanRev: 0,
-                    rsi: 50,
-                    sellPct: 0,
-                    volatility: 50,
-                    regime: 50,
-                    inst33: 50,
-                    signal: "RESEARCH",
-                    target1: 0,
-                    target2: 0,
-                    stop: 0
+                    symbol: ticker, price: 100, change: 0, meanRev: 0, rsi: 50,
+                    sellPct: 0, volatility: 50, regime: 50, inst33: 50,
+                    signal: "RESEARCH", target1: 110, target2: 120, stop: 90
                 };
                 
-                // Try to fetch live price
                 try {
                     const res = await fetch(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`);
                     const data = await res.json();
@@ -1086,14 +973,13 @@ Provide:
                     
                     ${ai ? `
                         <div class="ai-insight-box">
-                            <h3 style="color: #8b5cf6; font-size: 1.8em; margin-bottom: 15px;">🤖 AI Deep Dive</h3>
+                            <h3 style="color: #8b5cf6; font-size: 1.8em; margin-bottom: 15px;">🤖 AI Deep Dive (Perplexity via Secure Backend)</h3>
                             <div style="white-space: pre-wrap;">${ai}</div>
                         </div>
                     ` : `
-                        <div style="background: rgba(245, 158, 11, 0.15); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                            <strong style="color: #f59e0b;">💡 Enable AI for deeper analysis!</strong><br>
-                            Get latest news, fundamentals, and expert recommendations.
-                            <button onclick="showApiModal()" class="btn btn-ai" style="margin-top: 15px; padding: 10px 20px; font-size: 0.9em;">Enable AI</button>
+                        <div style="background: rgba(245, 158, 11, 0.15); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 10px;">
+                            <strong style="color: #f59e0b;">⚠️ AI Unavailable</strong><br>
+                            Configure Perplexity API key in Render environment variables.
                         </div>
                     `}
                     
@@ -1103,7 +989,7 @@ Provide:
                             <div class="target-box" style="border-color: #10b981;">
                                 <div class="target-label">Entry</div>
                                 <div class="target-price">$${stock.price.toFixed(2)}</div>
-                                <div style="color: #10b981; font-size: 0.9em; margin-top: 5px;">Current Live</div>
+                                <div style="color: #10b981; font-size: 0.9em;">Current Live</div>
                             </div>
                             <div class="target-box">
                                 <div class="target-label">5-Day Est</div>
@@ -1134,6 +1020,21 @@ Provide:
                     </div>
                     
                     <div class="chart-container">
+                        <div class="chart-signals-overlay">
+                            <h4 style="color: #667eea; margin-bottom: 15px;">📊 Trading Signals</h4>
+                            <div style="padding: 10px; background: rgba(16, 185, 129, 0.2); border-radius: 8px; margin-bottom: 10px;">
+                                <strong style="color: #10b981;">⬆️ ENTRY:</strong> $${stock.price.toFixed(2)}
+                            </div>
+                            <div style="padding: 10px; background: rgba(16, 185, 129, 0.2); border-radius: 8px; margin-bottom: 10px;">
+                                <strong style="color: #10b981;">🎯 TARGET 1:</strong> $${stock.target1}
+                            </div>
+                            <div style="padding: 10px; background: rgba(16, 185, 129, 0.2); border-radius: 8px; margin-bottom: 10px;">
+                                <strong style="color: #10b981;">🚀 TARGET 2:</strong> $${stock.target2}
+                            </div>
+                            <div style="padding: 10px; background: rgba(239, 68, 68, 0.2); border-radius: 8px;">
+                                <strong style="color: #ef4444;">🛑 STOP:</strong> $${stock.stop}
+                            </div>
+                        </div>
                         <div id="tradingview_chart" style="height: 700px;"></div>
                     </div>
                     
@@ -1157,7 +1058,7 @@ Provide:
         }
 
         function runScanner() {
-            alert('🎯 Scanner running on watchlist stocks');
+            goToHome();
             loadStocks();
         }
 
@@ -1173,14 +1074,14 @@ Provide:
             document.getElementById('detailedView').innerHTML = `
                 <div class="newsletter-section">
                     <div class="newsletter-header">
-                        <div class="newsletter-title">📊 Elite Trading Analytics Newsletter</div>
-                        <div style="color: #aaa;">November 21, 2025 | Powered by Proprietary ThinkScript</div>
+                        <div class="newsletter-title">📊 Elite Trading Newsletter</div>
+                        <div style="color: #aaa;">November 21, 2025 | Powered by ThinkScript + AI</div>
                     </div>
                     
                     <div class="tldr-box">
                         <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">⚡ TL;DR</h3>
                         <p style="line-height: 2; font-size: 1.1em;">
-                            <strong>${strong.length} STRONG BUY signals</strong> (Mean Rev < -2.0). ${inst.length} stocks with institutional accumulation (Inst 33 > 55). Semiconductor sector showing extreme mean reversion opportunities.
+                            <strong>${strong.length} STRONG BUY signals</strong> (Mean Rev < -2.0). ${inst.length} stocks with institutional accumulation (Inst 33 > 55).
                         </p>
                     </div>
                     
@@ -1191,31 +1092,9 @@ Provide:
                     <ul class="stock-list">
                         ${strong.map(s => `
                             <li onclick="analyzeStock('${s.symbol}')">
-                                <strong style="color: #10b981; font-size: 1.3em;">${s.symbol}</strong> - $${s.price.toFixed(2)} 
-                                <span style="color: ${s.change >= 0 ? '#10b981' : '#ef4444'}">
-                                    (${s.change > 0 ? '+' : ''}${s.change.toFixed(2)}%)
-                                </span>
-                                <br><br>
-                                <strong>Mean Reversion:</strong> ${s.meanRev} (EXTREME OVERSOLD)<br>
-                                <strong>RSI:</strong> ${s.rsi} | <strong>Regime:</strong> ${s.regime}% | <strong>Sell Pressure:</strong> ${s.sellPct}%<br>
-                                <strong>Inst 33:</strong> ${s.inst33}<br>
-                                <br>
-                                <strong style="color: #10b981;">🎯 Trade Setup:</strong><br>
-                                Entry: $${s.price.toFixed(2)} | Target 1: $${s.target1} | Target 2: $${s.target2} | Stop: $${s.stop}
-                            </li>
-                        `).join('')}
-                    </ul>
-                    
-                    <div class="section-header">
-                        <h3 style="color: #667eea; font-size: 1.8em;">🏦 INSTITUTIONAL ACCUMULATION</h3>
-                    </div>
-                    
-                    <ul class="stock-list">
-                        ${inst.map(s => `
-                            <li onclick="analyzeStock('${s.symbol}')">
-                                <strong style="color: #667eea; font-size: 1.3em;">${s.symbol}</strong> @ $${s.price.toFixed(2)}<br><br>
-                                <strong>Inst 33:</strong> ${s.inst33} (Smart money positioning)<br>
-                                <strong>Regime:</strong> ${s.regime}% | <strong>Mean Rev:</strong> ${s.meanRev}
+                                <strong style="color: #10b981; font-size: 1.3em;">${s.symbol}</strong> @ $${s.price.toFixed(2)}<br><br>
+                                Mean Rev: ${s.meanRev} | RSI: ${s.rsi} | Inst 33: ${s.inst33}<br>
+                                Entry: $${s.price.toFixed(2)} | Targets: $${s.target1}/$${s.target2} | Stop: $${s.stop}
                             </li>
                         `).join('')}
                     </ul>
@@ -1233,7 +1112,7 @@ Provide:
                                     <th>Mean Rev</th>
                                     <th>Inst 33</th>
                                     <th>Regime</th>
-                                    <th>Action</th>
+                                    <th>Signal</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -1251,19 +1130,11 @@ Provide:
                         </table>
                     </div>
                     
-                    <div style="background: rgba(16, 185, 129, 0.15); border-left: 4px solid #10b981; padding: 30px; border-radius: 12px; margin-top: 30px; line-height: 2;">
-                        <h3 style="color: #10b981; font-size: 1.8em; margin-bottom: 15px;">💡 YOUR COMPETITIVE ADVANTAGE</h3>
+                    <div style="background: rgba(16, 185, 129, 0.15); border-left: 4px solid #10b981; padding: 30px; border-radius: 12px; margin: 30px 0; line-height: 2;">
+                        <h3 style="color: #10b981; font-size: 1.8em; margin-bottom: 15px;">💡 YOUR EDGE</h3>
                         <p style="font-size: 1.1em;">
-                            <strong>1. Mean Reversion Precision:</strong> Your < -2.0 threshold identifies statistical extremes that standard indicators miss.<br><br>
-                            <strong>2. Institutional Flow (Inst 33):</strong> Proprietary metric reveals smart money positioning before price confirms.<br><br>
-                            <strong>3. Regime Detection:</strong> Unique 0-100% scale shows trend strength and reversal probability.<br><br>
-                            <strong>4. Composite Scoring:</strong> Multi-factor model combining momentum, flow, volatility, and sentiment.<br><br>
-                            <strong>Bottom Line:</strong> These indicators are showing EXTREME buying opportunities with institutional support. Mean reversion extremes + regime detection + smart money = asymmetric risk/reward.
+                            Mean reversion extremes + institutional flow + regime detection = asymmetric risk/reward opportunities.
                         </p>
-                    </div>
-                    
-                    <div style="text-align: center; margin-top: 40px; color: #666; font-size: 0.9em;">
-                        Disclaimer: For entertainment purposes only. Not financial advice.
                     </div>
                     
                     <button onclick="goToHome()" class="btn btn-scanner" style="width: 100%; padding: 20px; font-size: 1.2em; margin-top: 30px;">
