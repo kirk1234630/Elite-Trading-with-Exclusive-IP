@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics - Production</title>
+    <title>Elite Trading Analytics</title>
     <style>
         * {
             margin: 0;
@@ -56,145 +56,11 @@
             border-radius: 8px;
             color: white;
             cursor: pointer;
-            transition: all 0.3s;
             font-weight: 600;
         }
 
         .nav-btn:hover {
             background: rgba(102, 126, 234, 0.4);
-        }
-
-        .ai-chat-bar {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1500;
-        }
-
-        .chat-toggle-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            border: none;
-            color: white;
-            font-size: 1.8em;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5);
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .chat-toggle-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .ai-pulse {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            width: 20px;
-            height: 20px;
-            background: #10b981;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
-        }
-
-        .chat-panel {
-            position: fixed;
-            bottom: 100px;
-            right: 30px;
-            width: 400px;
-            max-height: 600px;
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 20px;
-            border: 2px solid #8b5cf6;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            display: none;
-            flex-direction: column;
-        }
-
-        .chat-panel.active {
-            display: flex;
-        }
-
-        .chat-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-title {
-            font-size: 1.3em;
-            font-weight: 700;
-            color: #8b5cf6;
-        }
-
-        .chat-close {
-            background: none;
-            border: none;
-            color: #aaa;
-            font-size: 1.5em;
-            cursor: pointer;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            max-height: 400px;
-        }
-
-        .chat-message {
-            margin-bottom: 15px;
-            padding: 12px;
-            border-radius: 10px;
-            line-height: 1.6;
-            font-size: 0.9em;
-        }
-
-        .chat-message.user {
-            background: rgba(102, 126, 234, 0.2);
-            margin-left: 20px;
-        }
-
-        .chat-message.ai {
-            background: rgba(139, 92, 246, 0.2);
-            margin-right: 20px;
-        }
-
-        .chat-input-area {
-            padding: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            gap: 10px;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 12px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            color: white;
-            outline: none;
-        }
-
-        .chat-send-btn {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
         }
 
         .container {
@@ -203,159 +69,70 @@
             padding: 20px;
         }
 
-        .market-story-header {
+        .header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 40px 20px;
             text-align: center;
             color: white;
             border-radius: 20px;
             margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
         }
 
-        .story-title {
+        .title {
             font-size: 2.8em;
             font-weight: 700;
             margin-bottom: 20px;
         }
 
-        .story-narrative {
-            font-size: 1.2em;
-            line-height: 1.6;
-            padding: 20px;
-        }
-
-        .api-status {
-            font-size: 0.9em;
-            color: rgba(255,255,255,0.7);
-            margin-top: 15px;
-        }
-
-        .proprietary-badge {
-            display: inline-block;
-            background: rgba(16, 185, 129, 0.2);
-            padding: 8px 20px;
-            border-radius: 20px;
-            border: 2px solid #10b981;
-            color: #10b981;
-            font-weight: 700;
-            margin: 10px 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .proprietary-badge:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
-        }
-
-        .search-section {
-            max-width: 900px;
-            margin: 30px auto;
-        }
-
         .search-bar {
             display: flex;
             gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            margin: 20px 0;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .search-input {
             flex: 1;
-            min-width: 250px;
-            padding: 20px 28px;
-            font-size: 1.3em;
+            padding: 15px 20px;
+            font-size: 1.1em;
             background: rgba(255,255,255,0.12);
             border: 2px solid rgba(255,255,255,0.25);
-            border-radius: 15px;
+            border-radius: 10px;
             color: white;
             outline: none;
         }
 
-        .analyze-btn {
-            padding: 20px 45px;
+        .btn {
+            padding: 15px 30px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 1.3em;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 16px 32px;
-            border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             color: white;
             font-weight: 700;
             cursor: pointer;
-            font-size: 1.05em;
-            transition: all 0.3s;
+            font-size: 1em;
         }
 
-        .btn-scanner {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        .btn-brief {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .btn-ai {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-        }
-
-        .filter-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin: 20px 0;
-            justify-content: center;
-        }
-
-        .filter-btn {
-            padding: 10px 20px;
-            border-radius: 20px;
-            border: 2px solid #667eea;
-            background: transparent;
-            color: #667eea;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-
-        .filter-btn:hover {
-            background: rgba(102, 126, 234, 0.2);
-        }
-
-        .filter-btn.active {
-            background: #667eea;
-            color: white;
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         .plays-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
             margin-top: 30px;
         }
 
         .play-card {
             background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 20px;
-            padding: 30px;
+            border-radius: 15px;
+            padding: 25px;
             cursor: pointer;
             border: 2px solid transparent;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
             transition: all 0.3s;
         }
 
@@ -365,10 +142,15 @@
         }
 
         .play-ticker {
-            font-size: 2.2em;
+            font-size: 2em;
             font-weight: 700;
             color: #fff;
             margin-bottom: 10px;
+        }
+
+        .play-price {
+            font-size: 1.3em;
+            margin-bottom: 15px;
         }
 
         .signal-badge {
@@ -376,201 +158,105 @@
             padding: 8px 16px;
             border-radius: 8px;
             font-weight: 700;
-            font-size: 0.9em;
-            margin: 5px 5px 15px 0;
-        }
-
-        .signal-strong-buy {
+            margin-bottom: 15px;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
         }
 
-        .signal-accumulate {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-        }
-
-        .play-metrics {
+        .metrics {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin: 15px 0;
-        }
-
-        .play-metric {
-            background: rgba(102, 126, 234, 0.12);
-            padding: 12px;
-            border-radius: 10px;
-        }
-
-        .metric-label {
-            font-size: 0.85em;
-            color: #999;
-            text-transform: uppercase;
-        }
-
-        .metric-value {
-            font-size: 1.3em;
-            font-weight: 700;
-            color: #fff;
-            margin-top: 5px;
-        }
-
-        .proprietary-insight {
-            background: rgba(16, 185, 129, 0.15);
-            border-left: 4px solid #10b981;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            font-size: 0.9em;
-            line-height: 1.5;
-        }
-
-        .ai-insight-box {
-            background: rgba(139, 92, 246, 0.15);
-            border-left: 4px solid #8b5cf6;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            line-height: 1.8;
-        }
-
-        .newsletter-section {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 25px;
-            padding: 50px;
-            margin: 30px 0;
-        }
-
-        .newsletter-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 30px;
-            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
-        }
-
-        .newsletter-title {
-            font-size: 2.5em;
-            color: #667eea;
+            gap: 10px;
             margin-bottom: 15px;
         }
 
-        .tldr-box {
-            background: rgba(16, 185, 129, 0.15);
-            border-left: 5px solid #10b981;
-            padding: 25px;
-            border-radius: 12px;
-            margin: 20px 0;
+        .metric {
+            background: rgba(102, 126, 234, 0.12);
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.9em;
         }
 
-        .section-header {
-            background: rgba(102, 126, 234, 0.15);
-            padding: 20px 30px;
-            border-radius: 15px;
-            margin: 30px 0 20px 0;
-            border-left: 5px solid #667eea;
+        .detail-view {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 30px 0;
         }
 
-        .stock-list {
-            list-style: none;
-            padding: 0;
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
         }
 
-        .stock-list li {
-            padding: 20px;
-            margin: 15px 0;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 12px;
-            border-left: 4px solid #10b981;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .stock-list li:hover {
-            background: rgba(102, 126, 234, 0.2);
-            transform: translateX(10px);
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin: 25px 0;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        th {
-            background: #667eea;
-            padding: 15px;
-            text-align: left;
+        .detail-title {
+            font-size: 2.8em;
             font-weight: 700;
         }
 
-        td {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .price-targets-section {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 20px;
-            padding: 30px;
-            margin: 30px 0;
-            border: 2px solid #667eea;
+        .detail-price {
+            font-size: 2em;
+            font-weight: 700;
         }
 
         .targets-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 12px;
+            margin: 20px 0;
         }
 
         .target-box {
             background: rgba(102, 126, 234, 0.15);
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             text-align: center;
-            border: 2px solid transparent;
         }
 
         .target-label {
             font-size: 0.8em;
             color: #999;
             text-transform: uppercase;
+            margin-bottom: 5px;
         }
 
-        .target-price {
-            font-size: 1.6em;
+        .target-value {
+            font-size: 1.3em;
             font-weight: 700;
             color: #10b981;
-            margin-top: 5px;
         }
 
         .chart-container {
             background: #0a0a1a;
-            border-radius: 20px;
+            border-radius: 15px;
             padding: 20px;
-            margin: 30px 0;
-            min-height: 800px;
+            margin: 20px 0;
+            height: 500px;
+        }
+
+        .ai-box {
+            background: rgba(139, 92, 246, 0.15);
+            border-left: 4px solid #8b5cf6;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            line-height: 1.8;
+            white-space: pre-wrap;
         }
 
         .loading {
             text-align: center;
-            padding: 60px 20px;
+            padding: 40px;
         }
 
         .spinner {
-            border: 5px solid rgba(255,255,255,0.1);
-            border-top: 5px solid #667eea;
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid #667eea;
             border-radius: 50%;
-            width: 50px;
-            height: 50px;
+            width: 40px;
+            height: 40px;
             animation: spin 1s linear infinite;
             margin: 0 auto 20px;
         }
@@ -580,351 +266,112 @@
             100% { transform: rotate(360deg); }
         }
 
-        .live-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: #10b981;
-            animation: pulse 2s infinite;
-            margin-right: 5px;
-        }
-
         .hidden {
             display: none;
         }
 
-        @media (max-width: 768px) {
-            .plays-grid {
-                grid-template-columns: 1fr;
-            }
+        .back-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
     </style>
 </head>
 <body>
-    <!-- AI CHAT -->
-    <div class="ai-chat-bar">
-        <div class="chat-panel" id="chatPanel">
-            <div class="chat-header">
-                <div class="chat-title">🤖 AI Assistant</div>
-                <button class="chat-close" onclick="toggleChat()">×</button>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-                <div class="chat-message ai">
-                    👋 Hi! Ask me anything about stocks!<br><br>
-                    <strong>Examples:</strong><br>
-                    • "Latest MU news?"<br>
-                    • "Best mean reversion plays?"
-                </div>
-            </div>
-            <div class="chat-input-area">
-                <input 
-                    type="text" 
-                    id="chatInput" 
-                    class="chat-input" 
-                    placeholder="Ask..."
-                    onkeypress="if(event.key==='Enter') sendChat()"
-                />
-                <button onclick="sendChat()" class="chat-send-btn">Send</button>
-            </div>
-        </div>
-        <button class="chat-toggle-btn" onclick="toggleChat()">
-            🤖
-            <span class="ai-pulse"></span>
-        </button>
-    </div>
-
     <div class="top-nav">
-        <div class="nav-logo" onclick="goToHome()">
+        <div class="nav-logo" onclick="goHome()">
             <span style="font-size: 2em;">📊</span>
-            <span class="nav-logo-text">Elite Trading Analytics</span>
+            <span class="nav-logo-text">Elite Trading</span>
         </div>
         <div class="nav-actions">
-            <button class="nav-btn" onclick="goToHome()">🏠 Home</button>
-            <button class="nav-btn" onclick="viewNewsletter()">📰 Newsletter</button>
-            <button class="nav-btn" onclick="toggleChat()">🤖 Chat</button>
+            <button class="nav-btn" onclick="goHome()">🏠 Home</button>
         </div>
     </div>
 
     <div class="container">
-        <div class="market-story-header" id="homeHeader">
-            <h1 class="story-title">Elite Trading Analytics</h1>
-            <div class="story-narrative">
-                "AI-Powered Analysis + Your Proprietary ThinkScript Edge + Live Market Data"
+        <div id="homeView">
+            <div class="header">
+                <h1 class="title">Elite Trading Analytics</h1>
+                <p style="font-size: 1.2em;">AI-Powered Stock Analysis</p>
             </div>
-            <div>
-                <span class="proprietary-badge" onclick="filterByMeanReversion()">Mean Reversion</span>
-                <span class="proprietary-badge" onclick="filterByInstitutional()">Inst 33 Flow</span>
-                <span class="proprietary-badge" onclick="filterByRegime()">Regime Detection</span>
-                <span class="proprietary-badge" style="border-color: #8b5cf6; color: #8b5cf6;">🤖 AI Active</span>
-            </div>
-            <div class="api-status" id="apiStatus">Connecting to backends...</div>
-        </div>
 
-        <div class="search-section" id="searchSection">
             <div class="search-bar">
                 <input 
                     type="text" 
                     id="tickerInput" 
                     class="search-input"
-                    placeholder="Enter ticker (AAPL, TSLA, NVDA)..." 
+                    placeholder="Enter ticker (AAPL, TSLA, MU)..."
                     onkeypress="if(event.key==='Enter') analyzeStock()"
                 />
-                <button onclick="analyzeStock()" class="analyze-btn">AI DEEP DIVE 🤖</button>
-            </div>
-            
-            <div class="action-buttons">
-                <button onclick="loadStocks()" class="btn btn-scanner">🎯 ALL STOCKS</button>
-                <button onclick="viewNewsletter()" class="btn btn-brief">📰 NEWSLETTER</button>
-                <button onclick="toggleChat()" class="btn btn-ai">🤖 AI CHAT</button>
+                <button class="btn" onclick="analyzeStock()">Analyze</button>
             </div>
 
-            <div class="filter-buttons" id="filterButtons">
-                <button class="filter-btn active" onclick="loadStocks()">All</button>
-                <button class="filter-btn" onclick="filterByMeanReversion()">Mean Rev < -2.0</button>
-                <button class="filter-btn" onclick="filterByInstitutional()">Inst 33 > 55</button>
-                <button class="filter-btn" onclick="filterByRegime()">Regime > 70%</button>
-                <button class="filter-btn" onclick="filterByOversold()">RSI < 35</button>
+            <div class="plays-grid" id="playsGrid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading stocks...</p>
+                </div>
             </div>
         </div>
 
-        <div id="detailedView" class="hidden"></div>
-        
-        <div class="plays-grid" id="playsGrid">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Loading Elite Trading Data...</p>
-            </div>
-        </div>
+        <div id="detailView" class="hidden"></div>
     </div>
 
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
 
     <script>
-        // CONFIG
         const BACKEND_URL = 'https://elite-trading-with-exclusive-ip.onrender.com';
 
-        // WATCHLIST DATA
         const WATCHLIST = [
-            {symbol:'MU',price:201.37,change:-10.87,meanRev:-2.47,rsi:41.24,sellPct:94.29,volatility:60.0,regime:75.6,inst33:53,signal:"STRONG BUY",target1:220,target2:235,stop:190},
-            {symbol:'SE',price:130.99,change:-8.74,meanRev:-2.46,rsi:27.72,volatility:42.0,regime:51.7,inst33:38,signal:"ACCUMULATE",target1:150,target2:165,stop:120},
-            {symbol:'RIVN',price:14.66,change:-0.41,meanRev:-1.75,rsi:58.91,volatility:52.0,regime:99.1,inst33:65,signal:"BUY",target1:22,target2:25,stop:13},
-            {symbol:'EA',price:201.12,change:-0.23,meanRev:-1.74,rsi:46.82,volatility:72.0,regime:64.7,inst33:53,signal:"MONITOR",target1:210,target2:225,stop:190},
-            {symbol:'LULU',price:164.69,change:-0.82,meanRev:-1.49,rsi:49.1,volatility:80.0,regime:28.2,inst33:58,signal:"MONITOR",target1:180,target2:200,stop:155},
-            {symbol:'TTWO',price:235.37,change:-2.84,meanRev:-2.28,rsi:43.08,volatility:75.0,regime:68.5,inst33:58,signal:"ACCUMULATE",target1:260,target2:280,stop:220}
+            {symbol:'MU',price:201.37,change:-10.87,meanRev:-2.47,rsi:41.24,regime:75.6,inst33:53,signal:"STRONG BUY",target1:220,target2:235,stop:190},
+            {symbol:'SE',price:130.99,change:-8.74,meanRev:-2.46,rsi:27.72,regime:51.7,inst33:38,signal:"ACCUMULATE",target1:150,target2:165,stop:120},
+            {symbol:'RIVN',price:14.66,change:-0.41,meanRev:-1.75,rsi:58.91,regime:99.1,inst33:65,signal:"BUY",target1:22,target2:25,stop:13},
+            {symbol:'EA',price:201.12,change:-0.23,meanRev:-1.74,rsi:46.82,regime:64.7,inst33:53,signal:"MONITOR",target1:210,target2:225,stop:190},
+            {symbol:'LULU',price:164.69,change:-0.82,meanRev:-1.49,rsi:49.1,regime:28.2,inst33:58,signal:"MONITOR",target1:180,target2:200,stop:155},
         ];
 
-        let stocks = [...WATCHLIST];
-        let currentFilter = 'all';
-
         window.addEventListener('load', () => {
-            checkBackend();
             loadStocks();
         });
 
-        async function checkBackend() {
-            try {
-                const res = await fetch(`${BACKEND_URL}/api/config`, {timeout: 5000});
-                const data = await res.json();
-                
-                updateStatus(`✅ All APIs Ready • Polygon: ${data.polygon_enabled ? '✓' : '✗'} Finnhub: ${data.finnhub_enabled ? '✓' : '✗'} AI: ${data.perplexity_enabled ? '✓' : '✗'}`);
-            } catch (err) {
-                updateStatus('⚠️ Backend connecting...');
-            }
-        }
-
-        function updateStatus(msg) {
-            const el = document.getElementById('apiStatus');
-            if (el) el.textContent = msg;
-        }
-
-        function toggleChat() {
-            document.getElementById('chatPanel').classList.toggle('active');
-        }
-
-        async function sendChat() {
-            const input = document.getElementById('chatInput');
-            const msg = input.value.trim();
-            if (!msg) return;
-
-            const msgs = document.getElementById('chatMessages');
-            msgs.innerHTML += `<div class="chat-message user">${msg}</div>`;
-            input.value = '';
-            
-            msgs.innerHTML += `<div class="chat-message ai" id="thinking">🤔 Analyzing...</div>`;
-            msgs.scrollTop = msgs.scrollHeight;
-
-            try {
-                const res = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        model: 'llama-3.1-sonar-large-128k-online',
-                        messages: [{role: 'user', content: msg}],
-                        temperature: 0.3,
-                        max_tokens: 400
-                    })
-                });
-
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-                const data = await res.json();
-                if (data.error) throw new Error(data.error);
-                
-                document.getElementById('thinking').remove();
-                msgs.innerHTML += `<div class="chat-message ai">${data.choices[0].message.content.replace(/\n/g, '<br>')}</div>`;
-                msgs.scrollTop = msgs.scrollHeight;
-                
-            } catch (err) {
-                if (document.getElementById('thinking')) {
-                    document.getElementById('thinking').innerHTML = `❌ ${err.message}`;
-                }
-            }
-        }
-
-        async function getAI(ticker, stock) {
-            try {
-                updateStatus('🤖 Running AI analysis...');
-                
-                const res = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        model: 'llama-3.1-sonar-large-128k-online',
-                        messages: [{
-                            role: 'user',
-                            content: `Deep analysis for ${ticker}:
-Price: $${stock.price} (${stock.change}%)
-Mean Reversion: ${stock.meanRev}
-RSI: ${stock.rsi}
-Inst 33: ${stock.inst33}
-Regime: ${stock.regime}%
-
-Provide: 1) Latest news 2) Technical setup 3) Entry/Targets/Stop 4) Risk/reward`
-                        }],
-                        temperature: 0.2,
-                        max_tokens: 800
-                    })
-                });
-
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-                const data = await res.json();
-                if (data.error) throw new Error(data.error);
-                
-                updateStatus('✅ AI analysis ready');
-                return data.choices[0].message.content;
-                
-            } catch (error) {
-                console.error('[AI] Error:', error);
-                updateStatus('⚠️ AI error: ' + error.message);
-                return null;
-            }
-        }
-
-        function calc(stock) {
-            const v = stock.volatility / 100;
-            const m = Math.abs(stock.meanRev);
-            const r = stock.regime / 100;
-            const p = stock.price;
-            
-            return {
-                d5: p + (m * v * 0.3 * p),
-                d10: p + (m * v * 0.5 * r * p)
-            };
-        }
-
-        // FILTER FUNCTIONS
-        function filterByMeanReversion() {
-            currentFilter = 'meanrev';
-            const filtered = WATCHLIST.filter(s => s.meanRev < -2.0);
-            displayStocks(filtered, 'Mean Reversion (MR < -2.0)');
-        }
-
-        function filterByInstitutional() {
-            currentFilter = 'inst';
-            const filtered = WATCHLIST.filter(s => s.inst33 > 55);
-            displayStocks(filtered, 'Institutional Accumulation (Inst 33 > 55)');
-        }
-
-        function filterByRegime() {
-            currentFilter = 'regime';
-            const filtered = WATCHLIST.filter(s => s.regime > 70);
-            displayStocks(filtered, 'Strong Regime (> 70%)');
-        }
-
-        function filterByOversold() {
-            currentFilter = 'oversold';
-            const filtered = WATCHLIST.filter(s => s.rsi < 35);
-            displayStocks(filtered, 'Oversold Signals (RSI < 35)');
-        }
-
         async function loadStocks() {
-            currentFilter = 'all';
-            displayStocks(WATCHLIST, 'All Stocks');
-        }
-
-        function displayStocks(stockList, title) {
             const grid = document.getElementById('playsGrid');
             
-            if (stockList.length === 0) {
-                grid.innerHTML = '<div style="text-align: center; padding: 40px; grid-column: 1/-1;"><p style="font-size: 1.2em;">No stocks matching criteria</p></div>';
-                return;
-            }
-            
-            grid.innerHTML = stockList.map(s => {
+            grid.innerHTML = WATCHLIST.map(s => {
                 const c = s.change >= 0 ? '#10b981' : '#ef4444';
-                const cls = s.signal === 'STRONG BUY' ? 'signal-strong-buy' : 'signal-accumulate';
-                const t = calc(s);
                 
                 return `
                     <div class="play-card" onclick="analyzeStock('${s.symbol}')">
-                        <div class="play-ticker">
-                            ${s.symbol} 
-                            <span style="color: ${c}; font-size: 0.6em;">${s.change > 0 ? '+' : ''}${s.change.toFixed(2)}%</span>
+                        <div class="play-ticker">${s.symbol}</div>
+                        <div class="play-price" style="color: ${c}">
+                            $${s.price.toFixed(2)} ${s.change > 0 ? '+' : ''}${s.change.toFixed(2)}%
                         </div>
-                        <div style="margin-bottom: 10px;">
-                            <span style="font-size: 1.4em;">$${s.price.toFixed(2)}</span>
-                            <span style="color: #8b5cf6; font-size: 0.8em; margin-left: 8px;">🤖 AI Ready</span>
-                        </div>
-                        <span class="signal-badge ${cls}">
-                            ${s.signal === 'STRONG BUY' ? '🔥' : '📈'} ${s.signal}
-                        </span>
+                        <span class="signal-badge">${s.signal}</span>
                         
-                        <div class="play-metrics">
-                            <div class="play-metric">
-                                <div class="metric-label">5D Est</div>
-                                <div class="metric-value" style="color: #10b981;">$${t.d5.toFixed(2)}</div>
+                        <div class="metrics">
+                            <div class="metric">
+                                <strong>Mean Rev:</strong><br>${s.meanRev}
                             </div>
-                            <div class="play-metric">
-                                <div class="metric-label">Mean Rev</div>
-                                <div class="metric-value" style="color: ${s.meanRev < -2.0 ? '#10b981' : '#fff'}">${s.meanRev}</div>
+                            <div class="metric">
+                                <strong>Inst 33:</strong><br>${s.inst33}
                             </div>
-                            <div class="play-metric">
-                                <div class="metric-label">Inst 33</div>
-                                <div class="metric-value" style="color: ${s.inst33 > 55 ? '#10b981' : '#fff'}">${s.inst33}</div>
+                            <div class="metric">
+                                <strong>RSI:</strong><br>${s.rsi}
                             </div>
-                            <div class="play-metric">
-                                <div class="metric-label">Regime</div>
-                                <div class="metric-value">${s.regime}%</div>
+                            <div class="metric">
+                                <strong>Regime:</strong><br>${s.regime}%
                             </div>
                         </div>
                         
-                        <div class="proprietary-insight">
-                            <strong>⬆️ ENTRY:</strong> $${s.price.toFixed(2)}<br>
-                            <strong>🎯 TARGETS:</strong> $${s.target1} → $${s.target2}<br>
-                            <strong style="color: #8b5cf6;">Click for AI Deep Dive</strong>
+                        <div style="font-size: 0.9em; color: #8b5cf6; cursor: pointer;">
+                            Click for AI Analysis →
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        function goToHome() {
-            document.getElementById('detailedView').classList.add('hidden');
-            document.getElementById('playsGrid').classList.remove('hidden');
-            document.getElementById('homeHeader').classList.remove('hidden');
-            document.getElementById('searchSection').classList.remove('hidden');
+        function goHome() {
+            document.getElementById('homeView').classList.remove('hidden');
+            document.getElementById('detailView').classList.add('hidden');
             loadStocks();
         }
 
@@ -933,183 +380,115 @@ Provide: 1) Latest news 2) Technical setup 3) Entry/Targets/Stop 4) Risk/reward`
                 ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
             }
             if (!ticker) return;
-            
-            document.getElementById('homeHeader').classList.add('hidden');
-            document.getElementById('searchSection').classList.add('hidden');
-            document.getElementById('playsGrid').classList.add('hidden');
-            document.getElementById('detailedView').classList.remove('hidden');
-            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing...</p></div>';
-            
+
+            document.getElementById('homeView').classList.add('hidden');
+            document.getElementById('detailView').classList.remove('hidden');
+            document.getElementById('detailView').innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing...</p></div>';
+
             let stock = WATCHLIST.find(s => s.symbol === ticker);
             if (!stock) {
                 stock = {
-                    symbol: ticker, price: 100, change: 0, meanRev: 0, rsi: 50,
-                    sellPct: 0, volatility: 50, regime: 50, inst33: 50,
-                    signal: "RESEARCH", target1: 110, target2: 120, stop: 90
+                    symbol: ticker,
+                    price: 100,
+                    change: 0,
+                    meanRev: 0,
+                    rsi: 50,
+                    regime: 50,
+                    inst33: 50,
+                    signal: "RESEARCH",
+                    target1: 110,
+                    target2: 120,
+                    stop: 90
                 };
             }
-            
-            const ai = await getAI(ticker, stock);
-            const t = calc(stock);
+
+            // Get AI analysis
+            let aiText = 'Getting AI analysis...';
+            try {
+                const res = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        model: 'llama-3.1-sonar-large-128k-online',
+                        messages: [{
+                            role: 'user',
+                            content: `Analyze ${ticker}. Price: $${stock.price}. Mean Reversion: ${stock.meanRev}. RSI: ${stock.rsi}. Provide 3-4 sentence analysis with entry/target prices.`
+                        }],
+                        temperature: 0.3,
+                        max_tokens: 300
+                    })
+                });
+
+                if (res.ok) {
+                    const data = await res.json();
+                    aiText = data.choices[0].message.content;
+                } else {
+                    const error = await res.json();
+                    aiText = `Error: ${error.error || 'API returned ' + res.status}`;
+                }
+            } catch (err) {
+                aiText = `Connection error: ${err.message}`;
+            }
+
             const c = stock.change >= 0 ? '#10b981' : '#ef4444';
-            
-            document.getElementById('detailedView').innerHTML = `
-                <div style="background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%); border-radius: 25px; padding: 40px;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 30px;">
+
+            document.getElementById('detailView').innerHTML = `
+                <div class="detail-view">
+                    <div class="detail-header">
                         <div>
-                            <div style="font-size: 3em; font-weight: 700;">${ticker}</div>
-                            <span class="signal-badge ${stock.signal === 'STRONG BUY' ? 'signal-strong-buy' : 'signal-accumulate'}">${stock.signal}</span>
+                            <div class="detail-title">${ticker}</div>
+                            <span class="signal-badge">${stock.signal}</span>
                         </div>
                         <div style="text-align: right;">
-                            <div style="font-size: 2.5em; font-weight: 700; color: ${c}">
-                                $${stock.price.toFixed(2)}
-                                <span class="live-indicator"></span>
-                            </div>
-                            <div style="color: ${c}; font-size: 1.2em;">
+                            <div class="detail-price" style="color: ${c}">$${stock.price.toFixed(2)}</div>
+                            <div style="color: ${c}; font-size: 1.1em;">
                                 ${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%
                             </div>
                         </div>
                     </div>
-                    
-                    ${ai ? `
-                        <div class="ai-insight-box">
-                            <h3 style="color: #8b5cf6; font-size: 1.6em; margin-bottom: 15px;">🤖 AI Deep Dive</h3>
-                            <div style="white-space: pre-wrap;">${ai}</div>
-                        </div>
-                    ` : `
-                        <div style="background: rgba(245, 158, 11, 0.15); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 10px;">
-                            ⚠️ AI unavailable - Check backend
-                        </div>
-                    `}
-                    
-                    <div class="price-targets-section">
-                        <h3 style="color: #667eea; text-align: center;">🎯 Price Targets</h3>
-                        <div class="targets-grid">
-                            <div class="target-box" style="border-color: #10b981;">
-                                <div class="target-label">Entry</div>
-                                <div class="target-price">$${stock.price.toFixed(2)}</div>
-                            </div>
-                            <div class="target-box">
-                                <div class="target-label">5D Est</div>
-                                <div class="target-price">$${t.d5.toFixed(2)}</div>
-                            </div>
-                            <div class="target-box">
-                                <div class="target-label">10D Est</div>
-                                <div class="target-price">$${t.d10.toFixed(2)}</div>
-                            </div>
-                            <div class="target-box" style="border-color: #10b981;">
-                                <div class="target-label">T1</div>
-                                <div class="target-price">$${stock.target1}</div>
-                            </div>
-                            <div class="target-box" style="border-color: #10b981;">
-                                <div class="target-label">T2</div>
-                                <div class="target-price">$${stock.target2}</div>
-                            </div>
-                            <div class="target-box" style="border-color: #ef4444;">
-                                <div class="target-label">Stop</div>
-                                <div class="target-price" style="color: #ef4444;">$${stock.stop}</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <button onclick="goToHome()" class="btn btn-scanner" style="width: 100%; padding: 20px;">← BACK</button>
-                </div>
-            `;
-        }
 
-        function viewNewsletter() {
-            document.getElementById('homeHeader').classList.add('hidden');
-            document.getElementById('searchSection').classList.add('hidden');
-            document.getElementById('playsGrid').classList.add('hidden');
-            document.getElementById('detailedView').classList.remove('hidden');
-            
-            const strong = WATCHLIST.filter(s => s.meanRev < -2.0);
-            const inst = WATCHLIST.filter(s => s.inst33 > 55);
-            const regime = WATCHLIST.filter(s => s.regime > 70);
-            
-            document.getElementById('detailedView').innerHTML = `
-                <div class="newsletter-section">
-                    <div class="newsletter-header">
-                        <div class="newsletter-title">📊 Elite Trading Newsletter</div>
-                        <div style="color: #aaa;">November 21, 2025 • AI-Powered Analysis</div>
+                    ${aiText ? `<div class="ai-box">🤖 ${aiText}</div>` : ''}
+
+                    <h3 style="margin-top: 30px; margin-bottom: 15px;">📊 Price Targets</h3>
+                    <div class="targets-grid">
+                        <div class="target-box">
+                            <div class="target-label">Entry</div>
+                            <div class="target-value">$${stock.price.toFixed(2)}</div>
+                        </div>
+                        <div class="target-box">
+                            <div class="target-label">Target 1</div>
+                            <div class="target-value">$${stock.target1}</div>
+                        </div>
+                        <div class="target-box">
+                            <div class="target-label">Target 2</div>
+                            <div class="target-value">$${stock.target2}</div>
+                        </div>
+                        <div class="target-box">
+                            <div class="target-label">Stop</div>
+                            <div class="target-value" style="color: #ef4444;">$${stock.stop}</div>
+                        </div>
                     </div>
-                    
-                    <div class="tldr-box">
-                        <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">⚡ TL;DR</h3>
-                        <p style="line-height: 2; font-size: 1.1em;">
-                            <strong>${strong.length} EXTREME MEAN REVERSION</strong> (MR < -2.0) | 
-                            <strong>${inst.length} INSTITUTIONAL ACCUMULATION</strong> (Inst 33 > 55) | 
-                            <strong>${regime.length} STRONG TRENDS</strong> (Regime > 70%)
-                        </p>
+
+                    <h3 style="margin-top: 30px; margin-bottom: 15px;">📈 Chart</h3>
+                    <div class="chart-container">
+                        <div id="tradingview_chart"></div>
                     </div>
-                    
-                    <div class="section-header">
-                        <h3 style="color: #667eea; font-size: 1.8em;">🔥 MEAN REVERSION EXTREMES (${strong.length})</h3>
-                    </div>
-                    <ul class="stock-list">
-                        ${strong.map(s => `
-                            <li onclick="analyzeStock('${s.symbol}')">
-                                <strong style="color: #10b981; font-size: 1.3em;">${s.symbol}</strong> @ $${s.price.toFixed(2)}<br>
-                                Mean Rev: ${s.meanRev} | RSI: ${s.rsi} | Entry: $${s.price.toFixed(2)} → T1: $${s.target1}
-                            </li>
-                        `).join('')}
-                    </ul>
-                    
-                    <div class="section-header">
-                        <h3 style="color: #667eea; font-size: 1.8em;">🏦 INSTITUTIONAL ACCUMULATION (${inst.length})</h3>
-                    </div>
-                    <ul class="stock-list">
-                        ${inst.map(s => `
-                            <li onclick="analyzeStock('${s.symbol}')">
-                                <strong style="color: #667eea; font-size: 1.3em;">${s.symbol}</strong> - Inst 33: ${s.inst33} | Regime: ${s.regime}%
-                            </li>
-                        `).join('')}
-                    </ul>
-                    
-                    <div class="section-header">
-                        <h3 style="color: #667eea; font-size: 1.8em;">📈 STRONG TRENDS (${regime.length})</h3>
-                    </div>
-                    <ul class="stock-list">
-                        ${regime.map(s => `
-                            <li onclick="analyzeStock('${s.symbol}')">
-                                <strong style="color: #10b981; font-size: 1.3em;">${s.symbol}</strong> - Regime: ${s.regime}% | Mean Rev: ${s.meanRev}
-                            </li>
-                        `).join('')}
-                    </ul>
-                    
-                    <div class="section-header">
-                        <h3 style="color: #667eea; font-size: 1.8em;">📊 WATCHLIST SUMMARY</h3>
-                    </div>
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Price</th>
-                                    <th>Mean Rev</th>
-                                    <th>Inst 33</th>
-                                    <th>Regime</th>
-                                    <th>Signal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${WATCHLIST.map(s => `
-                                    <tr onclick="analyzeStock('${s.symbol}')" style="cursor: pointer;">
-                                        <td><strong>${s.symbol}</strong></td>
-                                        <td>$${s.price.toFixed(2)}</td>
-                                        <td style="color: ${s.meanRev < -2.0 ? '#10b981' : '#fff'}">${s.meanRev}</td>
-                                        <td style="color: ${s.inst33 > 55 ? '#10b981' : '#fff'}">${s.inst33}</td>
-                                        <td>${s.regime}%</td>
-                                        <td><strong style="color: ${s.signal === 'STRONG BUY' ? '#10b981' : '#f59e0b'}">${s.signal}</strong></td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <button onclick="goToHome()" class="btn btn-scanner" style="width: 100%; padding: 20px; margin-top: 30px;">← BACK</button>
+
+                    <button class="btn back-btn" onclick="goHome()" style="width: 100%; padding: 15px; margin-top: 20px; font-size: 1.1em;">← Back to Watchlist</button>
                 </div>
             `;
+
+            // Load TradingView chart
+            new TradingView.widget({
+                "width": "100%",
+                "height": "100%",
+                "symbol": ticker,
+                "interval": "D",
+                "timezone": "America/New_York",
+                "theme": "dark",
+                "style": "1",
+                "container_id": "tradingview_chart"
+            });
         }
     </script>
 </body>
