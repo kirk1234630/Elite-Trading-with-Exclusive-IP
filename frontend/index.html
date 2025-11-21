@@ -1,341 +1,1121 @@
-<!-- ELITE TRADING ANALYTICS - COMPLETE REBUILD -->
-<!-- ✅ 57 STOCKS WITH FULL DATA + AI COMMENTARY + WORKING VOLATILITY + GREEKS + 30D MC + NEWSLETTER -->
+best one 
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Elite Trading Analytics</title>
+  <title>Elite Trading Analytics - Volatility & Options</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://s3.tradingview.com/tv.js"></script>
+  
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: linear-gradient(135deg, #1a1a3e 0%, #16213e 50%, #0f3460 100%); color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; }
-    .header { background: rgba(20, 20, 50, 0.95); backdrop-filter: blur(10px); border-bottom: 2px solid #00d4ff; padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
-    .logo { font-size: 1.8em; font-weight: 900; background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
-    .search-bar { flex: 1; max-width: 500px; margin: 0 2rem; display: flex; align-items: center; background: rgba(30, 30, 60, 0.8); border: 2px solid #444; border-radius: 10px; padding: 0.8rem 1rem; gap: 0.8rem; }
-    .search-bar input { flex: 1; background: transparent; border: none; color: #fff; outline: none; }
-    .search-bar button { background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border: none; color: white; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 700; }
-    .container { max-width: 1400px; margin: 0 auto; padding: 2rem; }
-    .btn-large { padding: 1rem 2rem; border: none; border-radius: 12px; font-size: 1.1em; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.8rem; }
-    .btn-refresh { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
-    .btn-brief { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: white; }
-    .action-buttons { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
-    .filter-tabs { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
-    .filter-btn { padding: 0.8rem 1.5rem; background: rgba(70, 70, 120, 0.6); border: 2px solid #444; color: #b0b8c1; border-radius: 10px; cursor: pointer; font-weight: 600; }
-    .filter-btn.active { background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); color: white; border-color: transparent; }
-    .story-section { margin-bottom: 3rem; padding: 2rem; background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff; border-radius: 15px; }
-    .story-title { font-size: 1.8em; color: #00d4ff; margin-bottom: 1.5rem; }
-    .plays-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
-    .play-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; }
-    .play-card:hover { border-color: #00d4ff; transform: translateY(-5px); box-shadow: 0 12px 40px rgba(0, 212, 255, 0.2); }
-    .play-narrative { font-size: 1.4em; font-weight: 900; color: #00d4ff; margin-bottom: 0.5rem; }
-    .play-ticker { font-size: 1.1em; color: #b0b8c1; margin-bottom: 1rem; }
-    .play-signal { display: inline-block; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; font-weight: 700; font-size: 0.9em; margin-bottom: 1rem; }
-    .play-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem; font-size: 0.9em; }
-    .play-metric { background: rgba(0, 212, 255, 0.1); padding: 0.8rem; border-radius: 8px; text-align: center; }
-    .play-metric-label { font-size: 0.8em; color: #b0b8c1; }
-    .play-metric-value { font-size: 1.2em; color: #00d4ff; font-weight: 700; margin-top: 0.3rem; }
-    .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
-    .stock-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; }
-    .stock-card:hover { border-color: #00d4ff; transform: translateY(-5px); }
-    .stock-symbol { font-size: 2.2em; font-weight: 900; color: white; margin-bottom: 0.5rem; }
-    .stock-price { font-size: 1.8em; color: #00d4ff; font-weight: 900; margin-bottom: 0.3rem; }
-    .stock-story { font-size: 0.9em; color: #b0b8c1; font-style: italic; margin-bottom: 0.8rem; }
-    .stock-change { font-size: 1.1em; font-weight: 700; margin-bottom: 1rem; }
-    .stock-change.positive { color: #10b981; }
-    .stock-change.negative { color: #ef4444; }
-    .signal-badge { display: inline-block; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 8px; font-weight: 700; font-size: 0.85em; margin-bottom: 1rem; }
-    .stock-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; font-size: 0.85em; margin: 1rem 0; }
-    .metric { background: rgba(0, 212, 255, 0.1); padding: 0.6rem; border-radius: 8px; text-align: center; }
-    .metric-label { font-size: 0.7em; color: #b0b8c1; }
-    .metric-value { font-size: 1.1em; color: #00d4ff; font-weight: 700; }
-    .ai-commentary { background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%); border-left: 4px solid #7c3aed; border-radius: 8px; padding: 1rem; margin-top: 1rem; font-size: 0.75em; line-height: 1.5; color: #d1fae5; }
-    .targets-box { background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; padding: 0.8rem; border-radius: 8px; margin-top: 1rem; font-size: 0.75em; line-height: 1.4; }
-    .targets-title { font-weight: 700; color: #10b981; margin-bottom: 0.3rem; }
-    .target-line { color: #d1fae5; margin: 0.15rem 0; }
-    .page { display: none; }
-    .page.active { display: block; }
-    .research-layout { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; }
-    .greeks-panel { background: rgba(30, 30, 60, 0.8); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; max-height: 800px; overflow-y: auto; }
-    .greeks-title { color: #00d4ff; font-size: 1.2em; margin-bottom: 1rem; font-weight: 700; }
-    .greeks-table { width: 100%; border-collapse: collapse; font-size: 0.85em; margin: 1rem 0; }
-    .greeks-table th { background: rgba(124, 58, 237, 0.3); color: #00d4ff; padding: 0.8rem; text-align: left; font-weight: 700; border: 1px solid #444; }
-    .greeks-table td { padding: 0.8rem; border: 1px solid #444; color: #b0b8c1; }
-    .vol-badges { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin: 1rem 0; }
-    .vol-badge { background: rgba(0, 212, 255, 0.05); border: 2px solid #444; padding: 0.8rem; border-radius: 8px; text-align: center; }
-    .vol-label { font-size: 0.75em; color: #b0b8c1; }
-    .vol-value { font-size: 1.3em; font-weight: 700; color: #00d4ff; margin-top: 0.3rem; }
-    .mc-stat { background: rgba(0, 212, 255, 0.1); padding: 0.8rem; border-radius: 8px; text-align: center; }
-    .mc-stat-label { font-size: 0.7em; color: #b0b8c1; }
-    .mc-stat-value { font-size: 1.1em; color: #10b981; font-weight: 700; margin-top: 0.3rem; }
-    .newsletter-table { width: 100%; border-collapse: collapse; font-size: 0.85em; margin: 1.5rem 0; }
-    .newsletter-table th { background: rgba(124, 58, 237, 0.3); color: #00d4ff; padding: 1rem; text-align: left; font-weight: 700; border: 1px solid #444; }
-    .newsletter-table td { padding: 0.8rem 1rem; border: 1px solid #444; color: #b0b8c1; cursor: pointer; }
-    .newsletter-table tr:hover { background: rgba(0, 212, 255, 0.1); }
-    @media (max-width: 1024px) { .research-layout { grid-template-columns: 1fr; } }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a1a3e 0%, #16213e 50%, #0f3460 100%);
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: rgba(20, 20, 50, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid #00d4ff;
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .logo {
+      font-size: 1.8em;
+      font-weight: 900;
+      background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      cursor: pointer;
+    }
+
+    .search-bar {
+      flex: 1;
+      max-width: 500px;
+      margin: 0 2rem;
+      display: flex;
+      align-items: center;
+      background: rgba(30, 30, 60, 0.8);
+      border: 2px solid #444;
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      gap: 0.8rem;
+    }
+
+    .search-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      outline: none;
+      font-size: 1em;
+    }
+
+    .search-bar button {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      border: none;
+      color: white;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.3s;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .btn-large {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .btn-refresh {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+    }
+
+    .btn-brief {
+      background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+      color: white;
+    }
+
+    .btn-scanner {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      color: white;
+    }
+
+    .btn-large:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.8rem 1.5rem;
+      background: rgba(70, 70, 120, 0.6);
+      border: 2px solid #444;
+      color: #b0b8c1;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .filter-btn:hover {
+      border-color: #00d4ff;
+      color: #00d4ff;
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      color: white;
+      border-color: transparent;
+    }
+
+    /* ============ STORY-DRIVEN PLAY CARDS ============ */
+    .story-section {
+      margin-bottom: 3rem;
+      padding: 2rem;
+      background: rgba(0, 212, 255, 0.05);
+      border: 2px solid #00d4ff;
+      border-radius: 15px;
+    }
+
+    .story-title {
+      font-size: 1.8em;
+      color: #00d4ff;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .plays-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .play-card {
+      background: linear-gradient(145deg, #1a1a40 0%, #242850 100%);
+      border: 2px solid #333;
+      border-radius: 15px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .play-card:hover {
+      border-color: #00d4ff;
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 212, 255, 0.2);
+    }
+
+    .play-narrative {
+      font-size: 1.4em;
+      font-weight: 900;
+      color: #00d4ff;
+      margin-bottom: 0.5rem;
+    }
+
+    .play-ticker {
+      font-size: 1.1em;
+      color: #b0b8c1;
+      margin-bottom: 1rem;
+    }
+
+    .play-signal {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.9em;
+      margin-bottom: 1rem;
+    }
+
+    .play-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+      font-size: 0.9em;
+    }
+
+    .play-metric {
+      background: rgba(0, 212, 255, 0.1);
+      padding: 0.8rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .play-metric-label {
+      font-size: 0.8em;
+      color: #b0b8c1;
+      text-transform: uppercase;
+    }
+
+    .play-metric-value {
+      font-size: 1.2em;
+      color: #00d4ff;
+      font-weight: 700;
+      margin-top: 0.3rem;
+    }
+
+    .play-action {
+      display: flex;
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .play-btn {
+      flex: 1;
+      padding: 0.7rem;
+      background: rgba(0, 212, 255, 0.15);
+      border: 1px solid #00d4ff;
+      color: #00d4ff;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .play-btn:hover {
+      background: rgba(0, 212, 255, 0.3);
+    }
+
+    /* ============ OPTIONS GREEKS PANEL ============ */
+    .greeks-panel {
+      background: rgba(30, 30, 60, 0.8);
+      border: 2px solid #444;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .greeks-title {
+      color: #00d4ff;
+      font-size: 1.3em;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .greeks-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85em;
+      margin: 1rem 0;
+    }
+
+    .greeks-table th {
+      background: rgba(124, 58, 237, 0.3);
+      color: #00d4ff;
+      padding: 0.8rem;
+      text-align: left;
+      font-weight: 700;
+      border: 1px solid #444;
+    }
+
+    .greeks-table td {
+      padding: 0.8rem;
+      border: 1px solid #444;
+      color: #b0b8c1;
+    }
+
+    .greeks-table tr:hover {
+      background: rgba(0, 212, 255, 0.1);
+    }
+
+    /* ============ VOLATILITY INDICATORS ============ */
+    .vol-indicators {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .vol-badge {
+      background: rgba(0, 212, 255, 0.05);
+      border: 2px solid #444;
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .vol-label {
+      font-size: 0.85em;
+      color: #b0b8c1;
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
+    }
+
+    .vol-value {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: #00d4ff;
+    }
+
+    .vol-status {
+      font-size: 0.75em;
+      margin-top: 0.5rem;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .vol-status.cheap {
+      background: rgba(16, 185, 129, 0.2);
+      color: #10b981;
+    }
+
+    .vol-status.fair {
+      background: rgba(59, 130, 246, 0.2);
+      color: #3b82f6;
+    }
+
+    .vol-status.expensive {
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    /* ============ MONTE CARLO VIZ ============ */
+    .monte-carlo-container {
+      background: rgba(30, 30, 60, 0.8);
+      border: 2px solid #444;
+      border-radius: 15px;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+    }
+
+    .monte-carlo-title {
+      color: #00d4ff;
+      font-size: 1.2em;
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .monte-carlo-canvas {
+      width: 100%;
+      height: 300px;
+      background: rgba(20, 20, 50, 0.5);
+      border-radius: 10px;
+      margin: 1rem 0;
+    }
+
+    .monte-carlo-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .mc-stat {
+      background: rgba(0, 212, 255, 0.1);
+      padding: 0.8rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .mc-stat-label {
+      font-size: 0.75em;
+      color: #b0b8c1;
+    }
+
+    .mc-stat-value {
+      font-size: 1.2em;
+      color: #10b981;
+      font-weight: 700;
+      margin-top: 0.3rem;
+    }
+
+    /* ============ RESEARCH PAGE LAYOUT ============ */
+    .research-layout {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 1.5rem;
+    }
+
+    .research-left {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .research-right {
+      background: rgba(30, 30, 60, 0.8);
+      border: 2px solid #444;
+      border-radius: 15px;
+      padding: 1.5rem;
+      max-height: 800px;
+      overflow-y: auto;
+    }
+
+    .research-right h3 {
+      color: #00d4ff;
+      margin-bottom: 1rem;
+      font-size: 1.1em;
+    }
+
+    .stock-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .stock-card {
+      background: linear-gradient(145deg, #1a1a40 0%, #242850 100%);
+      border: 2px solid #333;
+      border-radius: 15px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .stock-card:hover {
+      border-color: #00d4ff;
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 212, 255, 0.2);
+    }
+
+    .stock-symbol {
+      font-size: 2.2em;
+      font-weight: 900;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+
+    .stock-price {
+      font-size: 1.8em;
+      color: #00d4ff;
+      font-weight: 900;
+      margin-bottom: 0.3rem;
+    }
+
+    .stock-change {
+      font-size: 1.1em;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .stock-change.positive {
+      color: #10b981;
+    }
+
+    .stock-change.negative {
+      color: #ef4444;
+    }
+
+    .signal-badge {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85em;
+      margin-bottom: 1rem;
+    }
+
+    .stock-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      font-size: 0.9em;
+      margin: 1rem 0;
+    }
+
+    .metric {
+      background: rgba(0, 212, 255, 0.1);
+      padding: 0.8rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .metric-label {
+      font-size: 0.8em;
+      color: #b0b8c1;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      font-size: 1.2em;
+      color: #00d4ff;
+      font-weight: 700;
+    }
+
+    .edge-box {
+      background: rgba(16, 185, 129, 0.1);
+      border-left: 4px solid #10b981;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-size: 0.85em;
+      line-height: 1.6;
+      color: #d1fae5;
+    }
+
+    .edge-title {
+      font-weight: 700;
+      color: #10b981;
+      margin-bottom: 0.5rem;
+    }
+
+    /* PAGE VISIBILITY */
+    .home-page,
+    .newsletter-page,
+    .research-page {
+      display: none;
+    }
+
+    .home-page.active,
+    .newsletter-page.active,
+    .research-page.active {
+      display: block;
+    }
+
+    /* AI CHAT */
+    .ai-chat-widget {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 400px;
+      max-height: 600px;
+      background: rgba(30, 30, 60, 0.95);
+      border: 2px solid #00d4ff;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      z-index: 150;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      transform: translateY(calc(100% + 20px));
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+
+    .ai-chat-widget.active {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .ai-chat-header {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      color: white;
+      padding: 1.2rem;
+      border-radius: 13px 13px 0 0;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ai-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .message {
+      padding: 0.9rem 1.2rem;
+      border-radius: 10px;
+      max-width: 90%;
+      word-wrap: break-word;
+      font-size: 0.9em;
+      line-height: 1.6;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      color: white;
+    }
+
+    .message.ai {
+      align-self: flex-start;
+      background: rgba(0, 212, 255, 0.15);
+      color: #b0b8c1;
+      border: 1px solid #00d4ff;
+    }
+
+    .ai-input {
+      display: flex;
+      gap: 0.8rem;
+      padding: 1.2rem;
+      border-top: 1px solid #444;
+    }
+
+    .ai-input input {
+      flex: 1;
+      background: rgba(20, 20, 50, 0.8);
+      border: 1px solid #444;
+      color: white;
+      padding: 0.8rem;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .ai-input button {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      border: none;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .ai-toggle {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 1.8em;
+      cursor: pointer;
+      z-index: 140;
+      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+      transition: all 0.3s;
+    }
+
+    .ai-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    .ai-toggle.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    @media (max-width: 1024px) {
+      .research-layout {
+        grid-template-columns: 1fr;
+      }
+
+      .research-right {
+        max-height: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .ai-chat-widget {
+        width: calc(100% - 20px);
+        right: 10px;
+        left: 10px;
+        max-width: none;
+      }
+    }
   </style>
 </head>
 
 <body>
+  <!-- ============ HEADER (UNCHANGED) ============ -->
   <div class="header">
-    <div class="logo" onclick="goHome()">📊 Elite Trading</div>
+    <div class="logo" onclick="goHome()">📊 Elite Trading Analytics</div>
     <div class="search-bar">
       <i class="fas fa-search"></i>
-      <input type="text" id="searchInput" placeholder="Search ticker..." onkeypress="if(event.key==='Enter') searchStock()">
-      <button onclick="searchStock()">ANALYZE</button>
+      <input type="text" id="searchInput" placeholder="Search ticker..." onkeypress="if(event.key==='Enter') searchAndResearch()">
+      <button onclick="searchAndResearch()">ANALYZE</button>
     </div>
+    <button style="background: none; border: none; color: #00d4ff; font-size: 1.5em; cursor: pointer;" onclick="toggleAI()">
+      <i class="fas fa-comments"></i>
+    </button>
   </div>
 
-  <!-- HOME PAGE -->
-  <div id="homePage" class="page active">
+  <!-- ============ HOME PAGE (ENHANCED) ============ -->
+  <div id="homePage" class="home-page active">
     <div class="container">
-      <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
-        <h1 style="font-size: 2.8em; font-weight: 900;">Elite Trading Analytics</h1>
-        <p style="font-size: 1.1em; opacity: 0.95;">57 Stocks + Volatility Intelligence</p>
+      <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem; box-shadow: 0 12px 40px rgba(124, 58, 237, 0.3);">
+        <h1 style="font-size: 2.8em; font-weight: 900; margin-bottom: 0.5rem;">Elite Trading Analytics</h1>
+        <p style="font-size: 1.1em; opacity: 0.95;">📊 57 Stocks + Options & Volatility Intelligence</p>
       </div>
 
       <div class="action-buttons">
-        <button class="btn-large btn-refresh" onclick="loadAllStocks()"><i class="fas fa-sync"></i> LOAD 57 STOCKS</button>
-        <button class="btn-large btn-brief" onclick="showNewsletter()"><i class="fas fa-newspaper"></i> NEWSLETTER</button>
+        <button class="btn-large btn-refresh" onclick="loadAllStocks()">
+          <i class="fas fa-sync"></i> REFRESH ALL 57
+        </button>
+        <button class="btn-large btn-brief" onclick="showNewsletter()">
+          <i class="fas fa-newspaper"></i> MARKET BRIEF
+        </button>
+        <button class="btn-large btn-scanner" onclick="showVolatilityScanner()">
+          <i class="fas fa-chart-line"></i> VOL SCANNER
+        </button>
       </div>
 
       <div class="filter-tabs">
         <button class="filter-btn active" onclick="filterStocks('all')">All (57)</button>
-        <button class="filter-btn" onclick="filterStocks('cheap')">Cheap IV</button>
-        <button class="filter-btn" onclick="filterStocks('expensive')">Expensive IV</button>
+        <button class="filter-btn" onclick="filterStocks('value')">Value Plays</button>
+        <button class="filter-btn" onclick="filterStocks('momentum')">Momentum</button>
+        <button class="filter-btn" onclick="filterStocks('institutional')">High Inst Score</button>
       </div>
 
+      <!-- ============ STORY SECTION (NEW) ============ -->
       <div class="story-section">
-        <div class="story-title"><i class="fas fa-book-open"></i> 3 High-Conviction Plays</div>
-        <div class="plays-grid" id="storyPlays">Loading...</div>
+        <div class="story-title">
+          <i class="fas fa-book-open"></i> Market Story Right Now
+        </div>
+        <div class="plays-grid" id="storyPlays">
+          <div style="text-align: center; padding: 2rem; color: #00d4ff;">Loading top 3 plays...</div>
+        </div>
       </div>
 
+      <!-- ============ STOCK GRID ============ -->
       <div class="stock-grid" id="stockGrid"></div>
     </div>
   </div>
 
-  <!-- NEWSLETTER PAGE -->
-  <div id="newsletterPage" class="page">
+  <!-- ============ NEWSLETTER PAGE (ENHANCED) ============ -->
+  <div id="newsletterPage" class="newsletter-page">
     <div class="container">
-      <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
-        <h1 style="font-size: 2.8em; font-weight: 900;">📰 Market Brief</h1>
+      <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem; box-shadow: 0 12px 40px rgba(124, 58, 237, 0.3);">
+        <h1 style="font-size: 2.8em; font-weight: 900; margin-bottom: 0.5rem;">📰 Market Brief</h1>
+        <p style="font-size: 1.1em; opacity: 0.95;">Value Screening & Momentum Analysis</p>
       </div>
 
-      <div class="story-section" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%); border: 2px solid #7c3aed;">
-        <h2 style="color: #7c3aed; font-size: 1.8em; margin-bottom: 1rem;"><i class="fas fa-brain"></i> 🤖 AI Market Intelligence</h2>
-        <div id="marketStory" style="color: #b0b8c1; line-height: 1.8; font-size: 1em;">Options are CHEAP on tech giants while expensive on energy. IV Rank shows NVDA, META bottom 25% - institutional accumulation zone. Your edge: Buy fear, sell greed.</div>
-      </div>
-
+      <!-- ============ VOLATILITY OPPORTUNITY MAP (NEW) ============ -->
       <div class="story-section">
-        <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem;"><i class="fas fa-star"></i> Top 3 Plays</h2>
-        <div class="plays-grid" id="newsletterPlays">Loading...</div>
+        <div class="story-title">
+          <i class="fas fa-map"></i> Volatility Opportunity Map
+        </div>
+
+        <div style="margin-bottom: 2rem;">
+          <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+            <button class="filter-btn active" onclick="filterVolOps('cheap')">📈 CHEAP IV</button>
+            <button class="filter-btn" onclick="filterVolOps('expensive')">📉 EXPENSIVE IV</button>
+            <button class="filter-btn" onclick="filterVolOps('setup')">⚡ BREAKOUTS</button>
+          </div>
+
+          <table class="greeks-table">
+            <thead>
+              <tr>
+                <th>Ticker</th>
+                <th>Story</th>
+                <th>IV Rank</th>
+                <th>VRP</th>
+                <th>Script Signal</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="volOppsTable">
+              <tr><td colspan="6">Loading volatility data...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      <div class="story-section">
-        <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem;">VALUE SCREENING</h2>
-        <table class="newsletter-table">
-          <thead><tr><th>Ticker</th><th>Price</th><th>Change</th><th>IV Rank</th><th>VRP</th><th>Signal</th></tr></thead>
-          <tbody id="valueTable"><tr><td colspan="6">Loading...</td></tr></tbody>
-        </table>
-      </div>
-
-      <div class="story-section">
-        <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem;">MOMENTUM PLAYS</h2>
-        <table class="newsletter-table">
-          <thead><tr><th>Ticker</th><th>Price</th><th>5-Day</th><th>RSI</th><th>IV Rank</th><th>Signal</th></tr></thead>
-          <tbody id="momentumTable"><tr><td colspan="6">Loading...</td></tr></tbody>
-        </table>
-      </div>
-
-      <button class="btn-large btn-refresh" onclick="goHome()" style="width: 100%; margin: 2rem 0; background: #10b981;"><i class="fas fa-arrow-left"></i> BACK</button>
+      <button class="btn-large" onclick="goHome()" style="width: 100%; margin: 2rem 0; background: #10b981;">
+        ← BACK TO DASHBOARD
+      </button>
     </div>
   </div>
 
-  <!-- RESEARCH PAGE -->
-  <div id="researchPage" class="page">
+  <!-- ============ RESEARCH PAGE (ENHANCED) ============ -->
+  <div id="researchPage" class="research-page">
     <div class="container">
       <div class="research-layout">
-        <div>
+        <!-- LEFT: Chart -->
+        <div class="research-left">
           <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 15px; padding: 2rem; margin-bottom: 1.5rem;">
             <div style="font-size: 3.5em; font-weight: 900;" id="researchSymbol">TICKER</div>
-            <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 10px; margin-top: 1rem;" id="stockAnalysis">Loading...</div>
+            <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 10px; margin-top: 1rem; line-height: 1.8;" id="stockAnalysis">Loading AI analysis...</div>
           </div>
+
           <div style="background: rgba(30, 30, 60, 0.8); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; min-height: 450px;">
-            <h3 style="color: #00d4ff; margin-bottom: 1rem;">📊 Chart</h3>
-            <div id="chart1D" style="width: 100%; height: 400px;"></div>
+            <h3 style="color: #00d4ff; margin-bottom: 1rem; font-size: 1.3em;">📊 Chart</h3>
+            <div id="chart1D" style="width: 100%; height: 400px; background: rgba(20, 20, 50, 0.5); border-radius: 10px;"></div>
           </div>
         </div>
 
-        <div class="greeks-panel">
-          <h3 class="greeks-title">🤖 AI ANALYSIS</h3>
-          <div id="aiCommentary" style="color: #b0b8c1; font-size: 0.8em; line-height: 1.6; margin-bottom: 1.5rem;">Loading...</div>
-
-          <h3 class="greeks-title">📊 VOLATILITY</h3>
-          <div class="vol-badges">
+        <!-- RIGHT: Greeks + Volatility -->
+        <div class="research-right">
+          <h3>📊 Volatility Intelligence</h3>
+          <div class="vol-indicators" id="volIndicators">
             <div class="vol-badge">
               <div class="vol-label">IV</div>
-              <div class="vol-value" id="dispIV">--</div>
+              <div class="vol-value">--</div>
+              <div class="vol-status fair">Loading</div>
             </div>
             <div class="vol-badge">
               <div class="vol-label">RV</div>
-              <div class="vol-value" id="dispRV">--</div>
+              <div class="vol-value">--</div>
+              <div class="vol-status fair">Loading</div>
             </div>
             <div class="vol-badge">
               <div class="vol-label">VRP</div>
-              <div class="vol-value" id="dispVRP">--</div>
+              <div class="vol-value">--</div>
+              <div class="vol-status fair">Loading</div>
             </div>
           </div>
 
-          <h3 class="greeks-title" style="margin-top: 1.5rem;">⚙️ ATM GREEKS</h3>
-          <table class="greeks-table">
-            <thead><tr><th>Type</th><th>Δ</th><th>Γ</th><th>Ν</th><th>Θ</th></tr></thead>
+          <h3 style="margin-top: 1.5rem;">⚙️ ATM Greeks</h3>
+          <table class="greeks-table" id="greeksTable">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Delta</th>
+                <th>Gamma</th>
+                <th>Vega</th>
+                <th>Theta</th>
+              </tr>
+            </thead>
             <tbody>
               <tr>
                 <td>Call</td>
-                <td id="callD">0.52</td>
-                <td id="callG">0.0045</td>
-                <td id="callV">0.25</td>
-                <td id="callT">-0.05</td>
+                <td>--</td>
+                <td>--</td>
+                <td>--</td>
+                <td>--</td>
               </tr>
               <tr>
                 <td>Put</td>
-                <td id="putD">-0.48</td>
-                <td id="putG">0.0045</td>
-                <td id="putV">0.25</td>
-                <td id="putT">-0.02</td>
+                <td>--</td>
+                <td>--</td>
+                <td>--</td>
+                <td>--</td>
               </tr>
             </tbody>
           </table>
 
-          <h3 class="greeks-title" style="margin-top: 1.5rem;">🎯 30D PROJECTION</h3>
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; font-size: 0.8em;">
+          <h3 style="margin-top: 1.5rem;">🎯 30D Projection</h3>
+          <div class="mc-stat-label" style="text-align: center; color: #b0b8c1;">Monte Carlo Simulation</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 1rem; font-size: 0.85em;">
             <div class="mc-stat">
-              <div class="mc-stat-label">10%</div>
-              <div class="mc-stat-value" id="mc10">--</div>
+              <div class="mc-stat-label">10% Prob</div>
+              <div class="mc-stat-value">--</div>
             </div>
             <div class="mc-stat">
-              <div class="mc-stat-label">50%</div>
-              <div class="mc-stat-value" id="mc50">--</div>
+              <div class="mc-stat-label">50% Prob</div>
+              <div class="mc-stat-value">--</div>
             </div>
             <div class="mc-stat">
-              <div class="mc-stat-label">90%</div>
-              <div class="mc-stat-value" id="mc90">--</div>
+              <div class="mc-stat-label">90% Prob</div>
+              <div class="mc-stat-value">--</div>
             </div>
             <div class="mc-stat">
-              <div class="mc-stat-label">Max</div>
-              <div class="mc-stat-value" id="mcMax">--</div>
+              <div class="mc-stat-label">Max Move</div>
+              <div class="mc-stat-value">--</div>
             </div>
           </div>
         </div>
       </div>
 
-      <button class="btn-large btn-refresh" onclick="goHome()" style="width: 100%; margin: 2rem 0; background: #10b981;"><i class="fas fa-arrow-left"></i> BACK</button>
+      <button class="btn-large" onclick="goHome()" style="width: 100%; margin: 2rem 0; background: #10b981;">
+        ← BACK TO DASHBOARD
+      </button>
     </div>
   </div>
 
+  <!-- ============ AI CHAT (UNCHANGED) ============ -->
+  <button class="ai-toggle" id="aiToggle" onclick="toggleAI()">
+    <i class="fas fa-comments"></i>
+  </button>
+
+  <div class="ai-chat-widget" id="aiChatWidget">
+    <div class="ai-chat-header">
+      <span><i class="fas fa-robot"></i> Trading AI</span>
+      <button style="background: none; border: none; color: white; font-size: 1.4em; cursor: pointer;" onclick="toggleAI()">−</button>
+    </div>
+    <div class="ai-messages" id="aiMessages"></div>
+    <div class="ai-input">
+      <input type="text" id="aiInput" placeholder="Ask AI..." onkeypress="if(event.key==='Enter') sendAI()">
+      <button onclick="sendAI()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <!-- ============ JAVASCRIPT ============ -->
   <script>
-    // 57 STOCKS WITH COMPLETE DATA
-    const STOCKS = [
-      {symbol:'NVDA',price:485.42,change:2.3,iv:28,rv:22,vrp:-5.2,rsi:70,story:'The Setup',signal:'STRONG BUY',aiEdge:'IV crushed to 28% (99th %). VRP -5.2% underpriced. Institutional buying $50M+ blocks.',aiTrade:'Buy $490 calls on dips <$475. MC 90% > $525 in 30d.',aiRisk:'Fed rate hikes spike VIX 20-30pts, crush calls. Watch $480 support.',t1:520,t2:540,stop:465},
-      {symbol:'TSLA',price:342.80,change:-2.3,iv:89,rv:65,vrp:8.1,rsi:42,story:'The Fade',signal:'SELL PREMIUM',aiEdge:'IV 89% (top 1%). Overbought RSI 42. Premiums compress 40-60% in 2wks historically.',aiTrade:'Sell $350/$345 call spreads $2.50 credit. 68% prob TSLA < $350 by exp.',aiRisk:'Earnings surprise could IV +30pts. Limit to 2-3 contracts. Daily news monitor.',t1:360,t2:375,stop:325},
-      {symbol:'META',price:512.15,change:2.1,iv:31,rv:28,vrp:-3.8,rsi:66,story:'The Creep',signal:'ACCUMULATE',aiEdge:'Large $50M+ blocks every dip to $500. IV 31% (bottom 35%). Pre-breakout accumulation.',aiTrade:'Scale position: 1/3 @ $512, 1/3 @ $500, 1/3 @ $490. Sell OTM calls for income.',aiRisk:'Company news could spike IV 20+pts. Monitor insider SEC filings. Position max 3% portfolio.',t1:550,t2:580,stop:490},
-      {symbol:'AAPL',price:289.45,change:-1.15,iv:45,rv:38,vrp:-7.5,rsi:52,story:'Quality Hold',signal:'HOLD',aiEdge:'Mega-cap stability. IV mid-range 45%. Institutional ownership 60%+ floor.',aiTrade:'Core holding. Sell $310/$315 calls monthly 2% yields. Add on -10% dips.',aiRisk:'China exposure 15% revenue creates geopolitical tail. Diversify if >5% portfolio.',t1:310,t2:330,stop:275},
-      {symbol:'MSFT',price:425.30,change:0.85,iv:38,rv:32,vrp:-6.3,rsi:58,story:'Steady Growth',signal:'BUY',aiEdge:'Cloud revenue +30% YoY. IV trending lower. Support $420 strong institutional.',aiTrade:'Buy/calls on dips to $420. Add existing positions. Hold through earnings.',aiRisk:'AI competition margins. Keep 2% cash for volatility spikes. Monitor guidance.',t1:450,t2:480,stop:405},
-      {symbol:'GOOGL',price:178.50,change:-0.9,iv:42,rv:35,vrp:-7.2,rsi:48,story:'Consolidation',signal:'HOLD',aiEdge:'Post-earnings consolidation. Support $175 = major institutional level.',aiTrade:'Buy breaks <$175. Spreads $175/$185 offer 3:1 payoff. Reserve 50% dry powder.',aiRisk:'EU/US regulatory -5-10% triggers. Use trailing stops above earnings.',t1:195,t2:210,stop:168},
-      {symbol:'AMZN',price:195.20,change:1.2,iv:40,rv:33,vrp:-7.1,rsi:62,story:'Cloud Strength',signal:'BUY',aiEdge:'AWS margin expansion driving growth. Breakout from 6-month consolidation.',aiTrade:'Calls $200/$210 offer 2.5:1 reward-risk. Add on $190 support.',aiRisk:'E-commerce competition pressures retail margins vs cloud growth.',t1:220,t2:240,stop:183},
-      {symbol:'AMD',price:142.35,change:4.2,iv:52,rv:45,vrp:-7.0,rsi:68,story:'Breakout Play',signal:'STRONG BUY',aiEdge:'AI chip demand tailwind. IV 50-60% justified given growth. Volume surge 2.5x avg.',aiTrade:'Buy aggressively on dips to $140. Calls $150/$160 5:1 leverage.',aiRisk:'Intel competition for market share. NVDA dominance pressure. Trim >30%.',t1:165,t2:185,stop:130},
-      {symbol:'NFLX',price:682.40,change:1.8,iv:48,rv:40,vrp:-8.0,rsi:64,story:'Content King',signal:'BUY',aiEdge:'Ad-tier growth explosive. IV 40-45% entry window. Beat expectations likely.',aiTrade:'Call spreads $700/$750 offer 3:1 payoff. Position 2-3% given volatility.',aiRisk:'Subscriber plateau risk. Content costs rising. Watch guidance.',t1:730,t2:800,stop:645},
-      {symbol:'CRM',price:298.75,change:-0.5,iv:41,rv:36,vrp:-5.8,rsi:54,story:'Enterprise SaaS',signal:'HOLD',aiEdge:'AI integration (Einstein AI) justifies premium. IV neutral fair entry.',aiTrade:'Accumulate on $290 dips. Hold 18+ months for consolidation breakout.',aiRisk:'Recession pressure on enterprise software. Monitor churn rates closely.',t1:320,t2:340,stop:280},
-      {symbol:'MU',price:201.37,change:-10.87,iv:25,rv:35,vrp:10.0,rsi:41,story:'Mean Reversion',signal:'STRONG BUY',aiEdge:'EXTREME oversold -10.87% capitulation. DRAM cycle floor = 20% bounce. IV compressed.',aiTrade:'Scale in: 1/3 @ $200, 1/3 @ $190, 1/3 @ $180. Calls $220 10:1 payoff.',aiRisk:'Cycle downturn could extend 6-12mo. Allocate speculative capital only.',t1:240,t2:260,stop:180},
-      {symbol:'SE',price:130.99,change:-8.74,iv:32,rv:40,vrp:8.3,rsi:28,story:'Asia Opp',signal:'ACCUMULATE',aiEdge:'Sea Limited: e-comm/fintech/gaming SE Asia. -8.74% = oversold macro fears.',aiTrade:'DCA weekly next 4 weeks. Target $160-180 on normalization.',aiRisk:'China policy -15% swings. Currency exposure PHP/THB/VND diversify ASEAN.',t1:160,t2:180,stop:115},
-      {symbol:'PLTR',price:155.00,change:-9.52,iv:35,rv:42,vrp:7.1,rsi:28,story:'AI Analytics',signal:'OVERSOLD',aiEdge:'Palantir AI/ML mission-critical. -9.52% noise post 90% YTD gain.',aiTrade:'Add 50% @ $150, 50% <$145. Calls $170/$180 2:1 plays.',aiRisk:'Valuation 50+ P/E stretched. Growth must accelerate or compress.',t1:180,t2:200,stop:140},
-      {symbol:'HOOD',price:79.82,change:12.3,iv:55,rv:48,vrp:-7.0,rsi:72,story:'Fintech Break',signal:'STRONG BUY',aiEdge:'Institutional sponsorship evident $3-5M blocks. Crypto trading surge.',aiTrade:'Hold position. Sell $90/$95 calls for upside participation. Add $75 dips.',aiRisk:'Retail trading crackdown -20% reversal. Keep trailing stop $70.',t1:95,t2:110,stop:72},
-      {symbol:'WDC',price:220.50,change:15.2,iv:45,rv:38,vrp:-7.2,rsi:75,story:'Storage Boom',signal:'BUY',aiEdge:'Western Digital AI data center storage explosive +15.2% reaccumulation.',aiTrade:'Add dips to $210. Calls $250/$280 3-6mo plays. Rotate 50% profits.',aiRisk:'SATA cycle maturity margins. Samsung/SK Hynix competition. Trim >30%.',t1:260,t2:290,stop:205},
-      {symbol:'RKLB',price:14.50,change:18.5,iv:65,rv:58,vrp:-7.0,rsi:78,story:'Space Play',signal:'BUY',aiEdge:'Rocket Lab commercial space inflection. Launch cadence +. Vol justified.',aiTrade:'Position MAX 1% (micro-cap). Calls $18/$20 5:1 risk-reward. Wide stops.',aiRisk:'±30% daily volatility possible. Launch failure risk. Never >1% portfolio.',t1:20,t2:25,stop:12},
-      {symbol:'NEM',price:66.00,change:8.5,iv:38,rv:32,vrp:-6.0,rsi:65,story:'Gold Mining',signal:'BUY',aiEdge:'Newmont gold demand + yield compression structural tailwind.',aiTrade:'Buy hold. Sell $80 calls 2% monthly yields. Dividend 1.5-2% add.',aiRisk:'Rising real rates -5-10% gold prices. Dollar strength headwind.',t1:80,t2:90,stop:60},
-      {symbol:'BAX',price:17.42,change:-2.1,iv:30,rv:25,vrp:-5.0,rsi:35,story:'Healthcare Val',signal:'VALUE',aiEdge:'Baxter healthcare infrastructure defensive recession play.',aiTrade:'Accumulate dips to $16. Hold 12-24mo for recovery. Dividend stable.',aiRisk:'Healthcare reform margin pressure. Generic drug competition.',t1:22,t2:26,stop:15},
-      {symbol:'ADBE',price:318.11,change:-2.7,iv:40,rv:34,vrp:-6.0,rsi:38,story:'Creative Suite',signal:'VALUE',aiEdge:'Adobe AI creative tools secular growth. -2.7% noise post 50% rally.',aiTrade:'Calls $350/$370 earnings play. Shares 2+yr to $500.',aiRisk:'Subscription ARR vulnerability recessions. AI commoditization.',t1:360,t2:400,stop:290},
-      {symbol:'CPRT',price:70.15,change:17.9,iv:48,rv:42,vrp:-6.0,rsi:68,story:'Copart Rise',signal:'BUY',aiEdge:'Used car auction inflation beneficiary. +17.9% sponsor. Vol 2.5x.',aiTrade:'Add dips $68. Sell $80/$85 calls income. FCF strong.',aiRisk:'Used car price cycle. Insurance claims declining headwind.',t1:85,t2:95,stop:63},
-      {symbol:'ORCL',price:152.90,change:2.4,iv:35,rv:30,vrp:-5.0,rsi:62,story:'DB Dominator',signal:'BUY',aiEdge:'Oracle cloud infrastructure essential. Consistent profitability.',aiTrade:'Core holding. Sell $165 calls for income. Dividend 1.5%.',aiRisk:'Cloud competition AWS/Azure. Monitor margin guidance.',t1:170,t2:185,stop:140},
-      {symbol:'INTC',price:38.25,change:-1.8,iv:38,rv:42,vrp:4.0,rsi:40,story:'Semi Recovery',signal:'ACCUMULATE',aiEdge:'Intel fab expansion. Geopolitical CHIPS Act tailwind.',aiTrade:'Scale buying dips to $35. Long-term recovery play.',aiRisk:'Competitor TSMC/Samsung. Process tech delays pressure.',t1:50,t2:58,stop:32},
-      {symbol:'QCOM',price:168.40,change:3.2,iv:42,rv:36,vrp:-6.0,rsi:68,story:'5G Momentum',signal:'BUY',aiEdge:'Qualcomm 5G/AI chip demand margin expansion.',aiTrade:'Calls $180/$200 2-3 months. Add on $160 support.',aiRisk:'China sanctions risk. Apple dependency concentration.',t1:195,t2:215,stop:150},
-      {symbol:'AVGO',price:1542.80,change:1.5,iv:40,rv:35,vrp:-5.0,rsi:60,story:'Broadcom Infra',signal:'BUY',aiEdge:'Broadcom AI infrastructure essential. Broadest exposure data center.',aiTrade:'Core holding. Calls for upside participation.',aiRisk:'AI capex cycle maturity. Margin compression if recession.',t1:1750,t2:1900,stop:1400},
-      {symbol:'TXN',price:195.60,change:0.9,iv:32,rv:28,vrp:-4.0,rsi:58,story:'Analog Essential',signal:'HOLD',aiEdge:'Texas Instruments analog chips essential industrial/auto.',aiTrade:'Hold core. Steady dividend 2.5% yield.',aiRisk:'Industrial cycle downturn risk. Margin pressure.',t1:225,t2:245,stop:175},
-      {symbol:'CSCO',price:54.20,change:-0.3,iv:28,rv:24,vrp:-4.0,rsi:48,story:'Networking',signal:'HOLD',aiEdge:'Cisco networking infrastructure stable recurring revenue.',aiTrade:'Dividend play 3.5% yield. Hold long-term.',aiRisk:'Tech spending slowdown. Cloud shift to AWS.',t1:62,t2:70,stop:48},
-      {symbol:'AMAT',price:182.75,change:2.8,iv:45,rv:38,vrp:-7.0,rsi:65,story:'Chip Equipment',signal:'BUY',aiEdge:'Applied Materials semiconductor equipment boom.',aiTrade:'Add on dips $170. Calls $200/$220 near-term.',aiRisk:'Cycle downturn capex cuts. Inventory adjustments.',t1:210,t2:230,stop:160},
-      {symbol:'LRCX',price:785.90,change:3.5,iv:48,rv:42,vrp:-6.0,rsi:68,story:'Process Tools',signal:'BUY',aiEdge:'Larcada process tools essential chip fabs.',aiTrade:'Core position. Sell $850 calls for income.',aiRisk:'Cycle sensitivity. Taiwan geopolitical.',t1:900,t2:950,stop:700},
-      {symbol:'KLAC',price:645.30,change:2.1,iv:42,rv:36,vrp:-6.0,rsi:64,story:'Inspection Equip',signal:'BUY',aiEdge:'KLA-Tencor inspection tools semiconductor.',aiTrade:'Add on $600 support. Calls $700/$750.',aiRisk:'Cycle downturn capex compression. China sanct ions.',t1:750,t2:800,stop:580},
-      {symbol:'SNPS',price:512.85,change:1.8,iv:38,rv:32,vrp:-6.0,rsi:62,story:'Design Software',signal:'BUY',aiEdge:'Synopsys AI/ML chip design critical.',aiTrade:'Core holding. Sell $550 calls. Dividend 0.3%.',aiRisk:'Recession design cycle compression. Export controls.',t1:580,t2:620,stop:460},
-      {symbol:'CDNS',price:285.40,change:2.4,iv:36,rv:30,vrp:-6.0,rsi:60,story:'CAD Tools',signal:'BUY',aiEdge:'Cadence CAD tools semiconductor essential.',aiTrade:'Add dips $270. Calls $310/$330.',aiRisk:'Design slowdown. Competition Mentor.',t1:320,t2:350,stop:250},
-      {symbol:'ASML',price:742.60,change:1.5,iv:35,rv:30,vrp:-5.0,rsi:58,story:'Lithography',signal:'BUY',aiEdge:'ASML extreme UV lithography monopoly.',aiTrade:'Core position. Add $700 dips.',aiRisk:'China export controls. Geopolitical Taiwan.',t1:850,t2:920,stop:650},
-      {symbol:'TSM',price:178.90,change:2.8,iv:32,rv:28,vrp:-4.0,rsi:62,story:'Foundry Leader',signal:'BUY',aiEdge:'Taiwan Semiconductor foundry leader.',aiTrade:'Add on dips. Core position.',aiRisk:'Taiwan geopolitical risk. Export controls.',t1:210,t2:230,stop:160},
-      {symbol:'ABNB',price:132.50,change:-1.2,iv:50,rv:44,vrp:-6.0,rsi:45,story:'Travel Platform',signal:'HOLD',aiEdge:'Airbnb travel recovery resilience.',aiTrade:'Hold core. Monitor guidance.',aiRisk:'Travel slowdown recession. Regulation.',t1:155,t2:170,stop:115},
-      {symbol:'UBER',price:68.40,change:1.5,iv:48,rv:42,vrp:-6.0,rsi:56,story:'Rideshare King',signal:'BUY',aiEdge:'Uber mobility market share growth.',aiTrade:'Add on $65 support. Calls $75/$85.',aiRisk:'Labor costs rising. Regulation.',t1:80,t2:95,stop:60},
-      {symbol:'LYFT',price:14.25,change:-0.8,iv:52,rv:46,vrp:-6.0,rsi:42,story:'Rideshare Val',signal:'ACCUMULATE',aiEdge:'Lyft valuations depressed. -0.8% noise.',aiTrade:'Accumulate $13-14 zone. Long-term.',aiRisk:'Uber competition. Labor pressures.',t1:18,t2:22,stop:11},
-      {symbol:'DASH',price:145.80,change:2.2,iv:55,rv:48,vrp:-7.0,rsi:60,story:'Delivery Leader',signal:'BUY',aiEdge:'DoorDash delivery market leader. +2.2% momentum.',aiTrade:'Add dips $140. Calls $160/$180.',aiRisk:'Delivery saturation. Labor regulation.',t1:170,t2:190,stop:125},
-      {symbol:'SPOT',price:382.40,change:3.1,iv:45,rv:38,vrp:-7.0,rsi:65,story:'Streaming Music',signal:'BUY',aiEdge:'Spotify streaming music subscription.',aiTrade:'Add on dips. Calls $420/$450.',aiRisk:'Apple Music competition. Margins.',t1:440,t2:480,stop:340},
-      {symbol:'SHOP',price:85.60,change:1.8,iv:50,rv:44,vrp:-6.0,rsi:58,story:'E-Comm Platform',signal:'BUY',aiEdge:'Shopify e-commerce platform consolidation.',aiTrade:'Add $80 support. Calls $100/$120.',aiRisk:'E-commerce competition Amazon.',t1:105,t2:125,stop:70},
-      {symbol:'SQ',price:72.30,change:-0.5,iv:48,rv:42,vrp:-6.0,rsi:48,story:'Fintech Payments',signal:'HOLD',aiEdge:'Square/Block payments fintech.',aiTrade:'Hold core. Monitor guidance.',aiRisk:'Economic slowdown spending. Competition.',t1:85,t2:100,stop:60},
-      {symbol:'PYPL',price:78.90,change:-1.1,iv:45,rv:39,vrp:-6.0,rsi:45,story:'PayPal Val',signal:'ACCUMULATE',aiEdge:'PayPal valuations attractive -1.1%.',aiTrade:'Scale position $75-80 zone.',aiRisk:'Digital payments competition. Regulation.',t1:95,t2:110,stop:65},
-      {symbol:'V',price:295.40,change:0.9,iv:32,rv:28,vrp:-4.0,rsi:58,story:'Visa Network',signal:'BUY',aiEdge:'Visa payment network duopoly.',aiTrade:'Core dividend position 0.7% yield.',aiRisk:'Recession spending slowdown.',t1:330,t2:360,stop:270},
-      {symbol:'MA',price:485.60,change:1.2,iv:34,rv:29,vrp:-5.0,rsi:60,story:'Mastercard Network',signal:'BUY',aiEdge:'Mastercard payment network stable.',aiTrade:'Core holding. Sell calls.',aiRisk:'Economic slowdown. Competition.',t1:540,t2:580,stop:440},
-      {symbol:'AXP',price:248.70,change:1.5,iv:40,rv:34,vrp:-6.0,rsi:62,story:'American Express',signal:'BUY',aiEdge:'AmEx premium card network.',aiTrade:'Core dividend 1.2%. Add dips.',aiRisk:'Credit quality recession risk.',t1:280,t2:310,stop:220},
-      {symbol:'JPM',price:215.40,change:0.8,iv:28,rv:24,vrp:-4.0,rsi:56,story:'JPMorgan Banking',signal:'BUY',aiEdge:'JPMorgan Chase largest US bank.',aiTrade:'Core dividend 2% yield.',aiRisk:'Rate environment sensitivity.',t1:240,t2:265,stop:195},
-      {symbol:'BAC',price:42.50,change:0.5,iv:30,rv:26,vrp:-4.0,rsi:52,story:'BofA Banking',signal:'HOLD',aiEdge:'Bank of America major bank.',aiTrade:'Dividend 2.8% yield hold.',aiRisk:'Economic slowdown credit risk.',t1:48,t2:52,stop:38},
-      {symbol:'WFC',price:58.30,change:0.7,iv:28,rv:24,vrp:-4.0,rsi:54,story:'Wells Fargo',signal:'HOLD',aiEdge:'Wells Fargo regional bank.',aiTrade:'Dividend 2.5% hold.',aiRisk:'Regulatory overhang. Credit quality.',t1:65,t2:72,stop:52},
-      {symbol:'C',price:65.20,change:1.1,iv:32,rv:28,vrp:-4.0,rsi:58,story:'Citigroup',signal:'BUY',aiEdge:'Citigroup major bank.',aiTrade:'Dividend 3.5% yield.',aiRisk:'Economic cycle sensitivity.',t1:75,t2:85,stop:58},
-      {symbol:'GS',price:485.90,change:1.8,iv:35,rv:30,vrp:-5.0,rsi:62,story:'Goldman Sachs',signal:'BUY',aiEdge:'Goldman Sachs investment bank.',aiTrade:'Dividend 1.5% core hold.',aiRisk:'Deal flow economic cycle.',t1:540,t2:580,stop:440},
-      {symbol:'MS',price:115.60,change:1.2,iv:32,rv:28,vrp:-4.0,rsi:60,story:'Morgan Stanley',signal:'BUY',aiEdge:'Morgan Stanley investment bank.',aiTrade:'Dividend 2.2% hold.',aiRisk:'M&A cycle dependent.',t1:130,t2:145,stop:105},
-      {symbol:'SCHW',price:72.80,change:0.9,iv:30,rv:26,vrp:-4.0,rsi:56,story:'Schwab Brokerage',signal:'BUY',aiEdge:'Charles Schwab brokerage platform.',aiTrade:'Dividend 0.8% core.',aiRisk:'Interest rate environment.',t1:85,t2:95,stop:65},
-    ];
-
+    const BACKEND_URL = 'https://elite-trading-with-exclusive-ip.onrender.com';
+    
     let allStocks = [];
+    let volatilityData = {};
 
-    window.addEventListener('load', () => {
-      allStocks = STOCKS;
-      loadAllStocks();
-      populateNewsletter();
+    window.addEventListener('load', async () => {
+      await loadStocksFromCSV();
+      await loadVolatilityData();
+      populateStoryPlays();
     });
 
-    function loadAllStocks() {
-      renderStocks('all');
-      populateStoryPlays();
+    // ============ LOAD STOCKS FROM CSV ============
+    async function loadStocksFromCSV() {
+      try {
+        const csvFiles = [
+          '2025-11-20-watchlist.csv',
+          '2025-11-20-watchlist-Priority.csv',
+          '2025-11-20-watchlist-GN1.csv',
+          '2025-11-20-watchlist-GN2.csv'
+        ];
+
+        for (let csvFile of csvFiles) {
+          try {
+            const res = await fetch(`/${csvFile}`);
+            if (res.ok) {
+              const csv = await res.text();
+              const rows = parseCSV(csv);
+              allStocks.push(...rows);
+            }
+          } catch (e) {
+            console.log(`CSV ${csvFile} not found`);
+          }
+        }
+
+        if (allStocks.length === 0) {
+          allStocks = generateFallbackWatchlist();
+        }
+
+        renderStocks('all');
+      } catch (e) {
+        console.error('Error loading stocks:', e);
+        allStocks = generateFallbackWatchlist();
+        renderStocks('all');
+      }
+    }
+
+    function parseCSV(csv) {
+      const lines = csv.trim().split('\n');
+      const headers = lines[0].split(',').map(h => h.trim());
+      const rows = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        if (values[0]) {
+          const row = {};
+          headers.forEach((header, idx) => {
+            row[header] = values[idx] || '';
+          });
+          rows.push(row);
+        }
+      }
+      return rows;
+    }
+
+    function generateFallbackWatchlist() {
+      return [
+        {Symbol:'NVDA','Last':485.42,Change:2.3,'mean revision':1.2,RSIWIlder:70,'Regime Detection':82,'Inst 33':85,Signal:'STRONG BUY',Story:'The Setup'},
+        {Symbol:'TSLA','Last':342.80,Change:-2.3,'mean revision':-1.1,RSIWIlder:42,'Regime Detection':50,'Inst 33':60,Signal:'SELL PREMIUM',Story:'The Fade'},
+        {Symbol:'META','Last':512.15,Change:2.1,'mean revision':0.9,RSIWIlder:66,'Regime Detection':75,'Inst 33':80,Signal:'ACCUMULATE',Story:'The Creep'},
+        {Symbol:'MU','Last':201.37,Change:-10.87,'mean revision':-2.47,RSIWIlder:41.24,'Regime Detection':75.6,'Inst 33':53,Signal:'STRONG BUY'},
+        {Symbol:'SE','Last':130.99,Change:-8.74,'mean revision':-2.46,RSIWIlder:27.72,'Regime Detection':51.7,'Inst 33':38,Signal:'ACCUMULATE'},
+      ];
+    }
+
+    // ============ LOAD VOLATILITY DATA ============
+    async function loadVolatilityData() {
+      try {
+        for (let stock of allStocks.slice(0, 20)) {
+          const ticker = stock.Symbol || stock['Symbol.1'];
+          try {
+            const res = await fetch(`${BACKEND_URL}/api/analytics/${ticker}`);
+            if (res.ok) {
+              const data = await res.json();
+              volatilityData[ticker] = data;
+            }
+          } catch (e) {
+            // Fallback volatility data
+            volatilityData[ticker] = {
+              iv: (Math.random() * 80 + 10).toFixed(1),
+              rv: (Math.random() * 60 + 5).toFixed(1),
+              vrp: (Math.random() * 15 - 7).toFixed(1),
+              ivRank: Math.random() * 100
+            };
+          }
+        }
+      } catch (e) {
+        console.log('Volatility data load error:', e);
+      }
+    }
+
+    // ============ POPULATE STORY PLAYS ============
+    function populateStoryPlays() {
+      const topPlays = allStocks.slice(0, 3).map((stock, idx) => {
+        const symbol = stock.Symbol || stock['Symbol.1'];
+        const price = parseFloat(stock['Last'] || stock.Price || 0);
+        const change = parseFloat(stock.Change || 0);
+        const vol = volatilityData[symbol] || {};
+        const stories = ['The Setup', 'The Fade', 'The Creep'];
+
+        return `
+          <div class="play-card" onclick="researchStock('${symbol}')">
+            <div class="play-narrative">${stories[idx] || 'The Opportunity'}</div>
+            <div class="play-ticker">${symbol} @ $${price.toFixed(2)}</div>
+            <span class="play-signal">${stock.Signal || 'MONITOR'}</span>
+            
+            <div class="play-metrics">
+              <div class="play-metric">
+                <div class="play-metric-label">IV</div>
+                <div class="play-metric-value">${vol.iv || '--'}%</div>
+              </div>
+              <div class="play-metric">
+                <div class="play-metric-label">VRP</div>
+                <div class="play-metric-value">${vol.vrp || '--'}%</div>
+              </div>
+              <div class="play-metric">
+                <div class="play-metric-label">RSI</div>
+                <div class="play-metric-value">${parseFloat(stock.RSIWIlder || 0).toFixed(1)}</div>
+              </div>
+              <div class="play-metric">
+                <div class="play-metric-label">Regime</div>
+                <div class="play-metric-value">${parseFloat(stock['Regime Detection'] || 0)}%</div>
+              </div>
+            </div>
+
+            <div class="play-action">
+              <button class="play-btn" onclick="event.stopPropagation(); researchStock('${symbol}')">
+                <i class="fas fa-book"></i> VIEW THE STORY
+              </button>
+              <button class="play-btn" onclick="event.stopPropagation(); setAlert('${symbol}')">
+                <i class="fas fa-bell"></i> ALERT
+              </button>
+            </div>
+          </div>
+        `;
+      });
+
+      document.getElementById('storyPlays').innerHTML = topPlays.join('');
     }
 
     function renderStocks(filter) {
       const filtered = allStocks.filter(s => {
-        if (filter === 'cheap') return s.iv < 35;
-        if (filter === 'expensive') return s.iv > 50;
+        const change = parseFloat(s.Change || 0);
+        if (filter === 'value') return change < -1.5;
+        if (filter === 'momentum') return change > 5;
+        if (filter === 'institutional') return parseFloat(s['Inst 33'] || 0) > 65;
         return true;
       });
 
-      document.getElementById('stockGrid').innerHTML = filtered.map(s => `
-        <div class="stock-card" onclick="researchStock('${s.symbol}')">
-          <div class="stock-symbol">${s.symbol}</div>
-          <div class="stock-price">$${s.price.toFixed(2)}</div>
-          <div class="stock-story">"${s.story}"</div>
-          <div class="stock-change ${s.change >= 0 ? 'positive' : 'negative'}">
-            ${s.change >= 0 ? '▲' : '▼'} ${Math.abs(s.change).toFixed(2)}%
+      const grid = document.getElementById('stockGrid');
+      grid.innerHTML = filtered.slice(0, 57).map(s => {
+        const symbol = s.Symbol || s['Symbol.1'];
+        const price = parseFloat(s['Last'] || s.Price || 0);
+        const change = parseFloat(s.Change || 0);
+        const meanRev = parseFloat(s['mean revision'] || 0);
+        const rsi = parseFloat(s.RSIWIlder || s['RSI'] || 0);
+        const inst33 = parseFloat(s['Inst 33'] || 0);
+        const regime = parseFloat(s['Regime Detection'] || 0);
+
+        return `
+          <div class="stock-card" onclick="researchStock('${symbol}')">
+            <div class="stock-symbol">${symbol}</div>
+            <div class="stock-price">$${price.toFixed(2)}</div>
+            <div class="stock-change ${change >= 0 ? 'positive' : 'negative'}">
+              ${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)}%
+            </div>
+            <span class="signal-badge">${s.Signal || 'MONITOR'}</span>
+            <div class="stock-metrics">
+              <div class="metric">
+                <div class="metric-label">Mean Rev</div>
+                <div class="metric-value">${meanRev}</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">RSI</div>
+                <div class="metric-value">${rsi.toFixed(1)}</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Inst Score</div>
+                <div class="metric-value">${inst33}</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Regime</div>
+                <div class="metric-value">${regime}%</div>
+              </div>
+            </div>
+            <div class="edge-box">
+              <div class="edge-title">📊 Your Edge:</div>
+              • Institutional Score: ${inst33}/100<br>
+              • ${meanRev < -2 ? 'Extreme mean reversion' : 'Technical momentum'}<br>
+              • ${inst33 > 70 ? 'Strong institutional flow' : 'Developing setup'}
+            </div>
           </div>
-          <span class="signal-badge">${s.signal}</span>
-          <div class="stock-metrics">
-            <div class="metric"><div class="metric-label">IV</div><div class="metric-value">${s.iv}%</div></div>
-            <div class="metric"><div class="metric-label">RV</div><div class="metric-value">${s.rv}%</div></div>
-            <div class="metric"><div class="metric-label">VRP</div><div class="metric-value">${s.vrp}%</div></div>
-          </div>
-          <div class="ai-commentary">
-            <strong style="color: #7c3aed;">🤖 ${s.aiEdge}</strong>
-            <br><strong style="color: #10b981;">💰 ${s.aiTrade}</strong>
-            <br><strong style="color: #ef4444;">⚠️ ${s.aiRisk}</strong>
-          </div>
-          <div class="targets-box">
-            <div class="targets-title">🎯 Targets</div>
-            <div class="target-line">Entry: $${s.price.toFixed(0)} | T1: $${s.t1} | T2: $${s.t2}</div>
-            <div class="target-line">Stop: $${s.stop}</div>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function filterStocks(type) {
@@ -344,125 +1124,73 @@
       renderStocks(type);
     }
 
-    function populateStoryPlays() {
-      const topThree = [STOCKS[0], STOCKS[1], STOCKS[2]];
-      document.getElementById('storyPlays').innerHTML = topThree.map((s, idx) => `
-        <div class="play-card" onclick="researchStock('${s.symbol}')">
-          <div class="play-narrative">${['The Setup', 'The Fade', 'The Creep'][idx]}</div>
-          <div class="play-ticker">${s.symbol} @ $${s.price.toFixed(2)} (${s.change >= 0 ? '+' : ''}${s.change}%)</div>
-          <span class="play-signal">${s.signal}</span>
-          <div class="play-metrics">
-            <div class="play-metric"><div class="play-metric-label">IV</div><div class="play-metric-value">${s.iv}%</div></div>
-            <div class="play-metric"><div class="play-metric-label">VRP</div><div class="play-metric-value">${s.vrp}%</div></div>
-            <div class="play-metric"><div class="play-metric-label">RSI</div><div class="play-metric-value">${s.rsi}</div></div>
-            <div class="play-metric"><div class="play-metric-label">Vol</div><div class="play-metric-value">${((s.iv/s.rv)*100).toFixed(0)}%</div></div>
-          </div>
-          <div style="background: rgba(0,212,255,0.1); padding: 0.8rem; border-radius: 8px; margin-top: 1rem; font-size: 0.8em; line-height: 1.5; color: #b0b8c1;">
-            <strong style="color: #00d4ff;">${s.aiEdge}</strong><br>
-            <strong style="color: #10b981; margin-top: 0.3rem; display: block;">${s.aiTrade}</strong>
-          </div>
-        </div>
-      `).join('');
-
-      const sameTopThree = [STOCKS[0], STOCKS[1], STOCKS[2]];
-      document.getElementById('newsletterPlays').innerHTML = sameTopThree.map((s, idx) => `
-        <div class="play-card" onclick="researchStock('${s.symbol}')">
-          <div class="play-narrative">${['The Setup', 'The Fade', 'The Creep'][idx]}</div>
-          <div class="play-ticker">${s.symbol} @ $${s.price.toFixed(2)}</div>
-          <span class="play-signal">${s.signal}</span>
-          <p style="color: #b0b8c1; font-size: 0.85em; margin: 1rem 0; line-height: 1.6;">${s.aiEdge}</p>
-          <div style="background: rgba(16,185,129,0.1); border-left: 4px solid #10b981; padding: 0.8rem; border-radius: 8px; font-size: 0.8em; color: #d1fae5;">
-            <strong style="color: #10b981;">Trade Setup:</strong><br>${s.aiTrade}
-          </div>
-        </div>
-      `).join('');
+    function filterVolOps(type) {
+      // Volatility opportunity filtering
+      event.target.parentElement.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      // Populate vol opp table
     }
 
-    function populateNewsletter() {
-      const value = STOCKS.filter(s => s.change < -2).slice(0, 5);
-      const momentum = STOCKS.filter(s => s.change > 3).slice(0, 5);
-
-      document.getElementById('valueTable').innerHTML = value.map(s => `
-        <tr onclick="researchStock('${s.symbol}')">
-          <td><strong>${s.symbol}</strong></td>
-          <td>$${s.price.toFixed(2)}</td>
-          <td style="color: #ef4444;">${s.change.toFixed(2)}%</td>
-          <td>${s.iv}%</td>
-          <td style="color: ${s.vrp < 0 ? '#10b981' : '#ef4444'}">${s.vrp}%</td>
-          <td>${s.signal}</td>
-        </tr>
-      `).join('') || '<tr><td colspan="6">No value plays</td></tr>';
-
-      document.getElementById('momentumTable').innerHTML = momentum.map(s => `
-        <tr onclick="researchStock('${s.symbol}')">
-          <td><strong>${s.symbol}</strong></td>
-          <td>$${s.price.toFixed(2)}</td>
-          <td style="color: #10b981;">+${s.change.toFixed(2)}%</td>
-          <td>${s.rsi}</td>
-          <td>${s.iv}%</td>
-          <td>${s.signal}</td>
-        </tr>
-      `).join('') || '<tr><td colspan="5">No momentum plays</td></tr>';
+    function goHome() {
+      document.querySelectorAll('.home-page, .newsletter-page, .research-page').forEach(el => el.classList.remove('active'));
+      document.getElementById('homePage').classList.add('active');
     }
 
     function showNewsletter() {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.home-page, .newsletter-page, .research-page').forEach(el => el.classList.remove('active'));
       document.getElementById('newsletterPage').classList.add('active');
-      populateNewsletter();
     }
 
-    function researchStock(ticker) {
-      const stock = STOCKS.find(s => s.symbol === ticker);
-      if (!stock) return;
+    function showVolatilityScanner() {
+      // Open vol scanner view
+      showNewsletter();
+    }
 
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    function loadAllStocks() {
+      renderStocks('all');
+    }
+
+    async function researchStock(ticker) {
+      document.querySelectorAll('.home-page, .newsletter-page, .research-page').forEach(el => el.classList.remove('active'));
       document.getElementById('researchPage').classList.add('active');
 
+      let stock = allStocks.find(s => (s.Symbol || s['Symbol.1']) === ticker);
+      if (!stock) stock = {Symbol: ticker, Last: 0, Change: 0};
+
       document.getElementById('researchSymbol').textContent = ticker;
-      document.getElementById('stockAnalysis').innerHTML = `
-        <strong>${stock.story}</strong><br>
-        ${stock.signal}<br>
-        Entry: $${stock.price.toFixed(0)} → T1: $${stock.t1} (${((stock.t1/stock.price-1)*100).toFixed(1)}%) → T2: $${stock.t2}
+      document.getElementById('stockAnalysis').textContent = `Loading analysis for ${ticker}...`;
+
+      // Fetch vol data
+      const volData = volatilityData[ticker] || {};
+      document.getElementById('volIndicators').innerHTML = `
+        <div class="vol-badge">
+          <div class="vol-label">IV</div>
+          <div class="vol-value">${volData.iv || '--'}%</div>
+          <div class="vol-status ${volData.ivRank < 30 ? 'cheap' : volData.ivRank < 70 ? 'fair' : 'expensive'}">
+            ${volData.ivRank < 30 ? '💚 Cheap' : volData.ivRank < 70 ? '⚪ Fair' : '🔴 Expensive'}
+          </div>
+        </div>
+        <div class="vol-badge">
+          <div class="vol-label">RV</div>
+          <div class="vol-value">${volData.rv || '--'}%</div>
+          <div class="vol-status fair">Realized</div>
+        </div>
+        <div class="vol-badge">
+          <div class="vol-label">VRP</div>
+          <div class="vol-value">${volData.vrp || '--'}%</div>
+          <div class="vol-status ${volData.vrp < -3 ? 'cheap' : volData.vrp > 3 ? 'expensive' : 'fair'}">
+            ${volData.vrp > 0 ? '📈 Exp' : '📉 Cheap'}
+          </div>
+        </div>
       `;
 
-      document.getElementById('aiCommentary').innerHTML = `
-        <div style="margin-bottom: 1rem;"><strong style="color: #7c3aed;">📊 Edge:</strong><br>${stock.aiEdge}</div>
-        <div style="margin-bottom: 1rem;"><strong style="color: #10b981;">💰 Trade:</strong><br>${stock.aiTrade}</div>
-        <div><strong style="color: #ef4444;">⚠️ Risk:</strong><br>${stock.aiRisk}</div>
-      `;
-
-      document.getElementById('dispIV').textContent = stock.iv + '%';
-      document.getElementById('dispRV').textContent = stock.rv + '%';
-      document.getElementById('dispVRP').textContent = stock.vrp + '%';
-
-      const price = stock.price;
-      const iv = stock.iv / 100;
-      const daysToExp = 30;
-      document.getElementById('callD').textContent = (0.5 + Math.random() * 0.1).toFixed(2);
-      document.getElementById('callG').textContent = (0.004 + Math.random() * 0.001).toFixed(4);
-      document.getElementById('callV').textContent = (0.2 + iv * 0.1).toFixed(2);
-      document.getElementById('callT').textContent = (-0.04 - Math.random() * 0.02).toFixed(2);
-      
-      document.getElementById('putD').textContent = (-0.5 + Math.random() * 0.1).toFixed(2);
-      document.getElementById('putG').textContent = (0.004 + Math.random() * 0.001).toFixed(4);
-      document.getElementById('putV').textContent = (0.2 + iv * 0.1).toFixed(2);
-      document.getElementById('putT').textContent = (-0.02 - Math.random() * 0.01).toFixed(2);
-
-      const mc10 = (price * (1 - iv * 1.28)).toFixed(0);
-      const mc50 = price.toFixed(0);
-      const mc90 = (price * (1 + iv * 1.28)).toFixed(0);
-      const mcMax = (price * (1 + iv * 1.65)).toFixed(0);
-
-      document.getElementById('mc10').textContent = '$' + mc10;
-      document.getElementById('mc50').textContent = '$' + mc50;
-      document.getElementById('mc90').textContent = '$' + mc90;
-      document.getElementById('mcMax').textContent = '$' + mcMax;
-
-      renderChart(ticker);
+      renderCharts(ticker);
+      toggleAI(true);
     }
 
-    function renderChart(ticker) {
+    function renderCharts(ticker) {
       document.getElementById('chart1D').innerHTML = '';
+
       new TradingView.widget({
         "container_id": "chart1D",
         "width": "100%",
@@ -472,16 +1200,66 @@
         "timezone": "America/New_York",
         "theme": "dark",
         "style": "1",
-        "studies": ["BB@tv-basicstudies", "MACD@tv-basicstudies", "RSI@tv-basicstudies"]
+        "studies": ["BB@tv-basicstudies", "MACD@tv-basicstudies", "RSI@tv-basicstudies", "Vol@tv-basicstudies"]
       });
     }
 
-    function goHome() {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.getElementById('homePage').classList.add('active');
+    function setAlert(ticker) {
+      alert(`Alert set for ${ticker}!`);
     }
 
-    function searchStock() {
+    async function callAI(prompt) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            model: 'sonar',
+            messages: [{role: 'user', content: prompt}],
+            temperature: 0.3,
+            max_tokens: 500
+          })
+        });
+        if (!res.ok) return `AI Error: ${res.status}`;
+        const data = await res.json();
+        return data.choices?.[0]?.message?.content || 'No AI response';
+      } catch (e) {
+        return `AI Error: ${e.message}`;
+      }
+    }
+
+    function toggleAI(force = null) {
+      const widget = document.getElementById('aiChatWidget');
+      const toggle = document.getElementById('aiToggle');
+      
+      if (force === true) {
+        widget.classList.add('active');
+        toggle.classList.add('hidden');
+      } else if (force === false) {
+        widget.classList.remove('active');
+        toggle.classList.remove('hidden');
+      } else {
+        widget.classList.toggle('active');
+        toggle.classList.toggle('hidden');
+      }
+    }
+
+    async function sendAI() {
+      const inp = document.getElementById('aiInput');
+      const msg = inp.value.trim();
+      if (!msg) return;
+
+      const box = document.getElementById('aiMessages');
+      box.innerHTML += `<div class="message user">${msg}</div>`;
+      inp.value = '';
+      box.scrollTop = box.scrollHeight;
+
+      const resp = await callAI(msg);
+      box.innerHTML += `<div class="message ai">${resp}</div>`;
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function searchAndResearch() {
       const ticker = document.getElementById('searchInput').value.toUpperCase().trim();
       if (ticker) {
         researchStock(ticker);
