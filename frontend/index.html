@@ -36,11 +36,6 @@
             align-items: center;
             gap: 15px;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .nav-logo:hover {
-            transform: scale(1.05);
         }
 
         .nav-logo-text {
@@ -63,7 +58,6 @@
             cursor: pointer;
             transition: all 0.3s;
             font-weight: 600;
-            border: none;
         }
 
         .nav-btn:hover {
@@ -164,11 +158,13 @@
             padding: 12px;
             border-radius: 10px;
             line-height: 1.6;
+            font-size: 0.9em;
         }
 
         .chat-message.user {
             background: rgba(102, 126, 234, 0.2);
             margin-left: 20px;
+            text-align: right;
         }
 
         .chat-message.ai {
@@ -191,6 +187,7 @@
             border-radius: 10px;
             color: white;
             outline: none;
+            font-size: 0.9em;
         }
 
         .chat-send-btn {
@@ -226,8 +223,6 @@
         }
 
         .story-narrative {
-            max-width: 1000px;
-            margin: 0 auto;
             font-size: 1.2em;
             line-height: 1.6;
             padding: 20px;
@@ -249,12 +244,6 @@
             font-weight: 700;
             margin: 10px 5px;
             cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .proprietary-badge:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
         }
 
         .search-section {
@@ -290,15 +279,6 @@
             font-size: 1.3em;
             font-weight: 700;
             cursor: pointer;
-            position: relative;
-        }
-
-        .analyze-btn::before {
-            content: '🤖';
-            position: absolute;
-            top: 5px;
-            right: 10px;
-            font-size: 0.8em;
         }
 
         .action-buttons {
@@ -317,11 +297,6 @@
             cursor: pointer;
             font-size: 1.05em;
             transition: all 0.3s;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
 
         .btn-scanner {
@@ -356,7 +331,6 @@
         .play-card:hover {
             transform: translateY(-5px);
             border-color: #667eea;
-            box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
         }
 
         .play-ticker {
@@ -428,97 +402,7 @@
             border-radius: 10px;
             margin: 20px 0;
             line-height: 1.8;
-        }
-
-        .newsletter-section {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 25px;
-            padding: 50px;
-            margin: 30px 0;
-            max-width: 1400px;
-        }
-
-        .newsletter-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 30px;
-            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
-        }
-
-        .newsletter-title {
-            font-size: 2.5em;
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-
-        .tldr-box {
-            background: rgba(16, 185, 129, 0.15);
-            border-left: 5px solid #10b981;
-            padding: 25px;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-
-        .section-header {
-            background: rgba(102, 126, 234, 0.15);
-            padding: 20px 30px;
-            border-radius: 15px;
-            margin: 30px 0 20px 0;
-            border-left: 5px solid #667eea;
-        }
-
-        .stock-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .stock-list li {
-            padding: 20px;
-            margin: 15px 0;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 12px;
-            border-left: 4px solid #10b981;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .stock-list li:hover {
-            background: rgba(102, 126, 234, 0.2);
-            transform: translateX(10px);
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin: 25px 0;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        th {
-            background: #667eea;
-            padding: 15px;
-            text-align: left;
-            font-weight: 700;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .chart-container {
-            background: #0a0a1a;
-            border-radius: 20px;
-            padding: 20px;
-            margin: 30px 0;
-            min-height: 800px;
-            position: relative;
+            font-size: 0.95em;
         }
 
         .price-targets-section {
@@ -531,69 +415,60 @@
 
         .targets-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
             margin-top: 20px;
         }
 
         .target-box {
             background: rgba(102, 126, 234, 0.15);
-            padding: 20px;
-            border-radius: 12px;
+            padding: 15px;
+            border-radius: 10px;
             text-align: center;
             border: 2px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .target-box:hover {
-            border-color: #667eea;
-            transform: scale(1.05);
         }
 
         .target-label {
-            font-size: 0.9em;
+            font-size: 0.8em;
             color: #999;
             text-transform: uppercase;
-            margin-bottom: 10px;
         }
 
         .target-price {
-            font-size: 2em;
+            font-size: 1.6em;
             font-weight: 700;
             color: #10b981;
-        }
-
-        .target-percent {
-            font-size: 1.1em;
-            color: #667eea;
             margin-top: 5px;
         }
 
-        .chart-signals-overlay {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: rgba(0,0,0,0.9);
+        .target-percent {
+            font-size: 0.9em;
+            color: #667eea;
+            margin-top: 3px;
+        }
+
+        .chart-container {
+            background: #0a0a1a;
+            border-radius: 20px;
             padding: 20px;
-            border-radius: 12px;
-            z-index: 100;
-            border: 2px solid #667eea;
-            max-width: 400px;
+            margin: 30px 0;
+            min-height: 800px;
+            position: relative;
         }
 
         .loading {
             text-align: center;
-            padding: 80px 20px;
+            padding: 60px 20px;
         }
 
         .spinner {
             border: 5px solid rgba(255,255,255,0.1);
             border-top: 5px solid #667eea;
             border-radius: 50%;
-            width: 70px;
-            height: 70px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 25px;
+            margin: 0 auto 20px;
         }
 
         @keyframes spin {
@@ -619,13 +494,6 @@
             .plays-grid {
                 grid-template-columns: 1fr;
             }
-            .targets-grid {
-                grid-template-columns: 1fr;
-            }
-            .chat-panel {
-                width: 90%;
-                right: 5%;
-            }
         }
     </style>
 </head>
@@ -639,11 +507,11 @@
             </div>
             <div class="chat-messages" id="chatMessages">
                 <div class="chat-message ai">
-                    👋 Hi! I'm your AI trading assistant powered by Perplexity.<br><br>
-                    <strong>Ask me anything:</strong><br>
+                    👋 Hi! Ask me anything about stocks!<br><br>
+                    <strong>Examples:</strong><br>
                     • "Latest RIVN news?"<br>
-                    • "Analyze MU fundamentals"<br>
-                    • "Should I buy SNOW?"
+                    • "Analyze MU"<br>
+                    • "Best stocks today?"
                 </div>
             </div>
             <div class="chat-input-area">
@@ -651,7 +519,7 @@
                     type="text" 
                     id="chatInput" 
                     class="chat-input" 
-                    placeholder="Ask about any stock..."
+                    placeholder="Ask..."
                     onkeypress="if(event.key==='Enter') sendChat()"
                 />
                 <button onclick="sendChat()" class="chat-send-btn">Send</button>
@@ -670,8 +538,7 @@
         </div>
         <div class="nav-actions">
             <button class="nav-btn" onclick="goToHome()">🏠 Home</button>
-            <button class="nav-btn" onclick="viewNewsletter()">📰 Newsletter</button>
-            <button class="nav-btn" onclick="toggleChat()">🤖 AI Chat</button>
+            <button class="nav-btn" onclick="toggleChat()">🤖 Chat</button>
         </div>
     </div>
 
@@ -682,12 +549,12 @@
                 "AI-Powered Analysis + Your Proprietary ThinkScript Edge"
             </div>
             <div>
-                <span class="proprietary-badge" onclick="alert('Mean Reversion: < -2.0 = Extreme oversold, Strong Buy signal')">Mean Reversion</span>
-                <span class="proprietary-badge" onclick="alert('Inst 33: > 55 = Institutional accumulation, Smart money buying')">Inst 33 Flow</span>
-                <span class="proprietary-badge" onclick="alert('Regime Detection: > 70% = Strong trend, High conviction zone')">Regime Detection</span>
+                <span class="proprietary-badge">Mean Reversion</span>
+                <span class="proprietary-badge">Inst 33 Flow</span>
+                <span class="proprietary-badge">Regime Detection</span>
                 <span class="proprietary-badge" style="border-color: #8b5cf6; color: #8b5cf6;">🤖 AI Active</span>
             </div>
-            <div class="api-status" id="apiStatus">✅ Ready • AI powered by Perplexity • Click any stock for deep analysis</div>
+            <div class="api-status" id="apiStatus">Connecting to backend...</div>
         </div>
 
         <div class="search-section" id="searchSection">
@@ -696,24 +563,15 @@
                     type="text" 
                     id="tickerInput" 
                     class="search-input"
-                    placeholder="Enter ANY ticker (AAPL, TSLA, NVDA...)..." 
+                    placeholder="Enter ticker (AAPL, TSLA, NVDA)..." 
                     onkeypress="if(event.key==='Enter') analyzeStock()"
                 />
-                <button onclick="analyzeStock()" class="analyze-btn" id="analyzeBtn">
-                    AI DEEP DIVE
-                </button>
+                <button onclick="analyzeStock()" class="analyze-btn">AI DEEP DIVE 🤖</button>
             </div>
             
             <div class="action-buttons">
-                <button onclick="runScanner()" class="btn btn-scanner">
-                    🎯 SCAN WATCHLIST
-                </button>
-                <button onclick="viewNewsletter()" class="btn btn-brief">
-                    📰 FULL NEWSLETTER
-                </button>
-                <button onclick="toggleChat()" class="btn btn-ai">
-                    🤖 AI CHAT
-                </button>
+                <button onclick="loadStocks()" class="btn btn-scanner">🎯 SCAN WATCHLIST</button>
+                <button onclick="toggleChat()" class="btn btn-ai">🤖 AI CHAT</button>
             </div>
         </div>
 
@@ -722,7 +580,7 @@
         <div class="plays-grid" id="playsGrid">
             <div class="loading">
                 <div class="spinner"></div>
-                <p>Loading watchlist with live prices...</p>
+                <p>Loading Elite Trading Data...</p>
             </div>
         </div>
     </div>
@@ -730,10 +588,10 @@
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 
     <script>
-        // CONFIG - Backend URL
+        // CONFIG - FIXED BACKEND URL
         const BACKEND_URL = 'https://elite-trading-with-exclusive-ip.onrender.com';
 
-        // CSV WATCHLIST DATA
+        // WATCHLIST DATA
         const WATCHLIST = [
             {symbol:'MU',price:201.37,change:-10.87,meanRev:-2.47,rsi:41.24,sellPct:94.29,volatility:60.0,regime:75.6,inst33:53,signal:"STRONG BUY",target1:220,target2:235,stop:190},
             {symbol:'SE',price:130.99,change:-8.74,meanRev:-2.46,rsi:27.72,volatility:42.0,regime:51.7,inst33:38,signal:"ACCUMULATE",target1:150,target2:165,stop:120},
@@ -746,22 +604,29 @@
         let stocks = [...WATCHLIST];
 
         window.addEventListener('load', () => {
-            checkBackendStatus();
+            checkBackend();
             loadStocks();
         });
 
-        async function checkBackendStatus() {
+        async function checkBackend() {
             try {
-                const res = await fetch(`${BACKEND_URL}/api/config`);
+                const res = await fetch(`${BACKEND_URL}/api/config`, {timeout: 5000});
                 const data = await res.json();
+                
                 if (data.perplexity_enabled) {
-                    updateStatus('✅ AI Active via Secure Backend');
+                    updateStatus('✅ AI Active • Perplexity Ready');
                 } else {
-                    updateStatus('⚠️ AI disabled - configure key in Render');
+                    updateStatus('⚠️ Backend running • No AI provider');
                 }
-            } catch {
-                updateStatus('⚠️ Backend unavailable - using basic mode');
+            } catch (err) {
+                updateStatus('❌ Backend error: ' + err.message);
+                console.error('Backend check failed:', err);
             }
+        }
+
+        function updateStatus(msg) {
+            const el = document.getElementById('apiStatus');
+            if (el) el.textContent = msg;
         }
 
         function toggleChat() {
@@ -777,11 +642,13 @@
             msgs.innerHTML += `<div class="chat-message user">${msg}</div>`;
             input.value = '';
             
-            msgs.innerHTML += `<div class="chat-message ai" id="thinking">🤔 Thinking...</div>`;
+            msgs.innerHTML += `<div class="chat-message ai" id="thinking">🤔 Analyzing...</div>`;
             msgs.scrollTop = msgs.scrollHeight;
 
             try {
-                const res = await fetch(`${BACKEND_URL}/api/perplexity`, {
+                console.log('[CHAT] Sending:', msg);
+                
+                const res = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -792,20 +659,38 @@
                     })
                 });
 
+                console.log('[CHAT] Response status:', res.status);
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                }
+
                 const data = await res.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                console.log('[CHAT] Got response:', data.choices[0].message.content.substring(0, 50));
+                
                 document.getElementById('thinking').remove();
                 msgs.innerHTML += `<div class="chat-message ai">${data.choices[0].message.content.replace(/\n/g, '<br>')}</div>`;
                 msgs.scrollTop = msgs.scrollHeight;
+                
             } catch (err) {
-                document.getElementById('thinking').innerHTML = '❌ ' + err.message;
+                console.error('[CHAT] Error:', err);
+                if (document.getElementById('thinking')) {
+                    document.getElementById('thinking').innerHTML = `❌ ${err.message}`;
+                }
             }
         }
 
         async function getAI(ticker, stock) {
             try {
-                updateStatus('🤖 Running AI analysis via secure backend...');
+                updateStatus('🤖 Running AI analysis...');
+                console.log('[AI] Analyzing:', ticker);
                 
-                const res = await fetch(`${BACKEND_URL}/api/perplexity`, {
+                const res = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
@@ -818,24 +703,32 @@ Mean Reversion: ${stock.meanRev}
 RSI: ${stock.rsi}
 Inst 33: ${stock.inst33}
 Regime: ${stock.regime}%
-Volatility: ${stock.volatility}%
 
-Provide:
-1. Latest news (2-3 bullets)
-2. Technical setup
-3. Entry: $XX, Targets: $XX/$XX, Stop: $XX
-4. Risk/reward & timeframe`
+Provide: 1) Latest news 2) Technical setup 3) Entry/Targets/Stop 4) Risk/reward`
                         }],
                         temperature: 0.2,
                         max_tokens: 800
                     })
                 });
 
+                console.log('[AI] Response status:', res.status);
+
+                if (!res.ok) {
+                    throw new Error(`HTTP ${res.status}`);
+                }
+
                 const data = await res.json();
-                updateStatus('✅ AI analysis complete');
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                updateStatus('✅ AI analysis ready');
                 return data.choices[0].message.content;
-            } catch {
-                updateStatus('⚠️ AI unavailable');
+                
+            } catch (error) {
+                console.error('[AI] Error:', error);
+                updateStatus('⚠️ AI error: ' + error.message);
                 return null;
             }
         }
@@ -850,11 +743,6 @@ Provide:
                 d5: p + (m * v * 0.3 * p),
                 d10: p + (m * v * 0.5 * r * p)
             };
-        }
-
-        function updateStatus(msg) {
-            const el = document.getElementById('apiStatus');
-            if (el) el.textContent = msg;
         }
 
         async function loadStocks() {
@@ -876,12 +764,12 @@ Provide:
                             <span style="color: #8b5cf6; font-size: 0.8em; margin-left: 8px;">🤖 AI Ready</span>
                         </div>
                         <span class="signal-badge ${cls}">
-                            ${s.signal === 'STRONG BUY' ? '🔥 ' : '📈 '}${s.signal}
+                            ${s.signal === 'STRONG BUY' ? '🔥' : '📈'} ${s.signal}
                         </span>
                         
                         <div class="play-metrics">
                             <div class="play-metric">
-                                <div class="metric-label">5-Day Est</div>
+                                <div class="metric-label">5D Est</div>
                                 <div class="metric-value" style="color: #10b981;">$${t.d5.toFixed(2)}</div>
                             </div>
                             <div class="play-metric">
@@ -899,9 +787,9 @@ Provide:
                         </div>
                         
                         <div class="proprietary-insight">
-                            <strong>⬆️ ENTRY:</strong> $${s.price.toFixed(2)} (Live)<br>
+                            <strong>⬆️ ENTRY:</strong> $${s.price.toFixed(2)}<br>
                             <strong>🎯 TARGETS:</strong> $${s.target1} → $${s.target2}<br>
-                            <strong style="color: #8b5cf6;">🤖 Click for AI Deep Dive</strong>
+                            <strong style="color: #8b5cf6;">Click for AI Deep Dive</strong>
                         </div>
                     </div>
                 `;
@@ -925,7 +813,7 @@ Provide:
             document.getElementById('searchSection').classList.add('hidden');
             document.getElementById('playsGrid').classList.add('hidden');
             document.getElementById('detailedView').classList.remove('hidden');
-            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div><p>Running AI analysis...</p></div>';
+            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing ' + ticker + '...</p></div>';
             
             let stock = WATCHLIST.find(s => s.symbol === ticker);
             if (!stock) {
@@ -934,19 +822,6 @@ Provide:
                     sellPct: 0, volatility: 50, regime: 50, inst33: 50,
                     signal: "RESEARCH", target1: 110, target2: 120, stop: 90
                 };
-                
-                try {
-                    const res = await fetch(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`);
-                    const data = await res.json();
-                    const q = data.quoteResponse.result[0];
-                    if (q) {
-                        stock.price = q.regularMarketPrice;
-                        stock.change = q.regularMarketChangePercent;
-                        stock.target1 = Math.round(stock.price * 1.1);
-                        stock.target2 = Math.round(stock.price * 1.2);
-                        stock.stop = Math.round(stock.price * 0.9);
-                    }
-                } catch {}
             }
             
             const ai = await getAI(ticker, stock);
@@ -973,172 +848,52 @@ Provide:
                     
                     ${ai ? `
                         <div class="ai-insight-box">
-                            <h3 style="color: #8b5cf6; font-size: 1.8em; margin-bottom: 15px;">🤖 AI Deep Dive (Perplexity via Secure Backend)</h3>
+                            <h3 style="color: #8b5cf6; font-size: 1.6em; margin-bottom: 15px;">🤖 AI Deep Dive</h3>
                             <div style="white-space: pre-wrap;">${ai}</div>
                         </div>
                     ` : `
                         <div style="background: rgba(245, 158, 11, 0.15); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 10px;">
-                            <strong style="color: #f59e0b;">⚠️ AI Unavailable</strong><br>
-                            Configure Perplexity API key in Render environment variables.
+                            ⚠️ <strong>AI unavailable</strong> - Check backend connection
                         </div>
                     `}
                     
                     <div class="price-targets-section">
-                        <h3 style="color: #667eea; font-size: 1.8em; margin-bottom: 20px; text-align: center;">🎯 Price Targets</h3>
+                        <h3 style="color: #667eea; text-align: center;">🎯 Price Targets</h3>
                         <div class="targets-grid">
                             <div class="target-box" style="border-color: #10b981;">
                                 <div class="target-label">Entry</div>
                                 <div class="target-price">$${stock.price.toFixed(2)}</div>
-                                <div style="color: #10b981; font-size: 0.9em;">Current Live</div>
                             </div>
                             <div class="target-box">
-                                <div class="target-label">5-Day Est</div>
+                                <div class="target-label">5D Est</div>
                                 <div class="target-price">$${t.d5.toFixed(2)}</div>
                                 <div class="target-percent">+${((t.d5 - stock.price) / stock.price * 100).toFixed(1)}%</div>
                             </div>
                             <div class="target-box">
-                                <div class="target-label">10-Day Est</div>
+                                <div class="target-label">10D Est</div>
                                 <div class="target-price">$${t.d10.toFixed(2)}</div>
                                 <div class="target-percent">+${((t.d10 - stock.price) / stock.price * 100).toFixed(1)}%</div>
                             </div>
                             <div class="target-box" style="border-color: #10b981;">
-                                <div class="target-label">Target 1</div>
+                                <div class="target-label">T1</div>
                                 <div class="target-price">$${stock.target1}</div>
                                 <div class="target-percent">+${((stock.target1 - stock.price) / stock.price * 100).toFixed(1)}%</div>
                             </div>
                             <div class="target-box" style="border-color: #10b981;">
-                                <div class="target-label">Target 2</div>
+                                <div class="target-label">T2</div>
                                 <div class="target-price">$${stock.target2}</div>
                                 <div class="target-percent">+${((stock.target2 - stock.price) / stock.price * 100).toFixed(1)}%</div>
                             </div>
                             <div class="target-box" style="border-color: #ef4444;">
-                                <div class="target-label">Stop Loss</div>
+                                <div class="target-label">Stop</div>
                                 <div class="target-price" style="color: #ef4444;">$${stock.stop}</div>
                                 <div class="target-percent" style="color: #ef4444;">${((stock.stop - stock.price) / stock.price * 100).toFixed(1)}%</div>
                             </div>
                         </div>
                     </div>
                     
-                    <div class="chart-container">
-                        <div class="chart-signals-overlay">
-                            <h4 style="color: #667eea; margin-bottom: 15px;">📊 Trading Signals</h4>
-                            <div style="padding: 10px; background: rgba(16, 185, 129, 0.2); border-radius: 8px; margin-bottom: 10px;">
-                                <strong style="color: #10b981;">⬆️ ENTRY:</strong> $${stock.price.toFixed(2)}
-                            </div>
-                            <div style="padding: 10px; background: rgba(16, 185, 129, 0.2); border-radius: 8px; margin-bottom: 10px;">
-                                <strong style="color: #10b981;">🎯 TARGET 1:</strong> $${stock.target1}
-                            </div>
-                            <div style="padding: 10px; background: rgba(16, 185, 129, 0.2); border-radius: 8px; margin-bottom: 10px;">
-                                <strong style="color: #10b981;">🚀 TARGET 2:</strong> $${stock.target2}
-                            </div>
-                            <div style="padding: 10px; background: rgba(239, 68, 68, 0.2); border-radius: 8px;">
-                                <strong style="color: #ef4444;">🛑 STOP:</strong> $${stock.stop}
-                            </div>
-                        </div>
-                        <div id="tradingview_chart" style="height: 700px;"></div>
-                    </div>
-                    
-                    <button onclick="goToHome()" class="btn btn-scanner" style="width: 100%; padding: 20px; font-size: 1.2em;">
-                        ← BACK TO WATCHLIST
-                    </button>
-                </div>
-            `;
-            
-            new TradingView.widget({
-                "width": "100%",
-                "height": 700,
-                "symbol": ticker,
-                "interval": "D",
-                "timezone": "America/New_York",
-                "theme": "dark",
-                "style": "1",
-                "container_id": "tradingview_chart",
-                "studies": ["STD;MACD", "STD;RSI", "STD;Volume"]
-            });
-        }
-
-        function runScanner() {
-            goToHome();
-            loadStocks();
-        }
-
-        function viewNewsletter() {
-            document.getElementById('homeHeader').classList.add('hidden');
-            document.getElementById('searchSection').classList.add('hidden');
-            document.getElementById('playsGrid').classList.add('hidden');
-            document.getElementById('detailedView').classList.remove('hidden');
-            
-            const strong = WATCHLIST.filter(s => s.meanRev < -2.0);
-            const inst = WATCHLIST.filter(s => s.inst33 > 55);
-            
-            document.getElementById('detailedView').innerHTML = `
-                <div class="newsletter-section">
-                    <div class="newsletter-header">
-                        <div class="newsletter-title">📊 Elite Trading Newsletter</div>
-                        <div style="color: #aaa;">November 21, 2025 | Powered by ThinkScript + AI</div>
-                    </div>
-                    
-                    <div class="tldr-box">
-                        <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">⚡ TL;DR</h3>
-                        <p style="line-height: 2; font-size: 1.1em;">
-                            <strong>${strong.length} STRONG BUY signals</strong> (Mean Rev < -2.0). ${inst.length} stocks with institutional accumulation (Inst 33 > 55).
-                        </p>
-                    </div>
-                    
-                    <div class="section-header">
-                        <h3 style="color: #667eea; font-size: 1.8em;">🔥 STRONG BUY SIGNALS</h3>
-                    </div>
-                    
-                    <ul class="stock-list">
-                        ${strong.map(s => `
-                            <li onclick="analyzeStock('${s.symbol}')">
-                                <strong style="color: #10b981; font-size: 1.3em;">${s.symbol}</strong> @ $${s.price.toFixed(2)}<br><br>
-                                Mean Rev: ${s.meanRev} | RSI: ${s.rsi} | Inst 33: ${s.inst33}<br>
-                                Entry: $${s.price.toFixed(2)} | Targets: $${s.target1}/$${s.target2} | Stop: $${s.stop}
-                            </li>
-                        `).join('')}
-                    </ul>
-                    
-                    <div class="section-header">
-                        <h3 style="color: #667eea; font-size: 1.8em;">📊 SCORE SUMMARY</h3>
-                    </div>
-                    
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Price</th>
-                                    <th>Mean Rev</th>
-                                    <th>Inst 33</th>
-                                    <th>Regime</th>
-                                    <th>Signal</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${WATCHLIST.map(s => `
-                                    <tr onclick="analyzeStock('${s.symbol}')" style="cursor: pointer;">
-                                        <td><strong>${s.symbol}</strong></td>
-                                        <td>$${s.price.toFixed(2)}</td>
-                                        <td style="color: ${s.meanRev < -2.0 ? '#10b981' : '#fff'}">${s.meanRev}</td>
-                                        <td style="color: ${s.inst33 > 55 ? '#10b981' : '#fff'}">${s.inst33}</td>
-                                        <td>${s.regime}%</td>
-                                        <td><strong style="color: ${s.meanRev < -2.0 ? '#10b981' : '#f59e0b'}">${s.signal}</strong></td>
-                                    </tr>
-                                `).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div style="background: rgba(16, 185, 129, 0.15); border-left: 4px solid #10b981; padding: 30px; border-radius: 12px; margin: 30px 0; line-height: 2;">
-                        <h3 style="color: #10b981; font-size: 1.8em; margin-bottom: 15px;">💡 YOUR EDGE</h3>
-                        <p style="font-size: 1.1em;">
-                            Mean reversion extremes + institutional flow + regime detection = asymmetric risk/reward opportunities.
-                        </p>
-                    </div>
-                    
-                    <button onclick="goToHome()" class="btn btn-scanner" style="width: 100%; padding: 20px; font-size: 1.2em; margin-top: 30px;">
-                        ← BACK TO HOME
+                    <button onclick="goToHome()" class="btn btn-scanner" style="width: 100%; padding: 20px; margin-top: 20px;">
+                        ← BACK
                     </button>
                 </div>
             `;
