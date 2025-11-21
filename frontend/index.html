@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics - Your Proprietary Edge</title>
+    <title>Elite Trading Analytics - Live + CSV Data</title>
     <style>
         * {
             margin: 0;
@@ -22,6 +22,24 @@
             max-width: 1800px;
             margin: 0 auto;
             padding: 20px;
+        }
+
+        .api-config-banner {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            padding: 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .api-input {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            width: 400px;
+            margin: 0 10px;
+            font-size: 1em;
         }
 
         .market-story-header {
@@ -92,6 +110,11 @@
             font-size: 1.3em;
             font-weight: 700;
             cursor: pointer;
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .action-buttons {
@@ -221,6 +244,21 @@
             line-height: 1.5;
         }
 
+        .live-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+            margin-right: 5px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
         .chart-container {
             background: #0a0a1a;
             border-radius: 20px;
@@ -268,6 +306,21 @@
             line-height: 1.6;
         }
 
+        .loading-spinner {
+            border: 5px solid rgba(255,255,255,0.1);
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
         .hidden {
             display: none;
         }
@@ -281,10 +334,18 @@
 </head>
 <body>
     <div class="container">
+        <div class="api-config-banner" id="apiConfigBanner">
+            <h3>🔑 Configure Live Data API (Optional)</h3>
+            <p style="margin: 10px 0;">For live price updates, enter your Finnhub API key:</p>
+            <input type="text" id="finnhubApiKey" class="api-input" placeholder="Finnhub API Key (optional)" />
+            <button onclick="saveApiKey()" class="btn btn-brief" style="margin-left: 10px;">Save Key</button>
+            <button onclick="closeApiBanner()" class="btn" style="background: #666; margin-left: 10px;">Use CSV Data Only</button>
+        </div>
+
         <div class="market-story-header">
             <h1 class="story-title">📊 Elite Trading Analytics</h1>
             <div class="story-narrative">
-                "Powered by Your Proprietary ThinkScript Indicators"
+                "CSV Base Data + Live API Updates for Analysis"
             </div>
             <div>
                 <span class="proprietary-badge">Mean Reversion</span>
@@ -300,11 +361,11 @@
                     type="text" 
                     id="tickerInput" 
                     class="search-input"
-                    placeholder="Search ticker..." 
+                    placeholder="Search ticker for LIVE analysis..." 
                     onkeypress="if(event.key==='Enter') analyzeStock()"
                 />
-                <button onclick="analyzeStock()" class="analyze-btn">
-                    🔍 ANALYZE
+                <button onclick="analyzeStock()" class="analyze-btn" id="analyzeBtn">
+                    🔍 ANALYZE LIVE
                 </button>
             </div>
             
@@ -330,7 +391,7 @@
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 
     <script>
-        // YOUR CSV DATA - Loaded directly into the app
+        // YOUR CSV DATA
         const STOCK_DATA = [
             {symbol:"MU",price:201.37,change:-10.87,pct5Day:-15.02,meanRev:-2.47,rsi:41.24,volume:47420728,sellPct:94.29,volVsNormal:1.412,volatility:60.0,regime:75.6,inst33:53,masterScore:3.0,overallScore:0.0,composite:0.0,signal:"STRONG BUY"},
             {symbol:"SE",price:130.99,change:-8.74,pct5Day:-6.46,meanRev:-2.46,rsi:27.72,volume:10163684,sellPct:96.29,volVsNormal:2.05,volatility:42.0,regime:51.7,inst33:38,masterScore:1.0,overallScore:0.0,composite:0.0,signal:"ACCUMULATE"},
@@ -343,12 +404,73 @@
             {symbol:"ABNB",price:205.43,change:-1.06,pct5Day:-0.82,meanRev:-1.40,rsi:47.19,volume:4186831,sellPct:88.97,volVsNormal:1.165,volatility:82.0,regime:41.1,inst33:58,masterScore:2.0,overallScore:0.0,composite:0.0,signal:"MONITOR"}
         ];
 
+        let FINNHUB_API_KEY = '';
         let currentFilter = 'all';
         let currentStocks = [...STOCK_DATA];
 
         window.addEventListener('load', () => {
+            const savedKey = localStorage.getItem('finnhubKey');
+            if (savedKey) {
+                FINNHUB_API_KEY = savedKey;
+                document.getElementById('finnhubApiKey').value = savedKey;
+                document.getElementById('apiConfigBanner').style.display = 'none';
+            }
             displayStocks(currentStocks);
         });
+
+        function saveApiKey() {
+            const key = document.getElementById('finnhubApiKey').value.trim();
+            if (key) {
+                FINNHUB_API_KEY = key;
+                localStorage.setItem('finnhubKey', key);
+                alert('✅ API key saved! Live prices will be fetched when you click Analyze.');
+                document.getElementById('apiConfigBanner').style.display = 'none';
+            } else {
+                alert('Please enter a valid API key');
+            }
+        }
+
+        function closeApiBanner() {
+            document.getElementById('apiConfigBanner').style.display = 'none';
+        }
+
+        // LIVE PRICE FETCHING
+        async function fetchLivePrice(ticker) {
+            if (!FINNHUB_API_KEY) {
+                return { success: false, message: 'No API key configured' };
+            }
+
+            try {
+                const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${FINNHUB_API_KEY}`;
+                const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
+                
+                if (!response.ok) {
+                    return { success: false, message: `HTTP ${response.status}` };
+                }
+                
+                const data = await response.json();
+                
+                if (data.c && data.c > 0) {
+                    return {
+                        success: true,
+                        price: data.c,
+                        change: data.d,
+                        changePercent: data.dp,
+                        high: data.h,
+                        low: data.l,
+                        open: data.o,
+                        prevClose: data.pc,
+                        timestamp: Date.now()
+                    };
+                }
+                
+                return { success: false, message: 'Invalid data format' };
+                
+            } catch (error) {
+                console.error(`Finnhub error for ${ticker}:`, error);
+                return { success: false, message: error.message };
+            }
+        }
 
         function filterStocks(filter) {
             currentFilter = filter;
@@ -388,6 +510,7 @@
                         </div>
                         <div style="margin-bottom: 10px;">
                             <span style="font-size: 1.4em; color: #fff;">$${stock.price.toFixed(2)}</span>
+                            <span style="color: #aaa; font-size: 0.9em; margin-left: 10px;">(CSV Data)</span>
                         </div>
                         <span class="signal-badge ${signalClass}">
                             ${stock.signal === 'STRONG BUY' ? '🔥 ' : ''}${stock.signal}
@@ -410,115 +533,134 @@
                                 <div class="metric-label">Regime</div>
                                 <div class="metric-value">${stock.regime}%</div>
                             </div>
-                            <div class="play-metric">
-                                <div class="metric-label">Volatility</div>
-                                <div class="metric-value">${stock.volatility}%</div>
-                            </div>
-                            <div class="play-metric">
-                                <div class="metric-label">Sell Pressure</div>
-                                <div class="metric-value">${stock.sellPct}%</div>
-                            </div>
                         </div>
                         
                         <div class="proprietary-insight">
-                            <strong>📊 Your Edge:</strong><br>
-                            ${stock.meanRev < -2.0 ? '• Extreme mean reversion setup' : ''}<br>
-                            ${stock.inst33 > 55 ? '• Strong institutional accumulation' : ''}<br>
-                            ${stock.regime > 70 ? '• High regime strength (trend confirmed)' : ''}<br>
-                            ${stock.volatility > 70 ? '• Premium options opportunity' : ''}
-                            ${stock.sellPct > 90 ? '• Peak capitulation (bullish reversal zone)' : ''}
+                            <strong>📊 Click to Analyze with LIVE Price</strong>
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        function analyzeStock(ticker) {
+        async function analyzeStock(ticker) {
             if (typeof ticker !== 'string') {
                 ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
             }
             if (!ticker) return;
             
-            const stock = STOCK_DATA.find(s => s.symbol === ticker);
-            if (!stock) {
-                alert('Stock not found in watchlist');
+            // Get CSV data for proprietary indicators
+            const csvStock = STOCK_DATA.find(s => s.symbol === ticker);
+            if (!csvStock) {
+                alert('Stock not found in watchlist. Please search one of: ' + STOCK_DATA.map(s => s.symbol).join(', '));
                 return;
             }
             
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = '⏳ FETCHING LIVE DATA...';
+            
             document.getElementById('playsGrid').classList.add('hidden');
             document.getElementById('detailedView').classList.remove('hidden');
+            document.getElementById('detailedView').innerHTML = '<div style="text-align: center; padding: 100px;"><div class="loading-spinner"></div><p style="margin-top: 20px; font-size: 1.2em;">Fetching live price for ' + ticker + '...</p></div>';
             
-            const changeColor = stock.change >= 0 ? '#10b981' : '#ef4444';
+            // Fetch live price
+            const liveData = await fetchLivePrice(ticker);
+            
+            let finalPrice, finalChange, finalChangePercent, dataSource;
+            
+            if (liveData.success) {
+                finalPrice = liveData.price;
+                finalChange = liveData.change;
+                finalChangePercent = liveData.changePercent;
+                dataSource = 'LIVE (Finnhub)';
+            } else {
+                finalPrice = csvStock.price;
+                finalChange = csvStock.change;
+                finalChangePercent = csvStock.change;
+                dataSource = 'CSV Data';
+                console.log('Live fetch failed, using CSV:', liveData.message);
+            }
+            
+            const changeColor = finalChangePercent >= 0 ? '#10b981' : '#ef4444';
             
             document.getElementById('detailedView').innerHTML = `
                 <div class="detailed-view">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap;">
                         <div>
-                            <div style="font-size: 3em; font-weight: 700;">${stock.symbol}</div>
-                            <span class="signal-badge ${stock.signal === 'STRONG BUY' ? 'signal-strong-buy' : 'signal-accumulate'}">
-                                ${stock.signal}
+                            <div style="font-size: 3em; font-weight: 700;">${ticker}</div>
+                            <span class="signal-badge ${csvStock.signal === 'STRONG BUY' ? 'signal-strong-buy' : 'signal-accumulate'}">
+                                ${csvStock.signal}
                             </span>
                         </div>
                         <div style="text-align: right;">
                             <div style="font-size: 2.5em; font-weight: 700; color: ${changeColor}">
-                                $${stock.price.toFixed(2)}
+                                $${finalPrice.toFixed(2)}
+                                ${liveData.success ? '<span class="live-indicator"></span>' : ''}
                             </div>
                             <div style="color: ${changeColor}; font-size: 1.2em;">
-                                ${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}% today
+                                ${finalChangePercent > 0 ? '+' : ''}${finalChangePercent.toFixed(2)}%
                             </div>
-                            <div style="color: #aaa; font-size: 1em;">
-                                ${stock.pct5Day > 0 ? '+' : ''}${stock.pct5Day.toFixed(2)}% 5-day
+                            <div style="color: #aaa; font-size: 0.9em; margin-top: 5px;">
+                                ${dataSource} ${liveData.success ? '• Real-time' : '• From CSV'}
                             </div>
                         </div>
                     </div>
+                    
+                    ${!liveData.success ? `
+                        <div style="background: rgba(245, 158, 11, 0.2); border-left: 4px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+                            <strong style="color: #f59e0b;">⚠️ Using CSV Data:</strong> 
+                            ${FINNHUB_API_KEY ? 'Live API call failed. ' + liveData.message : 'No API key configured. Add Finnhub key for live prices.'}
+                        </div>
+                    ` : ''}
                     
                     <div class="brief-section">
                         <h3>🎯 Your Proprietary Signals</h3>
                         <div class="play-metrics" style="grid-template-columns: repeat(3, 1fr);">
                             <div class="play-metric">
                                 <div class="metric-label">Mean Reversion</div>
-                                <div class="metric-value" style="color: ${stock.meanRev < -2.0 ? '#10b981' : '#fff'}">${stock.meanRev}</div>
+                                <div class="metric-value" style="color: ${csvStock.meanRev < -2.0 ? '#10b981' : '#fff'}">${csvStock.meanRev}</div>
                                 <div style="font-size: 0.85em; color: #aaa; margin-top: 5px;">
-                                    ${stock.meanRev < -2.0 ? 'EXTREME OVERSOLD ✓' : 'Normal range'}
+                                    ${csvStock.meanRev < -2.0 ? 'EXTREME OVERSOLD ✓' : 'Normal range'}
                                 </div>
                             </div>
                             <div class="play-metric">
                                 <div class="metric-label">Inst 33 Flow</div>
-                                <div class="metric-value" style="color: ${stock.inst33 > 55 ? '#10b981' : '#fff'}">${stock.inst33}</div>
+                                <div class="metric-value" style="color: ${csvStock.inst33 > 55 ? '#10b981' : '#fff'}">${csvStock.inst33}</div>
                                 <div style="font-size: 0.85em; color: #aaa; margin-top: 5px;">
-                                    ${stock.inst33 > 55 ? 'ACCUMULATION ✓' : 'Neutral'}
+                                    ${csvStock.inst33 > 55 ? 'ACCUMULATION ✓' : 'Neutral'}
                                 </div>
                             </div>
                             <div class="play-metric">
                                 <div class="metric-label">Regime Detection</div>
-                                <div class="metric-value">${stock.regime}%</div>
+                                <div class="metric-value">${csvStock.regime}%</div>
                                 <div style="font-size: 0.85em; color: #aaa; margin-top: 5px;">
-                                    ${stock.regime > 70 ? 'STRONG TREND ✓' : 'Developing'}
+                                    ${csvStock.regime > 70 ? 'STRONG TREND ✓' : 'Developing'}
                                 </div>
                             </div>
                             <div class="play-metric">
                                 <div class="metric-label">RSI Wilder</div>
-                                <div class="metric-value">${stock.rsi}</div>
+                                <div class="metric-value">${csvStock.rsi}</div>
                             </div>
                             <div class="play-metric">
                                 <div class="metric-label">Volatility</div>
-                                <div class="metric-value">${stock.volatility}%</div>
+                                <div class="metric-value">${csvStock.volatility}%</div>
                             </div>
                             <div class="play-metric">
                                 <div class="metric-label">Sell Pressure</div>
-                                <div class="metric-value">${stock.sellPct}%</div>
+                                <div class="metric-value">${csvStock.sellPct}%</div>
                             </div>
                             <div class="play-metric">
                                 <div class="metric-label">Vol vs Normal</div>
-                                <div class="metric-value">${stock.volVsNormal}x</div>
+                                <div class="metric-value">${csvStock.volVsNormal}x</div>
                             </div>
                             <div class="play-metric">
                                 <div class="metric-label">Master Score</div>
-                                <div class="metric-value">${stock.masterScore}</div>
+                                <div class="metric-value">${csvStock.masterScore}</div>
                             </div>
                             <div class="play-metric">
                                 <div class="metric-label">Composite</div>
-                                <div class="metric-value">${stock.composite}</div>
+                                <div class="metric-value">${csvStock.composite}</div>
                             </div>
                         </div>
                     </div>
@@ -526,12 +668,12 @@
                     <div class="proprietary-insight" style="margin: 20px 0; padding: 25px;">
                         <h3 style="color: #10b981; margin-bottom: 15px;">💡 Trade Setup Analysis</h3>
                         <div style="line-height: 2;">
-                            ${stock.meanRev < -2.0 ? '<strong>✓ MEAN REVERSION EXTREME:</strong> Price is at statistical extreme, high probability reversal zone<br>' : ''}
-                            ${stock.sellPct > 90 ? '<strong>✓ CAPITULATION SIGNAL:</strong> Sell pressure at ' + stock.sellPct + '% indicates panic selling exhaustion<br>' : ''}
-                            ${stock.inst33 > 55 ? '<strong>✓ INSTITUTIONAL ACCUMULATION:</strong> Smart money positioning with Inst 33 score of ' + stock.inst33 + '<br>' : ''}
-                            ${stock.regime > 70 ? '<strong>✓ REGIME STRENGTH:</strong> ' + stock.regime + '% regime indicates established trend structure<br>' : ''}
-                            ${stock.volatility > 70 ? '<strong>✓ HIGH VOLATILITY:</strong> Premium options environment - consider credit spreads<br>' : ''}
-                            ${stock.volVsNormal > 1.5 ? '<strong>✓ VOLUME SURGE:</strong> ' + stock.volVsNormal + 'x normal volume confirms conviction<br>' : ''}
+                            ${csvStock.meanRev < -2.0 ? '<strong>✓ MEAN REVERSION EXTREME:</strong> Price at statistical extreme, high probability reversal zone<br>' : ''}
+                            ${csvStock.sellPct > 90 ? '<strong>✓ CAPITULATION SIGNAL:</strong> Sell pressure at ' + csvStock.sellPct + '% indicates panic selling exhaustion<br>' : ''}
+                            ${csvStock.inst33 > 55 ? '<strong>✓ INSTITUTIONAL ACCUMULATION:</strong> Smart money positioning with Inst 33 score of ' + csvStock.inst33 + '<br>' : ''}
+                            ${csvStock.regime > 70 ? '<strong>✓ REGIME STRENGTH:</strong> ' + csvStock.regime + '% regime indicates established trend structure<br>' : ''}
+                            ${csvStock.volatility > 70 ? '<strong>✓ HIGH VOLATILITY:</strong> Premium options environment - consider credit spreads<br>' : ''}
+                            ${csvStock.volVsNormal > 1.5 ? '<strong>✓ VOLUME SURGE:</strong> ' + csvStock.volVsNormal + 'x normal volume confirms conviction<br>' : ''}
                         </div>
                     </div>
                     
@@ -545,11 +687,11 @@
                 </div>
             `;
             
-            // Load TradingView chart with buy/sell annotations
+            // Load TradingView chart
             new TradingView.widget({
                 "width": "100%",
                 "height": 700,
-                "symbol": stock.symbol,
+                "symbol": ticker,
                 "interval": "D",
                 "timezone": "America/New_York",
                 "theme": "dark",
@@ -562,10 +704,11 @@
                     "STD;MACD",
                     "STD;RSI",
                     "STD;Volume"
-                ],
-                "disabled_features": ["use_localstorage_for_settings"],
-                "enabled_features": ["study_templates"]
+                ]
             });
+            
+            analyzeBtn.disabled = false;
+            analyzeBtn.textContent = '🔍 ANALYZE LIVE';
         }
 
         function backToGrid() {
@@ -623,80 +766,10 @@
                                     <span style="color: #aaa;">
                                         • Inst 33 Score: <strong>${s.inst33}</strong> (smart money positioning)
                                         • Regime: ${s.regime}% • Composite: ${s.composite}
-                                        • ${s.pct5Day > 0 ? 'Up' : 'Down'} ${Math.abs(s.pct5Day).toFixed(2)}% 5-day
-                                    </span>
-                                    <br>
-                                    <span style="color: #667eea;">
-                                        📊 Edge: Institutions accumulating despite ${s.sellPct}% retail selling
                                     </span>
                                 </li>
                             `).join('')}
                         </ul>
-                    </div>
-                    
-                    <div class="brief-section">
-                        <h3>📈 HIGH VOLATILITY OPPORTUNITIES (Vol > 70%)</h3>
-                        <ul class="brief-list">
-                            ${highVolStocks.map(s => `
-                                <li>
-                                    <strong style="color: #f59e0b;">${s.symbol}</strong> @ $${s.price.toFixed(2)}
-                                    <br>
-                                    <span style="color: #aaa;">
-                                        • Volatility: <strong>${s.volatility}%</strong> (rich option premiums)
-                                        • Vol vs Normal: ${s.volVsNormal}x
-                                        • RSI: ${s.rsi} • Inst 33: ${s.inst33}
-                                    </span>
-                                    <br>
-                                    <span style="color: #f59e0b;">
-                                        📊 Edge: High IV + ${s.inst33 > 55 ? 'institutional support' : 'momentum'} = premium collection opportunity
-                                    </span>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
-                    
-                    <div class="brief-section">
-                        <h3>🌐 MACRO CONTEXT (Fed + Market News)</h3>
-                        <ul class="brief-list">
-                            <li>
-                                <strong>Federal Reserve:</strong> Minutes show division on December rate cut. Current rate 4.50%-4.75%. 
-                                <span style="color: #aaa;">Slim chances of further cuts in December meeting.</span>
-                            </li>
-                            <li>
-                                <strong>Semiconductor Sector:</strong> MU, MRVL showing extreme mean reversion signals. 
-                                <span style="color: #10b981;">Your indicators suggest memory cycle bottom.</span>
-                            </li>
-                            <li>
-                                <strong>Growth Stocks:</strong> SNOW leading with 91.1% regime strength + Inst 33 of 63. 
-                                <span style="color: #667eea;">Cloud sector showing institutional support.</span>
-                            </li>
-                            <li>
-                                <strong>EV Sector:</strong> RIVN with highest Inst 33 score (65) despite retail selling. 
-                                <span style="color: #667eea;">Smart money positioning ahead of recovery.</span>
-                            </li>
-                        </ul>
-                    </div>
-                    
-                    <div class="brief-section" style="background: rgba(16, 185, 129, 0.15); border-left: 4px solid #10b981;">
-                        <h3 style="color: #10b981;">💎 YOUR COMPETITIVE EDGE</h3>
-                        <p style="line-height: 1.8; color: #e0e0e0;">
-                            <strong>What Makes This Analysis Different:</strong><br><br>
-                            
-                            <strong>1. Mean Reversion Precision:</strong> Your < -2.0 threshold identifies statistical extremes that standard RSI misses. 
-                            Currently 5 stocks in this zone with high reversal probability.<br><br>
-                            
-                            <strong>2. Institutional Flow (Inst 33):</strong> Proprietary metric reveals smart money positioning before price confirms. 
-                            RIVN (65), SNOW (63), TTWO/LULU/ABNB (58) showing accumulation.<br><br>
-                            
-                            <strong>3. Regime Detection:</strong> Unique 0-100% scale shows trend strength and reversal probability. 
-                            RIVN (99.1%), SNOW (91.1%), MU (75.6%) at extremes.<br><br>
-                            
-                            <strong>4. Composite Scoring:</strong> Multi-factor model combining momentum, flow, volatility. 
-                            RIVN leading with 2.0 composite score.<br><br>
-                            
-                            <strong>5. Volatility-Adjusted Signals:</strong> Integration of options market (IV) with equity signals. 
-                            ABNB/LULU/TTWO showing 80%+ vol = premium collection setups.
-                        </p>
                     </div>
                     
                     <button onclick="backToGrid()" class="btn btn-brief" style="width: 100%; padding: 20px; font-size: 1.2em; margin-top: 30px;">
