@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics - Real-Time ThinkScript</title>
+    <title>Elite Trading Analytics - Full Platform</title>
     <style>
         * {
             margin: 0;
@@ -67,10 +67,12 @@
             display: flex;
             gap: 15px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         .search-input {
             flex: 1;
+            min-width: 250px;
             padding: 20px 28px;
             font-size: 1.3em;
             background: rgba(255,255,255,0.12);
@@ -171,7 +173,7 @@
 
         .plays-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 25px;
             margin-top: 30px;
         }
@@ -265,23 +267,14 @@
             display: none;
         }
 
-        .error-message {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid #ef4444;
-            padding: 20px;
-            border-radius: 12px;
-            color: #fca5a5;
-            margin: 20px 0;
-        }
-
-        /* LARGE CHART CONTAINER */
+        /* LARGER CHART */
         .chart-container-wrapper {
             position: relative;
             background: #0a0a1a;
             border-radius: 20px;
             padding: 20px;
             margin: 30px 0;
-            min-height: 800px;
+            min-height: 950px;
             box-shadow: 0 15px 40px rgba(0,0,0,0.5);
         }
 
@@ -362,133 +355,42 @@
             font-size: 1.1em;
         }
 
-        .scalping-levels {
-            background: rgba(16, 185, 129, 0.1);
-            border-left: 3px solid #10b981;
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-
-        .scalping-title {
-            color: #10b981;
-            font-weight: 700;
-            margin-bottom: 10px;
-            font-size: 1.1em;
-        }
-
-        .scalping-row {
+        /* HORIZONTAL SIGNAL STORY */
+        .signal-story-horizontal {
             display: flex;
-            justify-content: space-between;
-            margin: 8px 0;
-            font-size: 0.95em;
-        }
-
-        .story-panel {
+            gap: 20px;
+            padding: 25px;
             background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
             border-radius: 15px;
-            padding: 30px;
             margin: 25px 0;
-            border-left: 5px solid #667eea;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            align-items: center;
         }
 
-        .story-panel-title {
-            font-size: 1.8em;
-            color: #667eea;
-            margin-bottom: 15px;
+        .signal-indicator {
+            text-align: center;
+            padding: 15px 25px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            min-width: 150px;
+        }
+
+        .signal-arrow {
+            font-size: 3em;
+            margin-bottom: 10px;
+        }
+
+        .signal-label {
+            font-size: 0.9em;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .signal-description {
+            font-size: 1.1em;
+            color: #fff;
             font-weight: 700;
-        }
-
-        .story-text {
-            font-size: 1.15em;
-            line-height: 1.9;
-            color: #ddd;
-        }
-
-        .chat-assistant {
-            background: linear-gradient(145deg, #1a1a2e 0%, #0f0f1e 100%);
-            border-radius: 15px;
-            padding: 25px;
-            margin: 25px 0;
-            border: 2px solid rgba(102, 126, 234, 0.3);
-        }
-
-        .chat-title {
-            font-size: 1.5em;
-            color: #667eea;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        .quick-questions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .quick-question-btn {
-            padding: 12px 18px;
-            background: rgba(102, 126, 234, 0.15);
-            border: 1px solid rgba(102, 126, 234, 0.3);
-            border-radius: 8px;
-            color: #667eea;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 0.95em;
-            text-align: left;
-        }
-
-        .quick-question-btn:hover {
-            background: rgba(102, 126, 234, 0.25);
-            border-color: #667eea;
-            transform: translateY(-2px);
-        }
-
-        .chat-input-area {
-            display: flex;
-            gap: 12px;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 15px;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            color: white;
-            font-size: 1em;
-            outline: none;
-        }
-
-        .chat-input:focus {
-            border-color: #667eea;
-            background: rgba(255,255,255,0.12);
-        }
-
-        .chat-send-btn {
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .chat-send-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .chat-response {
-            background: rgba(16, 185, 129, 0.1);
-            border-left: 3px solid #10b981;
-            padding: 20px;
-            border-radius: 10px;
-            margin-top: 20px;
-            line-height: 1.8;
-            color: #ddd;
         }
 
         .detailed-analysis {
@@ -506,6 +408,8 @@
             margin-bottom: 30px;
             padding-bottom: 20px;
             border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
         .ticker-display {
@@ -537,12 +441,43 @@
             border: 1px solid #10b981;
         }
 
+        /* Mobile Responsive */
         @media (max-width: 768px) {
+            .story-title {
+                font-size: 1.8em;
+            }
+
             .chart-overlay-dashboard {
                 position: relative;
                 top: 0;
                 left: 0;
                 margin-bottom: 20px;
+                width: 100%;
+            }
+
+            .plays-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .analysis-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .price-display {
+                text-align: center;
+            }
+
+            .ticker-display {
+                font-size: 2em;
+            }
+
+            .current-price {
+                font-size: 1.8em;
+            }
+
+            .signal-story-horizontal {
+                flex-direction: column;
             }
         }
     </style>
@@ -550,12 +485,12 @@
 <body>
     <div class="container">
         <div class="market-story-header">
-            <h1 class="story-title">📊 Elite Trading Analytics - Real-Time ThinkScript</h1>
+            <h1 class="story-title">📊 Elite Trading Analytics</h1>
             <div class="story-narrative" id="marketNarrative">
-                "Calculating proprietary indicators in real-time for all 57 stocks..."
+                "Calculating real-time ThinkScript for all 57 stocks..."
             </div>
             <div class="api-status" id="apiStatus">
-                🔄 Initializing real-time calculations...
+                🔄 Initializing...
             </div>
         </div>
 
@@ -565,20 +500,20 @@
                     type="text" 
                     id="tickerInput" 
                     class="search-input"
-                    placeholder="Search any ticker for real-time ThinkScript analysis..." 
+                    placeholder="Search any ticker..." 
                     onkeypress="if(event.key==='Enter') analyzeStock()"
                 />
                 <button onclick="analyzeStock()" class="analyze-btn" id="analyzeBtn">
-                    🔍 REAL-TIME ANALYSIS
+                    🔍 ANALYZE
                 </button>
             </div>
             
             <div class="action-buttons">
                 <button onclick="loadTopPlays()" class="btn btn-scanner">
-                    🔄 RECALCULATE ALL
+                    🔄 REFRESH ALL 57
                 </button>
                 <button onclick="viewNewsBrief()" class="btn btn-brief">
-                    📰 BRIEF
+                    📰 MARKET BRIEF
                 </button>
             </div>
 
@@ -595,7 +530,7 @@
         <div class="plays-grid" id="playsGrid">
             <div class="loading">
                 <div class="spinner"></div>
-                <p style="font-size: 1.2em;">Calculating real-time ThinkScript indicators...</p>
+                <p style="font-size: 1.2em;">Loading all 57 stocks...</p>
             </div>
         </div>
     </div>
@@ -603,49 +538,37 @@
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 
     <script>
-        // WATCHLIST - TICKERS ONLY (indicators calculated in real-time)
         const WATCHLIST_TICKERS = ["SNDK","OKLO","IONQ","MU","DDOG","SE","CRWV","MRNA","COIN","DASH","LYFT","SOFI","SMCI","ENVX","LCID","TSLA","NIO","UPST","NET","RKLB","FSLR","SNOW","TTWO","RIVN","EA","LULU","ABNB","SHOP","ROKU","PLTR","PATH","RDDT","ZS","SQ","CRWD","MARA","HOOD","BILL","U","AI","CVNA","TDOC","CELH","AFRM","GRAB","KVUE","ARM","META","PINS","WOLF","APP","NFLX","NVDA","DIS","CHWY","GOOGL","GOOG"];
 
         const API_BASE = 'https://elite-trading-with-exclusive-ip.onrender.com/api';
         let currentFilter = 'all';
         let liveStockData = [];
 
-        // REAL-TIME ThinkScript Calculations
         class ThinkScriptCalculator {
-            // Calculate CUSUM (Mean Reversion)
             static calculateCUSUM(prices) {
                 const returns = prices.slice(1).map((p, i) => (p - prices[i]) / prices[i]);
                 const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
                 let cusum = 0;
-                returns.forEach(r => {
-                    cusum += (r - mean);
-                });
+                returns.forEach(r => cusum += (r - mean));
                 return (cusum / returns.length).toFixed(2);
             }
 
-            // Calculate RSI (Wilder)
             static calculateRSI(prices, period = 14) {
                 const changes = prices.slice(1).map((p, i) => p - prices[i]);
                 const gains = changes.map(c => c > 0 ? c : 0);
                 const losses = changes.map(c => c < 0 ? -c : 0);
-                
                 let avgGain = gains.slice(0, period).reduce((a, b) => a + b, 0) / period;
                 let avgLoss = losses.slice(0, period).reduce((a, b) => a + b, 0) / period;
-                
                 const rs = avgGain / (avgLoss || 0.01);
-                const rsi = 100 - (100 / (1 + rs));
-                return rsi.toFixed(2);
+                return (100 - (100 / (1 + rs))).toFixed(2);
             }
 
-            // Calculate MACD
             static calculateMACD(prices) {
                 const ema12 = this.calculateEMA(prices, 12);
                 const ema26 = this.calculateEMA(prices, 26);
-                const macd = ema12[ema12.length - 1] - ema26[ema26.length - 1];
-                return macd.toFixed(2);
+                return (ema12[ema12.length - 1] - ema26[ema26.length - 1]).toFixed(2);
             }
 
-            // Calculate EMA
             static calculateEMA(data, period) {
                 const k = 2 / (period + 1);
                 const ema = [data[0]];
@@ -655,22 +578,17 @@
                 return ema;
             }
 
-            // Calculate Volatility (Historical)
             static calculateVolatility(prices) {
                 const returns = prices.slice(1).map((p, i) => Math.log(p / prices[i]));
                 const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
                 const variance = returns.reduce((sum, r) => sum + Math.pow(r - mean, 2), 0) / returns.length;
-                const volatility = Math.sqrt(variance * 252) * 100; // Annualized
-                return volatility.toFixed(1);
+                return (Math.sqrt(variance * 252) * 100).toFixed(1);
             }
 
-            // Calculate Institutional Score (volume-weighted momentum)
             static calculateInstScore(prices, volumes) {
-                if (!volumes || volumes.length === 0) return 0;
-                
+                if (!volumes || volumes.length === 0) return 50;
                 const recentPrices = prices.slice(-20);
                 const recentVolumes = volumes.slice(-20);
-                
                 let score = 0;
                 recentPrices.forEach((p, i) => {
                     if (i > 0) {
@@ -679,43 +597,25 @@
                         score += priceChange * volWeight * 100;
                     }
                 });
-                
                 return Math.min(100, Math.max(0, Math.round(score + 50)));
             }
 
-            // Calculate Regime Detection (volatility expansion/contraction)
             static calculateRegime(prices) {
                 const shortVol = this.calculateVolatility(prices.slice(-10));
                 const longVol = this.calculateVolatility(prices.slice(-30));
-                const regime = (parseFloat(shortVol) / parseFloat(longVol)) * 100;
-                return regime.toFixed(1);
+                return ((parseFloat(shortVol) / parseFloat(longVol)) * 100).toFixed(1);
             }
 
-            // Bull/Bear Power
-            static calculateBullBearPower(prices) {
-                const ema = this.calculateEMA(prices, 13);
-                const lastPrice = prices[prices.length - 1];
-                const lastEMA = ema[ema.length - 1];
-                
-                const bullPower = ((lastPrice - lastEMA) / lastEMA * 100).toFixed(2);
-                const bearPower = bullPower; // Simplified
-                
-                return { bullPower, bearPower };
-            }
-
-            // Calculate all indicators at once
             static calculateAll(priceData) {
                 const prices = priceData.closes;
                 const volumes = priceData.volumes || [];
-                
                 return {
                     cusum: this.calculateCUSUM(prices),
                     rsi: this.calculateRSI(prices),
                     macd: this.calculateMACD(prices),
                     volatility: this.calculateVolatility(prices),
                     instScore: this.calculateInstScore(prices, volumes),
-                    regime: this.calculateRegime(prices),
-                    bullBearPower: this.calculateBullBearPower(prices)
+                    regime: this.calculateRegime(prices)
                 };
             }
         }
@@ -725,25 +625,17 @@
             if (statusEl) statusEl.textContent = message;
         }
 
-        // Fetch historical prices for calculations
         async function fetchHistoricalData(ticker) {
             try {
-                // Fetch from your backend which should return time series
-                const res = await fetch(`${API_BASE}/timeseries?ticker=${ticker}`, { 
-                    signal: AbortSignal.timeout(10000) 
-                });
-                
+                const res = await fetch(`${API_BASE}/timeseries?ticker=${ticker}`, { signal: AbortSignal.timeout(10000) });
                 if (!res.ok) throw new Error('API error');
-                
                 const data = await res.json();
                 const timeSeries = data['Time Series (Daily)'];
+                if (!timeSeries) throw new Error('No data');
                 
-                if (!timeSeries) throw new Error('No time series data');
-                
-                const dates = Object.keys(timeSeries).slice(0, 60).reverse(); // Last 60 days
+                const dates = Object.keys(timeSeries).slice(0, 60).reverse();
                 const closes = dates.map(date => parseFloat(timeSeries[date]['4. close']));
                 const volumes = dates.map(date => parseInt(timeSeries[date]['5. volume']));
-                
                 const currentPrice = closes[closes.length - 1];
                 const prevPrice = closes[closes.length - 2];
                 const change = ((currentPrice - prevPrice) / prevPrice * 100);
@@ -757,7 +649,7 @@
                     isLive: true
                 };
             } catch (error) {
-                console.error(`Error fetching ${ticker}:`, error);
+                console.error(`Error ${ticker}:`, error);
                 return { success: false, isLive: false };
             }
         }
@@ -766,58 +658,53 @@
 
         async function loadTopPlays() {
             const grid = document.getElementById('playsGrid');
-            grid.innerHTML = '<div class="loading"><div class="spinner"></div><p style="font-size: 1.2em;">Calculating real-time ThinkScript indicators for 57 stocks...</p></div>';
-            updateAPIStatus('🔄 Real-time calculations in progress...');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div><p style="font-size: 1.2em;">Loading ALL 57 stocks with real-time calculations...</p></div>';
+            updateAPIStatus('🔄 Processing all 57 stocks...');
             
             liveStockData = [];
             let successCount = 0;
-            const batchSize = 5;
             
-            for (let i = 0; i < WATCHLIST_TICKERS.length; i += batchSize) {
-                const batch = WATCHLIST_TICKERS.slice(i, i + batchSize);
+            // Process ALL stocks (no batching limit)
+            for (let i = 0; i < WATCHLIST_TICKERS.length; i++) {
+                const ticker = WATCHLIST_TICKERS[i];
+                const historicalData = await fetchHistoricalData(ticker);
                 
-                const batchPromises = batch.map(async (ticker) => {
-                    const historicalData = await fetchHistoricalData(ticker);
+                if (historicalData.success) {
+                    const indicators = ThinkScriptCalculator.calculateAll(historicalData.priceData);
+                    successCount++;
                     
-                    if (historicalData.success) {
-                        // CALCULATE INDICATORS IN REAL-TIME
-                        const indicators = ThinkScriptCalculator.calculateAll(historicalData.priceData);
-                        successCount++;
-                        
-                        return {
-                            symbol: ticker,
-                            price: historicalData.price,
-                            change: historicalData.change,
-                            volume: historicalData.volume,
-                            cusum: parseFloat(indicators.cusum),
-                            rsi: parseFloat(indicators.rsi),
-                            macd: parseFloat(indicators.macd),
-                            volatility: parseFloat(indicators.volatility),
-                            instScore: indicators.instScore,
-                            regime: parseFloat(indicators.regime),
-                            bullPower: parseFloat(indicators.bullBearPower.bullPower),
-                            bearPower: parseFloat(indicators.bullBearPower.bearPower),
-                            isLive: true
-                        };
-                    } else {
-                        return {
-                            symbol: ticker,
-                            price: null,
-                            change: null,
-                            isLive: false
-                        };
-                    }
-                });
+                    liveStockData.push({
+                        symbol: ticker,
+                        price: historicalData.price,
+                        change: historicalData.change,
+                        volume: historicalData.volume,
+                        cusum: parseFloat(indicators.cusum),
+                        rsi: parseFloat(indicators.rsi),
+                        macd: parseFloat(indicators.macd),
+                        volatility: parseFloat(indicators.volatility),
+                        instScore: indicators.instScore,
+                        regime: parseFloat(indicators.regime),
+                        isLive: true
+                    });
+                } else {
+                    liveStockData.push({
+                        symbol: ticker,
+                        price: null,
+                        change: null,
+                        isLive: false
+                    });
+                }
                 
-                const batchResults = await Promise.all(batchPromises);
-                liveStockData.push(...batchResults);
-                updateAPIStatus(`🔄 Calculated ${liveStockData.length}/${WATCHLIST_TICKERS.length} stocks... (${successCount} complete)`);
+                // Update progress every 5 stocks
+                if (i % 5 === 0) {
+                    updateAPIStatus(`🔄 Progress: ${i + 1}/${WATCHLIST_TICKERS.length} stocks (${successCount} complete)`);
+                }
             }
             
-            updateAPIStatus(`✅ Real-time calculations complete! ${successCount} stocks analyzed`);
+            updateAPIStatus(`✅ Complete! ${successCount}/${WATCHLIST_TICKERS.length} stocks loaded`);
             applyFilter(currentFilter);
             document.getElementById('marketNarrative').textContent = 
-                `"${successCount} stocks analyzed with LIVE ThinkScript calculations (CUSUM, RSI, MACD, Volatility, Inst Score, Regime Detection)"`;
+                `"${successCount} stocks analyzed with real-time ThinkScript calculations"`;
         }
 
         function filterStocks(filter) {
@@ -829,62 +716,48 @@
 
         function applyFilter(filter) {
             let filtered = [...liveStockData].filter(s => s.isLive);
-            
             switch(filter) {
-                case 'strongBuy': 
-                    filtered = filtered.filter(s => s.cusum < -2); 
-                    break;
-                case 'accumulate': 
-                    filtered = filtered.filter(s => s.cusum < -1.5 && s.cusum >= -2); 
-                    break;
-                case 'highVol': 
-                    filtered = filtered.filter(s => s.volatility > 70); 
-                    break;
+                case 'strongBuy': filtered = filtered.filter(s => s.cusum < -2); break;
+                case 'accumulate': filtered = filtered.filter(s => s.cusum < -1.5 && s.cusum >= -2); break;
+                case 'highVol': filtered = filtered.filter(s => s.volatility > 70); break;
             }
-            
             displayPlays(filtered);
         }
 
         function displayPlays(stocks) {
             const grid = document.getElementById('playsGrid');
             if (stocks.length === 0) {
-                grid.innerHTML = '<div class="loading"><p>No stocks match filter</p></div>';
+                grid.innerHTML = '<div class="loading"><p>No stocks match</p></div>';
                 return;
             }
 
             grid.innerHTML = stocks.map(stock => {
                 const changeColor = stock.change >= 0 ? '#10b981' : '#ef4444';
-                
                 return `
                     <div class="play-card" onclick="document.getElementById('tickerInput').value='${stock.symbol}'; analyzeStock();">
                         <div class="play-ticker">
                             ${stock.symbol} 
                             <span style="color: ${changeColor}; font-size: 0.6em;">${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%</span>
                         </div>
-                        <div class="play-story-name">"${getStoryName(stock)}"</div>
+                        <div class="play-story-name">"${stock.cusum < -2 ? 'Deep Value' : 'Opportunity'}"</div>
                         <div style="font-size: 0.9em; margin-bottom: 10px;">
                             <span style="color: #fff; font-size: 1.2em;">$${stock.price.toFixed(2)}</span> 
-                            <span class="price-badge live-badge">⚡ REAL-TIME</span>
+                            <span class="price-badge live-badge">⚡ LIVE</span>
                         </div>
                         <div class="play-metrics">
-                            <div class="play-metric"><div class="metric-label">CUSUM (Live)</div><div class="metric-value">${stock.cusum}</div></div>
-                            <div class="play-metric"><div class="metric-label">Inst Score</div><div class="metric-value">${stock.instScore}</div></div>
-                            <div class="play-metric"><div class="metric-label">Volatility</div><div class="metric-value">${stock.volatility}%</div></div>
-                            <div class="play-metric"><div class="metric-label">Regime</div><div class="metric-value">${stock.regime}%</div></div>
+                            <div class="play-metric"><div class="metric-label">CUSUM</div><div class="metric-value">${stock.cusum}</div></div>
+                            <div class="play-metric"><div class="metric-label">Inst</div><div class="metric-value">${stock.instScore}</div></div>
+                            <div class="play-metric"><div class="metric-label">Vol</div><div class="metric-value">${stock.volatility}%</div></div>
+                            <div class="play-metric"><div class="metric-label">RSI</div><div class="metric-value">${stock.rsi}</div></div>
                         </div>
                         <div class="play-signal">
-                            <strong style="color: #10b981; font-size: 1.1em;">${stock.cusum < -2 ? 'STRONG BUY' : stock.cusum < -1.5 ? 'ACCUMULATE' : 'LONG'}</strong><br>
-                            <small style="color: #aaa;">MACD: ${stock.macd.toFixed(2)} | RSI: ${stock.rsi.toFixed(1)}</small>
+                            <strong style="color: #10b981; font-size: 1.1em;">${stock.cusum < -2 ? 'STRONG BUY' : stock.cusum < -1.5 ? 'ACCUMULATE' : 'MONITOR'}</strong><br>
+                            <small style="color: #aaa;">MACD: ${stock.macd}</small>
                         </div>
                     </div>
                 `;
             }).join('');
-        }
-
-        function getStoryName(stock) {
-            if (stock.cusum < -2 && stock.volatility > 80) return 'Perfect Storm';
-            if (stock.cusum < -2) return 'Deep Value';
-            return 'Opportunity';
+            updateAPIStatus(`📊 Showing ${stocks.length} stocks`);
         }
 
         async function analyzeStock() {
@@ -897,33 +770,26 @@
             
             document.getElementById('playsGrid').classList.add('hidden');
             document.getElementById('detailedView').classList.remove('hidden');
-            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div><p>Calculating real-time ThinkScript indicators...</p></div>';
+            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div><p>Calculating...</p></div>';
             
             try {
                 const historicalData = await fetchHistoricalData(ticker);
-                
-                if (!historicalData.success) {
-                    throw new Error('Unable to fetch data');
-                }
-                
+                if (!historicalData.success) throw new Error('Unable to fetch');
                 const indicators = ThinkScriptCalculator.calculateAll(historicalData.priceData);
-                
                 displayEnhancedChart(ticker, historicalData, indicators);
-                
             } catch (error) {
                 alert('Error: ' + error.message);
                 document.getElementById('detailedView').classList.add('hidden');
                 document.getElementById('playsGrid').classList.remove('hidden');
             } finally {
                 analyzeBtn.disabled = false;
-                analyzeBtn.textContent = '🔍 REAL-TIME ANALYSIS';
+                analyzeBtn.textContent = '🔍 ANALYZE';
             }
         }
 
         function displayEnhancedChart(ticker, liveData, indicators) {
             const price = liveData.price;
             const change = liveData.change;
-            
             let signal = 'NEUTRAL';
             let signalClass = 'signal-neutral';
             if (parseFloat(indicators.cusum) < -2 && parseFloat(indicators.rsi) < 40) {
@@ -934,13 +800,6 @@
                 signalClass = 'signal-buy';
             }
             
-            const atr = price * (parseFloat(indicators.volatility) / 100);
-            const entry = price;
-            const stop = (entry - atr * 1.5).toFixed(2);
-            const target = (entry + atr * 2.5).toFixed(2);
-            
-            const story = `<strong>${ticker}</strong> real-time analysis shows ${signal} signal. CUSUM at <strong>${indicators.cusum}</strong> ${parseFloat(indicators.cusum) < -2 ? 'indicates extreme Bear Deviation' : 'shows market positioning'}. RSI <strong>${indicators.rsi}</strong> ${parseFloat(indicators.rsi) < 30 ? 'is deeply oversold' : 'shows momentum'}. Institutional score of <strong>${indicators.instScore}</strong> ${indicators.instScore > 50 ? 'shows smart money accumulation' : 'indicates neutral positioning'}. Volatility at <strong>${indicators.volatility}%</strong> with regime detection at <strong>${indicators.regime}%</strong>.`;
-            
             const html = `
                 <div class="detailed-analysis">
                     <div class="analysis-header">
@@ -949,65 +808,48 @@
                             <div class="current-price" style="color: ${change >= 0 ? '#10b981' : '#ef4444'}">
                                 $${price.toFixed(2)} <span style="font-size: 0.6em">(${change > 0 ? '+' : ''}${change.toFixed(2)}%)</span>
                             </div>
-                            <span class="price-badge live-badge">⚡ REAL-TIME CALC</span>
+                            <span class="price-badge live-badge">⚡ LIVE</span>
                         </div>
                     </div>
 
                     <div class="chart-container-wrapper">
                         <div class="chart-overlay-dashboard">
-                            <div class="dashboard-header">⚡ Real-Time ThinkScript</div>
+                            <div class="dashboard-header">⚡ ThinkScript</div>
                             <div class="signal-badge ${signalClass}">${signal}</div>
-                            
                             <div class="dashboard-metrics">
-                                <div class="dashboard-metric-row">
-                                    <span class="dashboard-metric-label">CUSUM</span>
-                                    <span class="dashboard-metric-value" style="color: ${parseFloat(indicators.cusum) < -2 ? '#10b981' : '#f59e0b'}">${indicators.cusum}</span>
-                                </div>
-                                <div class="dashboard-metric-row">
-                                    <span class="dashboard-metric-label">RSI</span>
-                                    <span class="dashboard-metric-value">${indicators.rsi}</span>
-                                </div>
-                                <div class="dashboard-metric-row">
-                                    <span class="dashboard-metric-label">MACD</span>
-                                    <span class="dashboard-metric-value">${indicators.macd}</span>
-                                </div>
-                                <div class="dashboard-metric-row">
-                                    <span class="dashboard-metric-label">Volatility</span>
-                                    <span class="dashboard-metric-value">${indicators.volatility}%</span>
-                                </div>
-                                <div class="dashboard-metric-row">
-                                    <span class="dashboard-metric-label">Inst Score</span>
-                                    <span class="dashboard-metric-value">${indicators.instScore}</span>
-                                </div>
-                                <div class="dashboard-metric-row">
-                                    <span class="dashboard-metric-label">Regime</span>
-                                    <span class="dashboard-metric-value">${indicators.regime}%</span>
-                                </div>
-                            </div>
-                            
-                            <div class="scalping-levels">
-                                <div class="scalping-title">⚡ Scalping Levels</div>
-                                <div class="scalping-row">
-                                    <span style="color: #10b981;">Entry:</span>
-                                    <span style="color: #fff; font-weight: 700;">$${entry.toFixed(2)}</span>
-                                </div>
-                                <div class="scalping-row">
-                                    <span style="color: #ef4444;">Stop:</span>
-                                    <span style="color: #fff; font-weight: 700;">$${stop}</span>
-                                </div>
-                                <div class="scalping-row">
-                                    <span style="color: #10b981;">Target:</span>
-                                    <span style="color: #fff; font-weight: 700;">$${target}</span>
-                                </div>
+                                <div class="dashboard-metric-row"><span class="dashboard-metric-label">CUSUM</span><span class="dashboard-metric-value">${indicators.cusum}</span></div>
+                                <div class="dashboard-metric-row"><span class="dashboard-metric-label">RSI</span><span class="dashboard-metric-value">${indicators.rsi}</span></div>
+                                <div class="dashboard-metric-row"><span class="dashboard-metric-label">MACD</span><span class="dashboard-metric-value">${indicators.macd}</span></div>
+                                <div class="dashboard-metric-row"><span class="dashboard-metric-label">Vol</span><span class="dashboard-metric-value">${indicators.volatility}%</span></div>
+                                <div class="dashboard-metric-row"><span class="dashboard-metric-label">Inst</span><span class="dashboard-metric-value">${indicators.instScore}</span></div>
                             </div>
                         </div>
-                        
-                        <div style="min-height: 750px; background: #1a1a2e; border-radius: 15px; padding: 20px;" id="tradingview_chart"></div>
+                        <div style="height: 900px; background: #1a1a2e; border-radius: 15px;" id="tradingview_chart"></div>
                     </div>
 
-                    <div class="story-panel">
-                        <div class="story-panel-title">📖 Real-Time Analysis</div>
-                        <div class="story-text">${story}</div>
+                    <!-- HORIZONTAL SIGNAL STORY -->
+                    <div class="signal-story-horizontal">
+                        <div class="signal-indicator">
+                            <div class="signal-arrow" style="color: ${parseFloat(indicators.cusum) < -2 ? '#10b981' : '#f59e0b'}">
+                                ${parseFloat(indicators.cusum) < -2 ? '⬆️' : '↔️'}
+                            </div>
+                            <div class="signal-label">CUSUM Signal</div>
+                            <div class="signal-description">${parseFloat(indicators.cusum) < -2 ? 'STRONG BUY' : 'Neutral'}</div>
+                        </div>
+                        <div class="signal-indicator">
+                            <div class="signal-arrow" style="color: ${parseFloat(indicators.rsi) < 30 ? '#10b981' : parseFloat(indicators.rsi) > 70 ? '#ef4444' : '#f59e0b'}">
+                                ${parseFloat(indicators.rsi) < 30 ? '⬆️' : parseFloat(indicators.rsi) > 70 ? '⬇️' : '↔️'}
+                            </div>
+                            <div class="signal-label">RSI</div>
+                            <div class="signal-description">${parseFloat(indicators.rsi) < 30 ? 'Oversold' : parseFloat(indicators.rsi) > 70 ? 'Overbought' : 'Neutral'}</div>
+                        </div>
+                        <div class="signal-indicator">
+                            <div class="signal-arrow" style="color: ${indicators.instScore > 60 ? '#10b981' : '#f59e0b'}">
+                                ${indicators.instScore > 60 ? '⬆️' : '↔️'}
+                            </div>
+                            <div class="signal-label">Institutional</div>
+                            <div class="signal-description">${indicators.instScore > 60 ? 'Strong' : 'Moderate'}</div>
+                        </div>
                     </div>
 
                     <button onclick="backToGrid()" class="btn btn-scanner" style="width: 100%; padding: 20px; margin-top: 20px;">← BACK</button>
@@ -1015,10 +857,9 @@
             `;
             
             document.getElementById('detailedView').innerHTML = html;
-            
             new TradingView.widget({
                 "width": "100%",
-                "height": 750,
+                "height": 900,
                 "symbol": ticker,
                 "interval": "60",
                 "timezone": "America/New_York",
@@ -1038,10 +879,39 @@
         }
 
         function viewNewsBrief() {
-            alert('Market brief - to implement');
+            const liveCount = liveStockData.filter(s => s.isLive).length;
+            const avgCUSUM = (liveStockData.filter(s => s.isLive).reduce((sum, s) => sum + s.cusum, 0) / liveCount).toFixed(2);
+            const strongBuys = liveStockData.filter(s => s.isLive && s.cusum < -2);
+            
+            const grid = document.getElementById('playsGrid');
+            grid.innerHTML = `
+                <div style="background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%); border-radius: 25px; padding: 50px; max-width: 1200px; margin: 0 auto;">
+                    <h2 style="font-size: 2.5em; color: #667eea; text-align: center; margin-bottom: 30px;">📰 Market Intelligence Brief</h2>
+                    
+                    <div style="background: rgba(102, 126, 234, 0.12); padding: 30px; border-radius: 15px; border-left: 5px solid #667eea; margin-bottom: 25px;">
+                        <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">📊 Watchlist Overview</h3>
+                        <p style="font-size: 1.15em; line-height: 2;">
+                            <strong>Total Stocks:</strong> ${WATCHLIST_TICKERS.length}<br>
+                            <strong>Live Data:</strong> ${liveCount} stocks<br>
+                            <strong>Average CUSUM:</strong> ${avgCUSUM}<br>
+                            <strong>Strong Buy Signals:</strong> ${strongBuys.length} stocks
+                        </p>
+                    </div>
+                    
+                    <div style="background: rgba(16, 185, 129, 0.12); padding: 30px; border-radius: 15px; border-left: 5px solid #10b981; margin-bottom: 25px;">
+                        <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">🔥 Top Opportunities</h3>
+                        <ul style="font-size: 1.1em; line-height: 2; padding-left: 25px;">
+                            ${strongBuys.slice(0, 5).map(s => `<li><strong>${s.symbol}</strong>: CUSUM ${s.cusum} | RSI ${s.rsi} | $${s.price.toFixed(2)}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <button onclick="backToGrid()" class="btn btn-scanner" style="width: 100%; padding: 20px; font-size: 1.2em; margin-top: 20px;">← BACK TO WATCHLIST</button>
+                </div>
+            `;
         }
     </script>
 </body>
 </html>
+
 
     
