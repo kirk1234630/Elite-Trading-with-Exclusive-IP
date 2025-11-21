@@ -640,6 +640,51 @@
                 </div>
             </div>
 
+            <!-- Search Bar -->
+            <div style="padding: 40px 20px; max-width: 800px; margin: 0 auto;">
+                <div style="display: flex; gap: 15px; margin-bottom: 30px;">
+                    <input 
+                        type="text" 
+                        id="tickerInput" 
+                        placeholder="Enter ticker symbol (e.g., AAPL, TSLA, NVDA...)" 
+                        style="flex: 1; padding: 18px 24px; font-size: 1.2em; background: rgba(255,255,255,0.1); border: 2px solid rgba(255,255,255,0.2); border-radius: 12px; color: white; outline: none;"
+                        onkeypress="if(event.key==='Enter') analyzeCustomTicker()"
+                    />
+                    <button 
+                        onclick="analyzeCustomTicker()" 
+                        style="padding: 18px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 12px; color: white; font-size: 1.2em; font-weight: 700; cursor: pointer; transition: all 0.3s;"
+                        onmouseover="this.style.transform='scale(1.05)'" 
+                        onmouseout="this.style.transform='scale(1)'"
+                    >
+                        🔍 ANALYZE
+                    </button>
+                </div>
+                
+                <!-- Action Buttons -->
+                <div style="display: flex; gap: 15px; justify-content: center; margin-bottom: 30px;">
+                    <button 
+                        onclick="runFullScanner()" 
+                        style="padding: 15px 30px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; border-radius: 12px; color: white; font-size: 1.1em; font-weight: 700; cursor: pointer; transition: all 0.3s;"
+                        onmouseover="this.style.transform='scale(1.05)'" 
+                        onmouseout="this.style.transform='scale(1)'"
+                    >
+                        🔍 SCAN ALL MARKETS
+                    </button>
+                    <button 
+                        onclick="showNewsletter()" 
+                        style="padding: 15px 30px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border: none; border-radius: 12px; color: white; font-size: 1.1em; font-weight: 700; cursor: pointer; transition: all 0.3s;"
+                        onmouseover="this.style.transform='scale(1.05)'" 
+                        onmouseout="this.style.transform='scale(1)'"
+                    >
+                        📰 TODAY'S BRIEF
+                    </button>
+                </div>
+                
+                <div style="text-align: center; color: #999; margin-bottom: 20px;">
+                    Or analyze one of our top 3 high-conviction plays below
+                </div>
+            </div>
+
             <div class="top-plays">
                 <div class="plays-grid" id="topPlaysGrid">
                     <!-- Loading plays -->
@@ -829,7 +874,38 @@
             }
 
             plays.sort((a, b) => b.score - a.score);
-            displayTopPlays(plays.slice(0, 3));
+            const top3 = plays.slice(0, 3);
+            
+            // Update market narrative
+            updateMarketNarrative(top3);
+            
+            displayTopPlays(top3);
+        }
+        
+        function updateMarketNarrative(plays) {
+            if (plays.length === 0) {
+                document.getElementById('marketNarrative').textContent = 
+                    '"Market in neutral zone. Waiting for high-conviction setups to emerge."';
+                return;
+            }
+            
+            const longPlays = plays.filter(p => p.data.volatility.iv_rank < 35);
+            const shortPlays = plays.filter(p => p.data.volatility.iv_rank > 65);
+            
+            let narrative = '';
+            if (longPlays.length > 0 && shortPlays.length === 0) {
+                const tickers = longPlays.map(p => p.ticker).join(', ');
+                narrative = `"Options are CHEAP on ${tickers}. IV Rank in bottom quartile - institutional accumulation zone. Your edge: Buy fear when volatility compresses."`;
+            } else if (shortPlays.length > 0 && longPlays.length === 0) {
+                const tickers = shortPlays.map(p => p.ticker).join(', ');
+                narrative = `"Options are EXPENSIVE on ${tickers}. IV Rank in top quartile - premium selling opportunity. Your edge: Sell greed when volatility expands."`;
+            } else if (longPlays.length > 0 && shortPlays.length > 0) {
+                const longTickers = longPlays.map(p => p.ticker).join(', ');
+                const shortTickers = shortPlays.map(p => p.ticker).join(', ');
+                narrative = `"Mixed volatility environment: Options CHEAP on ${longTickers} while EXPENSIVE on ${shortTickers}. Your edge: Buy fear, sell greed."`;
+            }
+            
+            document.getElementById('marketNarrative').textContent = narrative;
         }
 
         function displayTopPlays(plays) {
@@ -971,6 +1047,44 @@
             alert('Trade idea copied to clipboard!');
         }
 
+        async function analyzeCustomTicker() {
+            const input = document.getElementById('tickerInput');
+            const ticker = input.value.trim().toUpperCase();
+            
+            if (!ticker) {
+                alert('Please enter a ticker symbol');
+                return;
+            }
+            
+            // Show loading
+            const grid = document.getElementById('topPlaysGrid');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing ' + ticker + '...</p></div>';
+            
+            try {
+                const res = await fetch(`${API_BASE}/api/analytics?ticker=${ticker}`);
+                if (!res.ok) {
+                    throw new Error('Ticker not found');
+                }
+                
+                const data = await res.json();
+                const ivRank = data.volatility.iv_rank;
+                const vrp = data.volatility.vrp_30d;
+                
+                // Create play object and view story immediately
+                const play = {
+                    ticker,
+                    data,
+                    score: Math.abs(ivRank - 50) + Math.abs(vrp) * 2
+                };
+                
+                viewStory(play);
+                
+            } catch (error) {
+                alert('Error analyzing ' + ticker + '. Please verify the ticker symbol and try again.');
+                loadTopPlays(); // Reload top plays on error
+            }
+        }
+
         function switchNewsletter(type) {
             const tabs = document.querySelectorAll('.newsletter-tab');
             tabs.forEach(tab => tab.classList.remove('active'));
@@ -983,6 +1097,85 @@
             };
             
             document.getElementById('newsletterBrief').innerHTML = newsletters[type];
+        }
+        
+        function runFullScanner() {
+            // Scroll to scanner results
+            document.getElementById('topPlaysGrid').scrollIntoView({ behavior: 'smooth' });
+            
+            // Show loading
+            const grid = document.getElementById('topPlaysGrid');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div><p>Scanning entire market for opportunities...</p></div>';
+            
+            // Reload with all plays
+            loadAllPlays();
+        }
+        
+        async function loadAllPlays() {
+            const tickers = ['NVDA', 'AAPL', 'TSLA', 'META', 'AMZN', 'GOOGL', 'MSFT', 'AMD', 
+                             'NFLX', 'INTC', 'CSCO', 'ORCL', 'IBM', 'CRM', 'ADBE', 'PYPL'];
+            const plays = [];
+
+            for (const ticker of tickers) {
+                try {
+                    const res = await fetch(`${API_BASE}/api/analytics?ticker=${ticker}`);
+                    if (!res.ok) continue;
+                    
+                    const data = await res.json();
+                    const ivRank = data.volatility.iv_rank;
+                    const vrp = data.volatility.vrp_30d;
+                    
+                    if ((ivRank < 35 && vrp < 0) || (ivRank > 65 && vrp > 0)) {
+                        plays.push({
+                            ticker,
+                            data,
+                            score: Math.abs(ivRank - 50) + Math.abs(vrp) * 2
+                        });
+                    }
+                } catch (error) {
+                    console.error(`Error loading ${ticker}:`, error);
+                }
+            }
+
+            plays.sort((a, b) => b.score - a.score);
+            displayTopPlays(plays); // Show all plays
+        }
+        
+        function showNewsletter() {
+            viewStory({
+                ticker: 'MARKET',
+                data: {
+                    price: 0,
+                    volatility: { iv_rank: 50, iv_30d: 20, vrp_30d: 0 }
+                }
+            });
+            
+            // Override to show newsletter only
+            document.getElementById('detailTicker').textContent = '📰 Daily Brief';
+            document.getElementById('detailPrice').textContent = new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+            });
+            document.getElementById('narrativeTitle').textContent = 'Today\'s Market Intelligence';
+            document.getElementById('narrativeText').innerHTML = `
+                <h3>🌅 Pre-Market Overview</h3>
+                <p>• Futures up +0.3%, tech leading broad market strength</p>
+                <p>• Volatility compressed across major indices - VIX at 14.2</p>
+                <p>• Key support levels holding, bullish continuation expected</p>
+                
+                <h3>🎯 Today's Focus Areas</h3>
+                <p>• Tech earnings season heating up - watch NVDA, META volatility</p>
+                <p>• Fed minutes at 2PM ET - potential market catalyst</p>
+                <p>• Options flow showing institutional call buying in semiconductors</p>
+                
+                <h3>⚠️ Risk Factors</h3>
+                <p>• Overbought conditions on hourly timeframes</p>
+                <p>• Watch for profit-taking after gap-up open</p>
+            `;
+            
+            // Hide trade card and charts
+            document.getElementById('tradeCard').style.display = 'none';
+            document.querySelector('.chart-layout').style.display = 'none';
+            document.querySelector('.social-proof').style.display = 'none';
         }
     </script>
 </body>
