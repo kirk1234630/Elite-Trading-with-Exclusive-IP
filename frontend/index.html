@@ -3,171 +3,937 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Elite Trading AI Dashboard</title>
+  <title>Elite Trading Analytics - Professional Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://s3.tradingview.com/tv.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ApexCharts/3.44.0/apexcharts.min.js"></script>
+  
   <style>
-    /* Add styling for tab bar, cards, modal, newsletter, and chat as needed */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --dark-bg: #0F1419;
+      --card-bg: #1a1f2e;
+      --secondary-bg: #232f47;
+      --accent: #00d4ff;
+      --success: #00c896;
+      --danger: #ff4757;
+      --text-primary: #ffffff;
+      --text-secondary: #b0b8c1;
+      --border: #2a3446;
+    }
+
+    body {
+      background: var(--dark-bg);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ============ HEADER ============ */
+    .header {
+      background: rgba(26, 31, 46, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-size: 1.5em;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .logo i {
+      font-size: 2em;
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .nav-link {
+      color: var(--text-secondary);
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.3s;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+    }
+
+    .nav-link:hover {
+      color: var(--accent);
+      background: rgba(0, 212, 255, 0.1);
+    }
+
+    .nav-link.active {
+      color: var(--accent);
+      border-bottom: 2px solid var(--accent);
+    }
+
+    /* ============ SEARCH BAR ============ */
+    .search-container {
+      flex: 1;
+      max-width: 400px;
+      margin: 0 2rem;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      gap: 0.5rem;
+      transition: border-color 0.3s;
+    }
+
+    .search-bar:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+    }
+
+    .search-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      outline: none;
+      font-size: 0.95em;
+    }
+
+    .search-bar input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .search-bar button {
+      background: var(--accent);
+      border: none;
+      color: var(--dark-bg);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .search-bar button:hover {
+      background: #00b8d4;
+      transform: translateY(-1px);
+    }
+
+    /* ============ MAIN CONTENT ============ */
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* ============ NEWSLETTER SECTION ============ */
+    .newsletter-section {
+      background: linear-gradient(135deg, #1a3a52 0%, #232f47 100%);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .newsletter-section h2 {
+      font-size: 1.5em;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .newsletter-content {
+      line-height: 1.8;
+      color: var(--text-secondary);
+      font-size: 0.95em;
+    }
+
+    .newsletter-highlights {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .highlight-card {
+      background: rgba(0, 200, 150, 0.1);
+      border: 1px solid rgba(0, 200, 150, 0.3);
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .highlight-card .value {
+      font-size: 1.8em;
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .highlight-card .label {
+      font-size: 0.85em;
+      color: var(--text-secondary);
+      margin-top: 0.3rem;
+    }
+
+    /* ============ FILTER TABS ============ */
+    .filter-tabs {
+      display: flex;
+      gap: 0.8rem;
+      margin: 2rem 0;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+
+    .filter-btn {
+      padding: 0.8rem 1.5rem;
+      background: transparent;
+      border: 2px solid var(--border);
+      color: var(--text-secondary);
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+      font-size: 0.95em;
+    }
+
+    .filter-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(0, 212, 255, 0.05);
+    }
+
+    .filter-btn.active {
+      background: var(--accent);
+      color: var(--dark-bg);
+      border-color: var(--accent);
+    }
+
+    /* ============ STOCK GRID ============ */
+    .stock-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .stock-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stock-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
+      transition: left 0.5s;
+    }
+
+    .stock-card:hover::before {
+      left: 100%;
+    }
+
+    .stock-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 12px 40px rgba(0, 212, 255, 0.15);
+      transform: translateY(-4px);
+    }
+
+    .stock-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      margin-bottom: 1rem;
+    }
+
+    .stock-symbol {
+      font-size: 1.6em;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .stock-price {
+      font-size: 1.8em;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stock-change {
+      font-size: 0.95em;
+      padding: 0.3rem 0.8rem;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .stock-change.positive {
+      background: rgba(0, 200, 150, 0.2);
+      color: var(--success);
+    }
+
+    .stock-change.negative {
+      background: rgba(255, 71, 87, 0.2);
+      color: var(--danger);
+    }
+
+    .signal-badge {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: linear-gradient(135deg, var(--accent) 0%, #00b8d4 100%);
+      color: var(--dark-bg);
+      border-radius: 20px;
+      font-size: 0.85em;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .stock-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin: 1rem 0;
+    }
+
+    .metric {
+      background: var(--secondary-bg);
+      padding: 0.8rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .metric-label {
+      font-size: 0.8em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 0.3rem;
+    }
+
+    .metric-value {
+      font-size: 1.3em;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .stock-footer {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .trend-icon {
+      font-size: 1.2em;
+    }
+
+    .trend-icon.up {
+      color: var(--success);
+    }
+
+    .trend-icon.down {
+      color: var(--danger);
+    }
+
+    /* ============ MODAL (DETAIL VIEW) ============ */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(5px);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      max-width: 900px;
+      width: 95%;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 2rem;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+    }
+
+    .modal-title {
+      font-size: 2em;
+      color: var(--text-primary);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 1.8em;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .modal-close:hover {
+      color: var(--danger);
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+
+    .chart-container {
+      background: var(--secondary-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem;
+      height: 400px;
+    }
+
+    .ai-section {
+      background: rgba(0, 212, 255, 0.05);
+      border: 1px solid rgba(0, 212, 255, 0.2);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .ai-section h3 {
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .ai-text {
+      line-height: 1.8;
+      color: var(--text-secondary);
+      font-size: 0.95em;
+    }
+
+    /* ============ AI CHAT WIDGET ============ */
+    .chat-widget {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 380px;
+      max-height: 600px;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      z-index: 150;
+      transform: translateY(calc(100% + 20px));
+      opacity: 0;
+      transition: all 0.3s;
+    }
+
+    .chat-widget.active {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .chat-header {
+      background: linear-gradient(135deg, var(--accent) 0%, #00b8d4 100%);
+      color: var(--dark-bg);
+      padding: 1rem;
+      border-radius: 16px 16px 0 0;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .chat-header button {
+      background: none;
+      border: none;
+      color: var(--dark-bg);
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .message {
+      padding: 0.8rem 1rem;
+      border-radius: 12px;
+      max-width: 85%;
+      word-wrap: break-word;
+      font-size: 0.9em;
+      line-height: 1.5;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: var(--accent);
+      color: var(--dark-bg);
+    }
+
+    .message.ai {
+      align-self: flex-start;
+      background: var(--secondary-bg);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .chat-input-area {
+      display: flex;
+      gap: 0.5rem;
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .chat-input-area input {
+      flex: 1;
+      background: var(--secondary-bg);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      padding: 0.8rem;
+      border-radius: 8px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+
+    .chat-input-area input:focus {
+      border-color: var(--accent);
+    }
+
+    .chat-input-area button {
+      background: var(--accent);
+      border: none;
+      color: var(--dark-bg);
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .chat-input-area button:hover {
+      background: #00b8d4;
+      transform: translateY(-2px);
+    }
+
+    .chat-toggle {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--accent) 0%, #00b8d4 100%);
+      border: none;
+      border-radius: 50%;
+      color: var(--dark-bg);
+      font-size: 1.5em;
+      cursor: pointer;
+      box-shadow: 0 12px 30px rgba(0, 212, 255, 0.4);
+      transition: all 0.3s;
+      z-index: 140;
+    }
+
+    .chat-toggle:hover {
+      transform: scale(1.1);
+      box-shadow: 0 16px 40px rgba(0, 212, 255, 0.5);
+    }
+
+    .chat-toggle.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* ============ RESPONSIVE ============ */
+    @media (max-width: 768px) {
+      .stock-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .modal-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .search-container {
+        display: none;
+      }
+
+      .filter-tabs {
+        overflow-x: auto;
+        gap: 0.5rem;
+      }
+
+      .chat-widget {
+        width: calc(100% - 20px);
+        right: 10px;
+      }
+
+      .header {
+        flex-wrap: wrap;
+        gap: 1rem;
+      }
+    }
+
+    /* ============ ANIMATIONS ============ */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .stock-card {
+      animation: fadeIn 0.4s ease-out;
+    }
   </style>
 </head>
+
 <body>
-<div id="newsletter" style="padding:2em;background:#232c4c;color:#fff;border-radius:16px;margin:1em 0;"></div>
-<div>
-  <button onclick="switchTab('priority')">Priority</button>
-  <button onclick="switchTab('meanrev')">Mean Reversion</button>
-  <button onclick="switchTab('gn1')">Golden Nugget 1</button>
-  <button onclick="switchTab('gn2')">Golden Nugget 2</button>
-</div>
-<div id="stockGrid"></div>
-
-<!-- Detail modal -->
-<div id="modal" style="display:none;position:fixed;top:0;left:0;width:100vw;height:100vh;background:#000a;">
-  <div id="modalContent" style="max-width:800px;margin:48px auto;background:#fff;padding:2em;border-radius:16px;">
-    <button onclick="closeModal()">X</button>
-    <div id="modalBody"></div>
+  <!-- ============ HEADER ============ -->
+  <div class="header">
+    <div class="logo">
+      <i class="fas fa-chart-line"></i>
+      <span>Elite Trading</span>
+    </div>
+    <div class="search-container">
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="Search ticker...">
+        <button onclick="analyzeStock()">Analyze</button>
+      </div>
+    </div>
+    <div class="header-nav">
+      <span class="nav-link" onclick="openNewsletter()">📰 Newsletter</span>
+      <span class="nav-link" onclick="toggleChat()">💬 Chat</span>
+    </div>
   </div>
-</div>
 
-<!-- AI Chat widget -->
-<div style="position:fixed;bottom:24px;right:24px;background:#fff;padding:1em;border-radius:12px;width:350px;">
-  <div id="chatBox" style="height:120px;overflow:auto;font-size:.93em;margin-bottom:.8em"></div>
-  <input id="chatInput" style="width:65%;padding:.5em;" placeholder="Ask AI...">
-  <button onclick="sendChat()">Send</button>
-</div>
+  <!-- ============ MAIN CONTENT ============ -->
+  <div class="container">
+    <!-- Newsletter Section -->
+    <div class="newsletter-section" id="newsletter">
+      <h2><i class="fas fa-newspaper"></i> Market Newsletter</h2>
+      <div class="newsletter-content" id="newsletterContent">
+        Loading AI-powered market summary...
+      </div>
+      <div class="newsletter-highlights" id="highlights"></div>
+    </div>
 
-<script>
-// --- Config ---
-const BACKEND_URL = 'https://elite-trading-with-exclusive-ip.onrender.com';
-const TAB_FILES = {
-  priority: '2025-11-20-watchlist-Priority.csv',
-  meanrev: '2025-11-20-watchlist.csv',
-  gn1: '2025-11-20-watchlist-GN1.csv',
-  gn2: '2025-11-20-watchlist-GN2.csv'
-};
+    <!-- Filter Tabs -->
+    <div class="filter-tabs">
+      <button class="filter-btn active" onclick="filterStocks('all')">All Stocks</button>
+      <button class="filter-btn" onclick="filterStocks('priority')">⭐ Priority</button>
+      <button class="filter-btn" onclick="filterStocks('meanrev')">📉 Mean Reversion</button>
+      <button class="filter-btn" onclick="filterStocks('gn1')">💎 Golden Nugget 1</button>
+      <button class="filter-btn" onclick="filterStocks('gn2')">💎 Golden Nugget 2</button>
+    </div>
 
-// --- State ---
-let stockData = {};
-let currentTab = 'priority';
+    <!-- Stock Grid -->
+    <div class="stock-grid" id="stockGrid">
+      <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
+        Loading stocks...
+      </div>
+    </div>
+  </div>
 
-// --- Helper: CSV parse ---
-function parseCSV(str) {
-  const [header, ...lines] = str.trim().split("\n");
-  const keys = header.split(",");
-  return lines.map(line => {
-    const vals = line.split(",");
-    let row = {};
-    keys.forEach((key, i) => row[key.trim()] = vals[i] ? vals[i].trim() : '');
-    return row;
-  });
-}
+  <!-- ============ DETAIL MODAL ============ -->
+  <div class="modal" id="detailModal" onclick="if(event.target === this) closeModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modalSymbol">SYMBOL</div>
+        </div>
+        <button class="modal-close" onclick="closeModal()">×</button>
+      </div>
+      
+      <div class="modal-grid">
+        <div class="chart-container" id="chartContainer"></div>
+        <div id="modalMetrics"></div>
+      </div>
 
-// --- Fetch, Newsletter, and Stock Grid Logic ---
-async function loadTab(tab) {
-  currentTab = tab;
-  const res = await fetch(`/${TAB_FILES[tab]}`);
-  const csv = await res.text();
-  const rows = parseCSV(csv);
-  stockData[tab] = rows;
+      <div class="ai-section">
+        <h3><i class="fas fa-brain"></i> AI Analysis</h3>
+        <div class="ai-text" id="aiAnalysis">Generating AI analysis...</div>
+      </div>
+    </div>
+  </div>
 
-  if (tab === 'priority') generateNewsletter(rows);
-  renderGrid(tab);
-}
-function switchTab(tab) { loadTab(tab); }
+  <!-- ============ AI CHAT WIDGET ============ -->
+  <button class="chat-toggle" id="chatToggle" onclick="toggleChat()">
+    <i class="fas fa-comments"></i>
+  </button>
+  <div class="chat-widget" id="chatWidget">
+    <div class="chat-header">
+      <span>AI Assistant</span>
+      <button onclick="toggleChat()">−</button>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+      <input type="text" id="chatInput" placeholder="Ask about stocks..." onkeypress="if(event.key==='Enter') sendChat()">
+      <button onclick="sendChat()">Send</button>
+    </div>
+  </div>
 
-async function generateNewsletter(rows) {
-  const prompt = `Write a trading newsletter summary for these tickers including mean revision, RSI, regime, highlights and unique observations:\n` +
-    rows.map(r=>`${r.Symbol} $${r.Last} | Chg: ${r.Change} | MeanRev: ${r['mean revision']} | Regime: ${r['Regime Detection']} | RSI: ${r['RSIWIlder']}`).join("\n");
-  const aiText = await callAI(prompt);
-  document.getElementById('newsletter').innerText = aiText || 'Newsletter unavailable.';
-}
+  <!-- ============ JAVASCRIPT ============ -->
+  <script>
+    // ===== CONFIG =====
+    const BACKEND_URL = 'https://elite-trading-with-exclusive-ip.onrender.com';
+    const WATCHLIST = [
+      {symbol:'MU',price:201.37,change:-10.87,meanRev:-2.47,rsi:41.24,regime:75.6,inst33:53,signal:"STRONG BUY",target1:220,target2:235,stop:190,category:'priority'},
+      {symbol:'SE',price:130.99,change:-8.74,meanRev:-2.46,rsi:27.72,regime:51.7,inst33:38,signal:"ACCUMULATE",target1:150,target2:165,stop:120,category:'meanrev'},
+      {symbol:'RIVN',price:14.66,change:-0.41,meanRev:-1.75,rsi:58.91,regime:99.1,inst33:65,signal:"BUY",target1:22,target2:25,stop:13,category:'gn1'},
+      {symbol:'EA',price:201.12,change:-0.23,meanRev:-1.74,rsi:46.82,regime:64.7,inst33:53,signal:"MONITOR",target1:210,target2:225,stop:190,category:'priority'},
+      {symbol:'LULU',price:164.69,change:-0.82,meanRev:-1.49,rsi:49.1,regime:28.2,inst33:58,signal:"MONITOR",target1:180,target2:200,stop:155,category:'gn2'},
+    ];
 
-// --- Stock Grid ---
-function renderGrid(tab) {
-  const rows = stockData[tab] || [];
-  document.getElementById('stockGrid').innerHTML = rows.slice(0,10).map((row,idx) => `
-    <div style="background:#1b2343;color:#c6e2f7;margin:1em 0;padding:1.2em;border-radius:10px;cursor:pointer"
-         onclick="showModal('${tab}', ${idx})">
-      <div><b>${row.Symbol || row['Symbol.1']}</b> $${row.Last || row['Last']}</div>
-      <div>Change: ${row.Change || row['Change']}, RSI: ${row['RSIWIlder']}, MR: ${row['mean revision']}, Regime: ${row['Regime Detection']}</div>
-    </div>`).join('');
-}
-
-// --- Detail Modal ---
-function showModal(tab, idx) {
-  const row = stockData[tab][idx];
-  const sym = row.Symbol || row['Symbol.1'];
-  const modalBody = document.getElementById('modalBody');
-  modalBody.innerHTML = `
-    <h2>${sym} ($${row.Last})</h2>
-    <b>Change:</b> ${row.Change}<br>
-    <b>Mean Rev:</b> ${row['mean revision']}<br>
-    <b>RSI:</b> ${row['RSIWIlder']}<br>
-    <b>Regime:</b> ${row['Regime Detection']}<br>
-    <b>Volume:</b> ${row.Volume}<br>
-    <b>Institutional Score:</b> ${row['Inst 33']}<br>
-    <br>
-    <div><b>AI Analysis:</b><div id="aiDetailBox">Loading...</div></div>
-    <div id="tvChart" style="height:400px;width:100%"></div>
-  `;
-  document.getElementById('modal').style.display = '';
-  // TradingView chart
-  new TradingView.widget({
-    "container_id": "tvChart",
-    "width": "100%",
-    "height": 400,
-    "symbol": sym,
-    "interval": "30",
-    "timezone": "America/New_York",
-    "theme": "dark",
-    "style": "1",
-    "hide_top_toolbar": true,
-    "save_image": false,
-    "hide_legend": false
-  });
-  // AI Expanded
-  callAI(`Deep actionable trading analysis for ${sym}: price $${row.Last}, mean revision ${row['mean revision']}, RSI ${row['RSIWIlder']}, Regime ${row['Regime Detection']}, highlights, opportunity, technical setup, and risk managment.`)
-    .then(txt => document.getElementById('aiDetailBox').innerText = txt || 'Unavailable');
-}
-function closeModal() { document.getElementById('modal').style.display = 'none'; }
-
-// --- Central AI function ---
-async function callAI(userPrompt) {
-  try {
-    const resp = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model: 'sonar',
-        messages:[{role:'user', content: userPrompt}],
-        temperature: 0.35,
-        max_tokens: 400
-      })
+    // ===== INIT =====
+    window.addEventListener('load', () => {
+      loadNewsletter();
+      renderStocks('all');
     });
-    if (resp.ok) {
-      const data = await resp.json();
-      return data.choices?.[0]?.message?.content || '';
+
+    // ===== NEWSLETTER =====
+    async function loadNewsletter() {
+      const prompt = `Write a brief, actionable trading market newsletter for these ${WATCHLIST.length} stocks:\n` +
+        WATCHLIST.map(s => `${s.symbol} $${s.price} | Change: ${s.change}% | Mean Rev: ${s.meanRev} | RSI: ${s.rsi} | Regime: ${s.regime}%`).join('\n') +
+        `\nInclude top 3 opportunities, key technical levels, and market context.`;
+      
+      const result = await callAI(prompt);
+      document.getElementById('newsletterContent').textContent = result || 'Newsletter unavailable';
+      
+      const highlights = `
+        <div class="highlight-card">
+          <div class="value">${WATCHLIST.length}</div>
+          <div class="label">Stocks Analyzed</div>
+        </div>
+        <div class="highlight-card">
+          <div class="value">${WATCHLIST.filter(s=>s.meanRev<-2).length}</div>
+          <div class="label">Mean Reversions</div>
+        </div>
+        <div class="highlight-card">
+          <div class="value">${WATCHLIST.filter(s=>s.signal.includes('BUY')).length}</div>
+          <div class="label">Buy Signals</div>
+        </div>
+      `;
+      document.getElementById('highlights').innerHTML = highlights;
     }
-    return 'Error loading AI response';
-  } catch(e) {
-    return 'AI unavailable';
-  }
-}
 
-// --- AI Chat ---
-let chatHistory = [];
-async function sendChat() {
-  const box = document.getElementById('chatBox');
-  const inp = document.getElementById('chatInput');
-  const msg = inp.value.trim();
-  if(!msg) return;
-  box.innerHTML += `<div style="color:#0af"><b>You:</b>${msg}</div>`;
-  inp.value = '';
-  const aiAnswer = await callAI(msg);
-  box.innerHTML += `<div style="color:#444"><b>AI:</b> ${aiAnswer}</div>`;
-  box.scrollTop = box.scrollHeight;
-}
+    // ===== RENDER STOCKS =====
+    function renderStocks(filter) {
+      const filtered = filter === 'all' ? WATCHLIST : WATCHLIST.filter(s => s.category === filter);
+      const html = filtered.map(s => `
+        <div class="stock-card" onclick="openDetail('${s.symbol}')">
+          <div class="stock-header">
+            <div>
+              <div class="stock-symbol">${s.symbol}</div>
+              <div class="stock-change ${s.change >= 0 ? 'positive' : 'negative'}">
+                ${s.change >= 0 ? '▲' : '▼'} ${Math.abs(s.change).toFixed(2)}%
+              </div>
+            </div>
+            <div class="stock-price">$${s.price.toFixed(2)}</div>
+          </div>
+          
+          <span class="signal-badge">${s.signal}</span>
+          
+          <div class="stock-metrics">
+            <div class="metric">
+              <div class="metric-label">Mean Rev</div>
+              <div class="metric-value">${s.meanRev}</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">RSI</div>
+              <div class="metric-value">${s.rsi}</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Regime</div>
+              <div class="metric-value">${s.regime}%</div>
+            </div>
+            <div class="metric">
+              <div class="metric-label">Inst 33</div>
+              <div class="metric-value">${s.inst33}</div>
+            </div>
+          </div>
+          
+          <div class="stock-footer">
+            <span>Targets: $${s.target1}-$${s.target2}</span>
+            <span class="trend-icon ${s.change >= 0 ? 'up' : 'down'}">
+              ${s.change >= 0 ? '📈' : '📉'}
+            </span>
+          </div>
+        </div>
+      `).join('');
+      
+      document.getElementById('stockGrid').innerHTML = html;
+    }
 
-// --- Init (load priority by default) ---
-window.onload = () => loadTab('priority');
-</script>
+    // ===== FILTER =====
+    function filterStocks(category) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderStocks(category);
+    }
+
+    // ===== DETAIL MODAL =====
+    async function openDetail(symbol) {
+      const stock = WATCHLIST.find(s => s.symbol === symbol);
+      document.getElementById('modalSymbol').textContent = symbol;
+      
+      const metricsHtml = `
+        <div class="stock-metrics">
+          <div class="metric"><div class="metric-label">Price</div><div class="metric-value">$${stock.price}</div></div>
+          <div class="metric"><div class="metric-label">Change</div><div class="metric-value">${stock.change}%</div></div>
+          <div class="metric"><div class="metric-label">Mean Rev</div><div class="metric-value">${stock.meanRev}</div></div>
+          <div class="metric"><div class="metric-label">RSI</div><div class="metric-value">${stock.rsi}</div></div>
+          <div class="metric"><div class="metric-label">Regime</div><div class="metric-value">${stock.regime}%</div></div>
+          <div class="metric"><div class="metric-label">Inst 33</div><div class="metric-value">${stock.inst33}</div></div>
+          <div class="metric"><div class="metric-label">T1</div><div class="metric-value">$${stock.target1}</div></div>
+          <div class="metric"><div class="metric-label">T2</div><div class="metric-value">$${stock.target2}</div></div>
+        </div>
+      `;
+      document.getElementById('modalMetrics').innerHTML = metricsHtml;
+
+      // AI Analysis
+      const aiPrompt = `Deep actionable trading analysis for ${symbol}: Price $${stock.price}, Mean Rev ${stock.meanRev}, RSI ${stock.rsi}, Regime ${stock.regime}%. Provide: technical setup, entry/targets/stop, risk/reward, and key levels.`;
+      const aiText = await callAI(aiPrompt);
+      document.getElementById('aiAnalysis').textContent = aiText || 'AI analysis unavailable';
+
+      // Chart
+      document.getElementById('chartContainer').innerHTML = '';
+      new TradingView.widget({
+        "container_id": "chartContainer",
+        "width": "100%",
+        "height": "100%",
+        "symbol": symbol,
+        "interval": "D",
+        "timezone": "America/New_York",
+        "theme": "dark",
+        "style": "1",
+        "hide_side_toolbar": false,
+        "hide_top_toolbar": false
+      });
+
+      document.getElementById('detailModal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('detailModal').classList.remove('active');
+    }
+
+    // ===== AI CALLS =====
+    async function callAI(prompt) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            model: 'sonar',
+            messages: [{role: 'user', content: prompt}],
+            temperature: 0.3,
+            max_tokens: 500
+          })
+        });
+        if (!res.ok) return 'Error: ' + res.status;
+        const data = await res.json();
+        return data.choices?.[0]?.message?.content || 'No response';
+      } catch (e) {
+        return 'Connection error: ' + e.message;
+      }
+    }
+
+    // ===== AI CHAT =====
+    let chatHistory = [];
+
+    function toggleChat() {
+      const widget = document.getElementById('chatWidget');
+      const toggle = document.getElementById('chatToggle');
+      widget.classList.toggle('active');
+      toggle.classList.toggle('hidden');
+    }
+
+    async function sendChat() {
+      const inp = document.getElementById('chatInput');
+      const msg = inp.value.trim();
+      if (!msg) return;
+
+      const box = document.getElementById('chatMessages');
+      box.innerHTML += `<div class="message user">${msg}</div>`;
+      inp.value = '';
+      box.scrollTop = box.scrollHeight;
+
+      const aiResp = await callAI(msg);
+      box.innerHTML += `<div class="message ai">${aiResp}</div>`;
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function analyzeStock() {
+      const ticker = document.getElementById('searchInput').value.toUpperCase();
+      const stock = WATCHLIST.find(s => s.symbol === ticker);
+      if (stock) {
+        openDetail(ticker);
+      } else {
+        alert('Stock not in watchlist');
+      }
+    }
+
+    function openNewsletter() {
+      alert('Newsletter already displayed at top of dashboard!');
+    }
+  </script>
 </body>
 </html>
