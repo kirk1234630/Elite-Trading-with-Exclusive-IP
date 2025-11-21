@@ -1,430 +1,73 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+from flask import Flask, jsonify, request
+from flask_cors import CORS
+import requests
+import os
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            min-height: 100vh;
-            color: #e0e0e0;
-        }
+app = Flask(__name__)
+CORS(app)
 
-        .top-nav {
-            background: rgba(0,0,0,0.3);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
+PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
+FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
 
-        .nav-logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-        }
+@app.route('/')
+def home():
+    return jsonify({'status': 'Elite Trading API Live'})
 
-        .nav-logo-text {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #667eea;
-        }
+@app.route('/api/config')
+def get_config():
+    return jsonify({
+        'perplexity_enabled': bool(PERPLEXITY_KEY),
+        'finnhub_enabled': bool(FINNHUB_KEY)
+    })
 
-        .container {
-            max-width: 1800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
+@app.route('/api/ai-analyze', methods=['POST'])
+def ai_analyze():
+    try:
+        if not PERPLEXITY_KEY:
+            return jsonify({'error': 'PERPLEXITY_API_KEY not set'}), 400
+        
+        data = request.json
+        
+        response = requests.post(
+            'https://api.perplexity.ai/chat/completions',
+            headers={
+                'Authorization': f'Bearer {PERPLEXITY_KEY}',
+                'Content-Type': 'application/json'
+            },
+            json=data,
+            timeout=90
+        )
+        
+        if response.status_code != 200:
+            return jsonify({'error': response.text}), response.status_code
+        
+        return jsonify(response.json())
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 40px 20px;
-            text-align: center;
-            color: white;
-            border-radius: 20px;
-            margin-bottom: 30px;
-        }
+@app.route('/api/quote')
+def get_quote():
+    ticker = request.args.get('ticker', 'AAPL').upper()
+    
+    if FINNHUB_KEY:
+        try:
+            url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
+            r = requests.get(url, timeout=5)
+            data = r.json()
+            if data.get('c'):
+                return jsonify({
+                    'symbol': ticker,
+                    'price': data.get('c'),
+                    'change': data.get('d', 0),
+                    'change_percent': data.get('dp', 0),
+                    'source': 'Finnhub'
+                })
+        except:
+            pass
+    
+    return jsonify({'error': 'Quote unavailable'}), 404
 
-        .title {
-            font-size: 2.8em;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .search-bar {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-            max-width: 900px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .search-input {
-            flex: 1;
-            padding: 15px 20px;
-            font-size: 1.1em;
-            background: rgba(255,255,255,0.12);
-            border: 2px solid rgba(255,255,255,0.25);
-            border-radius: 10px;
-            color: white;
-            outline: none;
-        }
-
-        .btn {
-            padding: 15px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 1em;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-
-        .plays-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .play-card {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 15px;
-            padding: 25px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.3s;
-        }
-
-        .play-card:hover {
-            transform: translateY(-5px);
-            border-color: #667eea;
-        }
-
-        .play-ticker {
-            font-size: 2em;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 10px;
-        }
-
-        .play-price {
-            font-size: 1.3em;
-            margin-bottom: 15px;
-        }
-
-        .signal-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 700;
-            margin-bottom: 15px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-        }
-
-        .metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-
-        .metric {
-            background: rgba(102, 126, 234, 0.12);
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 0.9em;
-        }
-
-        .detail-view {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 20px;
-            padding: 40px;
-            margin: 30px 0;
-        }
-
-        .detail-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .detail-title {
-            font-size: 2.8em;
-            font-weight: 700;
-        }
-
-        .detail-price {
-            font-size: 2em;
-            font-weight: 700;
-        }
-
-        .targets-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-            gap: 12px;
-            margin: 20px 0;
-        }
-
-        .target-box {
-            background: rgba(102, 126, 234, 0.15);
-            padding: 12px;
-            border-radius: 10px;
-            text-align: center;
-        }
-
-        .target-label {
-            font-size: 0.8em;
-            color: #999;
-            text-transform: uppercase;
-            margin-bottom: 5px;
-        }
-
-        .target-value {
-            font-size: 1.3em;
-            font-weight: 700;
-            color: #10b981;
-        }
-
-        .ai-box {
-            background: rgba(139, 92, 246, 0.15);
-            border-left: 4px solid #8b5cf6;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            line-height: 1.8;
-            white-space: pre-wrap;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 40px;
-        }
-
-        .spinner {
-            border: 4px solid rgba(255,255,255,0.1);
-            border-top: 4px solid #667eea;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .back-btn {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-    </style>
-</head>
-<body>
-    <div class="top-nav">
-        <div class="nav-logo" onclick="goHome()">
-            <span style="font-size: 2em;">📊</span>
-            <span class="nav-logo-text">Elite Trading</span>
-        </div>
-    </div>
-
-    <div class="container">
-        <div id="homeView">
-            <div class="header">
-                <h1 class="title">Elite Trading Analytics</h1>
-                <p style="font-size: 1.2em;">AI-Powered Stock Analysis + Live Data</p>
-            </div>
-
-            <div class="search-bar">
-                <input 
-                    type="text" 
-                    id="tickerInput" 
-                    class="search-input"
-                    placeholder="Enter ticker (AAPL, TSLA, MU)..."
-                    onkeypress="if(event.key==='Enter') analyzeStock()"
-                />
-                <button class="btn" onclick="analyzeStock()">Analyze</button>
-            </div>
-
-            <div class="plays-grid" id="playsGrid">
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p>Loading stocks...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="detailView" class="hidden"></div>
-    </div>
-
-    <script src="https://s3.tradingview.com/tv.js"></script>
-
-    <script>
-        const BACKEND_URL = 'https://elite-trading-with-exclusive-ip.onrender.com';
-
-        const WATCHLIST = [
-            {symbol:'MU',price:201.37,change:-10.87,meanRev:-2.47,rsi:41.24,regime:75.6,inst33:53,signal:"STRONG BUY",target1:220,target2:235,stop:190},
-            {symbol:'SE',price:130.99,change:-8.74,meanRev:-2.46,rsi:27.72,regime:51.7,inst33:38,signal:"ACCUMULATE",target1:150,target2:165,stop:120},
-            {symbol:'RIVN',price:14.66,change:-0.41,meanRev:-1.75,rsi:58.91,regime:99.1,inst33:65,signal:"BUY",target1:22,target2:25,stop:13},
-            {symbol:'EA',price:201.12,change:-0.23,meanRev:-1.74,rsi:46.82,regime:64.7,inst33:53,signal:"MONITOR",target1:210,target2:225,stop:190},
-            {symbol:'LULU',price:164.69,change:-0.82,meanRev:-1.49,rsi:49.1,regime:28.2,inst33:58,signal:"MONITOR",target1:180,target2:200,stop:155},
-        ];
-
-        window.addEventListener('load', () => {
-            loadStocks();
-        });
-
-        async function loadStocks() {
-            const grid = document.getElementById('playsGrid');
-            
-            grid.innerHTML = WATCHLIST.map(s => {
-                const c = s.change >= 0 ? '#10b981' : '#ef4444';
-                
-                return `
-                    <div class="play-card" onclick="analyzeStock('${s.symbol}')">
-                        <div class="play-ticker">${s.symbol}</div>
-                        <div class="play-price" style="color: ${c}">
-                            $${s.price.toFixed(2)} ${s.change > 0 ? '+' : ''}${s.change.toFixed(2)}%
-                        </div>
-                        <span class="signal-badge">${s.signal}</span>
-                        
-                        <div class="metrics">
-                            <div class="metric"><strong>Mean Rev:</strong> ${s.meanRev}</div>
-                            <div class="metric"><strong>Inst 33:</strong> ${s.inst33}</div>
-                            <div class="metric"><strong>RSI:</strong> ${s.rsi}</div>
-                            <div class="metric"><strong>Regime:</strong> ${s.regime}%</div>
-                        </div>
-                        
-                        <div style="font-size: 0.9em; color: #8b5cf6;">
-                            Click for AI Analysis →
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function goHome() {
-            document.getElementById('homeView').classList.remove('hidden');
-            document.getElementById('detailView').classList.add('hidden');
-            loadStocks();
-        }
-
-        async function analyzeStock(ticker) {
-            if (typeof ticker !== 'string') {
-                ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
-            }
-            if (!ticker) return;
-
-            document.getElementById('homeView').classList.add('hidden');
-            document.getElementById('detailView').classList.remove('hidden');
-            document.getElementById('detailView').innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing...</p></div>';
-
-            let stock = WATCHLIST.find(s => s.symbol === ticker);
-            if (!stock) {
-                stock = {
-                    symbol: ticker, price: 100, change: 0, meanRev: 0, rsi: 50,
-                    regime: 50, inst33: 50, signal: "RESEARCH", target1: 110, target2: 120, stop: 90
-                };
-            }
-
-            let aiText = 'Getting AI analysis...';
-            try {
-                const res = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        model: 'llama-3.1-sonar-large-128k-online',
-                        messages: [{
-                            role: 'user',
-                            content: `Analyze ${ticker}. Price: $${stock.price}. Mean Reversion: ${stock.meanRev}. RSI: ${stock.rsi}. Provide 3-4 sentence analysis with entry/target prices.`
-                        }],
-                        temperature: 0.3,
-                        max_tokens: 300
-                    })
-                });
-
-                if (res.ok) {
-                    const data = await res.json();
-                    aiText = data.choices[0].message.content;
-                } else {
-                    const error = await res.json();
-                    aiText = `Error: ${error.error || 'API returned ' + res.status}`;
-                }
-            } catch (err) {
-                aiText = `Connection error: ${err.message}`;
-            }
-
-            const c = stock.change >= 0 ? '#10b981' : '#ef4444';
-
-            document.getElementById('detailView').innerHTML = `
-                <div class="detail-view">
-                    <div class="detail-header">
-                        <div>
-                            <div class="detail-title">${ticker}</div>
-                            <span class="signal-badge">${stock.signal}</span>
-                        </div>
-                        <div style="text-align: right;">
-                            <div class="detail-price" style="color: ${c}">$${stock.price.toFixed(2)}</div>
-                            <div style="color: ${c}; font-size: 1.1em;">
-                                ${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%
-                            </div>
-                        </div>
-                    </div>
-
-                    ${aiText ? `<div class="ai-box">🤖 ${aiText}</div>` : ''}
-
-                    <h3 style="margin-top: 30px; margin-bottom: 15px;">📊 Price Targets</h3>
-                    <div class="targets-grid">
-                        <div class="target-box">
-                            <div class="target-label">Entry</div>
-                            <div class="target-value">$${stock.price.toFixed(2)}</div>
-                        </div>
-                        <div class="target-box">
-                            <div class="target-label">Target 1</div>
-                            <div class="target-value">$${stock.target1}</div>
-                        </div>
-                        <div class="target-box">
-                            <div class="target-label">Target 2</div>
-                            <div class="target-value">$${stock.target2}</div>
-                        </div>
-                        <div class="target-box">
-                            <div class="target-label">Stop</div>
-                            <div class="target-value" style="color: #ef4444;">$${stock.stop}</div>
-                        </div>
-                    </div>
-
-                    <button class="btn back-btn" onclick="goHome()" style="width: 100%; padding: 15px; margin-top: 20px; font-size: 1.1em;">← Back</button>
-                </div>
-            `;
-        }
-    </script>
-</body>
-</html>
+if __name__ == '__main__':
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port, debug=False)
