@@ -3,470 +3,188 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API Diagnostic Tool</title>
+    <title>Simple API Tester</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Monaco', 'Courier New', monospace;
+            font-family: monospace;
             background: #1a1a2e;
             color: #e0e0e0;
             padding: 40px;
-            line-height: 1.6;
-        }
-
-        .container {
-            max-width: 1200px;
+            max-width: 1000px;
             margin: 0 auto;
         }
-
-        h1 {
-            color: #667eea;
-            font-size: 2.5em;
-            margin-bottom: 10px;
-        }
-
-        h2 {
-            color: #10b981;
-            font-size: 1.8em;
-            margin: 30px 0 15px 0;
-            border-bottom: 2px solid #10b981;
-            padding-bottom: 10px;
-        }
-
-        .test-section {
+        h1 { color: #10b981; }
+        .test-box {
             background: #2d2d44;
+            padding: 30px;
             border-radius: 15px;
-            padding: 25px;
             margin: 20px 0;
-            border: 2px solid #667eea;
         }
-
-        .input-group {
-            display: flex;
-            gap: 15px;
-            margin: 20px 0;
-            flex-wrap: wrap;
-        }
-
-        input {
-            flex: 1;
-            min-width: 200px;
-            padding: 15px;
-            background: #1a1a2e;
-            border: 2px solid #667eea;
-            border-radius: 10px;
-            color: white;
-            font-size: 1.1em;
-            font-family: 'Monaco', monospace;
-        }
-
         button {
-            padding: 15px 40px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-size: 1.1em;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
-        }
-
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .result {
-            background: #1a1a2e;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 15px 0;
-            border-left: 5px solid #667eea;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            max-height: 500px;
-            overflow-y: auto;
-        }
-
-        .success {
-            border-left-color: #10b981;
-            background: rgba(16, 185, 129, 0.1);
-        }
-
-        .error {
-            border-left-color: #ef4444;
-            background: rgba(239, 68, 68, 0.1);
-        }
-
-        .status {
-            display: inline-block;
-            padding: 5px 15px;
-            border-radius: 5px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .status-success {
             background: #10b981;
             color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin: 10px 5px;
         }
-
-        .status-error {
-            background: #ef4444;
-            color: white;
-        }
-
-        .status-testing {
-            background: #f59e0b;
-            color: white;
-        }
-
-        .endpoint-list {
-            background: #2d2d44;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 15px 0;
-        }
-
-        .endpoint-item {
-            padding: 15px;
-            margin: 10px 0;
+        button:hover { background: #059669; }
+        .result {
             background: #1a1a2e;
-            border-radius: 8px;
-            border-left: 4px solid #667eea;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
-
-        .code {
-            background: #0f0f1e;
-            padding: 15px;
+        .success { border-left: 5px solid #10b981; }
+        .error { border-left: 5px solid #ef4444; }
+        input {
+            width: 100%;
+            padding: 12px;
+            background: #1a1a2e;
+            border: 2px solid #667eea;
             border-radius: 8px;
+            color: white;
+            font-size: 1em;
             margin: 10px 0;
-            font-family: 'Monaco', monospace;
-            font-size: 0.9em;
-            color: #10b981;
-        }
-
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-left: 10px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔧 API Diagnostic Tool</h1>
-        <p style="font-size: 1.1em; color: #aaa; margin-bottom: 30px;">
-            Test all available endpoints to find which one works for stock price data
-        </p>
-
-        <div class="test-section">
-            <h2>1. Configure API Base URL</h2>
-            <div class="input-group">
-                <input 
-                    type="text" 
-                    id="apiBase" 
-                    value="https://elite-trading-with-exclusive-ip.onrender.com/api"
-                    placeholder="Enter API base URL"
-                />
-            </div>
-        </div>
-
-        <div class="test-section">
-            <h2>2. Test Stock Ticker</h2>
-            <div class="input-group">
-                <input 
-                    type="text" 
-                    id="ticker" 
-                    value="AAPL"
-                    placeholder="Enter ticker (e.g., AAPL, TSLA)"
-                />
-                <button onclick="testAllEndpoints()">🚀 TEST ALL ENDPOINTS</button>
-            </div>
-        </div>
-
-        <div class="test-section">
-            <h2>3. Known Endpoints to Test</h2>
-            <div class="endpoint-list">
-                <div class="endpoint-item">
-                    <strong>1. /quote?ticker={ticker}</strong> - Alpha Vantage QUOTE_ENDPOINT
-                </div>
-                <div class="endpoint-item">
-                    <strong>2. /timeseries?ticker={ticker}</strong> - Alpha Vantage TIME_SERIES_DAILY
-                </div>
-                <div class="endpoint-item">
-                    <strong>3. /price/{ticker}</strong> - Simple price endpoint
-                </div>
-                <div class="endpoint-item">
-                    <strong>4. /stock/{ticker}</strong> - Stock data endpoint
-                </div>
-                <div class="endpoint-item">
-                    <strong>5. /data/{ticker}</strong> - Generic data endpoint
-                </div>
-            </div>
-        </div>
-
-        <div id="results"></div>
-
-        <div class="test-section" style="margin-top: 40px;">
-            <h2>4. Custom Endpoint Test</h2>
-            <p style="color: #aaa; margin-bottom: 15px;">Try a custom endpoint if none of the above work:</p>
-            <div class="input-group">
-                <input 
-                    type="text" 
-                    id="customEndpoint" 
-                    placeholder="/your-custom-endpoint"
-                />
-                <button onclick="testCustomEndpoint()">Test Custom</button>
-            </div>
-            <div id="customResult"></div>
+    <h1>🔍 Quick API Tester</h1>
+    
+    <div class="test-box">
+        <h2>Test Your Backend</h2>
+        <input type="text" id="apiUrl" value="https://elite-trading-with-exclusive-ip.onrender.com/api" placeholder="API Base URL">
+        <input type="text" id="ticker" value="AAPL" placeholder="Ticker">
+        
+        <div style="margin-top: 20px;">
+            <button onclick="testQuote()">Test /quote</button>
+            <button onclick="testTimeseries()">Test /timeseries</button>
+            <button onclick="testDirect()">Test Direct API</button>
+            <button onclick="testCORS()">Check CORS</button>
         </div>
     </div>
 
+    <div id="results"></div>
+
     <script>
-        const ENDPOINTS = [
-            {
-                name: 'Alpha Vantage Quote',
-                path: '/quote?ticker={ticker}',
-                parser: (data) => {
-                    if (data['Global Quote']) {
-                        return {
-                            price: data['Global Quote']['05. price'],
-                            change: data['Global Quote']['10. change percent'],
-                            volume: data['Global Quote']['06. volume']
-                        };
-                    }
-                    return null;
-                }
-            },
-            {
-                name: 'Alpha Vantage Time Series',
-                path: '/timeseries?ticker={ticker}',
-                parser: (data) => {
-                    if (data['Time Series (Daily)']) {
-                        const dates = Object.keys(data['Time Series (Daily)']);
-                        const latest = data['Time Series (Daily)'][dates[0]];
-                        return {
-                            price: latest['4. close'],
-                            volume: latest['5. volume'],
-                            date: dates[0]
-                        };
-                    }
-                    return null;
-                }
-            },
-            {
-                name: 'Simple Price',
-                path: '/price/{ticker}',
-                parser: (data) => {
-                    if (data.price) {
-                        return {
-                            price: data.price,
-                            change: data.change,
-                            volume: data.volume
-                        };
-                    }
-                    return null;
-                }
-            },
-            {
-                name: 'Stock Data',
-                path: '/stock/{ticker}',
-                parser: (data) => {
-                    if (data.price || data.currentPrice) {
-                        return {
-                            price: data.price || data.currentPrice,
-                            change: data.change || data.changePercent
-                        };
-                    }
-                    return null;
-                }
-            },
-            {
-                name: 'Generic Data',
-                path: '/data/{ticker}',
-                parser: (data) => {
-                    return data; // Return as-is
-                }
-            }
-        ];
+        const resultsDiv = document.getElementById('results');
 
-        async function testAllEndpoints() {
-            const apiBase = document.getElementById('apiBase').value.trim();
-            const ticker = document.getElementById('ticker').value.trim().toUpperCase();
-            
-            if (!apiBase || !ticker) {
-                alert('Please enter both API base URL and ticker');
-                return;
-            }
-
-            const resultsDiv = document.getElementById('results');
-            resultsDiv.innerHTML = '<h2>🔄 Testing Endpoints...</h2>';
-
-            for (const endpoint of ENDPOINTS) {
-                await testEndpoint(apiBase, ticker, endpoint, resultsDiv);
-            }
-
-            resultsDiv.innerHTML += '<h2 style="color: #10b981; margin-top: 40px;">✅ Testing Complete!</h2>';
+        function log(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.textContent = message;
+            resultsDiv.insertBefore(div, resultsDiv.firstChild);
         }
 
-        async function testEndpoint(apiBase, ticker, endpoint, resultsDiv) {
-            const testDiv = document.createElement('div');
-            testDiv.className = 'test-section';
+        async function testQuote() {
+            const base = document.getElementById('apiUrl').value;
+            const ticker = document.getElementById('ticker').value;
+            const url = `${base}/quote?ticker=${ticker}`;
             
-            const url = `${apiBase}${endpoint.path.replace('{ticker}', ticker)}`;
+            log(`Testing: ${url}`, 'info');
             
-            testDiv.innerHTML = `
-                <h3 style="color: #667eea;">Testing: ${endpoint.name}</h3>
-                <div class="code">URL: ${url}</div>
-                <div>
-                    <span class="status status-testing">TESTING <span class="spinner"></span></span>
-                </div>
-                <div id="result-${endpoint.name.replace(/\s/g, '')}"></div>
-            `;
-            
-            resultsDiv.appendChild(testDiv);
-
             try {
-                const startTime = Date.now();
+                const start = Date.now();
                 const response = await fetch(url, { 
-                    signal: AbortSignal.timeout(10000) 
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    signal: AbortSignal.timeout(10000)
                 });
-                const duration = Date.now() - startTime;
-
-                const resultDiv = document.getElementById(`result-${endpoint.name.replace(/\s/g, '')}`);
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-
-                const data = await response.json();
-                const parsed = endpoint.parser(data);
-
-                if (parsed) {
-                    resultDiv.innerHTML = `
-                        <span class="status status-success">✅ SUCCESS</span>
-                        <div style="color: #aaa; margin: 10px 0;">Response time: ${duration}ms</div>
-                        <div class="result success">
-                            <strong style="color: #10b981;">Parsed Data:</strong><br>
-                            ${JSON.stringify(parsed, null, 2)}
-                        </div>
-                        <details>
-                            <summary style="cursor: pointer; color: #667eea; margin: 10px 0;">Show Raw Response</summary>
-                            <div class="result">
-                                ${JSON.stringify(data, null, 2)}
-                            </div>
-                        </details>
-                        <div style="background: rgba(16, 185, 129, 0.2); padding: 15px; border-radius: 8px; margin-top: 15px;">
-                            <strong style="color: #10b981;">✅ THIS ENDPOINT WORKS!</strong><br>
-                            <span style="color: #ddd;">Use this endpoint in your trading app:</span>
-                            <div class="code" style="margin-top: 10px;">
-const API_BASE = '${apiBase}';<br>
-const endpoint = '${endpoint.path}';<br>
-const url = \`\${API_BASE}\${endpoint.replace('{ticker}', ticker)}\`;
-                            </div>
-                        </div>
-                    `;
+                const duration = Date.now() - start;
+                
+                log(`Response Status: ${response.status} ${response.statusText}\nTime: ${duration}ms`, 
+                    response.ok ? 'success' : 'error');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`SUCCESS! Data:\n${JSON.stringify(data, null, 2)}`, 'success');
                 } else {
-                    resultDiv.innerHTML = `
-                        <span class="status status-error">⚠️ UNEXPECTED FORMAT</span>
-                        <div style="color: #aaa; margin: 10px 0;">Response time: ${duration}ms</div>
-                        <div class="result">
-                            <strong>Raw Response:</strong><br>
-                            ${JSON.stringify(data, null, 2)}
-                        </div>
-                        <p style="color: #f59e0b; margin-top: 10px;">
-                            Response received but data format doesn't match expected structure.
-                        </p>
-                    `;
+                    const text = await response.text();
+                    log(`Error Response:\n${text}`, 'error');
                 }
-
             } catch (error) {
-                const resultDiv = document.getElementById(`result-${endpoint.name.replace(/\s/g, '')}`);
-                resultDiv.innerHTML = `
-                    <span class="status status-error">❌ FAILED</span>
-                    <div class="result error">
-                        <strong style="color: #ef4444;">Error:</strong><br>
-                        ${error.message}
-                    </div>
-                `;
+                log(`FAILED: ${error.message}`, 'error');
             }
-
-            // Small delay between requests
-            await new Promise(resolve => setTimeout(resolve, 500));
         }
 
-        async function testCustomEndpoint() {
-            const apiBase = document.getElementById('apiBase').value.trim();
-            const ticker = document.getElementById('ticker').value.trim().toUpperCase();
-            const customPath = document.getElementById('customEndpoint').value.trim();
+        async function testTimeseries() {
+            const base = document.getElementById('apiUrl').value;
+            const ticker = document.getElementById('ticker').value;
+            const url = `${base}/timeseries?ticker=${ticker}`;
             
-            if (!customPath) {
-                alert('Enter a custom endpoint path');
-                return;
-            }
-
-            const url = `${apiBase}${customPath.replace('{ticker}', ticker)}`;
-            const resultDiv = document.getElementById('customResult');
+            log(`Testing: ${url}`, 'info');
             
-            resultDiv.innerHTML = `
-                <div class="result">
-                    <span class="status status-testing">TESTING <span class="spinner"></span></span>
-                    <div class="code">URL: ${url}</div>
-                </div>
-            `;
-
             try {
                 const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
+                log(`Response: ${response.status}`, response.ok ? 'success' : 'error');
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`Data:\n${JSON.stringify(data, null, 2)}`, 'success');
                 }
-
-                const data = await response.json();
-
-                resultDiv.innerHTML = `
-                    <div class="result success">
-                        <span class="status status-success">✅ SUCCESS</span>
-                        <pre style="margin-top: 15px;">${JSON.stringify(data, null, 2)}</pre>
-                    </div>
-                `;
-
             } catch (error) {
-                resultDiv.innerHTML = `
-                    <div class="result error">
-                        <span class="status status-error">❌ FAILED</span>
-                        <div style="margin-top: 15px;">${error.message}</div>
-                    </div>
-                `;
+                log(`FAILED: ${error.message}`, 'error');
             }
         }
 
-        // Auto-test on load with a sample ticker
+        async function testDirect() {
+            log('Testing direct Alpha Vantage API...', 'info');
+            const ticker = document.getElementById('ticker').value;
+            const apiKey = 'demo'; // Using demo key
+            const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=${apiKey}`;
+            
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`Direct Alpha Vantage works!\n${JSON.stringify(data, null, 2)}`, 'success');
+                    
+                    if (data['Note']) {
+                        log('⚠️ Rate limit reached on demo key', 'error');
+                    }
+                } else {
+                    log(`Direct API failed: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`Direct API error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testCORS() {
+            const base = document.getElementById('apiUrl').value;
+            log('Checking if backend is accessible...', 'info');
+            
+            try {
+                // Test basic connectivity
+                const response = await fetch(base, { 
+                    method: 'GET',
+                    signal: AbortSignal.timeout(5000)
+                });
+                
+                log(`Backend responds: ${response.status}`, 'success');
+                log(`CORS Headers:\nAccess-Control-Allow-Origin: ${response.headers.get('Access-Control-Allow-Origin') || 'Not set'}`, 'info');
+                
+            } catch (error) {
+                log(`Backend unreachable: ${error.message}\n\nPossible issues:\n1. Backend is down\n2. CORS not configured\n3. Network/firewall blocking`, 'error');
+            }
+        }
+
+        // Auto-test on load
         window.addEventListener('load', () => {
-            console.log('API Diagnostic Tool Ready');
-            console.log('Click "TEST ALL ENDPOINTS" to begin');
+            log('Ready! Click buttons to test your API.', 'success');
+            
+            // Helpful tips
+            setTimeout(() => {
+                log(`💡 TIPS:\n- If all tests fail, your backend may be down\n- Check Render.com dashboard for backend status\n- Look for error messages in browser console (F12)\n- Try the "Test Direct API" to verify Alpha Vantage works`, 'info');
+            }, 1000);
         });
     </script>
 </body>
