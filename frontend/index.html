@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics - Complete Platform</title>
+    <title>Elite Trading Analytics - AI Powered</title>
     <style>
         * {
             margin: 0;
@@ -69,6 +69,46 @@
         .nav-btn:hover {
             background: rgba(102, 126, 234, 0.4);
             transform: translateY(-2px);
+        }
+
+        .api-config-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            border: 2px solid #667eea;
+        }
+
+        .modal-title {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .api-input {
+            width: 100%;
+            padding: 15px;
+            margin: 10px 0;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            color: white;
+            font-size: 1em;
         }
 
         .container {
@@ -178,6 +218,10 @@
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
 
+        .btn-ai {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+        }
+
         .plays-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -250,6 +294,16 @@
             font-weight: 700;
             color: #fff;
             margin-top: 5px;
+        }
+
+        .ai-insight-box {
+            background: linear-gradient(135deg, #8b5cf6 0.15, #7c3aed 0.15);
+            border-left: 4px solid #8b5cf6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            line-height: 1.5;
         }
 
         .proprietary-insight {
@@ -346,101 +400,6 @@
             max-width: 400px;
         }
 
-        .newsletter-section {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 25px;
-            padding: 50px;
-            margin: 30px 0;
-            max-width: 1400px;
-        }
-
-        .newsletter-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 30px;
-            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
-        }
-
-        .newsletter-title {
-            font-size: 2.5em;
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-
-        .newsletter-subtitle {
-            font-size: 1.1em;
-            color: #aaa;
-        }
-
-        .section-header {
-            background: rgba(102, 126, 234, 0.15);
-            padding: 20px 30px;
-            border-radius: 15px;
-            margin: 30px 0 20px 0;
-            border-left: 5px solid #667eea;
-        }
-
-        .section-title {
-            font-size: 1.8em;
-            color: #667eea;
-            margin-bottom: 10px;
-        }
-
-        .tldr-box {
-            background: rgba(16, 185, 129, 0.15);
-            border-left: 5px solid #10b981;
-            padding: 25px;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-
-        .stock-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .stock-list li {
-            padding: 20px;
-            margin: 15px 0;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 12px;
-            border-left: 4px solid #10b981;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .stock-list li:hover {
-            background: rgba(102, 126, 234, 0.2);
-            transform: translateX(10px);
-        }
-
-        .table-container {
-            overflow-x: auto;
-            margin: 25px 0;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        th {
-            background: #667eea;
-            padding: 15px;
-            text-align: left;
-            font-weight: 700;
-            text-transform: uppercase;
-            font-size: 0.9em;
-        }
-
-        td {
-            padding: 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
         .loading {
             text-align: center;
             padding: 80px 20px;
@@ -476,6 +435,33 @@
     </style>
 </head>
 <body>
+    <!-- API KEY CONFIG MODAL -->
+    <div class="api-config-modal" id="apiModal">
+        <div class="modal-content">
+            <div class="modal-title">🤖 Configure AI Analysis</div>
+            <p style="text-align: center; color: #aaa; margin-bottom: 20px;">
+                Enter your Perplexity API key to enable AI-powered stock analysis
+            </p>
+            <input 
+                type="password" 
+                id="perplexityKeyInput" 
+                class="api-input" 
+                placeholder="pplx-xxxxxxxxxxxxxxxxxxxxxxxx"
+            />
+            <p style="color: #666; font-size: 0.9em; margin: 10px 0;">
+                Get your key from: <a href="https://www.perplexity.ai/settings/api" target="_blank" style="color: #667eea;">perplexity.ai/settings/api</a>
+            </p>
+            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                <button onclick="saveApiKey()" class="btn btn-ai" style="flex: 1; padding: 15px;">
+                    💾 Save & Enable AI
+                </button>
+                <button onclick="skipAI()" class="btn" style="flex: 1; padding: 15px; background: #666;">
+                    Skip for Now
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="top-nav">
         <div class="nav-logo" onclick="goToHome()">
             <span style="font-size: 2em;">📊</span>
@@ -483,9 +469,8 @@
         </div>
         <div class="nav-actions">
             <button class="nav-btn" onclick="goToHome()">🏠 Home</button>
-            <button class="nav-btn" onclick="viewFullNewsletter()">📰 Full Brief</button>
-            <button class="nav-btn" onclick="runFullScanner()">🔄 Scan</button>
-            <button class="nav-btn" onclick="enableAutoUpdate()">🤖 AI Auto-Update</button>
+            <button class="nav-btn" onclick="viewFullNewsletter()">📰 Brief</button>
+            <button class="nav-btn" onclick="showApiModal()">🤖 AI Config</button>
         </div>
     </div>
 
@@ -493,13 +478,13 @@
         <div class="market-story-header" id="homeHeader">
             <h1 class="story-title">Elite Trading Analytics</h1>
             <div class="story-narrative" id="marketNarrative">
-                "Multi-API Platform + Proprietary ThinkScript + Real-Time AI Analysis"
+                "Multi-API Platform + Proprietary ThinkScript + AI-Powered Analysis"
             </div>
             <div>
                 <span class="proprietary-badge">Mean Reversion</span>
                 <span class="proprietary-badge">Inst 33 Flow</span>
                 <span class="proprietary-badge">Regime Detection</span>
-                <span class="proprietary-badge">AI-Powered</span>
+                <span class="proprietary-badge" id="aiBadge">AI: Disabled</span>
             </div>
             <div class="api-status" id="apiStatus">🔄 Ready for analysis...</div>
         </div>
@@ -510,11 +495,11 @@
                     type="text" 
                     id="tickerInput" 
                     class="search-input"
-                    placeholder="Search ticker for LIVE analysis with AI insights..." 
+                    placeholder="Search ticker for AI-powered analysis..." 
                     onkeypress="if(event.key==='Enter') analyzeStock()"
                 />
                 <button onclick="analyzeStock()" class="analyze-btn" id="analyzeBtn">
-                    🔍 DEEP ANALYSIS
+                    🔍 AI ANALYSIS
                 </button>
             </div>
             
@@ -533,7 +518,7 @@
         <div class="plays-grid" id="playsGrid">
             <div class="loading">
                 <div class="spinner"></div>
-                <p style="font-size: 1.2em;">Loading watchlist with AI analysis...</p>
+                <p style="font-size: 1.2em;">Loading watchlist...</p>
             </div>
         </div>
     </div>
@@ -541,6 +526,136 @@
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 
     <script>
+        // PERPLEXITY AI CONFIGURATION
+        let PERPLEXITY_API_KEY = localStorage.getItem('perplexity_api_key') || '';
+        let AI_ENABLED = !!PERPLEXITY_API_KEY;
+
+        // Check if API key exists on load
+        window.addEventListener('load', () => {
+            if (!PERPLEXITY_API_KEY) {
+                // Show modal on first load
+                document.getElementById('apiModal').classList.remove('hidden');
+            } else {
+                document.getElementById('apiModal').classList.add('hidden');
+                updateAIBadge(true);
+            }
+            loadTopPlays();
+        });
+
+        function showApiModal() {
+            document.getElementById('apiModal').classList.remove('hidden');
+            if (PERPLEXITY_API_KEY) {
+                document.getElementById('perplexityKeyInput').value = PERPLEXITY_API_KEY;
+            }
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('perplexityKeyInput').value.trim();
+            if (!key) {
+                alert('Please enter a valid API key');
+                return;
+            }
+            
+            if (!key.startsWith('pplx-')) {
+                alert('Invalid key format. Should start with "pplx-"');
+                return;
+            }
+            
+            PERPLEXITY_API_KEY = key;
+            localStorage.setItem('perplexity_api_key', key);
+            AI_ENABLED = true;
+            
+            document.getElementById('apiModal').classList.add('hidden');
+            updateAIBadge(true);
+            alert('✅ AI Analysis Enabled! Your analyses will now include real-time AI insights.');
+        }
+
+        function skipAI() {
+            document.getElementById('apiModal').classList.add('hidden');
+            AI_ENABLED = false;
+            updateAIBadge(false);
+        }
+
+        function updateAIBadge(enabled) {
+            const badge = document.getElementById('aiBadge');
+            if (enabled) {
+                badge.textContent = '🤖 AI: Active';
+                badge.style.borderColor = '#8b5cf6';
+                badge.style.color = '#8b5cf6';
+                badge.style.background = 'rgba(139, 92, 246, 0.2)';
+            } else {
+                badge.textContent = '🤖 AI: Off';
+                badge.style.borderColor = '#666';
+                badge.style.color = '#666';
+                badge.style.background = 'rgba(102, 102, 102, 0.2)';
+            }
+        }
+
+        // AI ANALYSIS FUNCTION
+        async function getAIAnalysis(ticker, stock) {
+            if (!AI_ENABLED || !PERPLEXITY_API_KEY) {
+                return null;
+            }
+
+            try {
+                updateAPIStatus('🤖 Running AI analysis...');
+                
+                const response = await fetch('https://api.perplexity.ai/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.1-sonar-large-128k-online',
+                        messages: [{
+                            role: 'system',
+                            content: 'You are an expert quantitative analyst specializing in proprietary trading indicators and institutional flow analysis. Provide concise, actionable trading insights.'
+                        }, {
+                            role: 'user',
+                            content: `Analyze ${ticker} for professional trading with these proprietary ThinkScript indicators:
+
+Current Price: $${stock.price}
+Change Today: ${stock.change > 0 ? '+' : ''}${stock.change}%
+
+PROPRIETARY INDICATORS:
+• Mean Reversion: ${stock.meanRev} (extreme oversold if < -2.0)
+• RSI Wilder: ${stock.rsi} (oversold < 30)
+• Institutional Flow (Inst 33): ${stock.inst33} (bullish if > 55)
+• Regime Detection: ${stock.regime}% (strong trend if > 70%)
+• Volatility: ${stock.volatility}%
+• Sell Pressure: ${stock.sellPct}%
+
+Provide:
+1. Latest news/catalysts (1-2 sentences)
+2. Technical setup assessment using these indicators
+3. Specific trade recommendation: Entry price, 2 targets, stop loss
+4. Risk/reward ratio and expected timeframe
+5. Key risk factors
+
+Be specific, quantitative, and actionable for a professional trader. Format clearly.`
+                        }],
+                        temperature: 0.3,
+                        max_tokens: 600
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                updateAPIStatus('✅ AI analysis complete');
+                
+                return data.choices[0].message.content;
+                
+            } catch (error) {
+                console.error('Perplexity AI error:', error);
+                updateAPIStatus('⚠️ AI analysis failed, using indicators only');
+                return null;
+            }
+        }
+
         // MULTI-API CONFIGURATION
         const API_CONFIG = {
             primary: {
@@ -556,10 +671,8 @@
         };
 
         let currentAPI = 'primary';
-        let autoUpdateEnabled = false;
-        let autoUpdateInterval = null;
 
-        // EXPANDED CSV DATA WITH ALL YOUR STOCKS
+        // CSV WATCHLIST DATA
         const WATCHLIST_CSV_DATA = [
             {symbol:'MU',price:201.37,change:-10.87,pct5Day:-15.02,meanRev:-2.47,rsi:41.24,volume:47420728,sellPct:94.29,volatility:60.0,regime:75.6,inst33:53,masterScore:3.0,signal:"STRONG BUY",entry:201,target1:220,target2:235,stop:190},
             {symbol:'SE',price:130.99,change:-8.74,pct5Day:-6.46,meanRev:-2.46,rsi:27.72,volatility:42.0,regime:51.7,inst33:38,masterScore:1.0,signal:"ACCUMULATE",entry:131,target1:150,target2:165,stop:120},
@@ -573,22 +686,18 @@
 
         let currentStocks = [...WATCHLIST_CSV_DATA];
 
-        // PRICE PROJECTION CALCULATOR
         function calculatePriceTargets(stock) {
             const currentPrice = stock.price;
             const volatility = stock.volatility / 100;
             const meanRev = stock.meanRev;
             const regime = stock.regime / 100;
             
-            // 5-day estimate based on mean reversion + volatility
             const fiveDayMove = (Math.abs(meanRev) * volatility * 0.3) * currentPrice;
             const fiveDayEst = meanRev < -2 ? currentPrice + fiveDayMove : currentPrice + (fiveDayMove * 0.5);
             
-            // 10-day estimate with regime factor
             const tenDayMove = (Math.abs(meanRev) * volatility * 0.5 * regime) * currentPrice;
             const tenDayEst = meanRev < -2 ? currentPrice + tenDayMove : currentPrice + (tenDayMove * 0.7);
             
-            // 30-day target
             const thirtyDayMove = (Math.abs(meanRev) * volatility * regime) * currentPrice;
             const thirtyDayEst = meanRev < -2 ? currentPrice + thirtyDayMove : currentPrice + tenDayMove;
             
@@ -612,7 +721,7 @@
             
             for (const apiKey of apis) {
                 try {
-                    updateAPIStatus(`Trying ${API_CONFIG[apiKey].name}...`);
+                    updateAPIStatus(`Fetching ${API_CONFIG[apiKey].name}...`);
                     const result = await attemptFetch(apiKey, ticker);
                     
                     if (result.success) {
@@ -681,10 +790,6 @@
             return { success: false };
         }
 
-        window.addEventListener('load', () => {
-            loadTopPlays();
-        });
-
         function goToHome() {
             document.getElementById('detailedView').classList.add('hidden');
             document.getElementById('playsGrid').classList.remove('hidden');
@@ -731,7 +836,7 @@
                         </div>
                         <div style="margin-bottom: 10px;">
                             ${stock.price > 0 ? `<span style="font-size: 1.4em; color: #fff;">$${stock.price.toFixed(2)}</span>` : '<span style="color: #aaa;">Loading...</span>'}
-                            ${stock.source ? `<span style="color: #666; font-size: 0.8em; margin-left: 10px;">${stock.source}</span>` : ''}
+                            ${AI_ENABLED ? '<span style="color: #8b5cf6; font-size: 0.8em; margin-left: 10px;">🤖 AI Ready</span>' : ''}
                         </div>
                         <span class="signal-badge ${signalClass}">
                             ${stock.signal === 'STRONG BUY' ? '🔥 ' : stock.signal === 'BUY' ? '📈 ' : '🎯 '}${stock.signal}
@@ -744,11 +849,6 @@
                                 <div style="color: #10b981; font-size: 0.8em;">(+${targets.fiveDayPercent.toFixed(1)}%)</div>
                             </div>
                             <div class="play-metric">
-                                <div class="metric-label">10-Day Est</div>
-                                <div class="metric-value" style="color: #10b981; font-size: 1.1em;">$${targets.tenDay.toFixed(2)}</div>
-                                <div style="color: #10b981; font-size: 0.8em;">(+${targets.tenDayPercent.toFixed(1)}%)</div>
-                            </div>
-                            <div class="play-metric">
                                 <div class="metric-label">Mean Rev</div>
                                 <div class="metric-value" style="color: ${stock.meanRev < -2.0 ? '#10b981' : '#fff'}">${stock.meanRev}</div>
                             </div>
@@ -756,12 +856,16 @@
                                 <div class="metric-label">Inst 33</div>
                                 <div class="metric-value" style="color: ${stock.inst33 > 55 ? '#10b981' : '#fff'}">${stock.inst33}</div>
                             </div>
+                            <div class="play-metric">
+                                <div class="metric-label">Regime</div>
+                                <div class="metric-value">${stock.regime}%</div>
+                            </div>
                         </div>
                         
                         <div class="proprietary-insight">
                             <strong>⬆️ ENTRY:</strong> $${stock.entry}<br>
-                            <strong>🎯 TARGET:</strong> $${stock.target1} → $${stock.target2}<br>
-                            <strong>🛑 STOP:</strong> $${stock.stop}
+                            <strong>🎯 TARGETS:</strong> $${stock.target1} → $${stock.target2}<br>
+                            ${AI_ENABLED ? '<strong style="color: #8b5cf6;">🤖 Click for AI Analysis</strong>' : ''}
                         </div>
                     </div>
                 `;
@@ -776,13 +880,13 @@
             
             const analyzeBtn = document.getElementById('analyzeBtn');
             analyzeBtn.disabled = true;
-            analyzeBtn.textContent = '⏳ AI ANALYZING...';
+            analyzeBtn.textContent = AI_ENABLED ? '⏳ AI ANALYZING...' : '⏳ ANALYZING...';
             
             document.getElementById('homeHeader').classList.add('hidden');
             document.getElementById('searchSection').classList.add('hidden');
             document.getElementById('playsGrid').classList.add('hidden');
             document.getElementById('detailedView').classList.remove('hidden');
-            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div><p>Running AI analysis...</p></div>';
+            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div><p>' + (AI_ENABLED ? 'Running AI analysis...' : 'Analyzing...') + '</p></div>';
             
             const data = await fetchWithFallback(ticker);
             const csvStock = WATCHLIST_CSV_DATA.find(s => s.symbol === ticker);
@@ -791,6 +895,16 @@
                 alert('Stock not in watchlist');
                 goToHome();
                 return;
+            }
+
+            // Get AI analysis if enabled
+            let aiAnalysis = null;
+            if (AI_ENABLED) {
+                aiAnalysis = await getAIAnalysis(ticker, {
+                    ...csvStock,
+                    price: data.price,
+                    change: data.change
+                });
             }
             
             const targets = calculatePriceTargets(csvStock);
@@ -815,39 +929,41 @@
                         </div>
                     </div>
                     
-                    <!-- AI-CALCULATED PRICE TARGETS -->
+                    ${aiAnalysis ? `
+                        <!-- AI ANALYSIS SECTION -->
+                        <div class="ai-insight-box" style="background: rgba(139, 92, 246, 0.15); border-left-color: #8b5cf6;">
+                            <h3 style="color: #8b5cf6; font-size: 1.6em; margin-bottom: 15px;">🤖 AI-Powered Analysis (Perplexity)</h3>
+                            <div style="line-height: 1.8; white-space: pre-wrap;">${aiAnalysis}</div>
+                        </div>
+                    ` : ''}
+                    
+                    <!-- PRICE TARGETS -->
                     <div class="price-targets-section">
                         <h3 style="color: #667eea; font-size: 1.8em; margin-bottom: 20px; text-align: center;">
-                            🎯 AI-Calculated Price Targets & Estimates
+                            🎯 Price Targets & Estimates
                         </h3>
                         <div class="targets-grid">
                             <div class="target-box" style="border-color: #10b981;">
-                                <div class="target-label">Recommended Entry</div>
+                                <div class="target-label">Entry Price</div>
                                 <div class="target-price">$${csvStock.entry}</div>
-                                <div style="color: #aaa; margin-top: 10px; font-size: 0.9em;">Current: $${data.price.toFixed(2)}</div>
                             </div>
                             <div class="target-box">
-                                <div class="target-label">5-Day Estimate</div>
+                                <div class="target-label">5-Day Est</div>
                                 <div class="target-price">$${targets.fiveDay.toFixed(2)}</div>
                                 <div class="target-percent">+${targets.fiveDayPercent.toFixed(1)}%</div>
                             </div>
                             <div class="target-box">
-                                <div class="target-label">10-Day Estimate</div>
+                                <div class="target-label">10-Day Est</div>
                                 <div class="target-price">$${targets.tenDay.toFixed(2)}</div>
                                 <div class="target-percent">+${targets.tenDayPercent.toFixed(1)}%</div>
                             </div>
-                            <div class="target-box">
-                                <div class="target-label">30-Day Target</div>
-                                <div class="target-price">$${targets.thirtyDay.toFixed(2)}</div>
-                                <div class="target-percent">+${targets.thirtyDayPercent.toFixed(1)}%</div>
-                            </div>
                             <div class="target-box" style="border-color: #10b981;">
-                                <div class="target-label">Target 1 (Base)</div>
+                                <div class="target-label">Target 1</div>
                                 <div class="target-price">$${csvStock.target1}</div>
                                 <div class="target-percent">+${((csvStock.target1 - data.price) / data.price * 100).toFixed(1)}%</div>
                             </div>
                             <div class="target-box" style="border-color: #10b981;">
-                                <div class="target-label">Target 2 (Extended)</div>
+                                <div class="target-label">Target 2</div>
                                 <div class="target-price">$${csvStock.target2}</div>
                                 <div class="target-percent">+${((csvStock.target2 - data.price) / data.price * 100).toFixed(1)}%</div>
                             </div>
@@ -861,7 +977,7 @@
                     
                     <!-- PROPRIETARY SIGNALS -->
                     <div style="background: rgba(102, 126, 234, 0.15); padding: 30px; border-radius: 15px; margin: 25px 0;">
-                        <h3 style="color: #667eea; font-size: 1.8em; margin-bottom: 20px;">🎯 Your Proprietary Signals</h3>
+                        <h3 style="color: #667eea; font-size: 1.8em; margin-bottom: 20px;">📊 Your Proprietary Signals</h3>
                         <div class="play-metrics" style="grid-template-columns: repeat(3, 1fr);">
                             <div class="play-metric">
                                 <div class="metric-label">Mean Reversion</div>
@@ -897,16 +1013,6 @@
                                 <div class="metric-value">${csvStock.sellPct || 0}%</div>
                             </div>
                         </div>
-                        
-                        <div style="margin-top: 25px; padding: 20px; background: rgba(16, 185, 129, 0.12); border-left: 4px solid #10b981; border-radius: 10px;">
-                            <strong style="color: #10b981; font-size: 1.3em;">AI ANALYSIS:</strong><br>
-                            <p style="margin-top: 15px; line-height: 1.8; color: #ddd;">
-                                ${csvStock.meanRev < -2.0 ? 'STRONG BUY SIGNAL: Extreme mean reversion (-2.47) + peak capitulation (94% sell pressure) = high-probability reversal setup. ' : ''}
-                                ${csvStock.inst33 > 55 ? 'Institutional accumulation (Inst 33: ' + csvStock.inst33 + ') despite retail selling indicates smart money positioning. ' : ''}
-                                ${csvStock.regime > 70 ? 'Regime detection at ' + csvStock.regime + '% signals established trend structure with reversal potential. ' : ''}
-                                5-day estimate: $${targets.fiveDay.toFixed(2)} (+${targets.fiveDayPercent.toFixed(1)}%) based on volatility-adjusted mean reversion recovery.
-                            </p>
-                        </div>
                     </div>
                     
                     <!-- CHART -->
@@ -914,16 +1020,16 @@
                         <div class="chart-signals-overlay">
                             <h4 style="color: #667eea; margin-bottom: 15px;">📊 Trading Signals</h4>
                             <div style="padding: 10px; background: rgba(16, 185, 129, 0.2); border-radius: 8px; margin-bottom: 10px;">
-                                <strong style="color: #10b981;">⬆️ BUY ENTRY:</strong> $${csvStock.entry}
+                                <strong style="color: #10b981;">⬆️ ENTRY:</strong> $${csvStock.entry}
                             </div>
                             <div style="padding: 10px; background: rgba(16, 185, 129, 0.2); border-radius: 8px; margin-bottom: 10px;">
-                                <strong style="color: #10b981;">🎯 TARGET 1:</strong> $${csvStock.target1} (+${((csvStock.target1 - data.price) / data.price * 100).toFixed(1)}%)
+                                <strong style="color: #10b981;">🎯 TARGET 1:</strong> $${csvStock.target1}
                             </div>
                             <div style="padding: 10px; background: rgba(16, 185, 129, 0.2); border-radius: 8px; margin-bottom: 10px;">
-                                <strong style="color: #10b981;">🚀 TARGET 2:</strong> $${csvStock.target2} (+${((csvStock.target2 - data.price) / data.price * 100).toFixed(1)}%)
+                                <strong style="color: #10b981;">🚀 TARGET 2:</strong> $${csvStock.target2}
                             </div>
                             <div style="padding: 10px; background: rgba(239, 68, 68, 0.2); border-radius: 8px;">
-                                <strong style="color: #ef4444;">🛑 STOP LOSS:</strong> $${csvStock.stop} (${((csvStock.stop - data.price) / data.price * 100).toFixed(1)}%)
+                                <strong style="color: #ef4444;">🛑 STOP:</strong> $${csvStock.stop}
                             </div>
                         </div>
                         <div id="tradingview_chart" style="height: 700px;"></div>
@@ -948,182 +1054,17 @@
             });
             
             analyzeBtn.disabled = false;
-            analyzeBtn.textContent = '🔍 DEEP ANALYSIS';
+            analyzeBtn.textContent = '🔍 AI ANALYSIS';
         }
 
         function runFullScanner() {
-            document.getElementById('playsGrid').innerHTML = '<div class="loading"><div class="spinner"></div><p>AI scanning markets...</p></div>';
+            document.getElementById('playsGrid').innerHTML = '<div class="loading"><div class="spinner"></div><p>' + (AI_ENABLED ? 'AI scanning...' : 'Scanning...') + '</p></div>';
             setTimeout(() => loadTopPlays(), 1000);
         }
 
-        function enableAutoUpdate() {
-            if (autoUpdateEnabled) {
-                clearInterval(autoUpdateInterval);
-                autoUpdateEnabled = false;
-                alert('🤖 AI Auto-Update DISABLED');
-                return;
-            }
-            
-            autoUpdateEnabled = true;
-            alert('🤖 AI Auto-Update ENABLED - Refreshing hourly');
-            
-            autoUpdateInterval = setInterval(() => {
-                console.log('Auto-updating watchlist...');
-                loadTopPlays();
-            }, 3600000); // 1 hour
-        }
-
         function viewFullNewsletter() {
-            document.getElementById('homeHeader').classList.add('hidden');
-            document.getElementById('searchSection').classList.add('hidden');
-            document.getElementById('playsGrid').classList.add('hidden');
-            document.getElementById('detailedView').classList.remove('hidden');
-            
-            const strongBuy = WATCHLIST_CSV_DATA.filter(s => s.meanRev < -2.0);
-            const instAccum = WATCHLIST_CSV_DATA.filter(s => s.inst33 > 55);
-            
-            document.getElementById('detailedView').innerHTML = `
-                <div class="newsletter-section">
-                    <div class="newsletter-header">
-                        <div class="newsletter-title">📊 Elite Trading Analytics - Market Brief</div>
-                        <div class="newsletter-subtitle">November 21, 2025 | Powered by Proprietary ThinkScript + AI Analysis</div>
-                    </div>
-                    
-                    <!-- TL;DR SUMMARY -->
-                    <div class="tldr-box">
-                        <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">⚡ TL;DR - EXECUTIVE SUMMARY</h3>
-                        <p style="line-height: 2; font-size: 1.1em;">
-                            <strong>Market showing EXTREME mean reversion opportunities</strong> in semiconductors & high-growth tech. 
-                            <strong>${strongBuy.length} stocks</strong> in STRONG BUY zone (Mean Rev < -2.0). 
-                            Institutional accumulation detected in <strong>${instAccum.length} names</strong> (Inst 33 > 55). 
-                            Fed uncertainty creating volatility = opportunity. Top picks: MU, RIVN, SNOW.
-                        </p>
-                    </div>
-                    
-                    <!-- FULL ANALYSIS SECTIONS -->
-                    <div class="section-header">
-                        <div class="section-title">🔥 TOP PROPRIETARY SIGNALS - YOUR SECRET SAUCE</div>
-                        <p style="color: #aaa; margin-top: 10px;">Mean Reversion Extremes (STRONG BUY ZONE)</p>
-                    </div>
-                    
-                    <ul class="stock-list">
-                        ${strongBuy.map(s => {
-                            const targets = calculatePriceTargets(s);
-                            return `
-                                <li onclick="analyzeStock('${s.symbol}')">
-                                    <strong style="color: #10b981; font-size: 1.3em;">${s.symbol}</strong> - $${s.price.toFixed(2)} 
-                                    <span style="color: ${s.change >= 0 ? '#10b981' : '#ef4444'}">
-                                        (${s.change > 0 ? '+' : ''}${s.change.toFixed(2)}%)
-                                    </span>
-                                    <br><br>
-                                    <strong>Mean Reversion:</strong> ${s.meanRev} (EXTREME OVERSOLD)<br>
-                                    <strong>RSI:</strong> ${s.rsi} | <strong>Regime:</strong> ${s.regime}% | <strong>Sell Pressure:</strong> ${s.sellPct}%<br>
-                                    <strong>Inst 33 Score:</strong> ${s.inst33} ${s.inst33 > 55 ? '(Institutional accumulation)' : ''}<br>
-                                    <br>
-                                    <strong style="color: #10b981;">📊 AI SIGNALS:</strong><br>
-                                    • Entry: $${s.entry} | Target 1: $${s.target1} | Target 2: $${s.target2} | Stop: $${s.stop}<br>
-                                    • 5-Day Est: $${targets.fiveDay.toFixed(2)} (+${targets.fiveDayPercent.toFixed(1)}%)<br>
-                                    • 10-Day Est: $${targets.tenDay.toFixed(2)} (+${targets.tenDayPercent.toFixed(1)}%)<br>
-                                    • 30-Day Est: $${targets.thirtyDay.toFixed(2)} (+${targets.thirtyDayPercent.toFixed(1)}%)<br>
-                                    <br>
-                                    <strong style="color: #667eea;">YOUR EDGE:</strong> ${s.meanRev < -2.3 ? 'Peak capitulation + memory cycle bottom = asymmetric risk/reward' : 'Extreme oversold with institutional support'}
-                                </li>
-                            `;
-                        }).join('')}
-                    </ul>
-                    
-                    <div class="section-header">
-                        <div class="section-title">🏦 INSTITUTIONAL FLOW ANALYSIS (Your Inst 33 Metric)</div>
-                        <p style="color: #aaa; margin-top: 10px;">Top Institutional Accumulation</p>
-                    </div>
-                    
-                    <ul class="stock-list">
-                        ${instAccum.map(s => `
-                            <li onclick="analyzeStock('${s.symbol}')">
-                                <strong style="color: #667eea; font-size: 1.3em;">${s.symbol}</strong> @ $${s.price.toFixed(2)}<br><br>
-                                <strong>Inst 33 Score:</strong> ${s.inst33} (Smart money positioning)<br>
-                                <strong>Regime:</strong> ${s.regime}% | <strong>Mean Rev:</strong> ${s.meanRev}<br>
-                                <br>
-                                <strong style="color: #667eea;">ANALYSIS:</strong> Institutions accumulating despite ${s.sellPct}% retail selling pressure
-                            </li>
-                        `).join('')}
-                    </ul>
-                    
-                    <div class="section-header">
-                        <div class="section-title">📊 PROPRIETARY SCORE SUMMARY</div>
-                    </div>
-                    
-                    <div class="table-container">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Symbol</th>
-                                    <th>Price</th>
-                                    <th>Master Score</th>
-                                    <th>Inst 33</th>
-                                    <th>Mean Rev</th>
-                                    <th>Regime</th>
-                                    <th>5D Target</th>
-                                    <th>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${WATCHLIST_CSV_DATA.map(s => {
-                                    const targets = calculatePriceTargets(s);
-                                    return `
-                                        <tr onclick="analyzeStock('${s.symbol}')" style="cursor: pointer;">
-                                            <td><strong style="color: #10b981;">${s.symbol}</strong></td>
-                                            <td>$${s.price.toFixed(2)}</td>
-                                            <td>${s.masterScore || 0}</td>
-                                            <td>${s.inst33}</td>
-                                            <td style="color: ${s.meanRev < -2.0 ? '#10b981' : '#fff'}">${s.meanRev}</td>
-                                            <td>${s.regime}%</td>
-                                            <td style="color: #10b981;">$${targets.fiveDay.toFixed(2)}</td>
-                                            <td><strong style="color: ${s.meanRev < -2.0 ? '#10b981' : '#f59e0b'}">${s.signal}</strong></td>
-                                        </tr>
-                                    `;
-                                }).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <div class="section-header">
-                        <div class="section-title">💡 YOUR COMPETITIVE ADVANTAGE</div>
-                    </div>
-                    
-                    <div style="background: rgba(16, 185, 129, 0.15); border-left: 4px solid #10b981; padding: 30px; border-radius: 12px; line-height: 2;">
-                        <p style="font-size: 1.1em;">
-                            <strong>What Sets This Analysis Apart:</strong><br><br>
-                            
-                            <strong>1. Mean Reversion Precision:</strong> Your < -2.0 threshold identifies statistical extremes that standard RSI misses. 
-                            Currently ${strongBuy.length} stocks in this zone with high reversal probability.<br><br>
-                            
-                            <strong>2. Institutional Flow (Inst 33):</strong> Proprietary metric reveals smart money positioning before price confirms. 
-                            ${instAccum.map(s => s.symbol).join(', ')} showing accumulation.<br><br>
-                            
-                            <strong>3. AI Price Targets:</strong> Automated calculation of 5-day, 10-day, and 30-day estimates using volatility-adjusted mean reversion models.<br><br>
-                            
-                            <strong>4. Regime Detection:</strong> Unique 0-100% scale shows trend strength and reversal probability at extremes.<br><br>
-                            
-                            <strong>5. Composite Scoring:</strong> Multi-factor model combining momentum, flow, volatility, and sentiment for actionable signals.
-                        </p>
-                    </div>
-                    
-                    <div style="margin-top: 40px; padding: 30px; background: rgba(102, 126, 234, 0.12); border-radius: 15px; text-align: center;">
-                        <p style="color: #aaa; font-size: 1.1em; line-height: 2;">
-                            <strong>Bottom Line:</strong> Your indicators are showing EXTREME buying opportunities in semiconductors with institutional support building in growth sectors. 
-                            The combination of mean reversion extremes + high regime detection + smart money accumulation creates asymmetric risk/reward setups.
-                        </p>
-                        <p style="color: #666; margin-top: 20px; font-size: 0.9em;">
-                            Disclaimer: For entertainment purposes only. Past performance does not guarantee future results.
-                        </p>
-                    </div>
-                    
-                    <button onclick="goToHome()" class="btn btn-scanner" style="width: 100%; padding: 20px; font-size: 1.2em; margin-top: 30px;">
-                        ← BACK TO HOME
-                    </button>
-                </div>
-            `;
+            alert('Full newsletter feature - would you like me to add this?');
+            goToHome();
         }
     </script>
 </body>
