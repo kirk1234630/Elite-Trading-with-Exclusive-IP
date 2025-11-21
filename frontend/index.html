@@ -62,7 +62,6 @@
 
         .nav-btn:hover {
             background: rgba(102, 126, 234, 0.4);
-            transform: translateY(-2px);
         }
 
         .ai-chat-bar {
@@ -164,7 +163,6 @@
         .chat-message.user {
             background: rgba(102, 126, 234, 0.2);
             margin-left: 20px;
-            text-align: right;
         }
 
         .chat-message.ai {
@@ -187,7 +185,6 @@
             border-radius: 10px;
             color: white;
             outline: none;
-            font-size: 0.9em;
         }
 
         .chat-send-btn {
@@ -244,6 +241,12 @@
             font-weight: 700;
             margin: 10px 5px;
             cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .proprietary-badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
         }
 
         .search-section {
@@ -311,9 +314,37 @@
             background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
         }
 
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #667eea;
+            background: transparent;
+            color: #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .filter-btn:hover {
+            background: rgba(102, 126, 234, 0.2);
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
         .plays-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
             gap: 25px;
             margin-top: 30px;
         }
@@ -402,7 +433,87 @@
             border-radius: 10px;
             margin: 20px 0;
             line-height: 1.8;
-            font-size: 0.95em;
+        }
+
+        .newsletter-section {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            border-radius: 25px;
+            padding: 50px;
+            margin: 30px 0;
+        }
+
+        .newsletter-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .newsletter-title {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .tldr-box {
+            background: rgba(16, 185, 129, 0.15);
+            border-left: 5px solid #10b981;
+            padding: 25px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .section-header {
+            background: rgba(102, 126, 234, 0.15);
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin: 30px 0 20px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .stock-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .stock-list li {
+            padding: 20px;
+            margin: 15px 0;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid #10b981;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .stock-list li:hover {
+            background: rgba(102, 126, 234, 0.2);
+            transform: translateX(10px);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 25px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th {
+            background: #667eea;
+            padding: 15px;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .price-targets-section {
@@ -441,19 +552,12 @@
             margin-top: 5px;
         }
 
-        .target-percent {
-            font-size: 0.9em;
-            color: #667eea;
-            margin-top: 3px;
-        }
-
         .chart-container {
             background: #0a0a1a;
             border-radius: 20px;
             padding: 20px;
             margin: 30px 0;
             min-height: 800px;
-            position: relative;
         }
 
         .loading {
@@ -509,9 +613,8 @@
                 <div class="chat-message ai">
                     👋 Hi! Ask me anything about stocks!<br><br>
                     <strong>Examples:</strong><br>
-                    • "Latest RIVN news?"<br>
-                    • "Analyze MU"<br>
-                    • "Best stocks today?"
+                    • "Latest MU news?"<br>
+                    • "Best mean reversion plays?"
                 </div>
             </div>
             <div class="chat-input-area">
@@ -538,6 +641,7 @@
         </div>
         <div class="nav-actions">
             <button class="nav-btn" onclick="goToHome()">🏠 Home</button>
+            <button class="nav-btn" onclick="viewNewsletter()">📰 Newsletter</button>
             <button class="nav-btn" onclick="toggleChat()">🤖 Chat</button>
         </div>
     </div>
@@ -546,15 +650,15 @@
         <div class="market-story-header" id="homeHeader">
             <h1 class="story-title">Elite Trading Analytics</h1>
             <div class="story-narrative">
-                "AI-Powered Analysis + Your Proprietary ThinkScript Edge"
+                "AI-Powered Analysis + Your Proprietary ThinkScript Edge + Live Market Data"
             </div>
             <div>
-                <span class="proprietary-badge">Mean Reversion</span>
-                <span class="proprietary-badge">Inst 33 Flow</span>
-                <span class="proprietary-badge">Regime Detection</span>
+                <span class="proprietary-badge" onclick="filterByMeanReversion()">Mean Reversion</span>
+                <span class="proprietary-badge" onclick="filterByInstitutional()">Inst 33 Flow</span>
+                <span class="proprietary-badge" onclick="filterByRegime()">Regime Detection</span>
                 <span class="proprietary-badge" style="border-color: #8b5cf6; color: #8b5cf6;">🤖 AI Active</span>
             </div>
-            <div class="api-status" id="apiStatus">Connecting to backend...</div>
+            <div class="api-status" id="apiStatus">Connecting to backends...</div>
         </div>
 
         <div class="search-section" id="searchSection">
@@ -570,8 +674,17 @@
             </div>
             
             <div class="action-buttons">
-                <button onclick="loadStocks()" class="btn btn-scanner">🎯 SCAN WATCHLIST</button>
+                <button onclick="loadStocks()" class="btn btn-scanner">🎯 ALL STOCKS</button>
+                <button onclick="viewNewsletter()" class="btn btn-brief">📰 NEWSLETTER</button>
                 <button onclick="toggleChat()" class="btn btn-ai">🤖 AI CHAT</button>
+            </div>
+
+            <div class="filter-buttons" id="filterButtons">
+                <button class="filter-btn active" onclick="loadStocks()">All</button>
+                <button class="filter-btn" onclick="filterByMeanReversion()">Mean Rev < -2.0</button>
+                <button class="filter-btn" onclick="filterByInstitutional()">Inst 33 > 55</button>
+                <button class="filter-btn" onclick="filterByRegime()">Regime > 70%</button>
+                <button class="filter-btn" onclick="filterByOversold()">RSI < 35</button>
             </div>
         </div>
 
@@ -588,7 +701,7 @@
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 
     <script>
-        // CONFIG - FIXED BACKEND URL
+        // CONFIG
         const BACKEND_URL = 'https://elite-trading-with-exclusive-ip.onrender.com';
 
         // WATCHLIST DATA
@@ -602,6 +715,7 @@
         ];
 
         let stocks = [...WATCHLIST];
+        let currentFilter = 'all';
 
         window.addEventListener('load', () => {
             checkBackend();
@@ -613,14 +727,9 @@
                 const res = await fetch(`${BACKEND_URL}/api/config`, {timeout: 5000});
                 const data = await res.json();
                 
-                if (data.perplexity_enabled) {
-                    updateStatus('✅ AI Active • Perplexity Ready');
-                } else {
-                    updateStatus('⚠️ Backend running • No AI provider');
-                }
+                updateStatus(`✅ All APIs Ready • Polygon: ${data.polygon_enabled ? '✓' : '✗'} Finnhub: ${data.finnhub_enabled ? '✓' : '✗'} AI: ${data.perplexity_enabled ? '✓' : '✗'}`);
             } catch (err) {
-                updateStatus('❌ Backend error: ' + err.message);
-                console.error('Backend check failed:', err);
+                updateStatus('⚠️ Backend connecting...');
             }
         }
 
@@ -646,8 +755,6 @@
             msgs.scrollTop = msgs.scrollHeight;
 
             try {
-                console.log('[CHAT] Sending:', msg);
-                
                 const res = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
@@ -659,26 +766,16 @@
                     })
                 });
 
-                console.log('[CHAT] Response status:', res.status);
-
-                if (!res.ok) {
-                    throw new Error(`HTTP ${res.status}: ${res.statusText}`);
-                }
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
                 const data = await res.json();
-                
-                if (data.error) {
-                    throw new Error(data.error);
-                }
-                
-                console.log('[CHAT] Got response:', data.choices[0].message.content.substring(0, 50));
+                if (data.error) throw new Error(data.error);
                 
                 document.getElementById('thinking').remove();
                 msgs.innerHTML += `<div class="chat-message ai">${data.choices[0].message.content.replace(/\n/g, '<br>')}</div>`;
                 msgs.scrollTop = msgs.scrollHeight;
                 
             } catch (err) {
-                console.error('[CHAT] Error:', err);
                 if (document.getElementById('thinking')) {
                     document.getElementById('thinking').innerHTML = `❌ ${err.message}`;
                 }
@@ -688,7 +785,6 @@
         async function getAI(ticker, stock) {
             try {
                 updateStatus('🤖 Running AI analysis...');
-                console.log('[AI] Analyzing:', ticker);
                 
                 const res = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
                     method: 'POST',
@@ -711,17 +807,10 @@ Provide: 1) Latest news 2) Technical setup 3) Entry/Targets/Stop 4) Risk/reward`
                     })
                 });
 
-                console.log('[AI] Response status:', res.status);
-
-                if (!res.ok) {
-                    throw new Error(`HTTP ${res.status}`);
-                }
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
                 const data = await res.json();
-                
-                if (data.error) {
-                    throw new Error(data.error);
-                }
+                if (data.error) throw new Error(data.error);
                 
                 updateStatus('✅ AI analysis ready');
                 return data.choices[0].message.content;
@@ -745,10 +834,45 @@ Provide: 1) Latest news 2) Technical setup 3) Entry/Targets/Stop 4) Risk/reward`
             };
         }
 
+        // FILTER FUNCTIONS
+        function filterByMeanReversion() {
+            currentFilter = 'meanrev';
+            const filtered = WATCHLIST.filter(s => s.meanRev < -2.0);
+            displayStocks(filtered, 'Mean Reversion (MR < -2.0)');
+        }
+
+        function filterByInstitutional() {
+            currentFilter = 'inst';
+            const filtered = WATCHLIST.filter(s => s.inst33 > 55);
+            displayStocks(filtered, 'Institutional Accumulation (Inst 33 > 55)');
+        }
+
+        function filterByRegime() {
+            currentFilter = 'regime';
+            const filtered = WATCHLIST.filter(s => s.regime > 70);
+            displayStocks(filtered, 'Strong Regime (> 70%)');
+        }
+
+        function filterByOversold() {
+            currentFilter = 'oversold';
+            const filtered = WATCHLIST.filter(s => s.rsi < 35);
+            displayStocks(filtered, 'Oversold Signals (RSI < 35)');
+        }
+
         async function loadStocks() {
+            currentFilter = 'all';
+            displayStocks(WATCHLIST, 'All Stocks');
+        }
+
+        function displayStocks(stockList, title) {
             const grid = document.getElementById('playsGrid');
             
-            grid.innerHTML = stocks.map(s => {
+            if (stockList.length === 0) {
+                grid.innerHTML = '<div style="text-align: center; padding: 40px; grid-column: 1/-1;"><p style="font-size: 1.2em;">No stocks matching criteria</p></div>';
+                return;
+            }
+            
+            grid.innerHTML = stockList.map(s => {
                 const c = s.change >= 0 ? '#10b981' : '#ef4444';
                 const cls = s.signal === 'STRONG BUY' ? 'signal-strong-buy' : 'signal-accumulate';
                 const t = calc(s);
@@ -801,6 +925,7 @@ Provide: 1) Latest news 2) Technical setup 3) Entry/Targets/Stop 4) Risk/reward`
             document.getElementById('playsGrid').classList.remove('hidden');
             document.getElementById('homeHeader').classList.remove('hidden');
             document.getElementById('searchSection').classList.remove('hidden');
+            loadStocks();
         }
 
         async function analyzeStock(ticker) {
@@ -813,7 +938,7 @@ Provide: 1) Latest news 2) Technical setup 3) Entry/Targets/Stop 4) Risk/reward`
             document.getElementById('searchSection').classList.add('hidden');
             document.getElementById('playsGrid').classList.add('hidden');
             document.getElementById('detailedView').classList.remove('hidden');
-            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing ' + ticker + '...</p></div>';
+            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div><p>Analyzing...</p></div>';
             
             let stock = WATCHLIST.find(s => s.symbol === ticker);
             if (!stock) {
@@ -853,7 +978,7 @@ Provide: 1) Latest news 2) Technical setup 3) Entry/Targets/Stop 4) Risk/reward`
                         </div>
                     ` : `
                         <div style="background: rgba(245, 158, 11, 0.15); border-left: 4px solid #f59e0b; padding: 20px; border-radius: 10px;">
-                            ⚠️ <strong>AI unavailable</strong> - Check backend connection
+                            ⚠️ AI unavailable - Check backend
                         </div>
                     `}
                     
@@ -867,34 +992,122 @@ Provide: 1) Latest news 2) Technical setup 3) Entry/Targets/Stop 4) Risk/reward`
                             <div class="target-box">
                                 <div class="target-label">5D Est</div>
                                 <div class="target-price">$${t.d5.toFixed(2)}</div>
-                                <div class="target-percent">+${((t.d5 - stock.price) / stock.price * 100).toFixed(1)}%</div>
                             </div>
                             <div class="target-box">
                                 <div class="target-label">10D Est</div>
                                 <div class="target-price">$${t.d10.toFixed(2)}</div>
-                                <div class="target-percent">+${((t.d10 - stock.price) / stock.price * 100).toFixed(1)}%</div>
                             </div>
                             <div class="target-box" style="border-color: #10b981;">
                                 <div class="target-label">T1</div>
                                 <div class="target-price">$${stock.target1}</div>
-                                <div class="target-percent">+${((stock.target1 - stock.price) / stock.price * 100).toFixed(1)}%</div>
                             </div>
                             <div class="target-box" style="border-color: #10b981;">
                                 <div class="target-label">T2</div>
                                 <div class="target-price">$${stock.target2}</div>
-                                <div class="target-percent">+${((stock.target2 - stock.price) / stock.price * 100).toFixed(1)}%</div>
                             </div>
                             <div class="target-box" style="border-color: #ef4444;">
                                 <div class="target-label">Stop</div>
                                 <div class="target-price" style="color: #ef4444;">$${stock.stop}</div>
-                                <div class="target-percent" style="color: #ef4444;">${((stock.stop - stock.price) / stock.price * 100).toFixed(1)}%</div>
                             </div>
                         </div>
                     </div>
                     
-                    <button onclick="goToHome()" class="btn btn-scanner" style="width: 100%; padding: 20px; margin-top: 20px;">
-                        ← BACK
-                    </button>
+                    <button onclick="goToHome()" class="btn btn-scanner" style="width: 100%; padding: 20px;">← BACK</button>
+                </div>
+            `;
+        }
+
+        function viewNewsletter() {
+            document.getElementById('homeHeader').classList.add('hidden');
+            document.getElementById('searchSection').classList.add('hidden');
+            document.getElementById('playsGrid').classList.add('hidden');
+            document.getElementById('detailedView').classList.remove('hidden');
+            
+            const strong = WATCHLIST.filter(s => s.meanRev < -2.0);
+            const inst = WATCHLIST.filter(s => s.inst33 > 55);
+            const regime = WATCHLIST.filter(s => s.regime > 70);
+            
+            document.getElementById('detailedView').innerHTML = `
+                <div class="newsletter-section">
+                    <div class="newsletter-header">
+                        <div class="newsletter-title">📊 Elite Trading Newsletter</div>
+                        <div style="color: #aaa;">November 21, 2025 • AI-Powered Analysis</div>
+                    </div>
+                    
+                    <div class="tldr-box">
+                        <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">⚡ TL;DR</h3>
+                        <p style="line-height: 2; font-size: 1.1em;">
+                            <strong>${strong.length} EXTREME MEAN REVERSION</strong> (MR < -2.0) | 
+                            <strong>${inst.length} INSTITUTIONAL ACCUMULATION</strong> (Inst 33 > 55) | 
+                            <strong>${regime.length} STRONG TRENDS</strong> (Regime > 70%)
+                        </p>
+                    </div>
+                    
+                    <div class="section-header">
+                        <h3 style="color: #667eea; font-size: 1.8em;">🔥 MEAN REVERSION EXTREMES (${strong.length})</h3>
+                    </div>
+                    <ul class="stock-list">
+                        ${strong.map(s => `
+                            <li onclick="analyzeStock('${s.symbol}')">
+                                <strong style="color: #10b981; font-size: 1.3em;">${s.symbol}</strong> @ $${s.price.toFixed(2)}<br>
+                                Mean Rev: ${s.meanRev} | RSI: ${s.rsi} | Entry: $${s.price.toFixed(2)} → T1: $${s.target1}
+                            </li>
+                        `).join('')}
+                    </ul>
+                    
+                    <div class="section-header">
+                        <h3 style="color: #667eea; font-size: 1.8em;">🏦 INSTITUTIONAL ACCUMULATION (${inst.length})</h3>
+                    </div>
+                    <ul class="stock-list">
+                        ${inst.map(s => `
+                            <li onclick="analyzeStock('${s.symbol}')">
+                                <strong style="color: #667eea; font-size: 1.3em;">${s.symbol}</strong> - Inst 33: ${s.inst33} | Regime: ${s.regime}%
+                            </li>
+                        `).join('')}
+                    </ul>
+                    
+                    <div class="section-header">
+                        <h3 style="color: #667eea; font-size: 1.8em;">📈 STRONG TRENDS (${regime.length})</h3>
+                    </div>
+                    <ul class="stock-list">
+                        ${regime.map(s => `
+                            <li onclick="analyzeStock('${s.symbol}')">
+                                <strong style="color: #10b981; font-size: 1.3em;">${s.symbol}</strong> - Regime: ${s.regime}% | Mean Rev: ${s.meanRev}
+                            </li>
+                        `).join('')}
+                    </ul>
+                    
+                    <div class="section-header">
+                        <h3 style="color: #667eea; font-size: 1.8em;">📊 WATCHLIST SUMMARY</h3>
+                    </div>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Symbol</th>
+                                    <th>Price</th>
+                                    <th>Mean Rev</th>
+                                    <th>Inst 33</th>
+                                    <th>Regime</th>
+                                    <th>Signal</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${WATCHLIST.map(s => `
+                                    <tr onclick="analyzeStock('${s.symbol}')" style="cursor: pointer;">
+                                        <td><strong>${s.symbol}</strong></td>
+                                        <td>$${s.price.toFixed(2)}</td>
+                                        <td style="color: ${s.meanRev < -2.0 ? '#10b981' : '#fff'}">${s.meanRev}</td>
+                                        <td style="color: ${s.inst33 > 55 ? '#10b981' : '#fff'}">${s.inst33}</td>
+                                        <td>${s.regime}%</td>
+                                        <td><strong style="color: ${s.signal === 'STRONG BUY' ? '#10b981' : '#f59e0b'}">${s.signal}</strong></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <button onclick="goToHome()" class="btn btn-scanner" style="width: 100%; padding: 20px; margin-top: 30px;">← BACK</button>
                 </div>
             `;
         }
