@@ -3,607 +3,461 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics - Fixed</title>
+    <title>Test Finnhub & Polygon APIs</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            min-height: 100vh;
+            font-family: 'Monaco', monospace;
+            background: #1a1a2e;
             color: #e0e0e0;
-        }
-
-        .container {
-            max-width: 1800px;
+            padding: 40px;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
         }
-
-        .market-story-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 40px 20px;
-            text-align: center;
-            color: white;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        }
-
-        .story-title {
-            font-size: 2.8em;
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .story-narrative {
-            max-width: 1000px;
-            margin: 0 auto;
-            font-size: 1.3em;
-            line-height: 1.8;
+        h1 { color: #10b981; font-size: 2.5em; }
+        h2 { color: #667eea; margin-top: 30px; }
+        .api-section {
+            background: #2d2d44;
             padding: 30px;
-            background: rgba(255, 255, 255, 0.15);
             border-radius: 15px;
-            backdrop-filter: blur(10px);
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
         }
-
-        .api-status {
-            font-size: 0.9em;
-            color: rgba(255,255,255,0.7);
-            margin-top: 15px;
-        }
-
-        .search-section {
-            max-width: 900px;
-            margin: 30px auto;
-        }
-
-        .search-bar {
+        .input-group {
             display: flex;
             gap: 15px;
-            margin-bottom: 20px;
+            margin: 20px 0;
             flex-wrap: wrap;
         }
-
-        .search-input {
+        input {
             flex: 1;
             min-width: 250px;
-            padding: 20px 28px;
-            font-size: 1.3em;
-            background: rgba(255,255,255,0.12);
-            border: 2px solid rgba(255,255,255,0.25);
-            border-radius: 15px;
+            padding: 15px;
+            background: #1a1a2e;
+            border: 2px solid #667eea;
+            border-radius: 10px;
             color: white;
-            outline: none;
-            transition: all 0.3s;
+            font-size: 1.1em;
+            font-family: 'Monaco', monospace;
         }
-
-        .search-input::placeholder {
-            color: rgba(255,255,255,0.5);
-        }
-
-        .analyze-btn {
-            padding: 20px 45px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 1.3em;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .analyze-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 16px 32px;
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1.05em;
-        }
-
-        .btn-scanner {
+        button {
+            padding: 15px 40px;
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        .btn-brief {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .filters {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
+            border: none;
+            border-radius: 10px;
             color: white;
+            font-size: 1.1em;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
         }
-
-        .filter-btn:hover, .filter-btn.active {
-            background: rgba(102, 126, 234, 0.3);
-            border-color: #667eea;
+        button:hover { transform: translateY(-2px); }
+        .result {
+            background: #1a1a2e;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 400px;
+            overflow-y: auto;
         }
-
-        .plays-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
+        .success {
+            border-left: 5px solid #10b981;
+            background: rgba(16, 185, 129, 0.1);
         }
-
-        .play-card {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 20px;
-            padding: 30px;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            border: 2px solid transparent;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        .error {
+            border-left: 5px solid #ef4444;
+            background: rgba(239, 68, 68, 0.1);
         }
-
-        .play-card:hover {
-            transform: translateY(-8px);
-            border-color: #667eea;
+        .info {
+            border-left: 5px solid #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
         }
-
-        .play-ticker {
-            font-size: 2.2em;
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 5px;
             font-weight: 700;
-            color: #fff;
             margin-bottom: 10px;
         }
-
-        .play-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 15px 0;
-        }
-
-        .play-metric {
-            background: rgba(102, 126, 234, 0.12);
+        .status-success { background: #10b981; color: white; }
+        .status-error { background: #ef4444; color: white; }
+        .code {
+            background: #0f0f1e;
             padding: 15px;
-            border-radius: 12px;
-        }
-
-        .metric-label {
+            border-radius: 8px;
+            margin: 10px 0;
             font-size: 0.9em;
-            color: #999;
-            text-transform: uppercase;
+            color: #10b981;
         }
-
-        .metric-value {
-            font-size: 1.4em;
-            font-weight: 700;
-            color: #fff;
-            margin-top: 5px;
+        .comparison-table {
+            width: 100%;
+            margin: 20px 0;
+            border-collapse: collapse;
         }
-
-        .loading {
-            text-align: center;
-            padding: 80px 20px;
+        .comparison-table th {
+            background: #667eea;
+            padding: 15px;
+            text-align: left;
         }
-
-        .spinner {
-            border: 5px solid rgba(255, 255, 255, 0.1);
-            border-top: 5px solid #667eea;
-            border-radius: 50%;
-            width: 70px;
-            height: 70px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 25px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .chart-container-wrapper {
-            background: #0a0a1a;
-            border-radius: 20px;
-            padding: 20px;
-            margin: 30px 0;
-            min-height: 900px;
-        }
-
-        .detailed-analysis {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 25px;
-            padding: 40px;
-            margin: 30px 0;
-        }
-
-        @media (max-width: 768px) {
-            .story-title {
-                font-size: 1.8em;
-            }
-            .plays-grid {
-                grid-template-columns: 1fr;
-            }
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #667eea;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="market-story-header">
-            <h1 class="story-title">📊 Elite Trading Analytics</h1>
-            <div class="story-narrative" id="marketNarrative">
-                "Loading live data..."
-            </div>
-            <div class="api-status" id="apiStatus">
-                🔄 Initializing...
-            </div>
-        </div>
+    <h1>🔬 Test Finnhub & Polygon APIs</h1>
+    <p style="font-size: 1.1em; color: #aaa; margin-bottom: 30px;">
+        Compare API providers to find the fastest and most reliable for your trading dashboard
+    </p>
 
-        <div class="search-section">
-            <div class="search-bar">
-                <input 
-                    type="text" 
-                    id="tickerInput" 
-                    class="search-input"
-                    placeholder="Search ticker (e.g., META, NVDA)..." 
-                    onkeypress="if(event.key==='Enter') analyzeStock()"
-                />
-                <button onclick="analyzeStock()" class="analyze-btn" id="analyzeBtn">
-                    🔍 ANALYZE
-                </button>
-            </div>
-            
-            <div class="action-buttons">
-                <button onclick="loadTopPlays()" class="btn btn-scanner">
-                    🔄 REFRESH ALL 57
-                </button>
-                <button onclick="viewNewsBrief()" class="btn btn-brief">
-                    📰 MARKET BRIEF
-                </button>
-            </div>
-
-            <div class="filters">
-                <button class="filter-btn active" onclick="filterStocks('all')">All (57)</button>
-                <button class="filter-btn" onclick="filterStocks('strongBuy')">Strong Buy</button>
-                <button class="filter-btn" onclick="filterStocks('accumulate')">Accumulate</button>
-                <button class="filter-btn" onclick="filterStocks('highVol')">High Vol</button>
-            </div>
+    <!-- Finnhub Section -->
+    <div class="api-section">
+        <h2>📊 Finnhub API</h2>
+        <p style="color: #aaa; margin-bottom: 15px;">
+            Free tier: 60 API calls/minute | Real-time stock quotes
+        </p>
+        <div class="input-group">
+            <input type="text" id="finnhubKey" placeholder="Finnhub API Key (get free at finnhub.io)" value="demo" />
+            <input type="text" id="finnhubTicker" placeholder="Ticker" value="AAPL" />
+            <button onclick="testFinnhub()">Test Finnhub</button>
         </div>
-
-        <div id="detailedView" class="hidden"></div>
-        
-        <div class="plays-grid" id="playsGrid">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p style="font-size: 1.2em;">Loading stocks...</p>
-            </div>
-        </div>
+        <div id="finnhubResult"></div>
     </div>
 
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+    <!-- Polygon Section -->
+    <div class="api-section">
+        <h2>📈 Polygon.io API</h2>
+        <p style="color: #aaa; margin-bottom: 15px;">
+            Free tier: 5 API calls/minute | Professional-grade data
+        </p>
+        <div class="input-group">
+            <input type="text" id="polygonKey" placeholder="Polygon API Key (get free at polygon.io)" value="demo" />
+            <input type="text" id="polygonTicker" placeholder="Ticker" value="AAPL" />
+            <button onclick="testPolygon()">Test Polygon</button>
+        </div>
+        <div id="polygonResult"></div>
+    </div>
+
+    <!-- Alpha Vantage for comparison -->
+    <div class="api-section">
+        <h2>📉 Alpha Vantage (Current)</h2>
+        <p style="color: #aaa; margin-bottom: 15px;">
+            Free tier: 25 API calls/day | 5 calls/minute
+        </p>
+        <div class="input-group">
+            <input type="text" id="alphaKey" placeholder="Alpha Vantage API Key" value="demo" />
+            <input type="text" id="alphaTicker" placeholder="Ticker" value="AAPL" />
+            <button onclick="testAlphaVantage()">Test Alpha Vantage</button>
+        </div>
+        <div id="alphaResult"></div>
+    </div>
+
+    <!-- Test All Button -->
+    <div style="text-align: center; margin: 40px 0;">
+        <button onclick="testAll()" style="font-size: 1.3em; padding: 20px 50px;">
+            🚀 TEST ALL APIs (Comparison)
+        </button>
+    </div>
+
+    <div id="comparisonResult"></div>
 
     <script>
-        const WATCHLIST_TICKERS = ["META","NVDA","TSLA","GOOGL","GOOG","AAPL","MSFT","AMZN","NFLX","DIS","PLTR","CRWD","SNOW","DDOG","NET","ZS","SHOP","SQ","COIN","HOOD","SOFI","RKLB","IONQ","ARM","RDDT","ABNB","DASH","LYFT","UBER","ROKU","PINS","SNAP","CELH","AFRM","PATH","BILL","U","AI","CVNA","TDOC","GRAB","KVUE","WOLF","APP","CHWY","LULU","EA","TTWO","RIVN","LCID","NIO","FSLR","MARA","UPST","SMCI","ENVX","OKLO"];
-
-        const API_BASE = 'https://elite-trading-with-exclusive-ip.onrender.com/api';
-        let currentFilter = 'all';
-        let liveStockData = [];
-
-        function updateAPIStatus(message) {
-            const statusEl = document.getElementById('apiStatus');
-            if (statusEl) statusEl.textContent = message;
-        }
-
-        // FIXED: Use working /quote endpoint with proper parsing
-        async function fetchLivePrice(ticker, retries = 2) {
-            for (let attempt = 0; attempt <= retries; attempt++) {
-                try {
-                    const res = await fetch(`${API_BASE}/quote?ticker=${ticker}`, { 
-                        signal: AbortSignal.timeout(15000) 
-                    });
-                    
-                    if (!res.ok) {
-                        if (attempt < retries) {
-                            await new Promise(resolve => setTimeout(resolve, 1000));
-                            continue;
-                        }
-                        return { success: false };
-                    }
-                    
-                    const data = await res.json();
-                    
-                    // Parse Alpha Vantage Global Quote format
-                    if (data['Global Quote']) {
-                        const quote = data['Global Quote'];
-                        return {
-                            success: true,
-                            price: parseFloat(quote['05. price']),
-                            change: parseFloat(quote['10. change percent'].replace('%', '')),
-                            volume: parseInt(quote['06. volume']),
-                            isLive: true
-                        };
-                    }
-                    
-                    return { success: false };
-                    
-                } catch (error) {
-                    console.error(`${ticker} attempt ${attempt + 1}:`, error.message);
-                    if (attempt < retries) {
-                        await new Promise(resolve => setTimeout(resolve, 1000));
-                    }
-                }
-            }
-            return { success: false };
-        }
-
-        window.addEventListener('load', () => {
-            loadTopPlays();
-        });
-
-        async function loadTopPlays() {
-            const grid = document.getElementById('playsGrid');
-            grid.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading 57 stocks with rate limiting...</p></div>';
-            updateAPIStatus('🔄 Fetching live data (slow to avoid rate limits)...');
+        async function testFinnhub() {
+            const apiKey = document.getElementById('finnhubKey').value.trim();
+            const ticker = document.getElementById('finnhubTicker').value.trim().toUpperCase();
+            const resultDiv = document.getElementById('finnhubResult');
             
-            liveStockData = [];
-            let successCount = 0;
-            let failCount = 0;
-            
-            // SLOW DOWN: Only 1 stock at a time with 1 second delay
-            for (let i = 0; i < WATCHLIST_TICKERS.length; i++) {
-                const ticker = WATCHLIST_TICKERS[i];
-                
-                const priceData = await fetchLivePrice(ticker);
-                
-                if (priceData.success) {
-                    successCount++;
-                    liveStockData.push({
-                        symbol: ticker,
-                        price: priceData.price,
-                        change: priceData.change,
-                        volume: priceData.volume,
-                        cusum: -1.5,
-                        rsi: 45,
-                        volatility: 50,
-                        instScore: 50,
-                        isLive: true
-                    });
-                } else {
-                    failCount++;
-                    liveStockData.push({
-                        symbol: ticker,
-                        price: null,
-                        isLive: false
-                    });
-                }
-                
-                // Update every stock
-                updateAPIStatus(`🔄 Progress: ${i + 1}/${WATCHLIST_TICKERS.length} | ✅ ${successCount} | ❌ ${failCount}`);
-                
-                // Show partial results every 10 stocks
-                if ((i + 1) % 10 === 0) {
-                    applyFilter(currentFilter);
-                }
-                
-                // 1 second delay between requests to avoid rate limit
-                await new Promise(resolve => setTimeout(resolve, 1000));
-            }
-            
-            updateAPIStatus(`✅ Complete: ${successCount}/${WATCHLIST_TICKERS.length} stocks loaded`);
-            document.getElementById('marketNarrative').textContent = 
-                `"${successCount} stocks with live pricing ready"`;
-            
-            applyFilter(currentFilter);
-        }
-
-        function filterStocks(filter) {
-            currentFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            applyFilter(filter);
-        }
-
-        function applyFilter(filter) {
-            let filtered = [...liveStockData].filter(s => s.isLive);
-            
-            switch(filter) {
-                case 'strongBuy': 
-                    filtered = filtered.filter(s => s.cusum < -2); 
-                    break;
-                case 'accumulate': 
-                    filtered = filtered.filter(s => s.cusum < -1.5 && s.cusum >= -2); 
-                    break;
-                case 'highVol': 
-                    filtered = filtered.filter(s => s.volatility > 70); 
-                    break;
-            }
-            
-            displayPlays(filtered);
-        }
-
-        function displayPlays(stocks) {
-            const grid = document.getElementById('playsGrid');
-            
-            if (stocks.length === 0) {
-                grid.innerHTML = '<div class="loading"><p style="font-size: 1.3em;">Loading stocks... Please wait</p></div>';
-                return;
-            }
-
-            grid.innerHTML = stocks.map(stock => {
-                const changeColor = stock.change >= 0 ? '#10b981' : '#ef4444';
-                
-                return `
-                    <div class="play-card" onclick="document.getElementById('tickerInput').value='${stock.symbol}'; analyzeStock();">
-                        <div class="play-ticker">
-                            ${stock.symbol} 
-                            <span style="color: ${changeColor}; font-size: 0.6em;">${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%</span>
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <span style="color: #fff; font-size: 1.3em;">$${stock.price.toFixed(2)}</span>
-                            <span style="color: #10b981; font-size: 0.9em; margin-left: 10px;">● LIVE</span>
-                        </div>
-                        <div class="play-metrics">
-                            <div class="play-metric">
-                                <div class="metric-label">Volume</div>
-                                <div class="metric-value">${(stock.volume / 1000000).toFixed(1)}M</div>
-                            </div>
-                            <div class="play-metric">
-                                <div class="metric-label">Change</div>
-                                <div class="metric-value" style="color: ${changeColor}">${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%</div>
-                            </div>
-                        </div>
-                        <div style="margin-top: 15px; padding: 15px; background: rgba(16, 185, 129, 0.12); border-left: 4px solid #10b981; border-radius: 8px;">
-                            <strong style="color: #10b981; font-size: 1.1em;">
-                                ${stock.change < -2 ? '🔥 BUY DIP' : stock.change > 3 ? '📈 MOMENTUM' : '📊 MONITOR'}
-                            </strong>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            updateAPIStatus(`📊 Showing ${stocks.length} stocks`);
-        }
-
-        async function analyzeStock() {
-            const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
-            if (!ticker) return alert('Enter a ticker');
-            
-            const analyzeBtn = document.getElementById('analyzeBtn');
-            analyzeBtn.disabled = true;
-            analyzeBtn.textContent = '⏳ LOADING...';
-            
-            document.getElementById('playsGrid').classList.add('hidden');
-            document.getElementById('detailedView').classList.remove('hidden');
-            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            resultDiv.innerHTML = '<div class="result info">Testing Finnhub...</div>';
             
             try {
-                const priceData = await fetchLivePrice(ticker);
-                if (!priceData.success) throw new Error('Unable to fetch price');
+                const start = Date.now();
                 
-                const html = `
-                    <div class="detailed-analysis">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap;">
-                            <div style="font-size: 3em; font-weight: 700;">${ticker}</div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 2.5em; font-weight: 700; color: ${priceData.change >= 0 ? '#10b981' : '#ef4444'}">
-                                    $${priceData.price.toFixed(2)}
-                                </div>
-                                <div style="color: ${priceData.change >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.2em;">
-                                    ${priceData.change > 0 ? '+' : ''}${priceData.change.toFixed(2)}%
-                                </div>
+                // Finnhub Quote endpoint
+                const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${apiKey}`;
+                const response = await fetch(url);
+                
+                const duration = Date.now() - start;
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Parse Finnhub format
+                const parsed = {
+                    price: data.c, // current price
+                    change: data.d, // change
+                    changePercent: data.dp, // change percent
+                    high: data.h, // high
+                    low: data.l, // low
+                    open: data.o, // open
+                    previousClose: data.pc // previous close
+                };
+                
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        <span class="status status-success">✅ SUCCESS</span>
+                        <div style="color: #aaa; margin: 10px 0;">Response time: ${duration}ms</div>
+                        <div style="margin: 15px 0;">
+                            <strong style="color: #10b981;">Parsed Data:</strong><br>
+                            Price: $${parsed.price}<br>
+                            Change: ${parsed.change > 0 ? '+' : ''}${parsed.change} (${parsed.changePercent}%)<br>
+                            High: $${parsed.high} | Low: $${parsed.low}<br>
+                            Volume: Real-time available
+                        </div>
+                        <details>
+                            <summary style="cursor: pointer; color: #667eea;">Show Raw Response</summary>
+                            <div class="code">${JSON.stringify(data, null, 2)}</div>
+                        </details>
+                        <div style="background: rgba(16, 185, 129, 0.2); padding: 15px; border-radius: 8px; margin-top: 15px;">
+                            <strong style="color: #10b981;">✅ Finnhub Works!</strong><br>
+                            <div class="code" style="margin-top: 10px;">
+// Usage example:
+const url = \`https://finnhub.io/api/v1/quote?symbol=\${ticker}&token=\${apiKey}\`;
+const res = await fetch(url);
+const data = await res.json();
+const price = data.c; // current price
                             </div>
                         </div>
-                        <div class="chart-container-wrapper">
-                            <div style="height: 800px; background: #1a1a2e; border-radius: 15px;" id="tradingview_chart"></div>
-                        </div>
-                        <button onclick="backToGrid()" class="btn btn-scanner" style="width: 100%; padding: 20px; margin-top: 20px;">← BACK TO WATCHLIST</button>
                     </div>
                 `;
                 
-                document.getElementById('detailedView').innerHTML = html;
-                
-                new TradingView.widget({
-                    "width": "100%",
-                    "height": 800,
-                    "symbol": ticker,
-                    "interval": "60",
-                    "timezone": "America/New_York",
-                    "theme": "dark",
-                    "style": "1",
-                    "container_id": "tradingview_chart",
-                    "studies": ["STD;MACD", "STD;RSI", "STD;Volume"]
-                });
-                
             } catch (error) {
-                alert('Error: ' + error.message);
-                backToGrid();
-            } finally {
-                analyzeBtn.disabled = false;
-                analyzeBtn.textContent = '🔍 ANALYZE';
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <span class="status status-error">❌ FAILED</span>
+                        <div style="margin-top: 15px;">
+                            <strong>Error:</strong> ${error.message}
+                        </div>
+                        <div style="margin-top: 15px; color: #f59e0b;">
+                            💡 Get free API key at: <a href="https://finnhub.io/register" target="_blank" style="color: #10b981;">finnhub.io/register</a>
+                        </div>
+                    </div>
+                `;
             }
         }
 
-        function backToGrid() {
-            document.getElementById('detailedView').classList.add('hidden');
-            document.getElementById('playsGrid').classList.remove('hidden');
+        async function testPolygon() {
+            const apiKey = document.getElementById('polygonKey').value.trim();
+            const ticker = document.getElementById('polygonTicker').value.trim().toUpperCase();
+            const resultDiv = document.getElementById('polygonResult');
+            
+            resultDiv.innerHTML = '<div class="result info">Testing Polygon...</div>';
+            
+            try {
+                const start = Date.now();
+                
+                // Polygon Previous Close endpoint (works with free tier)
+                const url = `https://api.polygon.io/v2/aggs/ticker/${ticker}/prev?adjusted=true&apiKey=${apiKey}`;
+                const response = await fetch(url);
+                
+                const duration = Date.now() - start;
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.status !== 'OK') {
+                    throw new Error(data.error || 'API returned error');
+                }
+                
+                // Parse Polygon format
+                const result = data.results[0];
+                const parsed = {
+                    price: result.c, // close
+                    open: result.o,
+                    high: result.h,
+                    low: result.l,
+                    volume: result.v,
+                    date: new Date(result.t).toLocaleDateString()
+                };
+                
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        <span class="status status-success">✅ SUCCESS</span>
+                        <div style="color: #aaa; margin: 10px 0;">Response time: ${duration}ms</div>
+                        <div style="margin: 15px 0;">
+                            <strong style="color: #10b981;">Parsed Data:</strong><br>
+                            Price: $${parsed.price}<br>
+                            Open: $${parsed.open} | High: $${parsed.high} | Low: $${parsed.low}<br>
+                            Volume: ${(parsed.volume / 1000000).toFixed(2)}M<br>
+                            Date: ${parsed.date}
+                        </div>
+                        <details>
+                            <summary style="cursor: pointer; color: #667eea;">Show Raw Response</summary>
+                            <div class="code">${JSON.stringify(data, null, 2)}</div>
+                        </details>
+                        <div style="background: rgba(16, 185, 129, 0.2); padding: 15px; border-radius: 8px; margin-top: 15px;">
+                            <strong style="color: #10b981;">✅ Polygon Works!</strong><br>
+                            <div class="code" style="margin-top: 10px;">
+// Usage example:
+const url = \`https://api.polygon.io/v2/aggs/ticker/\${ticker}/prev?adjusted=true&apiKey=\${apiKey}\`;
+const res = await fetch(url);
+const data = await res.json();
+const price = data.results[0].c;
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <span class="status status-error">❌ FAILED</span>
+                        <div style="margin-top: 15px;">
+                            <strong>Error:</strong> ${error.message}
+                        </div>
+                        <div style="margin-top: 15px; color: #f59e0b;">
+                            💡 Get free API key at: <a href="https://polygon.io/dashboard/signup" target="_blank" style="color: #10b981;">polygon.io/signup</a>
+                        </div>
+                    </div>
+                `;
+            }
         }
 
-        function viewNewsBrief() {
-            const liveStocks = liveStockData.filter(s => s.isLive);
-            const bigGainers = liveStocks.filter(s => s.change > 3).sort((a,b) => b.change - a.change);
-            const bigLosers = liveStocks.filter(s => s.change < -3).sort((a,b) => a.change - b.change);
+        async function testAlphaVantage() {
+            const apiKey = document.getElementById('alphaKey').value.trim();
+            const ticker = document.getElementById('alphaTicker').value.trim().toUpperCase();
+            const resultDiv = document.getElementById('alphaResult');
             
-            const grid = document.getElementById('playsGrid');
-            grid.innerHTML = `
-                <div style="background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%); border-radius: 25px; padding: 50px; max-width: 1200px; margin: 0 auto;">
-                    <h2 style="font-size: 2.5em; color: #667eea; text-align: center; margin-bottom: 30px;">📰 Live Market Brief</h2>
-                    
-                    <div style="background: rgba(102, 126, 234, 0.12); padding: 30px; border-radius: 15px; margin-bottom: 25px;">
-                        <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">📊 Real-Time Overview</h3>
-                        <p style="font-size: 1.15em; line-height: 2;">
-                            <strong>Watchlist:</strong> ${WATCHLIST_TICKERS.length} stocks<br>
-                            <strong>Live Data:</strong> ${liveStocks.length} stocks<br>
-                            <strong>Big Gainers:</strong> ${bigGainers.length} stocks up 3%+<br>
-                            <strong>Big Losers:</strong> ${bigLosers.length} stocks down 3%+
-                        </p>
+            resultDiv.innerHTML = '<div class="result info">Testing Alpha Vantage...</div>';
+            
+            try {
+                const start = Date.now();
+                const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=${apiKey}`;
+                const response = await fetch(url);
+                const duration = Date.now() - start;
+                
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (data['Note']) {
+                    throw new Error('Rate limit reached (25 calls/day, 5 calls/minute)');
+                }
+                
+                if (data['Global Quote']) {
+                    const quote = data['Global Quote'];
+                    resultDiv.innerHTML = `
+                        <div class="result success">
+                            <span class="status status-success">✅ SUCCESS</span>
+                            <div style="color: #aaa; margin: 10px 0;">Response time: ${duration}ms</div>
+                            <div style="margin: 15px 0;">
+                                <strong style="color: #10b981;">Parsed Data:</strong><br>
+                                Price: $${quote['05. price']}<br>
+                                Change: ${quote['10. change percent']}<br>
+                                Volume: ${(parseInt(quote['06. volume']) / 1000000).toFixed(2)}M
+                            </div>
+                            <div class="code">${JSON.stringify(data, null, 2)}</div>
+                        </div>
+                    `;
+                } else {
+                    throw new Error('Unexpected response format');
+                }
+                
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <span class="status status-error">❌ FAILED</span>
+                        <div style="margin-top: 15px;"><strong>Error:</strong> ${error.message}</div>
                     </div>
-                    
-                    ${bigGainers.length > 0 ? `
-                        <div style="background: rgba(16, 185, 129, 0.12); padding: 30px; border-radius: 15px; margin-bottom: 25px;">
-                            <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">📈 Top Gainers</h3>
-                            <ul style="font-size: 1.1em; line-height: 2; padding-left: 25px;">
-                                ${bigGainers.slice(0, 10).map(s => `
-                                    <li><strong>${s.symbol}</strong>: $${s.price.toFixed(2)} (+${s.change.toFixed(2)}%)</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                    ` : ''}
-                    
-                    ${bigLosers.length > 0 ? `
-                        <div style="background: rgba(239, 68, 68, 0.12); padding: 30px; border-radius: 15px; margin-bottom: 25px;">
-                            <h3 style="color: #ef4444; font-size: 1.6em; margin-bottom: 15px;">📉 Top Losers</h3>
-                            <ul style="font-size: 1.1em; line-height: 2; padding-left: 25px;">
-                                ${bigLosers.slice(0, 10).map(s => `
-                                    <li><strong>${s.symbol}</strong>: $${s.price.toFixed(2)} (${s.change.toFixed(2)}%)</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                    ` : ''}
-                    
-                    <button onclick="backToGrid()" class="btn btn-scanner" style="width: 100%; padding: 20px; font-size: 1.2em;">← BACK TO WATCHLIST</button>
+                `;
+            }
+        }
+
+        async function testAll() {
+            const comparisonDiv = document.getElementById('comparisonResult');
+            comparisonDiv.innerHTML = '<h2>🔄 Running comparison tests...</h2>';
+            
+            const results = {
+                finnhub: { speed: 0, success: false },
+                polygon: { speed: 0, success: false },
+                alpha: { speed: 0, success: false }
+            };
+            
+            // Test Finnhub
+            try {
+                const start = Date.now();
+                const res = await fetch('https://finnhub.io/api/v1/quote?symbol=AAPL&token=demo');
+                results.finnhub.speed = Date.now() - start;
+                results.finnhub.success = res.ok;
+            } catch (e) {}
+            
+            // Test Polygon
+            try {
+                const start = Date.now();
+                const res = await fetch('https://api.polygon.io/v2/aggs/ticker/AAPL/prev?adjusted=true&apiKey=demo');
+                results.polygon.speed = Date.now() - start;
+                results.polygon.success = res.ok;
+            } catch (e) {}
+            
+            // Test Alpha Vantage
+            try {
+                const start = Date.now();
+                const res = await fetch('https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=AAPL&apikey=demo');
+                results.alpha.speed = Date.now() - start;
+                results.alpha.success = res.ok;
+            } catch (e) {}
+            
+            comparisonDiv.innerHTML = `
+                <h2>📊 API Comparison Results</h2>
+                <table class="comparison-table">
+                    <tr>
+                        <th>API Provider</th>
+                        <th>Speed</th>
+                        <th>Status</th>
+                        <th>Rate Limit</th>
+                        <th>Recommendation</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Finnhub</strong></td>
+                        <td>${results.finnhub.speed}ms</td>
+                        <td>${results.finnhub.success ? '✅' : '❌'}</td>
+                        <td>60/min</td>
+                        <td style="color: #10b981;">⭐ Best for real-time</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Polygon</strong></td>
+                        <td>${results.polygon.speed}ms</td>
+                        <td>${results.polygon.success ? '✅' : '❌'}</td>
+                        <td>5/min</td>
+                        <td style="color: #f59e0b;">Good for historical</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Alpha Vantage</strong></td>
+                        <td>${results.alpha.speed}ms</td>
+                        <td>${results.alpha.success ? '✅' : '❌'}</td>
+                        <td>25/day</td>
+                        <td style="color: #ef4444;">Too limited</td>
+                    </tr>
+                </table>
+                
+                <div class="result success" style="margin-top: 30px;">
+                    <h3 style="color: #10b981;">💡 Recommendation:</h3>
+                    <p style="font-size: 1.1em; line-height: 1.8;">
+                        <strong>Use Finnhub</strong> - It has the best rate limits (60/min) and is perfect for your 57-stock watchlist.<br><br>
+                        1. Sign up at: <a href="https://finnhub.io/register" target="_blank" style="color: #10b981;">finnhub.io/register</a><br>
+                        2. Get your free API key (takes 30 seconds)<br>
+                        3. I'll update your dashboard to use Finnhub<br><br>
+                        <strong>Benefits:</strong> Faster updates, higher limits, better reliability
+                    </p>
                 </div>
             `;
         }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            console.log('API Comparison Tool Ready');
+        });
     </script>
 </body>
 </html>
