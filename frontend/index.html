@@ -3,189 +3,607 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple API Tester</title>
+    <title>Elite Trading Analytics - Fixed</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: monospace;
-            background: #1a1a2e;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
             color: #e0e0e0;
-            padding: 40px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .market-story-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .story-title {
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .story-narrative {
             max-width: 1000px;
             margin: 0 auto;
-        }
-        h1 { color: #10b981; }
-        .test-box {
-            background: #2d2d44;
+            font-size: 1.3em;
+            line-height: 1.8;
             padding: 30px;
+            background: rgba(255, 255, 255, 0.15);
             border-radius: 15px;
-            margin: 20px 0;
+            backdrop-filter: blur(10px);
         }
-        button {
-            background: #10b981;
+
+        .api-status {
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.7);
+            margin-top: 15px;
+        }
+
+        .search-section {
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 20px 28px;
+            font-size: 1.3em;
+            background: rgba(255,255,255,0.12);
+            border: 2px solid rgba(255,255,255,0.25);
+            border-radius: 15px;
             color: white;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input::placeholder {
+            color: rgba(255,255,255,0.5);
+        }
+
+        .analyze-btn {
+            padding: 20px 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
-            padding: 15px 30px;
-            border-radius: 8px;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.3em;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 1.1em;
-            margin: 10px 5px;
+            transition: all 0.3s;
         }
-        button:hover { background: #059669; }
-        .result {
-            background: #1a1a2e;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 15px 0;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+
+        .analyze-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
-        .success { border-left: 5px solid #10b981; }
-        .error { border-left: 5px solid #ef4444; }
-        input {
-            width: 100%;
-            padding: 12px;
-            background: #1a1a2e;
-            border: 2px solid #667eea;
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.05em;
+        }
+
+        .btn-scanner {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .btn-brief {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
             border-radius: 8px;
             color: white;
-            font-size: 1em;
-            margin: 10px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
+        .plays-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .play-card {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .play-card:hover {
+            transform: translateY(-8px);
+            border-color: #667eea;
+        }
+
+        .play-ticker {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .play-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .play-metric {
+            background: rgba(102, 126, 234, 0.12);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #999;
+            text-transform: uppercase;
+        }
+
+        .metric-value {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #fff;
+            margin-top: 5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .spinner {
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .chart-container-wrapper {
+            background: #0a0a1a;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 30px 0;
+            min-height: 900px;
+        }
+
+        .detailed-analysis {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            border-radius: 25px;
+            padding: 40px;
+            margin: 30px 0;
+        }
+
+        @media (max-width: 768px) {
+            .story-title {
+                font-size: 1.8em;
+            }
+            .plays-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <h1>🔍 Quick API Tester</h1>
-    
-    <div class="test-box">
-        <h2>Test Your Backend</h2>
-        <input type="text" id="apiUrl" value="https://elite-trading-with-exclusive-ip.onrender.com/api" placeholder="API Base URL">
-        <input type="text" id="ticker" value="AAPL" placeholder="Ticker">
+    <div class="container">
+        <div class="market-story-header">
+            <h1 class="story-title">📊 Elite Trading Analytics</h1>
+            <div class="story-narrative" id="marketNarrative">
+                "Loading live data..."
+            </div>
+            <div class="api-status" id="apiStatus">
+                🔄 Initializing...
+            </div>
+        </div>
+
+        <div class="search-section">
+            <div class="search-bar">
+                <input 
+                    type="text" 
+                    id="tickerInput" 
+                    class="search-input"
+                    placeholder="Search ticker (e.g., META, NVDA)..." 
+                    onkeypress="if(event.key==='Enter') analyzeStock()"
+                />
+                <button onclick="analyzeStock()" class="analyze-btn" id="analyzeBtn">
+                    🔍 ANALYZE
+                </button>
+            </div>
+            
+            <div class="action-buttons">
+                <button onclick="loadTopPlays()" class="btn btn-scanner">
+                    🔄 REFRESH ALL 57
+                </button>
+                <button onclick="viewNewsBrief()" class="btn btn-brief">
+                    📰 MARKET BRIEF
+                </button>
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterStocks('all')">All (57)</button>
+                <button class="filter-btn" onclick="filterStocks('strongBuy')">Strong Buy</button>
+                <button class="filter-btn" onclick="filterStocks('accumulate')">Accumulate</button>
+                <button class="filter-btn" onclick="filterStocks('highVol')">High Vol</button>
+            </div>
+        </div>
+
+        <div id="detailedView" class="hidden"></div>
         
-        <div style="margin-top: 20px;">
-            <button onclick="testQuote()">Test /quote</button>
-            <button onclick="testTimeseries()">Test /timeseries</button>
-            <button onclick="testDirect()">Test Direct API</button>
-            <button onclick="testCORS()">Check CORS</button>
+        <div class="plays-grid" id="playsGrid">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p style="font-size: 1.2em;">Loading stocks...</p>
+            </div>
         </div>
     </div>
 
-    <div id="results"></div>
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 
     <script>
-        const resultsDiv = document.getElementById('results');
+        const WATCHLIST_TICKERS = ["META","NVDA","TSLA","GOOGL","GOOG","AAPL","MSFT","AMZN","NFLX","DIS","PLTR","CRWD","SNOW","DDOG","NET","ZS","SHOP","SQ","COIN","HOOD","SOFI","RKLB","IONQ","ARM","RDDT","ABNB","DASH","LYFT","UBER","ROKU","PINS","SNAP","CELH","AFRM","PATH","BILL","U","AI","CVNA","TDOC","GRAB","KVUE","WOLF","APP","CHWY","LULU","EA","TTWO","RIVN","LCID","NIO","FSLR","MARA","UPST","SMCI","ENVX","OKLO"];
 
-        function log(message, type = 'info') {
-            const div = document.createElement('div');
-            div.className = `result ${type}`;
-            div.textContent = message;
-            resultsDiv.insertBefore(div, resultsDiv.firstChild);
+        const API_BASE = 'https://elite-trading-with-exclusive-ip.onrender.com/api';
+        let currentFilter = 'all';
+        let liveStockData = [];
+
+        function updateAPIStatus(message) {
+            const statusEl = document.getElementById('apiStatus');
+            if (statusEl) statusEl.textContent = message;
         }
 
-        async function testQuote() {
-            const base = document.getElementById('apiUrl').value;
-            const ticker = document.getElementById('ticker').value;
-            const url = `${base}/quote?ticker=${ticker}`;
-            
-            log(`Testing: ${url}`, 'info');
-            
-            try {
-                const start = Date.now();
-                const response = await fetch(url, { 
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    signal: AbortSignal.timeout(10000)
-                });
-                
-                const duration = Date.now() - start;
-                
-                log(`Response Status: ${response.status} ${response.statusText}\nTime: ${duration}ms`, 
-                    response.ok ? 'success' : 'error');
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    log(`SUCCESS! Data:\n${JSON.stringify(data, null, 2)}`, 'success');
-                } else {
-                    const text = await response.text();
-                    log(`Error Response:\n${text}`, 'error');
-                }
-            } catch (error) {
-                log(`FAILED: ${error.message}`, 'error');
-            }
-        }
-
-        async function testTimeseries() {
-            const base = document.getElementById('apiUrl').value;
-            const ticker = document.getElementById('ticker').value;
-            const url = `${base}/timeseries?ticker=${ticker}`;
-            
-            log(`Testing: ${url}`, 'info');
-            
-            try {
-                const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
-                log(`Response: ${response.status}`, response.ok ? 'success' : 'error');
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    log(`Data:\n${JSON.stringify(data, null, 2)}`, 'success');
-                }
-            } catch (error) {
-                log(`FAILED: ${error.message}`, 'error');
-            }
-        }
-
-        async function testDirect() {
-            log('Testing direct Alpha Vantage API...', 'info');
-            const ticker = document.getElementById('ticker').value;
-            const apiKey = 'demo'; // Using demo key
-            const url = `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=${apiKey}`;
-            
-            try {
-                const response = await fetch(url);
-                if (response.ok) {
-                    const data = await response.json();
-                    log(`Direct Alpha Vantage works!\n${JSON.stringify(data, null, 2)}`, 'success');
+        // FIXED: Use working /quote endpoint with proper parsing
+        async function fetchLivePrice(ticker, retries = 2) {
+            for (let attempt = 0; attempt <= retries; attempt++) {
+                try {
+                    const res = await fetch(`${API_BASE}/quote?ticker=${ticker}`, { 
+                        signal: AbortSignal.timeout(15000) 
+                    });
                     
-                    if (data['Note']) {
-                        log('⚠️ Rate limit reached on demo key', 'error');
+                    if (!res.ok) {
+                        if (attempt < retries) {
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            continue;
+                        }
+                        return { success: false };
                     }
-                } else {
-                    log(`Direct API failed: ${response.status}`, 'error');
+                    
+                    const data = await res.json();
+                    
+                    // Parse Alpha Vantage Global Quote format
+                    if (data['Global Quote']) {
+                        const quote = data['Global Quote'];
+                        return {
+                            success: true,
+                            price: parseFloat(quote['05. price']),
+                            change: parseFloat(quote['10. change percent'].replace('%', '')),
+                            volume: parseInt(quote['06. volume']),
+                            isLive: true
+                        };
+                    }
+                    
+                    return { success: false };
+                    
+                } catch (error) {
+                    console.error(`${ticker} attempt ${attempt + 1}:`, error.message);
+                    if (attempt < retries) {
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
                 }
-            } catch (error) {
-                log(`Direct API error: ${error.message}`, 'error');
             }
+            return { success: false };
         }
 
-        async function testCORS() {
-            const base = document.getElementById('apiUrl').value;
-            log('Checking if backend is accessible...', 'info');
+        window.addEventListener('load', () => {
+            loadTopPlays();
+        });
+
+        async function loadTopPlays() {
+            const grid = document.getElementById('playsGrid');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading 57 stocks with rate limiting...</p></div>';
+            updateAPIStatus('🔄 Fetching live data (slow to avoid rate limits)...');
+            
+            liveStockData = [];
+            let successCount = 0;
+            let failCount = 0;
+            
+            // SLOW DOWN: Only 1 stock at a time with 1 second delay
+            for (let i = 0; i < WATCHLIST_TICKERS.length; i++) {
+                const ticker = WATCHLIST_TICKERS[i];
+                
+                const priceData = await fetchLivePrice(ticker);
+                
+                if (priceData.success) {
+                    successCount++;
+                    liveStockData.push({
+                        symbol: ticker,
+                        price: priceData.price,
+                        change: priceData.change,
+                        volume: priceData.volume,
+                        cusum: -1.5,
+                        rsi: 45,
+                        volatility: 50,
+                        instScore: 50,
+                        isLive: true
+                    });
+                } else {
+                    failCount++;
+                    liveStockData.push({
+                        symbol: ticker,
+                        price: null,
+                        isLive: false
+                    });
+                }
+                
+                // Update every stock
+                updateAPIStatus(`🔄 Progress: ${i + 1}/${WATCHLIST_TICKERS.length} | ✅ ${successCount} | ❌ ${failCount}`);
+                
+                // Show partial results every 10 stocks
+                if ((i + 1) % 10 === 0) {
+                    applyFilter(currentFilter);
+                }
+                
+                // 1 second delay between requests to avoid rate limit
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            updateAPIStatus(`✅ Complete: ${successCount}/${WATCHLIST_TICKERS.length} stocks loaded`);
+            document.getElementById('marketNarrative').textContent = 
+                `"${successCount} stocks with live pricing ready"`;
+            
+            applyFilter(currentFilter);
+        }
+
+        function filterStocks(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            applyFilter(filter);
+        }
+
+        function applyFilter(filter) {
+            let filtered = [...liveStockData].filter(s => s.isLive);
+            
+            switch(filter) {
+                case 'strongBuy': 
+                    filtered = filtered.filter(s => s.cusum < -2); 
+                    break;
+                case 'accumulate': 
+                    filtered = filtered.filter(s => s.cusum < -1.5 && s.cusum >= -2); 
+                    break;
+                case 'highVol': 
+                    filtered = filtered.filter(s => s.volatility > 70); 
+                    break;
+            }
+            
+            displayPlays(filtered);
+        }
+
+        function displayPlays(stocks) {
+            const grid = document.getElementById('playsGrid');
+            
+            if (stocks.length === 0) {
+                grid.innerHTML = '<div class="loading"><p style="font-size: 1.3em;">Loading stocks... Please wait</p></div>';
+                return;
+            }
+
+            grid.innerHTML = stocks.map(stock => {
+                const changeColor = stock.change >= 0 ? '#10b981' : '#ef4444';
+                
+                return `
+                    <div class="play-card" onclick="document.getElementById('tickerInput').value='${stock.symbol}'; analyzeStock();">
+                        <div class="play-ticker">
+                            ${stock.symbol} 
+                            <span style="color: ${changeColor}; font-size: 0.6em;">${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%</span>
+                        </div>
+                        <div style="margin-bottom: 15px;">
+                            <span style="color: #fff; font-size: 1.3em;">$${stock.price.toFixed(2)}</span>
+                            <span style="color: #10b981; font-size: 0.9em; margin-left: 10px;">● LIVE</span>
+                        </div>
+                        <div class="play-metrics">
+                            <div class="play-metric">
+                                <div class="metric-label">Volume</div>
+                                <div class="metric-value">${(stock.volume / 1000000).toFixed(1)}M</div>
+                            </div>
+                            <div class="play-metric">
+                                <div class="metric-label">Change</div>
+                                <div class="metric-value" style="color: ${changeColor}">${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%</div>
+                            </div>
+                        </div>
+                        <div style="margin-top: 15px; padding: 15px; background: rgba(16, 185, 129, 0.12); border-left: 4px solid #10b981; border-radius: 8px;">
+                            <strong style="color: #10b981; font-size: 1.1em;">
+                                ${stock.change < -2 ? '🔥 BUY DIP' : stock.change > 3 ? '📈 MOMENTUM' : '📊 MONITOR'}
+                            </strong>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            updateAPIStatus(`📊 Showing ${stocks.length} stocks`);
+        }
+
+        async function analyzeStock() {
+            const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
+            if (!ticker) return alert('Enter a ticker');
+            
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = '⏳ LOADING...';
+            
+            document.getElementById('playsGrid').classList.add('hidden');
+            document.getElementById('detailedView').classList.remove('hidden');
+            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
             
             try {
-                // Test basic connectivity
-                const response = await fetch(base, { 
-                    method: 'GET',
-                    signal: AbortSignal.timeout(5000)
+                const priceData = await fetchLivePrice(ticker);
+                if (!priceData.success) throw new Error('Unable to fetch price');
+                
+                const html = `
+                    <div class="detailed-analysis">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap;">
+                            <div style="font-size: 3em; font-weight: 700;">${ticker}</div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 2.5em; font-weight: 700; color: ${priceData.change >= 0 ? '#10b981' : '#ef4444'}">
+                                    $${priceData.price.toFixed(2)}
+                                </div>
+                                <div style="color: ${priceData.change >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.2em;">
+                                    ${priceData.change > 0 ? '+' : ''}${priceData.change.toFixed(2)}%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container-wrapper">
+                            <div style="height: 800px; background: #1a1a2e; border-radius: 15px;" id="tradingview_chart"></div>
+                        </div>
+                        <button onclick="backToGrid()" class="btn btn-scanner" style="width: 100%; padding: 20px; margin-top: 20px;">← BACK TO WATCHLIST</button>
+                    </div>
+                `;
+                
+                document.getElementById('detailedView').innerHTML = html;
+                
+                new TradingView.widget({
+                    "width": "100%",
+                    "height": 800,
+                    "symbol": ticker,
+                    "interval": "60",
+                    "timezone": "America/New_York",
+                    "theme": "dark",
+                    "style": "1",
+                    "container_id": "tradingview_chart",
+                    "studies": ["STD;MACD", "STD;RSI", "STD;Volume"]
                 });
                 
-                log(`Backend responds: ${response.status}`, 'success');
-                log(`CORS Headers:\nAccess-Control-Allow-Origin: ${response.headers.get('Access-Control-Allow-Origin') || 'Not set'}`, 'info');
-                
             } catch (error) {
-                log(`Backend unreachable: ${error.message}\n\nPossible issues:\n1. Backend is down\n2. CORS not configured\n3. Network/firewall blocking`, 'error');
+                alert('Error: ' + error.message);
+                backToGrid();
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = '🔍 ANALYZE';
             }
         }
 
-        // Auto-test on load
-        window.addEventListener('load', () => {
-            log('Ready! Click buttons to test your API.', 'success');
+        function backToGrid() {
+            document.getElementById('detailedView').classList.add('hidden');
+            document.getElementById('playsGrid').classList.remove('hidden');
+        }
+
+        function viewNewsBrief() {
+            const liveStocks = liveStockData.filter(s => s.isLive);
+            const bigGainers = liveStocks.filter(s => s.change > 3).sort((a,b) => b.change - a.change);
+            const bigLosers = liveStocks.filter(s => s.change < -3).sort((a,b) => a.change - b.change);
             
-            // Helpful tips
-            setTimeout(() => {
-                log(`💡 TIPS:\n- If all tests fail, your backend may be down\n- Check Render.com dashboard for backend status\n- Look for error messages in browser console (F12)\n- Try the "Test Direct API" to verify Alpha Vantage works`, 'info');
-            }, 1000);
-        });
+            const grid = document.getElementById('playsGrid');
+            grid.innerHTML = `
+                <div style="background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%); border-radius: 25px; padding: 50px; max-width: 1200px; margin: 0 auto;">
+                    <h2 style="font-size: 2.5em; color: #667eea; text-align: center; margin-bottom: 30px;">📰 Live Market Brief</h2>
+                    
+                    <div style="background: rgba(102, 126, 234, 0.12); padding: 30px; border-radius: 15px; margin-bottom: 25px;">
+                        <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">📊 Real-Time Overview</h3>
+                        <p style="font-size: 1.15em; line-height: 2;">
+                            <strong>Watchlist:</strong> ${WATCHLIST_TICKERS.length} stocks<br>
+                            <strong>Live Data:</strong> ${liveStocks.length} stocks<br>
+                            <strong>Big Gainers:</strong> ${bigGainers.length} stocks up 3%+<br>
+                            <strong>Big Losers:</strong> ${bigLosers.length} stocks down 3%+
+                        </p>
+                    </div>
+                    
+                    ${bigGainers.length > 0 ? `
+                        <div style="background: rgba(16, 185, 129, 0.12); padding: 30px; border-radius: 15px; margin-bottom: 25px;">
+                            <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">📈 Top Gainers</h3>
+                            <ul style="font-size: 1.1em; line-height: 2; padding-left: 25px;">
+                                ${bigGainers.slice(0, 10).map(s => `
+                                    <li><strong>${s.symbol}</strong>: $${s.price.toFixed(2)} (+${s.change.toFixed(2)}%)</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    ${bigLosers.length > 0 ? `
+                        <div style="background: rgba(239, 68, 68, 0.12); padding: 30px; border-radius: 15px; margin-bottom: 25px;">
+                            <h3 style="color: #ef4444; font-size: 1.6em; margin-bottom: 15px;">📉 Top Losers</h3>
+                            <ul style="font-size: 1.1em; line-height: 2; padding-left: 25px;">
+                                ${bigLosers.slice(0, 10).map(s => `
+                                    <li><strong>${s.symbol}</strong>: $${s.price.toFixed(2)} (${s.change.toFixed(2)}%)</li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    
+                    <button onclick="backToGrid()" class="btn btn-scanner" style="width: 100%; padding: 20px; font-size: 1.2em;">← BACK TO WATCHLIST</button>
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>
