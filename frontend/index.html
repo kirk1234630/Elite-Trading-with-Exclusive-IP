@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Elite Trading Analytics - Professional Dashboard</title>
+  <title>Elite Trading Research Platform</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://s3.tradingview.com/tv.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ApexCharts/3.44.0/apexcharts.min.js"></script>
@@ -22,6 +22,7 @@
       --accent: #00d4ff;
       --success: #00c896;
       --danger: #ff4757;
+      --warning: #ffa502;
       --text-primary: #ffffff;
       --text-secondary: #b0b8c1;
       --border: #2a3446;
@@ -53,44 +54,15 @@
       display: flex;
       align-items: center;
       gap: 0.8rem;
-      font-size: 1.5em;
+      font-size: 1.3em;
       font-weight: 700;
       color: var(--accent);
-    }
-
-    .logo i {
-      font-size: 2em;
-    }
-
-    .header-nav {
-      display: flex;
-      gap: 2rem;
-      align-items: center;
-    }
-
-    .nav-link {
-      color: var(--text-secondary);
       cursor: pointer;
-      font-weight: 500;
-      transition: all 0.3s;
-      padding: 0.5rem 1rem;
-      border-radius: 6px;
     }
 
-    .nav-link:hover {
-      color: var(--accent);
-      background: rgba(0, 212, 255, 0.1);
-    }
-
-    .nav-link.active {
-      color: var(--accent);
-      border-bottom: 2px solid var(--accent);
-    }
-
-    /* ============ SEARCH BAR ============ */
-    .search-container {
+    .header-search {
       flex: 1;
-      max-width: 400px;
+      max-width: 500px;
       margin: 0 2rem;
     }
 
@@ -98,16 +70,16 @@
       display: flex;
       align-items: center;
       background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.5rem 1rem;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      padding: 0.7rem 1rem;
       gap: 0.5rem;
-      transition: border-color 0.3s;
+      transition: all 0.3s;
     }
 
     .search-bar:focus-within {
       border-color: var(--accent);
-      box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+      box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
     }
 
     .search-bar input {
@@ -116,7 +88,7 @@
       border: none;
       color: var(--text-primary);
       outline: none;
-      font-size: 0.95em;
+      font-size: 1em;
     }
 
     .search-bar input::placeholder {
@@ -127,7 +99,7 @@
       background: var(--accent);
       border: none;
       color: var(--dark-bg);
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1.2rem;
       border-radius: 6px;
       cursor: pointer;
       font-weight: 600;
@@ -139,7 +111,28 @@
       transform: translateY(-1px);
     }
 
-    /* ============ MAIN CONTENT ============ */
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .header-btn {
+      background: transparent;
+      border: 2px solid var(--border);
+      color: var(--text-secondary);
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s;
+      font-weight: 600;
+    }
+
+    .header-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ============ MAIN CONTAINER ============ */
     .container {
       max-width: 1600px;
       margin: 0 auto;
@@ -157,7 +150,7 @@
     }
 
     .newsletter-section h2 {
-      font-size: 1.5em;
+      font-size: 1.4em;
       color: var(--accent);
       margin-bottom: 1rem;
       display: flex;
@@ -173,7 +166,7 @@
 
     .newsletter-highlights {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 1rem;
       margin-top: 1.5rem;
     }
@@ -181,13 +174,13 @@
     .highlight-card {
       background: rgba(0, 200, 150, 0.1);
       border: 1px solid rgba(0, 200, 150, 0.3);
-      padding: 1rem;
-      border-radius: 8px;
+      padding: 1.2rem;
+      border-radius: 10px;
       text-align: center;
     }
 
     .highlight-card .value {
-      font-size: 1.8em;
+      font-size: 2em;
       color: var(--success);
       font-weight: 700;
     }
@@ -195,7 +188,7 @@
     .highlight-card .label {
       font-size: 0.85em;
       color: var(--text-secondary);
-      margin-top: 0.3rem;
+      margin-top: 0.5rem;
     }
 
     /* ============ FILTER TABS ============ */
@@ -204,7 +197,7 @@
       gap: 0.8rem;
       margin: 2rem 0;
       flex-wrap: wrap;
-      border-bottom: 1px solid var(--border);
+      border-bottom: 2px solid var(--border);
       padding-bottom: 1rem;
     }
 
@@ -251,21 +244,6 @@
       overflow: hidden;
     }
 
-    .stock-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
-      transition: left 0.5s;
-    }
-
-    .stock-card:hover::before {
-      left: 100%;
-    }
-
     .stock-card:hover {
       border-color: var(--accent);
       box-shadow: 0 12px 40px rgba(0, 212, 255, 0.15);
@@ -293,9 +271,10 @@
 
     .stock-change {
       font-size: 0.95em;
-      padding: 0.3rem 0.8rem;
-      border-radius: 4px;
+      padding: 0.4rem 0.8rem;
+      border-radius: 6px;
       font-weight: 600;
+      margin-top: 0.3rem;
     }
 
     .stock-change.positive {
@@ -322,7 +301,7 @@
     .stock-metrics {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 1rem;
+      gap: 0.8rem;
       margin: 1rem 0;
     }
 
@@ -342,125 +321,172 @@
     }
 
     .metric-value {
-      font-size: 1.3em;
+      font-size: 1.2em;
       color: var(--accent);
       font-weight: 700;
     }
 
-    .stock-footer {
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
+    /* ============ RESEARCH PAGE ============ */
+    .research-page {
+      display: none;
+    }
+
+    .research-page.active {
+      display: block;
+    }
+
+    .research-header {
+      background: linear-gradient(135deg, var(--card-bg) 0%, var(--secondary-bg) 100%);
+      border-bottom: 2px solid var(--accent);
+      padding: 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+    }
+
+    .research-title-section {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: start;
+      margin-bottom: 1.5rem;
     }
 
-    .trend-icon {
-      font-size: 1.2em;
+    .research-title {
+      font-size: 2.5em;
+      color: var(--text-primary);
+      font-weight: 700;
     }
 
-    .trend-icon.up {
-      color: var(--success);
+    .research-price-info {
+      text-align: right;
     }
 
-    .trend-icon.down {
-      color: var(--danger);
+    .research-price {
+      font-size: 2.8em;
+      color: var(--accent);
+      font-weight: 700;
     }
 
-    /* ============ MODAL (DETAIL VIEW) ============ */
-    .modal {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(5px);
-      z-index: 200;
-      align-items: center;
-      justify-content: center;
+    .research-change {
+      font-size: 1.3em;
+      margin-top: 0.3rem;
     }
 
-    .modal.active {
-      display: flex;
+    .research-metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
     }
 
-    .modal-content {
+    .research-metric {
+      background: rgba(0, 212, 255, 0.05);
+      border: 1px solid var(--border);
+      padding: 1rem;
+      border-radius: 10px;
+      text-align: center;
+    }
+
+    .research-metric-label {
+      font-size: 0.85em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .research-metric-value {
+      font-size: 1.5em;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ============ CHART PAGE ============ */
+    .chart-section {
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      max-width: 900px;
-      width: 95%;
-      max-height: 90vh;
-      overflow-y: auto;
-      padding: 2rem;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin: 2rem 0;
     }
 
-    .modal-header {
+    .chart-container {
+      width: 100%;
+      height: 600px;
+      background: var(--secondary-bg);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .chart-controls {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 1rem;
+      gap: 0.8rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
     }
 
-    .modal-title {
-      font-size: 2em;
-      color: var(--text-primary);
-    }
-
-    .modal-close {
-      background: none;
-      border: none;
+    .chart-btn {
+      padding: 0.6rem 1.2rem;
+      background: var(--secondary-bg);
+      border: 1px solid var(--border);
       color: var(--text-secondary);
-      font-size: 1.8em;
+      border-radius: 6px;
       cursor: pointer;
-      transition: color 0.3s;
+      font-weight: 600;
+      transition: all 0.3s;
     }
 
-    .modal-close:hover {
-      color: var(--danger);
+    .chart-btn:hover,
+    .chart-btn.active {
+      background: var(--accent);
+      color: var(--dark-bg);
+      border-color: var(--accent);
     }
 
-    .modal-grid {
+    /* ============ COMMENTARY SECTION ============ */
+    .commentary-section {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 2rem;
       margin: 2rem 0;
     }
 
-    .chart-container {
-      background: var(--secondary-bg);
+    .commentary-box {
+      background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 12px;
-      padding: 1rem;
-      height: 400px;
-    }
-
-    .ai-section {
-      background: rgba(0, 212, 255, 0.05);
-      border: 1px solid rgba(0, 212, 255, 0.2);
-      border-radius: 12px;
       padding: 1.5rem;
-      margin: 2rem 0;
     }
 
-    .ai-section h3 {
+    .commentary-box h3 {
       color: var(--accent);
       margin-bottom: 1rem;
+      font-size: 1.2em;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .ai-text {
+    .commentary-text {
       line-height: 1.8;
       color: var(--text-secondary);
       font-size: 0.95em;
+    }
+
+    .commentary-list {
+      list-style: none;
+    }
+
+    .commentary-list li {
+      padding: 0.6rem 0;
+      color: var(--text-secondary);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .commentary-list li:last-child {
+      border-bottom: none;
+    }
+
+    .commentary-list li strong {
+      color: var(--accent);
     }
 
     /* ============ AI CHAT WIDGET ============ */
@@ -468,10 +494,10 @@
       position: fixed;
       bottom: 30px;
       right: 30px;
-      width: 380px;
-      max-height: 600px;
+      width: 420px;
+      max-height: 650px;
       background: var(--card-bg);
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: 16px;
       display: flex;
       flex-direction: column;
@@ -480,54 +506,73 @@
       transform: translateY(calc(100% + 20px));
       opacity: 0;
       transition: all 0.3s;
+      pointer-events: none;
     }
 
     .chat-widget.active {
       transform: translateY(0);
       opacity: 1;
+      pointer-events: all;
     }
 
     .chat-header {
       background: linear-gradient(135deg, var(--accent) 0%, #00b8d4 100%);
       color: var(--dark-bg);
-      padding: 1rem;
-      border-radius: 16px 16px 0 0;
+      padding: 1.2rem;
+      border-radius: 14px 14px 0 0;
       font-weight: 700;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 1rem;
+    }
+
+    .chat-header span {
+      font-size: 1.1em;
     }
 
     .chat-header button {
       background: none;
       border: none;
       color: var(--dark-bg);
-      font-size: 1.2em;
+      font-size: 1.4em;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
     }
 
     .chat-messages {
       flex: 1;
       overflow-y: auto;
-      padding: 1rem;
+      padding: 1.2rem;
       display: flex;
       flex-direction: column;
       gap: 1rem;
     }
 
     .message {
-      padding: 0.8rem 1rem;
+      padding: 1rem;
       border-radius: 12px;
-      max-width: 85%;
+      max-width: 90%;
       word-wrap: break-word;
       font-size: 0.9em;
-      line-height: 1.5;
+      line-height: 1.6;
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     .message.user {
       align-self: flex-end;
       background: var(--accent);
       color: var(--dark-bg);
+      border-radius: 12px 2px 12px 12px;
     }
 
     .message.ai {
@@ -535,13 +580,16 @@
       background: var(--secondary-bg);
       color: var(--text-secondary);
       border: 1px solid var(--border);
+      border-radius: 2px 12px 12px 12px;
     }
 
     .chat-input-area {
       display: flex;
-      gap: 0.5rem;
-      padding: 1rem;
+      gap: 0.7rem;
+      padding: 1.2rem;
       border-top: 1px solid var(--border);
+      background: var(--card-bg);
+      border-radius: 0 0 14px 14px;
     }
 
     .chat-input-area input {
@@ -553,6 +601,7 @@
       border-radius: 8px;
       outline: none;
       transition: border-color 0.3s;
+      font-size: 0.9em;
     }
 
     .chat-input-area input:focus {
@@ -566,7 +615,7 @@
       padding: 0.8rem 1.5rem;
       border-radius: 8px;
       cursor: pointer;
-      font-weight: 600;
+      font-weight: 700;
       transition: all 0.3s;
     }
 
@@ -579,17 +628,20 @@
       position: fixed;
       bottom: 30px;
       right: 30px;
-      width: 60px;
-      height: 60px;
+      width: 70px;
+      height: 70px;
       background: linear-gradient(135deg, var(--accent) 0%, #00b8d4 100%);
       border: none;
       border-radius: 50%;
       color: var(--dark-bg);
-      font-size: 1.5em;
+      font-size: 1.6em;
       cursor: pointer;
       box-shadow: 0 12px 30px rgba(0, 212, 255, 0.4);
       transition: all 0.3s;
       z-index: 140;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .chat-toggle:hover {
@@ -603,43 +655,44 @@
     }
 
     /* ============ RESPONSIVE ============ */
+    @media (max-width: 1024px) {
+      .commentary-section {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 768px) {
       .stock-grid {
         grid-template-columns: 1fr;
       }
 
-      .modal-grid {
-        grid-template-columns: 1fr;
+      .header {
+        flex-wrap: wrap;
+        gap: 1rem;
+        padding: 1rem;
       }
 
-      .search-container {
-        display: none;
-      }
-
-      .filter-tabs {
-        overflow-x: auto;
-        gap: 0.5rem;
+      .header-search {
+        flex: 1;
+        min-width: 100%;
+        max-width: none;
+        margin: 0;
       }
 
       .chat-widget {
         width: calc(100% - 20px);
         right: 10px;
+        left: 10px;
+        max-width: none;
       }
 
-      .header {
-        flex-wrap: wrap;
-        gap: 1rem;
+      .research-title {
+        font-size: 1.8em;
       }
-    }
 
-    /* ============ ANIMATIONS ============ */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .stock-card {
-      animation: fadeIn 0.4s ease-out;
+      .container {
+        padding: 1rem;
+      }
     }
   </style>
 </head>
@@ -647,27 +700,27 @@
 <body>
   <!-- ============ HEADER ============ -->
   <div class="header">
-    <div class="logo">
+    <div class="logo" onclick="goHome()">
       <i class="fas fa-chart-line"></i>
       <span>Elite Trading</span>
     </div>
-    <div class="search-container">
+    <div class="header-search">
       <div class="search-bar">
         <i class="fas fa-search"></i>
-        <input type="text" id="searchInput" placeholder="Search ticker...">
-        <button onclick="analyzeStock()">Analyze</button>
+        <input type="text" id="searchInput" placeholder="Search any ticker..." onkeypress="if(event.key==='Enter') searchStock()">
+        <button onclick="searchStock()">Research</button>
       </div>
     </div>
-    <div class="header-nav">
-      <span class="nav-link" onclick="openNewsletter()">📰 Newsletter</span>
-      <span class="nav-link" onclick="toggleChat()">💬 Chat</span>
+    <div class="header-actions">
+      <button class="header-btn" onclick="goHome()">📊 Dashboard</button>
+      <button class="header-btn" onclick="toggleChat()">💬 Chat</button>
     </div>
   </div>
 
-  <!-- ============ MAIN CONTENT ============ -->
-  <div class="container">
-    <!-- Newsletter Section -->
-    <div class="newsletter-section" id="newsletter">
+  <!-- ============ MAIN CONTENT (HOME) ============ -->
+  <div class="container" id="homePage">
+    <!-- Newsletter -->
+    <div class="newsletter-section">
       <h2><i class="fas fa-newspaper"></i> Market Newsletter</h2>
       <div class="newsletter-content" id="newsletterContent">
         Loading AI-powered market summary...
@@ -675,9 +728,9 @@
       <div class="newsletter-highlights" id="highlights"></div>
     </div>
 
-    <!-- Filter Tabs -->
+    <!-- Filters -->
     <div class="filter-tabs">
-      <button class="filter-btn active" onclick="filterStocks('all')">All Stocks</button>
+      <button class="filter-btn active" onclick="filterStocks('all')">📋 All Stocks</button>
       <button class="filter-btn" onclick="filterStocks('priority')">⭐ Priority</button>
       <button class="filter-btn" onclick="filterStocks('meanrev')">📉 Mean Reversion</button>
       <button class="filter-btn" onclick="filterStocks('gn1')">💎 Golden Nugget 1</button>
@@ -692,26 +745,59 @@
     </div>
   </div>
 
-  <!-- ============ DETAIL MODAL ============ -->
-  <div class="modal" id="detailModal" onclick="if(event.target === this) closeModal()">
-    <div class="modal-content">
-      <div class="modal-header">
+  <!-- ============ RESEARCH PAGE ============ -->
+  <div class="container research-page" id="researchPage">
+    <!-- Research Header -->
+    <div class="research-header">
+      <div class="research-title-section">
         <div>
-          <div class="modal-title" id="modalSymbol">SYMBOL</div>
+          <div class="research-title" id="researchSymbol">TICKER</div>
         </div>
-        <button class="modal-close" onclick="closeModal()">×</button>
+        <div class="research-price-info">
+          <div class="research-price" id="researchPrice">$0.00</div>
+          <div class="research-change" id="researchChange">+0.00%</div>
+        </div>
       </div>
-      
-      <div class="modal-grid">
-        <div class="chart-container" id="chartContainer"></div>
-        <div id="modalMetrics"></div>
-      </div>
+      <div class="research-metrics-grid" id="researchMetrics"></div>
+    </div>
 
-      <div class="ai-section">
-        <h3><i class="fas fa-brain"></i> AI Analysis</h3>
-        <div class="ai-text" id="aiAnalysis">Generating AI analysis...</div>
+    <!-- Chart Section -->
+    <div class="chart-section">
+      <div class="chart-controls">
+        <button class="chart-btn active" onclick="setChartInterval('1D')">1D</button>
+        <button class="chart-btn" onclick="setChartInterval('1W')">1W</button>
+        <button class="chart-btn" onclick="setChartInterval('1M')">1M</button>
+        <button class="chart-btn" onclick="setChartInterval('3M')">3M</button>
+        <button class="chart-btn" onclick="setChartInterval('1Y')">1Y</button>
+        <button class="chart-btn" onclick="setChartInterval('ALL')">All</button>
+      </div>
+      <div class="chart-container" id="chartContainer"></div>
+    </div>
+
+    <!-- Commentary -->
+    <div class="commentary-section">
+      <div class="commentary-box">
+        <h3><i class="fas fa-lightbulb"></i> Technical Setup</h3>
+        <div class="commentary-text" id="technicalComment">Loading analysis...</div>
+      </div>
+      <div class="commentary-box">
+        <h3><i class="fas fa-target"></i> Entry & Targets</h3>
+        <ul class="commentary-list" id="entryTargets">
+          <li>Loading targets...</li>
+        </ul>
       </div>
     </div>
+
+    <!-- AI Deep Dive -->
+    <div class="commentary-box" style="margin: 2rem 0;">
+      <h3><i class="fas fa-brain"></i> AI Deep Analysis</h3>
+      <div class="commentary-text" id="aiDeepDive">Generating comprehensive AI analysis...</div>
+    </div>
+
+    <!-- Back Button -->
+    <button class="header-btn" onclick="goHome()" style="width: 100%; padding: 1rem; font-size: 1.1em; margin: 2rem 0;">
+      ← Back to Dashboard
+    </button>
   </div>
 
   <!-- ============ AI CHAT WIDGET ============ -->
@@ -720,13 +806,13 @@
   </button>
   <div class="chat-widget" id="chatWidget">
     <div class="chat-header">
-      <span>AI Assistant</span>
+      <span><i class="fas fa-robot"></i> Trading AI</span>
       <button onclick="toggleChat()">−</button>
     </div>
     <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input-area">
-      <input type="text" id="chatInput" placeholder="Ask about stocks..." onkeypress="if(event.key==='Enter') sendChat()">
-      <button onclick="sendChat()">Send</button>
+      <input type="text" id="chatInput" placeholder="Ask anything..." onkeypress="if(event.key==='Enter') sendChat()">
+      <button onclick="sendChat()"><i class="fas fa-paper-plane"></i></button>
     </div>
   </div>
 
@@ -742,17 +828,28 @@
       {symbol:'LULU',price:164.69,change:-0.82,meanRev:-1.49,rsi:49.1,regime:28.2,inst33:58,signal:"MONITOR",target1:180,target2:200,stop:155,category:'gn2'},
     ];
 
+    // ===== STATE =====
+    let currentResearchSymbol = null;
+    let currentChartInterval = '1D';
+
     // ===== INIT =====
     window.addEventListener('load', () => {
       loadNewsletter();
       renderStocks('all');
     });
 
+    // ===== NAVIGATION =====
+    function goHome() {
+      document.getElementById('homePage').style.display = 'block';
+      document.getElementById('researchPage').classList.remove('active');
+      currentResearchSymbol = null;
+    }
+
     // ===== NEWSLETTER =====
     async function loadNewsletter() {
       const prompt = `Write a brief, actionable trading market newsletter for these ${WATCHLIST.length} stocks:\n` +
         WATCHLIST.map(s => `${s.symbol} $${s.price} | Change: ${s.change}% | Mean Rev: ${s.meanRev} | RSI: ${s.rsi} | Regime: ${s.regime}%`).join('\n') +
-        `\nInclude top 3 opportunities, key technical levels, and market context.`;
+        `\nInclude: top 3 opportunities, key technical levels, market context in 3-4 sentences max.`;
       
       const result = await callAI(prompt);
       document.getElementById('newsletterContent').textContent = result || 'Newsletter unavailable';
@@ -760,7 +857,7 @@
       const highlights = `
         <div class="highlight-card">
           <div class="value">${WATCHLIST.length}</div>
-          <div class="label">Stocks Analyzed</div>
+          <div class="label">Stocks Monitored</div>
         </div>
         <div class="highlight-card">
           <div class="value">${WATCHLIST.filter(s=>s.meanRev<-2).length}</div>
@@ -768,7 +865,11 @@
         </div>
         <div class="highlight-card">
           <div class="value">${WATCHLIST.filter(s=>s.signal.includes('BUY')).length}</div>
-          <div class="label">Buy Signals</div>
+          <div class="label">Active Buy Signals</div>
+        </div>
+        <div class="highlight-card">
+          <div class="value">${WATCHLIST.filter(s=>s.regime>70).length}</div>
+          <div class="label">Strong Trends</div>
         </div>
       `;
       document.getElementById('highlights').innerHTML = highlights;
@@ -778,7 +879,7 @@
     function renderStocks(filter) {
       const filtered = filter === 'all' ? WATCHLIST : WATCHLIST.filter(s => s.category === filter);
       const html = filtered.map(s => `
-        <div class="stock-card" onclick="openDetail('${s.symbol}')">
+        <div class="stock-card" onclick="researchStock('${s.symbol}')">
           <div class="stock-header">
             <div>
               <div class="stock-symbol">${s.symbol}</div>
@@ -809,70 +910,136 @@
               <div class="metric-value">${s.inst33}</div>
             </div>
           </div>
-          
-          <div class="stock-footer">
-            <span>Targets: $${s.target1}-$${s.target2}</span>
-            <span class="trend-icon ${s.change >= 0 ? 'up' : 'down'}">
-              ${s.change >= 0 ? '📈' : '📉'}
-            </span>
-          </div>
         </div>
       `).join('');
       
       document.getElementById('stockGrid').innerHTML = html;
     }
 
-    // ===== FILTER =====
     function filterStocks(category) {
       document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
       event.target.classList.add('active');
       renderStocks(category);
     }
 
-    // ===== DETAIL MODAL =====
-    async function openDetail(symbol) {
-      const stock = WATCHLIST.find(s => s.symbol === symbol);
-      document.getElementById('modalSymbol').textContent = symbol;
-      
+    // ===== SEARCH & RESEARCH =====
+    function searchStock() {
+      const ticker = document.getElementById('searchInput').value.toUpperCase().trim();
+      if (ticker) researchStock(ticker);
+    }
+
+    async function researchStock(ticker) {
+      currentResearchSymbol = ticker;
+      document.getElementById('homePage').style.display = 'none';
+      document.getElementById('researchPage').classList.add('active');
+
+      // Find in watchlist or create new
+      let stock = WATCHLIST.find(s => s.symbol === ticker);
+      if (!stock) {
+        stock = {
+          symbol: ticker,
+          price: 'Loading...',
+          change: 0,
+          meanRev: 0,
+          rsi: 0,
+          regime: 0,
+          inst33: 0,
+          target1: 0,
+          target2: 0
+        };
+      }
+
+      // Update header
+      document.getElementById('researchSymbol').textContent = ticker;
+      document.getElementById('researchPrice').textContent = `$${stock.price}`;
+      document.getElementById('researchChange').textContent = `${stock.change > 0 ? '+' : ''}${stock.change}%`;
+
+      // Metrics
       const metricsHtml = `
-        <div class="stock-metrics">
-          <div class="metric"><div class="metric-label">Price</div><div class="metric-value">$${stock.price}</div></div>
-          <div class="metric"><div class="metric-label">Change</div><div class="metric-value">${stock.change}%</div></div>
-          <div class="metric"><div class="metric-label">Mean Rev</div><div class="metric-value">${stock.meanRev}</div></div>
-          <div class="metric"><div class="metric-label">RSI</div><div class="metric-value">${stock.rsi}</div></div>
-          <div class="metric"><div class="metric-label">Regime</div><div class="metric-value">${stock.regime}%</div></div>
-          <div class="metric"><div class="metric-label">Inst 33</div><div class="metric-value">${stock.inst33}</div></div>
-          <div class="metric"><div class="metric-label">T1</div><div class="metric-value">$${stock.target1}</div></div>
-          <div class="metric"><div class="metric-label">T2</div><div class="metric-value">$${stock.target2}</div></div>
+        <div class="research-metric">
+          <div class="research-metric-label">Price</div>
+          <div class="research-metric-value">$${stock.price}</div>
+        </div>
+        <div class="research-metric">
+          <div class="research-metric-label">Change</div>
+          <div class="research-metric-value">${stock.change}%</div>
+        </div>
+        <div class="research-metric">
+          <div class="research-metric-label">Mean Rev</div>
+          <div class="research-metric-value">${stock.meanRev}</div>
+        </div>
+        <div class="research-metric">
+          <div class="research-metric-label">RSI</div>
+          <div class="research-metric-value">${stock.rsi}</div>
+        </div>
+        <div class="research-metric">
+          <div class="research-metric-label">Regime</div>
+          <div class="research-metric-value">${stock.regime}%</div>
+        </div>
+        <div class="research-metric">
+          <div class="research-metric-label">Inst 33</div>
+          <div class="research-metric-value">${stock.inst33}</div>
         </div>
       `;
-      document.getElementById('modalMetrics').innerHTML = metricsHtml;
-
-      // AI Analysis
-      const aiPrompt = `Deep actionable trading analysis for ${symbol}: Price $${stock.price}, Mean Rev ${stock.meanRev}, RSI ${stock.rsi}, Regime ${stock.regime}%. Provide: technical setup, entry/targets/stop, risk/reward, and key levels.`;
-      const aiText = await callAI(aiPrompt);
-      document.getElementById('aiAnalysis').textContent = aiText || 'AI analysis unavailable';
+      document.getElementById('researchMetrics').innerHTML = metricsHtml;
 
       // Chart
+      renderChart(ticker);
+
+      // Technical Commentary
+      const technicalPrompt = `Provide a SHORT 2-sentence technical analysis for ${ticker} at price $${stock.price} with RSI ${stock.rsi}, Mean Reversion ${stock.meanRev}. Focus on: support/resistance, trend, momentum.`;
+      const technicalText = await callAI(technicalPrompt);
+      document.getElementById('technicalComment').textContent = technicalText;
+
+      // Entry & Targets
+      const targetsHtml = `
+        <li><strong>Entry:</strong> $${stock.price.toFixed(2)}</li>
+        <li><strong>T1 (5%):</strong> $${stock.target1}</li>
+        <li><strong>T2 (10%):</strong> $${stock.target2}</li>
+        <li><strong>Stop Loss:</strong> $${stock.stop}</li>
+      `;
+      document.getElementById('entryTargets').innerHTML = targetsHtml;
+
+      // Deep AI Analysis
+      const deepPrompt = `Comprehensive trading analysis for ${ticker} at $${stock.price}:
+- **Market Context**: Where is this stock in broader trend?
+- **Key Levels**: Support/Resistance to watch
+- **Setup**: What's the technical setup right now?
+- **Trade Plan**: Best entry, targets, and risk management
+- **Catalysts**: Any news or events to watch?
+Keep it concise but actionable, 5-7 sentences max.`;
+      const aiText = await callAI(deepPrompt);
+      document.getElementById('aiDeepDive').textContent = aiText;
+
+      document.getElementById('searchInput').value = '';
+    }
+
+    // ===== CHARTING =====
+    function renderChart(ticker) {
       document.getElementById('chartContainer').innerHTML = '';
       new TradingView.widget({
         "container_id": "chartContainer",
         "width": "100%",
         "height": "100%",
-        "symbol": symbol,
-        "interval": "D",
+        "symbol": ticker,
+        "interval": currentChartInterval,
         "timezone": "America/New_York",
         "theme": "dark",
         "style": "1",
+        "toolbar_bg": "#1a1f2e",
+        "withdateranges": true,
         "hide_side_toolbar": false,
-        "hide_top_toolbar": false
+        "allow_symbol_change": true,
+        "save_image": true,
+        "studies": ["BB@tv-basicstudies", "RSI@tv-basicstudies", "MACD@tv-basicstudies"]
       });
-
-      document.getElementById('detailModal').classList.add('active');
     }
 
-    function closeModal() {
-      document.getElementById('detailModal').classList.remove('active');
+    function setChartInterval(interval) {
+      currentChartInterval = interval;
+      document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderChart(currentResearchSymbol);
     }
 
     // ===== AI CALLS =====
@@ -885,7 +1052,7 @@
             model: 'sonar',
             messages: [{role: 'user', content: prompt}],
             temperature: 0.3,
-            max_tokens: 500
+            max_tokens: 600
           })
         });
         if (!res.ok) return 'Error: ' + res.status;
@@ -897,8 +1064,6 @@
     }
 
     // ===== AI CHAT =====
-    let chatHistory = [];
-
     function toggleChat() {
       const widget = document.getElementById('chatWidget');
       const toggle = document.getElementById('chatToggle');
@@ -919,20 +1084,6 @@
       const aiResp = await callAI(msg);
       box.innerHTML += `<div class="message ai">${aiResp}</div>`;
       box.scrollTop = box.scrollHeight;
-    }
-
-    function analyzeStock() {
-      const ticker = document.getElementById('searchInput').value.toUpperCase();
-      const stock = WATCHLIST.find(s => s.symbol === ticker);
-      if (stock) {
-        openDetail(ticker);
-      } else {
-        alert('Stock not in watchlist');
-      }
-    }
-
-    function openNewsletter() {
-      alert('Newsletter already displayed at top of dashboard!');
     }
   </script>
 </body>
