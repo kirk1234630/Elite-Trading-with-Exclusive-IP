@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics - Multi-API Platform</title>
+    <title>Elite Trading Analytics</title>
     <style>
         * {
             margin: 0;
@@ -18,13 +18,83 @@
             color: #e0e0e0;
         }
 
+        .top-nav {
+            background: rgba(0,0,0,0.3);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-logo-icon {
+            font-size: 2em;
+        }
+
+        .nav-logo-text {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid #667eea;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
+        }
+
         .container {
             max-width: 1800px;
             margin: 0 auto;
             padding: 20px;
         }
 
-        /* Header */
+        .api-config-banner {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            padding: 20px;
+            text-align: center;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .api-input {
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            width: 400px;
+            margin: 0 10px;
+            font-size: 1em;
+        }
+
         .market-story-header {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 40px 20px;
@@ -39,27 +109,27 @@
             font-size: 2.8em;
             font-weight: 700;
             margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
         }
 
         .story-narrative {
             max-width: 1000px;
             margin: 0 auto;
-            font-size: 1.3em;
-            line-height: 1.8;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+            font-size: 1.2em;
+            line-height: 1.6;
+            padding: 20px;
         }
 
-        .api-status {
-            font-size: 0.9em;
-            color: rgba(255,255,255,0.7);
-            margin-top: 15px;
+        .proprietary-badge {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.2);
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 2px solid #10b981;
+            color: #10b981;
+            font-weight: 700;
+            margin: 10px 5px;
         }
 
-        /* Search Section */
         .search-section {
             max-width: 900px;
             margin: 30px auto;
@@ -69,10 +139,12 @@
             display: flex;
             gap: 15px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
         }
 
         .search-input {
             flex: 1;
+            min-width: 250px;
             padding: 20px 28px;
             font-size: 1.3em;
             background: rgba(255,255,255,0.12);
@@ -80,13 +152,6 @@
             border-radius: 15px;
             color: white;
             outline: none;
-            transition: all 0.3s;
-        }
-
-        .search-input:focus {
-            border-color: #667eea;
-            background: rgba(255,255,255,0.18);
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
         }
 
         .analyze-btn {
@@ -98,13 +163,6 @@
             font-size: 1.3em;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .analyze-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
         }
 
         .analyze-btn:disabled {
@@ -112,7 +170,6 @@
             cursor: not-allowed;
         }
 
-        /* Action Buttons */
         .action-buttons {
             display: flex;
             gap: 15px;
@@ -127,28 +184,38 @@
             color: white;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s;
             font-size: 1.05em;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 18px rgba(0,0,0,0.4);
-        }
-
-        .btn-scanner {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
         }
 
         .btn-brief {
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
 
-        /* Top Plays Grid */
+        .filters {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .filter-btn.active {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+
         .plays-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
             gap: 25px;
             margin-top: 30px;
         }
@@ -158,15 +225,14 @@
             border-radius: 20px;
             padding: 30px;
             cursor: pointer;
-            transition: all 0.4s ease;
             border: 2px solid transparent;
             box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            transition: all 0.3s;
         }
 
         .play-card:hover {
-            transform: translateY(-8px);
+            transform: translateY(-5px);
             border-color: #667eea;
-            box-shadow: 0 20px 45px rgba(102, 126, 234, 0.4);
         }
 
         .play-ticker {
@@ -176,62 +242,159 @@
             margin-bottom: 10px;
         }
 
-        .play-story-name {
-            font-size: 1.4em;
-            color: #667eea;
-            margin-bottom: 15px;
-            font-weight: 600;
+        .signal-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9em;
+            margin: 5px 5px 15px 0;
+        }
+
+        .signal-strong-buy {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .signal-accumulate {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
         }
 
         .play-metrics {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
             margin: 15px 0;
         }
 
         .play-metric {
             background: rgba(102, 126, 234, 0.12);
-            padding: 15px;
-            border-radius: 12px;
+            padding: 12px;
+            border-radius: 10px;
         }
 
         .metric-label {
-            font-size: 0.9em;
+            font-size: 0.85em;
             color: #999;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .metric-value {
-            font-size: 1.4em;
+            font-size: 1.3em;
             font-weight: 700;
             color: #fff;
             margin-top: 5px;
         }
 
-        .play-signal {
-            background: rgba(16, 185, 129, 0.12);
+        .proprietary-insight {
+            background: rgba(16, 185, 129, 0.15);
             border-left: 4px solid #10b981;
-            padding: 18px;
-            border-radius: 10px;
-            margin: 18px 0;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 0.9em;
+            line-height: 1.5;
         }
 
-        /* Loading States */
-        .loading {
-            text-align: center;
-            padding: 80px 20px;
+        .live-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #10b981;
+            animation: pulse 2s infinite;
+            margin-right: 5px;
         }
 
-        .spinner {
-            border: 5px solid rgba(255, 255, 255, 0.1);
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .chart-container {
+            background: #0a0a1a;
+            border-radius: 20px;
+            padding: 20px;
+            margin: 30px 0;
+            min-height: 800px;
+            position: relative;
+        }
+
+        .chart-signals-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 12px;
+            z-index: 100;
+            border: 2px solid #667eea;
+        }
+
+        .signal-legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .signal-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signal-arrow {
+            font-size: 1.5em;
+        }
+
+        .detailed-view {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            border-radius: 25px;
+            padding: 40px;
+            margin: 30px 0;
+        }
+
+        .market-brief {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            border-radius: 25px;
+            padding: 40px;
+            margin: 30px 0;
+            max-width: 1400px;
+        }
+
+        .brief-section {
+            background: rgba(102, 126, 234, 0.1);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .brief-section h3 {
+            color: #667eea;
+            font-size: 1.6em;
+            margin-bottom: 15px;
+        }
+
+        .brief-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .brief-list li {
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            line-height: 1.6;
+        }
+
+        .loading-spinner {
+            border: 5px solid rgba(255,255,255,0.1);
             border-top: 5px solid #667eea;
             border-radius: 50%;
-            width: 70px;
-            height: 70px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 25px;
+            margin: 20px auto;
         }
 
         @keyframes spin {
@@ -243,616 +406,431 @@
             display: none;
         }
 
-        .error-message {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid #ef4444;
-            padding: 20px;
-            border-radius: 12px;
-            color: #fca5a5;
-            margin: 20px 0;
-        }
-
-        /* Detailed Analysis View */
-        .detailed-analysis {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 25px;
-            padding: 40px;
-            margin: 30px 0;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-        }
-
-        .analysis-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
-        }
-
-        .ticker-display {
-            font-size: 3em;
-            font-weight: 700;
-            color: #fff;
-        }
-
-        .price-display {
-            text-align: right;
-        }
-
-        .current-price {
-            font-size: 2.5em;
-            font-weight: 700;
-        }
-
-        /* Responsive Design */
         @media (max-width: 768px) {
-            .story-title {
-                font-size: 2em;
-            }
-            
             .plays-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .play-metrics {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
+    <!-- TOP NAVIGATION BAR -->
+    <div class="top-nav">
+        <div class="nav-logo" onclick="goToHome()">
+            <span class="nav-logo-icon">📊</span>
+            <span class="nav-logo-text">Elite Trading Analytics</span>
+        </div>
+        <div class="nav-actions">
+            <button class="nav-btn" onclick="goToHome()">🏠 Home</button>
+            <button class="nav-btn" onclick="viewNewsBrief()">📰 Brief</button>
+            <button class="nav-btn" onclick="showApiConfig()">⚙️ API</button>
+        </div>
+    </div>
+
     <div class="container">
-        <div class="market-story-header">
-            <h1 class="story-title">📊 Elite Trading Analytics Platform</h1>
-            <div class="story-narrative" id="marketNarrative">
-                "Loading proprietary indicators from your CSV watchlist..."
+        <div class="api-config-banner hidden" id="apiConfigBanner">
+            <h3>🔑 Configure Live Data API (Optional)</h3>
+            <p style="margin: 10px 0;">For live price updates, enter your Finnhub API key:</p>
+            <input type="text" id="finnhubApiKey" class="api-input" placeholder="Finnhub API Key (optional)" />
+            <button onclick="saveApiKey()" class="btn btn-brief" style="margin-left: 10px;">Save Key</button>
+            <button onclick="closeApiBanner()" class="btn" style="background: #666; margin-left: 10px;">Close</button>
+        </div>
+
+        <div class="market-story-header" id="homeHeader">
+            <h1 class="story-title">Elite Trading Analytics</h1>
+            <div class="story-narrative">
+                "CSV Base Data + Live API Updates | Your Proprietary ThinkScript Edge"
             </div>
-            <div class="api-status" id="apiStatus">
-                🔄 Initializing multi-API system...
+            <div>
+                <span class="proprietary-badge">Mean Reversion</span>
+                <span class="proprietary-badge">Inst 33 Flow</span>
+                <span class="proprietary-badge">Regime Detection</span>
+                <span class="proprietary-badge">Buy/Sell Signals</span>
             </div>
         </div>
 
-        <div class="search-section">
+        <div class="search-section" id="searchSection">
             <div class="search-bar">
                 <input 
                     type="text" 
                     id="tickerInput" 
                     class="search-input"
-                    placeholder="Enter ticker (e.g., NVDA, TSLA, AAPL...)" 
+                    placeholder="Search ticker for LIVE analysis..." 
                     onkeypress="if(event.key==='Enter') analyzeStock()"
                 />
                 <button onclick="analyzeStock()" class="analyze-btn" id="analyzeBtn">
-                    🔍 DEEP ANALYSIS
+                    🔍 ANALYZE LIVE
                 </button>
             </div>
             
             <div class="action-buttons">
-                <button onclick="runFullScanner()" class="btn btn-scanner">
-                    🎯 SCAN MARKETS
-                </button>
                 <button onclick="viewNewsBrief()" class="btn btn-brief">
-                    📰 MARKET BRIEF
+                    📰 MARKET BRIEF + INSIGHTS
                 </button>
+            </div>
+
+            <div class="filters">
+                <button class="filter-btn active" onclick="filterStocks('all')">All Stocks</button>
+                <button class="filter-btn" onclick="filterStocks('strongBuy')">🔥 Strong Buy</button>
+                <button class="filter-btn" onclick="filterStocks('institutional')">🏦 Inst Flow</button>
+                <button class="filter-btn" onclick="filterStocks('highVol')">📈 High Vol</button>
             </div>
         </div>
 
         <div id="detailedView" class="hidden"></div>
         
-        <div class="plays-grid" id="playsGrid">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p style="font-size: 1.2em;">Loading watchlist from CSV...</p>
-            </div>
-        </div>
+        <div class="plays-grid" id="playsGrid"></div>
     </div>
 
-    <!-- TradingView Widget Script -->
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 
     <script>
-        // Multi-API Configuration with Fallback Chain
-        const API_CONFIG = {
-            primary: {
-                name: 'Render Backend',
-                baseUrl: 'https://elite-trading-with-exclusive-ip.onrender.com/api',
-                quote: (ticker) => `/quote?ticker=${ticker}`,
-                analytics: (ticker) => `/analytics?ticker=${ticker}`
-            },
-            fallback1: {
-                name: 'Alpha Vantage',
-                baseUrl: 'https://www.alphavantage.co/query',
-                quote: (ticker) => `?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=demo`
-            },
-            fallback2: {
-                name: 'Yahoo Finance (Direct)',
-                baseUrl: 'https://query1.finance.yahoo.com',
-                quote: (ticker) => `/v7/finance/quote?symbols=${ticker}`,
-                chart: (ticker) => `/v8/finance/chart/${ticker}?range=1mo&interval=1d`
-            },
-            fallback3: {
-                name: 'Yahoo Finance (Proxy)',
-                baseUrl: 'https://api.allorigins.win/raw?url=',
-                quote: (ticker) => encodeURIComponent(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`)
-            }
-        };
-
-        let currentAPI = 'primary';
-        let watchlistData = [];
-
-        // Load watchlist from CSV data
-        const WATCHLIST_CSV_DATA = [
-            {symbol: 'SNDK', cusum: -0.84, instScore: 53, volatility: 43.0, regime: 149.2, macd: 24.57, rsi: 47.15},
-            {symbol: 'OKLO', cusum: -1.68, instScore: 38, volatility: 63.0, regime: 113.4, macd: -9.56, rsi: 35.97},
-            {symbol: 'IONQ', cusum: -2.18, instScore: 41, volatility: 98.0, regime: 97.4, macd: -4.64, rsi: 32.57},
-            {symbol: 'MU', cusum: -2.47, instScore: 53, volatility: 60.0, regime: 75.6, macd: 7.8, rsi: 41.24},
-            {symbol: 'DDOG', cusum: -0.84, instScore: 53, volatility: 69.0, regime: 'VOL CONTRACTION', macd: 5.54, rsi: 42.03},
-            {symbol: 'SE', cusum: -2.46, instScore: 38, volatility: 42.0, regime: 51.7, macd: -8.05, rsi: 27.72},
-            {symbol: 'MRNA', cusum: -2.08, instScore: 38, volatility: 38.0, regime: 77.4, macd: -0.61, rsi: 36.31},
-            {symbol: 'COIN', cusum: -2.02, instScore: 35, volatility: 23.0, regime: 76.9, macd: -22.19, rsi: 27.78}
+        // YOUR CSV DATA
+        const STOCK_DATA = [
+            {symbol:"MU",price:201.37,change:-10.87,pct5Day:-15.02,meanRev:-2.47,rsi:41.24,volume:47420728,sellPct:94.29,volVsNormal:1.412,volatility:60.0,regime:75.6,inst33:53,masterScore:3.0,signal:"STRONG BUY",buySignals:[{price:205,type:"accumulate"},{price:195,type:"strong"}],sellSignals:[{price:235,type:"target"}]},
+            {symbol:"SE",price:130.99,change:-8.74,pct5Day:-6.46,meanRev:-2.46,rsi:27.72,volume:10163684,sellPct:96.29,volVsNormal:2.05,volatility:42.0,regime:51.7,inst33:38,signal:"ACCUMULATE",buySignals:[{price:128,type:"strong"}],sellSignals:[{price:150,type:"target"}]},
+            {symbol:"MRVL",price:76.68,change:-5.71,pct5Day:-12.39,meanRev:-2.38,rsi:36.84,volume:23315865,sellPct:92.82,volVsNormal:1.399,volatility:71.0,regime:56.6,inst33:28,signal:"ACCUMULATE",buySignals:[{price:75,type:"strong"}],sellSignals:[{price:88,type:"target"}]},
+            {symbol:"SNOW",price:244.66,change:-3.29,pct5Day:-4.77,meanRev:-2.30,rsi:39.87,volume:3669359,sellPct:77.23,volVsNormal:1.182,volatility:56.0,regime:91.1,inst33:63,signal:"BUY",buySignals:[{price:240,type:"accumulate"}],sellSignals:[{price:270,type:"target"}]},
+            {symbol:"TTWO",price:216.23,change:-2.84,pct5Day:-2.35,meanRev:-2.28,rsi:43.08,volume:1632395,sellPct:81.52,volVsNormal:1.113,volatility:75.0,regime:68.5,inst33:58,signal:"ACCUMULATE",buySignals:[{price:212,type:"accumulate"}],sellSignals:[{price:240,type:"target"}]},
+            {symbol:"RIVN",price:18.56,change:-1.96,pct5Day:7.74,meanRev:-1.75,rsi:58.91,volume:32859073,sellPct:88.24,volVsNormal:1.189,volatility:52.0,regime:99.1,inst33:65,signal:"BUY",buySignals:[{price:18,type:"accumulate"}],sellSignals:[{price:22,type:"target"}]},
+            {symbol:"EA",price:194.94,change:-1.26,pct5Day:0.2,meanRev:-1.74,rsi:46.82,volume:1695881,sellPct:82.94,volVsNormal:0.793,volatility:72.0,regime:64.7,inst33:53,signal:"MONITOR",buySignals:[],sellSignals:[]},
+            {symbol:"LULU",price:456.78,change:-1.17,pct5Day:6.15,meanRev:-1.49,rsi:49.1,volume:1953854,sellPct:83.38,volVsNormal:1.231,volatility:80.0,regime:28.2,inst33:58,signal:"MONITOR",buySignals:[],sellSignals:[]},
+            {symbol:"ABNB",price:205.43,change:-1.06,pct5Day:-0.82,meanRev:-1.40,rsi:47.19,volume:4186831,sellPct:88.97,volVsNormal:1.165,volatility:82.0,regime:41.1,inst33:58,signal:"MONITOR",buySignals:[],sellSignals:[]}
         ];
 
-        // Multi-API Fetch with Waterfall Fallback
-        async function fetchWithFallback(ticker) {
-            const apis = ['primary', 'fallback1', 'fallback2', 'fallback3'];
-            
-            for (const apiKey of apis) {
-                try {
-                    updateAPIStatus(`Trying ${API_CONFIG[apiKey].name}...`);
-                    const result = await attemptFetch(apiKey, ticker);
-                    
-                    if (result.success) {
-                        currentAPI = apiKey;
-                        updateAPIStatus(`✅ Connected: ${API_CONFIG[apiKey].name}`);
-                        return result;
-                    }
-                } catch (error) {
-                    console.log(`${API_CONFIG[apiKey].name} failed:`, error.message);
-                    continue;
-                }
-            }
-            
-            // All APIs failed - use CSV fallback
-            updateAPIStatus(`⚠️ Using CSV data (all APIs failed)`);
-            return await fetchFromCSV(ticker);
-        }
+        let FINNHUB_API_KEY = '';
+        let currentFilter = 'all';
+        let currentStocks = [...STOCK_DATA];
 
-        async function attemptFetch(apiKey, ticker) {
-            const config = API_CONFIG[apiKey];
-            
-            if (apiKey === 'primary') {
-                // Try Render backend
-                const quoteUrl = config.baseUrl + config.quote(ticker);
-                const response = await fetch(quoteUrl, { timeout: 5000 });
-                
-                if (!response.ok) throw new Error('API returned error');
-                
-                const data = await response.json();
-                const quote = data['Global Quote'];
-                
-                return {
-                    success: true,
-                    price: parseFloat(quote['05. price']),
-                    change: parseFloat(quote['10. change percent'].replace('%', '')),
-                    volume: parseInt(quote['06. volume']),
-                    source: config.name
-                };
-                
-            } else if (apiKey === 'fallback2') {
-                // Yahoo Finance direct
-                const quoteUrl = config.baseUrl + config.quote(ticker);
-                const response = await fetch(quoteUrl);
-                
-                if (!response.ok) throw new Error('API returned error');
-                
-                const data = await response.json();
-                const quote = data.quoteResponse.result[0];
-                
-                return {
-                    success: true,
-                    price: quote.regularMarketPrice,
-                    change: quote.regularMarketChangePercent,
-                    volume: quote.regularMarketVolume,
-                    afterHours: quote.postMarketPrice || quote.preMarketPrice,
-                    afterHoursChange: quote.postMarketChangePercent || quote.preMarketChangePercent,
-                    source: config.name
-                };
-                
-            } else if (apiKey === 'fallback3') {
-                // Yahoo with CORS proxy
-                const quoteUrl = config.baseUrl + config.quote(ticker);
-                const response = await fetch(quoteUrl);
-                
-                if (!response.ok) throw new Error('Proxy failed');
-                
-                const data = await response.json();
-                const quote = data.quoteResponse.result[0];
-                
-                return {
-                    success: true,
-                    price: quote.regularMarketPrice,
-                    change: quote.regularMarketChangePercent,
-                    volume: quote.regularMarketVolume,
-                    source: config.name
-                };
-            }
-            
-            throw new Error('Unsupported API key');
-        }
-
-        async function fetchFromCSV(ticker) {
-            const csvStock = WATCHLIST_CSV_DATA.find(s => s.symbol === ticker);
-            
-            if (csvStock) {
-                return {
-                    success: true,
-                    price: 0,
-                    change: 0,
-                    volume: 0,
-                    source: 'CSV Watchlist',
-                    csvData: csvStock
-                };
-            }
-            
-            return { success: false };
-        }
-
-        function updateAPIStatus(message) {
-            const statusEl = document.getElementById('apiStatus');
-            if (statusEl) {
-                statusEl.textContent = message;
-            }
-        }
-
-        // Load top plays on startup
         window.addEventListener('load', () => {
-            loadTopPlays();
+            const savedKey = localStorage.getItem('finnhubKey');
+            if (savedKey) {
+                FINNHUB_API_KEY = savedKey;
+                document.getElementById('finnhubApiKey').value = savedKey;
+            }
+            displayStocks(currentStocks);
         });
 
-        async function loadTopPlays() {
-            watchlistData = WATCHLIST_CSV_DATA;
-            const plays = [];
-
-            for (const stock of watchlistData.slice(0, 8)) {
-                try {
-                    const data = await fetchWithFallback(stock.symbol);
-                    
-                    plays.push({
-                        ticker: stock.symbol,
-                        price: data.price || 0,
-                        change: data.change || 0,
-                        cusum: stock.cusum,
-                        instScore: stock.instScore,
-                        volatility: stock.volatility,
-                        regime: stock.regime,
-                        macd: stock.macd,
-                        rsi: stock.rsi,
-                        source: data.source
-                    });
-                    
-                } catch (error) {
-                    console.error(`Error loading ${stock.symbol}:`, error);
-                    // Add with CSV data only
-                    plays.push({
-                        ticker: stock.symbol,
-                        price: 0,
-                        change: 0,
-                        ...stock,
-                        source: 'CSV Only'
-                    });
-                }
-            }
-
-            displayPlays(plays);
-            updateNarrative(plays);
+        function goToHome() {
+            document.getElementById('detailedView').classList.add('hidden');
+            document.getElementById('playsGrid').classList.remove('hidden');
+            document.getElementById('homeHeader').classList.remove('hidden');
+            document.getElementById('searchSection').classList.remove('hidden');
+            displayStocks(currentStocks);
         }
 
-        function displayPlays(plays) {
-            const grid = document.getElementById('playsGrid');
-            
-            if (plays.length === 0) {
-                grid.innerHTML = '<div class="loading"><p style="font-size: 1.3em;">No opportunities in watchlist.</p></div>';
-                return;
+        function showApiConfig() {
+            document.getElementById('apiConfigBanner').classList.remove('hidden');
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('finnhubApiKey').value.trim();
+            if (key) {
+                FINNHUB_API_KEY = key;
+                localStorage.setItem('finnhubKey', key);
+                alert('✅ API key saved! Live prices will be fetched when you click Analyze.');
+                closeApiBanner();
+            } else {
+                alert('Please enter a valid API key');
+            }
+        }
+
+        function closeApiBanner() {
+            document.getElementById('apiConfigBanner').classList.add('hidden');
+        }
+
+        async function fetchLivePrice(ticker) {
+            if (!FINNHUB_API_KEY) {
+                return { success: false, message: 'No API key configured' };
             }
 
-            grid.innerHTML = plays.map(play => {
-                const changeColor = play.change >= 0 ? '#10b981' : '#ef4444';
-                const regimeValue = typeof play.regime === 'number' ? `${play.regime}%` : play.regime;
+            try {
+                const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${FINNHUB_API_KEY}`;
+                const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
+                
+                if (!response.ok) {
+                    return { success: false, message: `HTTP ${response.status}` };
+                }
+                
+                const data = await response.json();
+                
+                if (data.c && data.c > 0) {
+                    return {
+                        success: true,
+                        price: data.c,
+                        change: data.d,
+                        changePercent: data.dp,
+                        high: data.h,
+                        low: data.l,
+                        open: data.o,
+                        prevClose: data.pc
+                    };
+                }
+                
+                return { success: false, message: 'Invalid data' };
+                
+            } catch (error) {
+                return { success: false, message: error.message };
+            }
+        }
+
+        function filterStocks(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            let filtered = [...STOCK_DATA];
+            
+            switch(filter) {
+                case 'strongBuy':
+                    filtered = filtered.filter(s => s.meanRev < -2.0);
+                    break;
+                case 'institutional':
+                    filtered = filtered.filter(s => s.inst33 > 55);
+                    break;
+                case 'highVol':
+                    filtered = filtered.filter(s => s.volatility > 70);
+                    break;
+            }
+            
+            currentStocks = filtered;
+            displayStocks(filtered);
+        }
+
+        function displayStocks(stocks) {
+            const grid = document.getElementById('playsGrid');
+            
+            grid.innerHTML = stocks.map(stock => {
+                const changeColor = stock.change >= 0 ? '#10b981' : '#ef4444';
+                const signalClass = stock.signal === 'STRONG BUY' ? 'signal-strong-buy' : stock.signal === 'ACCUMULATE' || stock.signal === 'BUY' ? 'signal-accumulate' : 'signal-monitor';
                 
                 return `
-                    <div class="play-card" onclick="document.getElementById('tickerInput').value='${play.ticker}'; analyzeStock();">
+                    <div class="play-card" onclick="analyzeStock('${stock.symbol}')">
                         <div class="play-ticker">
-                            ${play.ticker} 
-                            ${play.price > 0 ? `<span style="color: ${changeColor}; font-size: 0.6em;">
-                                ${play.change > 0 ? '+' : ''}${play.change.toFixed(2)}%
-                            </span>` : ''}
+                            ${stock.symbol} 
+                            <span style="color: ${changeColor}; font-size: 0.6em;">${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%</span>
                         </div>
-                        <div class="play-story-name">"${getStoryName(play)}"</div>
-                        
-                        ${play.price > 0 ? `
-                            <div style="font-size: 0.9em; color: #888; margin-bottom: 10px;">
-                                $${play.price.toFixed(2)} • ${play.source}
-                            </div>
-                        ` : ''}
+                        <div style="margin-bottom: 10px;">
+                            <span style="font-size: 1.4em; color: #fff;">$${stock.price.toFixed(2)}</span>
+                        </div>
+                        <span class="signal-badge ${signalClass}">
+                            ${stock.signal === 'STRONG BUY' ? '🔥 ' : stock.signal === 'BUY' ? '📈 ' : stock.signal === 'ACCUMULATE' ? '🎯 ' : ''}${stock.signal}
+                        </span>
                         
                         <div class="play-metrics">
                             <div class="play-metric">
-                                <div class="metric-label">CUSUM</div>
-                                <div class="metric-value">${play.cusum}</div>
+                                <div class="metric-label">Mean Reversion</div>
+                                <div class="metric-value" style="color: ${stock.meanRev < -2.0 ? '#10b981' : '#fff'}">${stock.meanRev}</div>
                             </div>
                             <div class="play-metric">
-                                <div class="metric-label">Inst Score</div>
-                                <div class="metric-value">${play.instScore}</div>
-                            </div>
-                            <div class="play-metric">
-                                <div class="metric-label">Volatility</div>
-                                <div class="metric-value">${play.volatility}%</div>
+                                <div class="metric-label">Inst 33</div>
+                                <div class="metric-value" style="color: ${stock.inst33 > 55 ? '#10b981' : '#fff'}">${stock.inst33}</div>
                             </div>
                             <div class="play-metric">
                                 <div class="metric-label">Regime</div>
-                                <div class="metric-value">${regimeValue}</div>
+                                <div class="metric-value">${stock.regime}%</div>
+                            </div>
+                            <div class="play-metric">
+                                <div class="metric-label">RSI</div>
+                                <div class="metric-value">${stock.rsi}</div>
                             </div>
                         </div>
                         
-                        <div class="play-signal">
-                            <strong style="color: #10b981; font-size: 1.1em;">
-                                ${play.cusum < -2 ? 'STRONG BUY' : play.cusum < -1.5 ? 'ACCUMULATE' : 'LONG'}
-                            </strong><br>
-                            <small style="color: #aaa;">MACD: ${play.macd} | RSI: ${play.rsi}</small>
-                        </div>
-                        
-                        <div style="margin-top: 18px; padding: 18px; background: rgba(102, 126, 234, 0.12); border-radius: 10px; font-size: 0.95em; line-height: 1.7;">
-                            <strong style="color: #667eea;">📊 Signal:</strong><br>
-                            ${getReasoningText(play)}
+                        <div class="proprietary-insight">
+                            ${stock.buySignals.length > 0 ? `<strong>⬆️ BUY:</strong> $${stock.buySignals.map(s => s.price).join(', $')}<br>` : ''}
+                            ${stock.sellSignals.length > 0 ? `<strong>⬇️ TARGET:</strong> $${stock.sellSignals.map(s => s.price).join(', $')}` : ''}
+                            ${stock.buySignals.length === 0 && stock.sellSignals.length === 0 ? '<strong>📊 Click to analyze with buy/sell signals</strong>' : ''}
                         </div>
                     </div>
                 `;
             }).join('');
         }
 
-        function getStoryName(play) {
-            if (play.cusum < -2 && play.volatility > 80) return 'The Perfect Storm';
-            if (play.cusum < -2) return 'Deep Value Zone';
-            if (play.cusum < -1.5) return 'Mean Reversion Setup';
-            if (play.cusum < -1) return 'Accumulation Phase';
-            if (play.volatility > 100) return 'Volatility Explosion';
-            if (play.instScore > 50) return 'Institutional Favorite';
-            return 'High Probability Trade';
-        }
-
-        function getReasoningText(play) {
-            if (play.cusum < -2) {
-                return `Extreme Bear Deviation (${play.cusum}) with ${play.instScore} Inst Score. Volatility at ${play.volatility}% signals explosive reversal potential.`;
-            } else if (play.cusum < -1.5) {
-                return `Strong mean reversion setup with CUSUM ${play.cusum}. Regime detection at ${play.regime} shows institutional accumulation.`;
-            } else {
-                return `CUSUM ${play.cusum} with ${play.volatility}% volatility creates asymmetric risk/reward. RSI ${play.rsi} oversold.`;
+        async function analyzeStock(ticker) {
+            if (typeof ticker !== 'string') {
+                ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
             }
-        }
-
-        function updateNarrative(plays) {
-            const narrative = plays.length > 0 
-                ? `"Loaded ${plays.length} opportunities from your CSV watchlist. Top pick: ${plays[0].ticker} with CUSUM ${plays[0].cusum} and Inst Score ${plays[0].instScore}."`
-                : '"Loading watchlist data..."';
+            if (!ticker) return;
             
-            document.getElementById('marketNarrative').textContent = narrative;
-        }
-
-        async function analyzeStock() {
-            const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
-            if (!ticker) return alert('Please enter a ticker symbol');
+            const csvStock = STOCK_DATA.find(s => s.symbol === ticker);
+            if (!csvStock) {
+                alert('Stock not found. Available: ' + STOCK_DATA.map(s => s.symbol).join(', '));
+                return;
+            }
             
             const analyzeBtn = document.getElementById('analyzeBtn');
             analyzeBtn.disabled = true;
-            analyzeBtn.textContent = '⏳ ANALYZING...';
+            analyzeBtn.textContent = '⏳ FETCHING...';
             
+            document.getElementById('homeHeader').classList.add('hidden');
+            document.getElementById('searchSection').classList.add('hidden');
             document.getElementById('playsGrid').classList.add('hidden');
             document.getElementById('detailedView').classList.remove('hidden');
-            document.getElementById('detailedView').innerHTML = `
-                <div class="loading">
-                    <div class="spinner"></div>
-                    <p style="font-size: 1.3em;">Running deep analysis on ${ticker}...</p>
+            document.getElementById('detailedView').innerHTML = '<div style="text-align: center; padding: 100px;"><div class="loading-spinner"></div><p style="margin-top: 20px;">Fetching live data...</p></div>';
+            
+            const liveData = await fetchLivePrice(ticker);
+            
+            let finalPrice, finalChangePercent, dataSource;
+            
+            if (liveData.success) {
+                finalPrice = liveData.price;
+                finalChangePercent = liveData.changePercent;
+                dataSource = 'LIVE (Finnhub)';
+            } else {
+                finalPrice = csvStock.price;
+                finalChangePercent = csvStock.change;
+                dataSource = 'CSV Data';
+            }
+            
+            const changeColor = finalChangePercent >= 0 ? '#10b981' : '#ef4444';
+            
+            // Generate buy/sell signal legend HTML
+            const signalLegendHTML = `
+                <div class="chart-signals-overlay">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">📊 Trading Signals</h4>
+                    <div class="signal-legend">
+                        <div class="signal-legend-item">
+                            <span class="signal-arrow" style="color: #10b981;">⬆</span>
+                            <span>Strong Buy (Mean Rev < -2.0)</span>
+                        </div>
+                        <div class="signal-legend-item">
+                            <span class="signal-arrow" style="color: #f59e0b;">⬆</span>
+                            <span>Accumulate Zone</span>
+                        </div>
+                        <div class="signal-legend-item">
+                            <span class="signal-arrow" style="color: #ef4444;">⬇</span>
+                            <span>Target / Sell</span>
+                        </div>
+                    </div>
+                    ${csvStock.buySignals.length > 0 ? `
+                        <div style="margin-top: 15px; padding: 10px; background: rgba(16, 185, 129, 0.2); border-radius: 8px;">
+                            <strong style="color: #10b981;">BUY ZONES:</strong><br>
+                            ${csvStock.buySignals.map(s => `$${s.price} (${s.type})`).join(', ')}
+                        </div>
+                    ` : ''}
+                    ${csvStock.sellSignals.length > 0 ? `
+                        <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.2); border-radius: 8px;">
+                            <strong style="color: #ef4444;">TARGETS:</strong><br>
+                            ${csvStock.sellSignals.map(s => `$${s.price}`).join(', ')}
+                        </div>
+                    ` : ''}
                 </div>
             `;
             
-            try {
-                const data = await fetchWithFallback(ticker);
-                
-                if (!data.success) {
-                    throw new Error('Unable to fetch data from any source');
-                }
-                
-                // Find CSV data if available
-                const csvData = WATCHLIST_CSV_DATA.find(s => s.symbol === ticker);
-                
-                displaySimpleAnalysis(ticker, data, csvData);
-                
-            } catch (error) {
-                console.error('Analysis error:', error);
-                document.getElementById('detailedView').innerHTML = `
-                    <div class="error-message">
-                        <h3>❌ Error Analyzing ${ticker}</h3>
-                        <p>${error.message}</p>
-                        <p>All API sources failed. Please check ticker symbol and try again.</p>
-                        <button onclick="backToGrid()" class="btn btn-scanner" style="margin-top: 20px;">
-                            ← BACK TO WATCHLIST
-                        </button>
-                    </div>
-                `;
-            } finally {
-                analyzeBtn.disabled = false;
-                analyzeBtn.textContent = '🔍 DEEP ANALYSIS';
-            }
-        }
-
-        function displaySimpleAnalysis(ticker, data, csvData) {
-            const changeColor = data.change >= 0 ? '#10b981' : '#ef4444';
-            
-            const html = `
-                <div class="detailed-analysis">
-                    <div class="analysis-header">
-                        <div class="ticker-display">${ticker}</div>
-                        <div class="price-display">
-                            ${data.price > 0 ? `
-                                <div class="current-price" style="color: ${changeColor}">
-                                    $${data.price.toFixed(2)} 
-                                    <span style="font-size: 0.6em">(${data.change > 0 ? '+' : ''}${data.change.toFixed(2)}%)</span>
-                                </div>
-                                <div style="font-size: 0.9em; color: #888; margin-top: 10px;">
-                                    Source: ${data.source}
-                                </div>
-                            ` : '<div class="current-price">Price Unavailable</div>'}
-                            
-                            ${data.afterHours ? `
-                                <div style="color: ${data.afterHoursChange >= 0 ? '#10b981' : '#ef4444'}; margin-top: 10px;">
-                                    After Hours: $${data.afterHours.toFixed(2)} (${data.afterHoursChange > 0 ? '+' : ''}${data.afterHoursChange.toFixed(2)}%)
-                                </div>
-                            ` : ''}
+            document.getElementById('detailedView').innerHTML = `
+                <div class="detailed-view">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                        <div>
+                            <div style="font-size: 3em; font-weight: 700;">${ticker}</div>
+                            <span class="signal-badge ${csvStock.signal === 'STRONG BUY' ? 'signal-strong-buy' : 'signal-accumulate'}">
+                                ${csvStock.signal}
+                            </span>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 2.5em; font-weight: 700; color: ${changeColor}">
+                                $${finalPrice.toFixed(2)}
+                                ${liveData.success ? '<span class="live-indicator"></span>' : ''}
+                            </div>
+                            <div style="color: ${changeColor}; font-size: 1.2em;">
+                                ${finalChangePercent > 0 ? '+' : ''}${finalChangePercent.toFixed(2)}%
+                            </div>
+                            <div style="color: #aaa; font-size: 0.9em;">${dataSource}</div>
                         </div>
                     </div>
-
-                    ${csvData ? `
-                        <div style="background: rgba(102, 126, 234, 0.15); padding: 30px; border-radius: 15px; margin: 25px 0;">
-                            <h3 style="color: #667eea; font-size: 1.8em; margin-bottom: 20px;">📊 Your Proprietary Indicators</h3>
-                            
-                            <div class="play-metrics" style="grid-template-columns: repeat(3, 1fr);">
-                                <div class="play-metric">
-                                    <div class="metric-label">CUSUM</div>
-                                    <div class="metric-value">${csvData.cusum}</div>
-                                </div>
-                                <div class="play-metric">
-                                    <div class="metric-label">Inst Score</div>
-                                    <div class="metric-value">${csvData.instScore}</div>
-                                </div>
-                                <div class="play-metric">
-                                    <div class="metric-label">Volatility</div>
-                                    <div class="metric-value">${csvData.volatility}%</div>
-                                </div>
-                                <div class="play-metric">
-                                    <div class="metric-label">Regime</div>
-                                    <div class="metric-value">${csvData.regime}</div>
-                                </div>
-                                <div class="play-metric">
-                                    <div class="metric-label">MACD</div>
-                                    <div class="metric-value">${csvData.macd}</div>
-                                </div>
-                                <div class="play-metric">
-                                    <div class="metric-label">RSI</div>
-                                    <div class="metric-value">${csvData.rsi}</div>
-                                </div>
+                    
+                    <div class="brief-section">
+                        <h3>🎯 Your Proprietary Signals</h3>
+                        <div class="play-metrics" style="grid-template-columns: repeat(3, 1fr);">
+                            <div class="play-metric">
+                                <div class="metric-label">Mean Reversion</div>
+                                <div class="metric-value" style="color: ${csvStock.meanRev < -2.0 ? '#10b981' : '#fff'}">${csvStock.meanRev}</div>
                             </div>
-                            
-                            <div style="margin-top: 25px; padding: 20px; background: rgba(16, 185, 129, 0.12); border-left: 4px solid #10b981; border-radius: 10px;">
-                                <strong style="color: #10b981; font-size: 1.3em;">
-                                    ${csvData.cusum < -2 ? 'STRONG BUY SIGNAL' : csvData.cusum < -1.5 ? 'ACCUMULATE' : 'LONG POSITION'}
-                                </strong><br>
-                                <p style="margin-top: 15px; line-height: 1.8; color: #ddd;">
-                                    ${getReasoningText(csvData)}
-                                </p>
+                            <div class="play-metric">
+                                <div class="metric-label">Inst 33</div>
+                                <div class="metric-value" style="color: ${csvStock.inst33 > 55 ? '#10b981' : '#fff'}">${csvStock.inst33}</div>
+                            </div>
+                            <div class="play-metric">
+                                <div class="metric-label">Regime</div>
+                                <div class="metric-value">${csvStock.regime}%</div>
+                            </div>
+                            <div class="play-metric">
+                                <div class="metric-label">RSI</div>
+                                <div class="metric-value">${csvStock.rsi}</div>
+                            </div>
+                            <div class="play-metric">
+                                <div class="metric-label">Volatility</div>
+                                <div class="metric-value">${csvStock.volatility}%</div>
+                            </div>
+                            <div class="play-metric">
+                                <div class="metric-label">Sell Pressure</div>
+                                <div class="metric-value">${csvStock.sellPct}%</div>
                             </div>
                         </div>
-                    ` : `
-                        <div style="background: rgba(245, 158, 11, 0.12); padding: 25px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #f59e0b;">
-                            <p style="color: #fbbf24; font-size: 1.1em;">
-                                ⚠️ ${ticker} not found in your CSV watchlist. Showing live price data only.
-                            </p>
-                        </div>
-                    `}
-
-                    <!-- TradingView Chart -->
-                    <div style="background: #1a1a2e; border-radius: 15px; padding: 20px; margin: 30px 0; min-height: 500px;" id="tradingview_chart"></div>
-
-                    <button onclick="backToGrid()" class="btn btn-scanner" style="width: 100%; margin-top: 30px; font-size: 1.2em; padding: 20px;">
-                        ← BACK TO WATCHLIST
+                    </div>
+                    
+                    <div class="chart-container">
+                        ${signalLegendHTML}
+                        <div id="tradingview_chart" style="height: 700px;"></div>
+                    </div>
+                    
+                    <button onclick="goToHome()" class="btn btn-brief" style="width: 100%; padding: 20px; font-size: 1.2em;">
+                        ← BACK TO HOME
                     </button>
                 </div>
             `;
             
-            document.getElementById('detailedView').innerHTML = html;
-            
-            // Initialize TradingView widget
             new TradingView.widget({
-                "autosize": true,
+                "width": "100%",
+                "height": 700,
                 "symbol": ticker,
                 "interval": "D",
                 "timezone": "America/New_York",
                 "theme": "dark",
                 "style": "1",
-                "locale": "en",
-                "enable_publishing": false,
-                "allow_symbol_change": true,
                 "container_id": "tradingview_chart",
-                "height": 500
+                "studies": ["STD;MACD", "STD;RSI", "STD;Volume"]
             });
             
-            document.getElementById('marketNarrative').textContent = 
-                `"Analysis complete for ${ticker}. Data from: ${data.source}"`;
-        }
-
-        function backToGrid() {
-            document.getElementById('detailedView').classList.add('hidden');
-            document.getElementById('playsGrid').classList.remove('hidden');
-            loadTopPlays();
-        }
-
-        function runFullScanner() {
-            document.getElementById('playsGrid').innerHTML = '<div class="loading"><div class="spinner"></div><p style="font-size: 1.3em;">Scanning watchlist with multi-API system...</p></div>';
-            setTimeout(() => loadTopPlays(), 1000);
+            analyzeBtn.disabled = false;
+            analyzeBtn.textContent = '🔍 ANALYZE LIVE';
         }
 
         function viewNewsBrief() {
-            const grid = document.getElementById('playsGrid');
-            const stocks = watchlistData.slice(0, 8);
+            document.getElementById('homeHeader').classList.add('hidden');
+            document.getElementById('searchSection').classList.add('hidden');
+            document.getElementById('playsGrid').classList.add('hidden');
+            document.getElementById('detailedView').classList.remove('hidden');
             
-            const avgCUSUM = (stocks.reduce((sum, s) => sum + s.cusum, 0) / stocks.length).toFixed(2);
-            const avgInst = Math.round(stocks.reduce((sum, s) => sum + s.instScore, 0) / stocks.length);
-            const avgVol = Math.round(stocks.reduce((sum, s) => sum + s.volatility, 0) / stocks.length);
+            const strongBuyStocks = STOCK_DATA.filter(s => s.meanRev < -2.0);
+            const instStocks = STOCK_DATA.filter(s => s.inst33 > 55);
             
-            const briefHTML = `
-                <div style="background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%); border-radius: 25px; padding: 50px; max-width: 1200px; margin: 0 auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
-                    <h2 style="font-size: 2.5em; color: #667eea; margin-bottom: 35px; text-align: center;">📰 Elite Market Intelligence</h2>
+            document.getElementById('detailedView').innerHTML = `
+                <div class="market-brief">
+                    <h2 style="font-size: 2.5em; color: #667eea; text-align: center; margin-bottom: 30px;">
+                        📰 Elite Market Brief - November 20, 2025
+                    </h2>
                     
-                    <div style="background: rgba(102, 126, 234, 0.12); padding: 30px; border-radius: 18px; margin-bottom: 30px; border-left: 5px solid #667eea;">
-                        <h3 style="color: #10b981; margin-bottom: 18px; font-size: 1.6em;">🌅 Your Watchlist Overview</h3>
-                        <p style="line-height: 2; font-size: 1.1em;">
-                            Currently tracking ${stocks.length} stocks from your CSV file (2025-11-20-watchlist.csv). 
-                            Average CUSUM: ${avgCUSUM} | Average Inst Score: ${avgInst} | Average Volatility: ${avgVol}%
-                        </p>
-                    </div>
-                    
-                    <div style="background: rgba(102, 126, 234, 0.12); padding: 30px; border-radius: 18px; margin-bottom: 30px; border-left: 5px solid #667eea;">
-                        <h3 style="color: #667eea; margin-bottom: 18px; font-size: 1.6em;">🎯 Top Opportunities</h3>
-                        <ul style="line-height: 2; padding-left: 25px; font-size: 1.1em;">
-                            ${stocks.slice(0, 4).map((s, i) => `
-                                <li><strong>${s.symbol}</strong>: CUSUM ${s.cusum} | Inst ${s.instScore} | Vol ${s.volatility}% | ${s.cusum < -2 ? '🔥 STRONG BUY' : s.cusum < -1.5 ? '📈 ACCUMULATE' : '📊 LONG'}</li>
+                    <div class="brief-section">
+                        <h3>🔥 STRONG BUY SIGNALS (Mean Reversion < -2.0)</h3>
+                        <ul class="brief-list">
+                            ${strongBuyStocks.map(s => `
+                                <li onclick="analyzeStock('${s.symbol}')" style="cursor: pointer;">
+                                    <strong style="color: #10b981;">${s.symbol}</strong> @ $${s.price.toFixed(2)}
+                                    <br>
+                                    <span style="color: #aaa;">
+                                        Mean Rev: ${s.meanRev} | RSI: ${s.rsi} | Inst 33: ${s.inst33}
+                                        ${s.buySignals.length > 0 ? `<br>⬆️ Buy: $${s.buySignals.map(b => b.price).join(', $')}` : ''}
+                                    </span>
+                                </li>
                             `).join('')}
                         </ul>
                     </div>
                     
-                    <div style="background: rgba(239, 68, 68, 0.12); padding: 30px; border-radius: 18px; margin-bottom: 30px; border-left: 5px solid #ef4444;">
-                        <h3 style="color: #ef4444; margin-bottom: 18px; font-size: 1.6em;">⚠️ Risk Management</h3>
-                        <p style="line-height: 2; font-size: 1.1em;">
-                            Current watchlist shows elevated volatility (avg ${avgVol}%). All positions show negative CUSUM indicating Bear Deviation zones. 
-                            Use strict position sizing and ATR-based stops. Monitor regime detection for volatility expansion signals.
-                        </p>
-                    </div>
-                    
-                    <div style="background: rgba(245, 158, 11, 0.12); padding: 30px; border-radius: 18px; margin-bottom: 30px; border-left: 5px solid #f59e0b;">
-                        <h3 style="color: #f59e0b; margin-bottom: 18px; font-size: 1.6em;">💡 Strategy Notes</h3>
-                        <p style="line-height: 2; font-size: 1.1em;">
-                            Multi-API system active: ${currentAPI}. Data sources include your backend, Alpha Vantage, and Yahoo Finance with automatic fallback. 
-                            All indicators derived from your proprietary ThinkScript CSV export.
-                        </p>
-                    </div>
-                    
-                    <button onclick="backToGrid()" class="btn btn-scanner" style="width: 100%; margin-top: 25px; font-size: 1.3em; padding: 22px;">
-                        ← BACK TO WATCHLIST
+                    <button onclick="goToHome()" class="btn btn-brief" style="width: 100%; padding: 20px; font-size: 1.2em; margin-top: 30px;">
+                        ← BACK TO HOME
                     </button>
                 </div>
             `;
-            
-            grid.innerHTML = briefHTML;
-            document.getElementById('marketNarrative').textContent = '"Reading market intelligence from your CSV watchlist..."';
         }
     </script>
 </body>
