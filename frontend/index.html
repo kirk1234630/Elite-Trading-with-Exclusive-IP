@@ -132,7 +132,6 @@
       color: var(--accent);
     }
 
-    /* ============ MAIN CONTAINER ============ */
     .container {
       max-width: 1600px;
       margin: 0 auto;
@@ -177,6 +176,14 @@
       padding: 1.2rem;
       border-radius: 10px;
       text-align: center;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .highlight-card:hover {
+      transform: translateY(-3px);
+      border-color: var(--accent);
+      background: rgba(0, 212, 255, 0.1);
     }
 
     .highlight-card .value {
@@ -189,6 +196,129 @@
       font-size: 0.85em;
       color: var(--text-secondary);
       margin-top: 0.5rem;
+    }
+
+    /* ============ STOCKS MODAL ============ */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border: 2px solid var(--accent);
+      border-radius: 16px;
+      padding: 2rem;
+      max-width: 600px;
+      width: 95%;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 1rem;
+    }
+
+    .modal-title {
+      font-size: 1.8em;
+      color: var(--accent);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 2em;
+      cursor: pointer;
+      transition: color 0.3s;
+    }
+
+    .modal-close:hover {
+      color: var(--danger);
+    }
+
+    .stocks-list {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.2rem;
+    }
+
+    .stock-item {
+      background: var(--secondary-bg);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .stock-item:hover {
+      border-color: var(--accent);
+      background: rgba(0, 212, 255, 0.05);
+      transform: translateX(10px);
+    }
+
+    .stock-item-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .stock-item-symbol {
+      font-size: 1.5em;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .stock-item-price {
+      font-size: 1.3em;
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .stock-item-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.8rem;
+      margin-top: 1rem;
+    }
+
+    .stock-item-metric {
+      background: var(--dark-bg);
+      padding: 0.8rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .stock-item-metric-label {
+      font-size: 0.75em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+    }
+
+    .stock-item-metric-value {
+      font-size: 1.1em;
+      color: var(--success);
+      font-weight: 700;
+      margin-top: 0.3rem;
     }
 
     /* ============ FILTER TABS ============ */
@@ -340,7 +470,7 @@
       border-bottom: 2px solid var(--accent);
       padding: 2rem;
       border-radius: 12px;
-      margin-bottom: 2rem;
+      margin-bottom: 1.5rem;
     }
 
     .research-title-section {
@@ -351,7 +481,7 @@
     }
 
     .research-title {
-      font-size: 2.5em;
+      font-size: 2.8em;
       color: var(--text-primary);
       font-weight: 700;
     }
@@ -361,19 +491,19 @@
     }
 
     .research-price {
-      font-size: 2.8em;
+      font-size: 3em;
       color: var(--accent);
       font-weight: 700;
     }
 
     .research-change {
-      font-size: 1.3em;
-      margin-top: 0.3rem;
+      font-size: 1.4em;
+      margin-top: 0.5rem;
     }
 
     .research-metrics-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       gap: 1rem;
     }
 
@@ -386,7 +516,7 @@
     }
 
     .research-metric-label {
-      font-size: 0.85em;
+      font-size: 0.8em;
       color: var(--text-secondary);
       text-transform: uppercase;
       font-weight: 600;
@@ -394,26 +524,18 @@
     }
 
     .research-metric-value {
-      font-size: 1.5em;
+      font-size: 1.6em;
       color: var(--accent);
       font-weight: 700;
     }
 
-    /* ============ CHART PAGE ============ */
+    /* ============ 4-LAYER RESEARCH PAGE ============ */
     .chart-section {
       background: var(--card-bg);
-      border: 1px solid var(--border);
+      border: 2px solid var(--border);
       border-radius: 12px;
       padding: 1.5rem;
-      margin: 2rem 0;
-    }
-
-    .chart-container {
-      width: 100%;
-      height: 600px;
-      background: var(--secondary-bg);
-      border-radius: 12px;
-      overflow: hidden;
+      margin: 1.5rem 0;
     }
 
     .chart-controls {
@@ -424,7 +546,7 @@
     }
 
     .chart-btn {
-      padding: 0.6rem 1.2rem;
+      padding: 0.7rem 1.3rem;
       background: var(--secondary-bg);
       border: 1px solid var(--border);
       color: var(--text-secondary);
@@ -432,6 +554,7 @@
       cursor: pointer;
       font-weight: 600;
       transition: all 0.3s;
+      font-size: 0.9em;
     }
 
     .chart-btn:hover,
@@ -441,12 +564,51 @@
       border-color: var(--accent);
     }
 
-    /* ============ COMMENTARY SECTION ============ */
-    .commentary-section {
+    /* LAYER 1: MAIN CHART (HUGE) */
+    .layer-1-chart {
+      width: 100%;
+      height: 800px;
+      background: var(--secondary-bg);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    /* LAYER 2: METRICS GRID */
+    .layer-2-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .layer-2-metric-box {
+      background: var(--secondary-bg);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      border-radius: 10px;
+    }
+
+    .layer-2-metric-box h4 {
+      font-size: 0.9em;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 0.8rem;
+    }
+
+    .layer-2-metric-box .value {
+      font-size: 2em;
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* LAYER 3: COMMENTARY */
+    .layer-3-commentary {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      margin: 2rem 0;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
     }
 
     .commentary-box {
@@ -476,9 +638,10 @@
     }
 
     .commentary-list li {
-      padding: 0.6rem 0;
+      padding: 0.8rem 0;
       color: var(--text-secondary);
       border-bottom: 1px solid var(--border);
+      font-size: 0.95em;
     }
 
     .commentary-list li:last-child {
@@ -487,6 +650,29 @@
 
     .commentary-list li strong {
       color: var(--accent);
+    }
+
+    /* LAYER 4: AI DEEP DIVE */
+    .layer-4-ai {
+      background: linear-gradient(135deg, rgba(0, 212, 255, 0.05) 0%, rgba(0, 200, 150, 0.05) 100%);
+      border: 2px solid rgba(0, 212, 255, 0.2);
+      border-radius: 12px;
+      padding: 2rem;
+    }
+
+    .layer-4-ai h3 {
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      font-size: 1.4em;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .layer-4-ai .content {
+      line-height: 2;
+      color: var(--text-secondary);
+      font-size: 1em;
     }
 
     /* ============ AI CHAT WIDGET ============ */
@@ -527,23 +713,6 @@
       gap: 1rem;
     }
 
-    .chat-header span {
-      font-size: 1.1em;
-    }
-
-    .chat-header button {
-      background: none;
-      border: none;
-      color: var(--dark-bg);
-      font-size: 1.4em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 30px;
-      height: 30px;
-    }
-
     .chat-messages {
       flex: 1;
       overflow-y: auto;
@@ -560,19 +729,12 @@
       word-wrap: break-word;
       font-size: 0.9em;
       line-height: 1.6;
-      animation: fadeIn 0.3s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .message.user {
       align-self: flex-end;
       background: var(--accent);
       color: var(--dark-bg);
-      border-radius: 12px 2px 12px 12px;
     }
 
     .message.ai {
@@ -580,7 +742,6 @@
       background: var(--secondary-bg);
       color: var(--text-secondary);
       border: 1px solid var(--border);
-      border-radius: 2px 12px 12px 12px;
     }
 
     .chat-input-area {
@@ -588,8 +749,6 @@
       gap: 0.7rem;
       padding: 1.2rem;
       border-top: 1px solid var(--border);
-      background: var(--card-bg);
-      border-radius: 0 0 14px 14px;
     }
 
     .chat-input-area input {
@@ -600,12 +759,6 @@
       padding: 0.8rem;
       border-radius: 8px;
       outline: none;
-      transition: border-color 0.3s;
-      font-size: 0.9em;
-    }
-
-    .chat-input-area input:focus {
-      border-color: var(--accent);
     }
 
     .chat-input-area button {
@@ -616,12 +769,6 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: 700;
-      transition: all 0.3s;
-    }
-
-    .chat-input-area button:hover {
-      background: #00b8d4;
-      transform: translateY(-2px);
     }
 
     .chat-toggle {
@@ -646,7 +793,6 @@
 
     .chat-toggle:hover {
       transform: scale(1.1);
-      box-shadow: 0 16px 40px rgba(0, 212, 255, 0.5);
     }
 
     .chat-toggle.hidden {
@@ -654,9 +800,8 @@
       pointer-events: none;
     }
 
-    /* ============ RESPONSIVE ============ */
     @media (max-width: 1024px) {
-      .commentary-section {
+      .layer-3-commentary {
         grid-template-columns: 1fr;
       }
     }
@@ -666,17 +811,16 @@
         grid-template-columns: 1fr;
       }
 
-      .header {
-        flex-wrap: wrap;
-        gap: 1rem;
-        padding: 1rem;
+      .layer-1-chart {
+        height: 400px;
       }
 
-      .header-search {
-        flex: 1;
-        min-width: 100%;
-        max-width: none;
-        margin: 0;
+      .research-title {
+        font-size: 1.8em;
+      }
+
+      .research-price {
+        font-size: 2em;
       }
 
       .chat-widget {
@@ -684,14 +828,6 @@
         right: 10px;
         left: 10px;
         max-width: none;
-      }
-
-      .research-title {
-        font-size: 1.8em;
-      }
-
-      .container {
-        padding: 1rem;
       }
     }
   </style>
@@ -717,9 +853,8 @@
     </div>
   </div>
 
-  <!-- ============ MAIN CONTENT (HOME) ============ -->
+  <!-- ============ HOME PAGE ============ -->
   <div class="container" id="homePage">
-    <!-- Newsletter -->
     <div class="newsletter-section">
       <h2><i class="fas fa-newspaper"></i> Market Newsletter</h2>
       <div class="newsletter-content" id="newsletterContent">
@@ -728,24 +863,18 @@
       <div class="newsletter-highlights" id="highlights"></div>
     </div>
 
-    <!-- Filters -->
     <div class="filter-tabs">
       <button class="filter-btn active" onclick="filterStocks('all')">📋 All Stocks</button>
       <button class="filter-btn" onclick="filterStocks('priority')">⭐ Priority</button>
       <button class="filter-btn" onclick="filterStocks('meanrev')">📉 Mean Reversion</button>
-      <button class="filter-btn" onclick="filterStocks('gn1')">💎 Golden Nugget 1</button>
-      <button class="filter-btn" onclick="filterStocks('gn2')">💎 Golden Nugget 2</button>
+      <button class="filter-btn" onclick="filterStocks('gn1')">💎 GN1</button>
+      <button class="filter-btn" onclick="filterStocks('gn2')">💎 GN2</button>
     </div>
 
-    <!-- Stock Grid -->
-    <div class="stock-grid" id="stockGrid">
-      <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: var(--text-secondary);">
-        Loading stocks...
-      </div>
-    </div>
+    <div class="stock-grid" id="stockGrid"></div>
   </div>
 
-  <!-- ============ RESEARCH PAGE ============ -->
+  <!-- ============ RESEARCH PAGE (4 LAYERS) ============ -->
   <div class="container research-page" id="researchPage">
     <!-- Research Header -->
     <div class="research-header">
@@ -761,7 +890,7 @@
       <div class="research-metrics-grid" id="researchMetrics"></div>
     </div>
 
-    <!-- Chart Section -->
+    <!-- LAYER 1: HUGE CHART -->
     <div class="chart-section">
       <div class="chart-controls">
         <button class="chart-btn active" onclick="setChartInterval('1D')">1D</button>
@@ -769,13 +898,15 @@
         <button class="chart-btn" onclick="setChartInterval('1M')">1M</button>
         <button class="chart-btn" onclick="setChartInterval('3M')">3M</button>
         <button class="chart-btn" onclick="setChartInterval('1Y')">1Y</button>
-        <button class="chart-btn" onclick="setChartInterval('ALL')">All</button>
       </div>
-      <div class="chart-container" id="chartContainer"></div>
+      <div class="layer-1-chart" id="chartContainer"></div>
     </div>
 
-    <!-- Commentary -->
-    <div class="commentary-section">
+    <!-- LAYER 2: YOUR PROPRIETARY METRICS -->
+    <div class="layer-2-metrics" id="layer2Metrics"></div>
+
+    <!-- LAYER 3: COMMENTARY (Technical + Targets) -->
+    <div class="layer-3-commentary">
       <div class="commentary-box">
         <h3><i class="fas fa-lightbulb"></i> Technical Setup</h3>
         <div class="commentary-text" id="technicalComment">Loading analysis...</div>
@@ -788,26 +919,37 @@
       </div>
     </div>
 
-    <!-- AI Deep Dive -->
-    <div class="commentary-box" style="margin: 2rem 0;">
+    <!-- LAYER 4: AI DEEP DIVE -->
+    <div class="layer-4-ai">
       <h3><i class="fas fa-brain"></i> AI Deep Analysis</h3>
-      <div class="commentary-text" id="aiDeepDive">Generating comprehensive AI analysis...</div>
+      <div class="content" id="aiDeepDive">Generating comprehensive analysis...</div>
     </div>
 
     <!-- Back Button -->
-    <button class="header-btn" onclick="goHome()" style="width: 100%; padding: 1rem; font-size: 1.1em; margin: 2rem 0;">
+    <button class="header-btn" onclick="goHome()" style="width: 100%; padding: 1.2rem; font-size: 1.1em; margin: 2rem 0;">
       ← Back to Dashboard
     </button>
   </div>
 
-  <!-- ============ AI CHAT WIDGET ============ -->
+  <!-- ============ STOCKS MODAL ============ -->
+  <div class="modal" id="stocksModal" onclick="if(event.target===this) closeStocksModal()">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title">📊 Stocks Being Monitored</div>
+        <button class="modal-close" onclick="closeStocksModal()">×</button>
+      </div>
+      <div class="stocks-list" id="stocksList"></div>
+    </div>
+  </div>
+
+  <!-- ============ AI CHAT ============ -->
   <button class="chat-toggle" id="chatToggle" onclick="toggleChat()">
     <i class="fas fa-comments"></i>
   </button>
   <div class="chat-widget" id="chatWidget">
     <div class="chat-header">
       <span><i class="fas fa-robot"></i> Trading AI</span>
-      <button onclick="toggleChat()">−</button>
+      <button onclick="toggleChat()" style="background:none;border:none;color:var(--dark-bg);font-size:1.4em;cursor:pointer;">−</button>
     </div>
     <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input-area">
@@ -818,34 +960,29 @@
 
   <!-- ============ JAVASCRIPT ============ -->
   <script>
-    // ===== CONFIG =====
     const BACKEND_URL = 'https://elite-trading-with-exclusive-ip.onrender.com';
     const WATCHLIST = [
-      {symbol:'MU',price:201.37,change:-10.87,meanRev:-2.47,rsi:41.24,regime:75.6,inst33:53,signal:"STRONG BUY",target1:220,target2:235,stop:190,category:'priority'},
-      {symbol:'SE',price:130.99,change:-8.74,meanRev:-2.46,rsi:27.72,regime:51.7,inst33:38,signal:"ACCUMULATE",target1:150,target2:165,stop:120,category:'meanrev'},
-      {symbol:'RIVN',price:14.66,change:-0.41,meanRev:-1.75,rsi:58.91,regime:99.1,inst33:65,signal:"BUY",target1:22,target2:25,stop:13,category:'gn1'},
-      {symbol:'EA',price:201.12,change:-0.23,meanRev:-1.74,rsi:46.82,regime:64.7,inst33:53,signal:"MONITOR",target1:210,target2:225,stop:190,category:'priority'},
-      {symbol:'LULU',price:164.69,change:-0.82,meanRev:-1.49,rsi:49.1,regime:28.2,inst33:58,signal:"MONITOR",target1:180,target2:200,stop:155,category:'gn2'},
+      {symbol:'MU',price:201.37,change:-10.87,meanRev:-2.47,rsi:41.24,regime:75.6,inst33:53,signal:"STRONG BUY",target1:220,target2:235,stop:190,category:'priority',volume:"47.3M",iv:"38.2%"},
+      {symbol:'SE',price:130.99,change:-8.74,meanRev:-2.46,rsi:27.72,regime:51.7,inst33:38,signal:"ACCUMULATE",target1:150,target2:165,stop:120,category:'meanrev',volume:"31.2M",iv:"42.1%"},
+      {symbol:'RIVN',price:14.66,change:-0.41,meanRev:-1.75,rsi:58.91,regime:99.1,inst33:65,signal:"BUY",target1:22,target2:25,stop:13,category:'gn1',volume:"203M",iv:"85.3%"},
+      {symbol:'EA',price:201.12,change:-0.23,meanRev:-1.74,rsi:46.82,regime:64.7,inst33:53,signal:"MONITOR",target1:210,target2:225,stop:190,category:'priority',volume:"1.8M",iv:"21.5%"},
+      {symbol:'LULU',price:164.69,change:-0.82,meanRev:-1.49,rsi:49.1,regime:28.2,inst33:58,signal:"MONITOR",target1:180,target2:200,stop:155,category:'gn2',volume:"2.1M",iv:"26.4%"},
     ];
 
-    // ===== STATE =====
     let currentResearchSymbol = null;
     let currentChartInterval = '1D';
 
-    // ===== INIT =====
     window.addEventListener('load', () => {
       loadNewsletter();
       renderStocks('all');
     });
 
-    // ===== NAVIGATION =====
     function goHome() {
       document.getElementById('homePage').style.display = 'block';
       document.getElementById('researchPage').classList.remove('active');
       currentResearchSymbol = null;
     }
 
-    // ===== NEWSLETTER =====
     async function loadNewsletter() {
       const prompt = `Write a brief, actionable trading market newsletter for these ${WATCHLIST.length} stocks:\n` +
         WATCHLIST.map(s => `${s.symbol} $${s.price} | Change: ${s.change}% | Mean Rev: ${s.meanRev} | RSI: ${s.rsi} | Regime: ${s.regime}%`).join('\n') +
@@ -855,7 +992,7 @@
       document.getElementById('newsletterContent').textContent = result || 'Newsletter unavailable';
       
       const highlights = `
-        <div class="highlight-card">
+        <div class="highlight-card" onclick="showStocksModal()">
           <div class="value">${WATCHLIST.length}</div>
           <div class="label">Stocks Monitored</div>
         </div>
@@ -867,15 +1004,10 @@
           <div class="value">${WATCHLIST.filter(s=>s.signal.includes('BUY')).length}</div>
           <div class="label">Active Buy Signals</div>
         </div>
-        <div class="highlight-card">
-          <div class="value">${WATCHLIST.filter(s=>s.regime>70).length}</div>
-          <div class="label">Strong Trends</div>
-        </div>
       `;
       document.getElementById('highlights').innerHTML = highlights;
     }
 
-    // ===== RENDER STOCKS =====
     function renderStocks(filter) {
       const filtered = filter === 'all' ? WATCHLIST : WATCHLIST.filter(s => s.category === filter);
       const html = filtered.map(s => `
@@ -889,30 +1021,15 @@
             </div>
             <div class="stock-price">$${s.price.toFixed(2)}</div>
           </div>
-          
           <span class="signal-badge">${s.signal}</span>
-          
           <div class="stock-metrics">
-            <div class="metric">
-              <div class="metric-label">Mean Rev</div>
-              <div class="metric-value">${s.meanRev}</div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">RSI</div>
-              <div class="metric-value">${s.rsi}</div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Regime</div>
-              <div class="metric-value">${s.regime}%</div>
-            </div>
-            <div class="metric">
-              <div class="metric-label">Inst 33</div>
-              <div class="metric-value">${s.inst33}</div>
-            </div>
+            <div class="metric"><div class="metric-label">Mean Rev</div><div class="metric-value">${s.meanRev}</div></div>
+            <div class="metric"><div class="metric-label">RSI</div><div class="metric-value">${s.rsi}</div></div>
+            <div class="metric"><div class="metric-label">Regime</div><div class="metric-value">${s.regime}%</div></div>
+            <div class="metric"><div class="metric-label">Inst 33</div><div class="metric-value">${s.inst33}</div></div>
           </div>
         </div>
       `).join('');
-      
       document.getElementById('stockGrid').innerHTML = html;
     }
 
@@ -922,10 +1039,35 @@
       renderStocks(category);
     }
 
-    // ===== SEARCH & RESEARCH =====
-    function searchStock() {
-      const ticker = document.getElementById('searchInput').value.toUpperCase().trim();
-      if (ticker) researchStock(ticker);
+    function showStocksModal() {
+      const html = WATCHLIST.map(s => `
+        <div class="stock-item" onclick="researchStock('${s.symbol}')">
+          <div class="stock-item-header">
+            <div class="stock-item-symbol">${s.symbol}</div>
+            <div class="stock-item-price">$${s.price.toFixed(2)}</div>
+          </div>
+          <div class="stock-item-metrics">
+            <div class="stock-item-metric">
+              <div class="stock-item-metric-label">Mean Rev</div>
+              <div class="stock-item-metric-value">${s.meanRev}</div>
+            </div>
+            <div class="stock-item-metric">
+              <div class="stock-item-metric-label">RSI</div>
+              <div class="stock-item-metric-value">${s.rsi}</div>
+            </div>
+            <div class="stock-item-metric">
+              <div class="stock-item-metric-label">Regime</div>
+              <div class="stock-item-metric-value">${s.regime}%</div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('stocksList').innerHTML = html;
+      document.getElementById('stocksModal').classList.add('active');
+    }
+
+    function closeStocksModal() {
+      document.getElementById('stocksModal').classList.remove('active');
     }
 
     async function researchStock(ticker) {
@@ -933,7 +1075,6 @@
       document.getElementById('homePage').style.display = 'none';
       document.getElementById('researchPage').classList.add('active');
 
-      // Find in watchlist or create new
       let stock = WATCHLIST.find(s => s.symbol === ticker);
       if (!stock) {
         stock = {
@@ -945,24 +1086,21 @@
           regime: 0,
           inst33: 0,
           target1: 0,
-          target2: 0
+          target2: 0,
+          stop: 0,
+          volume: 'N/A',
+          iv: 'N/A'
         };
       }
 
-      // Update header
       document.getElementById('researchSymbol').textContent = ticker;
       document.getElementById('researchPrice').textContent = `$${stock.price}`;
       document.getElementById('researchChange').textContent = `${stock.change > 0 ? '+' : ''}${stock.change}%`;
 
-      // Metrics
       const metricsHtml = `
         <div class="research-metric">
           <div class="research-metric-label">Price</div>
           <div class="research-metric-value">$${stock.price}</div>
-        </div>
-        <div class="research-metric">
-          <div class="research-metric-label">Change</div>
-          <div class="research-metric-value">${stock.change}%</div>
         </div>
         <div class="research-metric">
           <div class="research-metric-label">Mean Rev</div>
@@ -980,18 +1118,40 @@
           <div class="research-metric-label">Inst 33</div>
           <div class="research-metric-value">${stock.inst33}</div>
         </div>
+        <div class="research-metric">
+          <div class="research-metric-label">IV</div>
+          <div class="research-metric-value">${stock.iv}</div>
+        </div>
       `;
       document.getElementById('researchMetrics').innerHTML = metricsHtml;
 
-      // Chart
+      // LAYER 2: Proprietary Metrics
+      const layer2Html = `
+        <div class="layer-2-metric-box">
+          <h4>Mean Reversion Score</h4>
+          <div class="value">${stock.meanRev}</div>
+        </div>
+        <div class="layer-2-metric-box">
+          <h4>Regime Detection</h4>
+          <div class="value">${stock.regime}%</div>
+        </div>
+        <div class="layer-2-metric-box">
+          <h4>Institutional 33 Score</h4>
+          <div class="value">${stock.inst33}</div>
+        </div>
+        <div class="layer-2-metric-box">
+          <h4>Volume</h4>
+          <div class="value">${stock.volume}</div>
+        </div>
+      `;
+      document.getElementById('layer2Metrics').innerHTML = layer2Html;
+
       renderChart(ticker);
 
-      // Technical Commentary
-      const technicalPrompt = `Provide a SHORT 2-sentence technical analysis for ${ticker} at price $${stock.price} with RSI ${stock.rsi}, Mean Reversion ${stock.meanRev}. Focus on: support/resistance, trend, momentum.`;
+      const technicalPrompt = `SHORT 2-sentence technical analysis for ${ticker} at $${stock.price} with RSI ${stock.rsi}, Mean Rev ${stock.meanRev}. Focus on support/resistance, trend momentum.`;
       const technicalText = await callAI(technicalPrompt);
       document.getElementById('technicalComment').textContent = technicalText;
 
-      // Entry & Targets
       const targetsHtml = `
         <li><strong>Entry:</strong> $${stock.price.toFixed(2)}</li>
         <li><strong>T1 (5%):</strong> $${stock.target1}</li>
@@ -1000,21 +1160,18 @@
       `;
       document.getElementById('entryTargets').innerHTML = targetsHtml;
 
-      // Deep AI Analysis
       const deepPrompt = `Comprehensive trading analysis for ${ticker} at $${stock.price}:
-- **Market Context**: Where is this stock in broader trend?
-- **Key Levels**: Support/Resistance to watch
-- **Setup**: What's the technical setup right now?
-- **Trade Plan**: Best entry, targets, and risk management
-- **Catalysts**: Any news or events to watch?
-Keep it concise but actionable, 5-7 sentences max.`;
+- **Market Context**: Where in broader trend?
+- **Key Levels**: Support/Resistance
+- **Setup**: Technical setup right now?
+- **Trade Plan**: Entry, targets, risk management
+Keep it 5-7 sentences, actionable.`;
       const aiText = await callAI(deepPrompt);
       document.getElementById('aiDeepDive').textContent = aiText;
 
       document.getElementById('searchInput').value = '';
     }
 
-    // ===== CHARTING =====
     function renderChart(ticker) {
       document.getElementById('chartContainer').innerHTML = '';
       new TradingView.widget({
@@ -1031,7 +1188,7 @@ Keep it concise but actionable, 5-7 sentences max.`;
         "hide_side_toolbar": false,
         "allow_symbol_change": true,
         "save_image": true,
-        "studies": ["BB@tv-basicstudies", "RSI@tv-basicstudies", "MACD@tv-basicstudies"]
+        "studies": ["BB@tv-basicstudies", "RSI@tv-basicstudies", "MACD@tv-basicstudies", "Vol@tv-basicstudies"]
       });
     }
 
@@ -1042,7 +1199,6 @@ Keep it concise but actionable, 5-7 sentences max.`;
       renderChart(currentResearchSymbol);
     }
 
-    // ===== AI CALLS =====
     async function callAI(prompt) {
       try {
         const res = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
@@ -1063,7 +1219,6 @@ Keep it concise but actionable, 5-7 sentences max.`;
       }
     }
 
-    // ===== AI CHAT =====
     function toggleChat() {
       const widget = document.getElementById('chatWidget');
       const toggle = document.getElementById('chatToggle');
@@ -1084,6 +1239,11 @@ Keep it concise but actionable, 5-7 sentences max.`;
       const aiResp = await callAI(msg);
       box.innerHTML += `<div class="message ai">${aiResp}</div>`;
       box.scrollTop = box.scrollHeight;
+    }
+
+    function searchStock() {
+      const ticker = document.getElementById('searchInput').value.toUpperCase().trim();
+      if (ticker) researchStock(ticker);
     }
   </script>
 </body>
