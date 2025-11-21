@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics - Finnhub</title>
+    <title>Elite Trading Analytics - Connected</title>
     <style>
         * {
             margin: 0;
@@ -22,24 +22,6 @@
             max-width: 1800px;
             margin: 0 auto;
             padding: 20px;
-        }
-
-        .api-key-banner {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            padding: 20px;
-            text-align: center;
-            border-radius: 15px;
-            margin-bottom: 20px;
-            color: white;
-        }
-
-        .api-key-input {
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: none;
-            width: 400px;
-            margin: 0 10px;
-            font-size: 1em;
         }
 
         .market-story-header {
@@ -74,6 +56,24 @@
             font-size: 0.9em;
             color: rgba(255,255,255,0.7);
             margin-top: 15px;
+        }
+
+        .data-sources {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .source-badge {
+            background: rgba(16, 185, 129, 0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            border: 1px solid #10b981;
+            color: #10b981;
+            font-size: 0.9em;
+            font-weight: 700;
         }
 
         .search-section {
@@ -277,19 +277,18 @@
 </head>
 <body>
     <div class="container">
-        <div class="api-key-banner" id="apiKeyBanner">
-            <h3>🔑 d4fv8k9r01qgiiengmugd4fv8k9r01qgiiengmv0 </h3>
-            <input type="text" id="finnhubKey" class="api-key-input" placeholder="d4ft15pr01qgiien7240d4ft15pr01qgiien724g" />
-            <button onclick="saveApiKey()" class="btn btn-scanner">Save & Load Stocks</button>
-        </div>
-
         <div class="market-story-header">
-            <h1 class="story-title">📊 Elite Trading Analytics - Finnhub</h1>
+            <h1 class="story-title">📊 Elite Trading Analytics</h1>
             <div class="story-narrative" id="marketNarrative">
-                "Finnhub integration - 60 calls/minute | Fast & Reliable"
+                "Multi-source data powered by your backend"
+            </div>
+            <div class="data-sources">
+                <span class="source-badge">🔵 Finnhub</span>
+                <span class="source-badge">🟣 Polygon (Massive)</span>
+                <span class="source-badge">🟢 FRED</span>
             </div>
             <div class="api-status" id="apiStatus">
-                💡 d4fv8k9r01qgiiengmugd4fv8k9r01qgiiengmv0
+                🔄 Connecting to backend...
             </div>
         </div>
 
@@ -328,7 +327,8 @@
         
         <div class="plays-grid" id="playsGrid">
             <div class="loading">
-                <p style="font-size: 1.2em;">Enter your Finnhub API key to load stocks</p>
+                <div class="spinner"></div>
+                <p style="font-size: 1.2em;">Loading stocks from backend...</p>
             </div>
         </div>
     </div>
@@ -338,7 +338,9 @@
     <script>
         const WATCHLIST_TICKERS = ["META","NVDA","TSLA","GOOGL","GOOG","AAPL","MSFT","AMZN","NFLX","DIS","PLTR","CRWD","SNOW","DDOG","NET","ZS","SHOP","SQ","COIN","HOOD","SOFI","RKLB","IONQ","ARM","RDDT","ABNB","DASH","LYFT","UBER","ROKU","PINS","SNAP","CELH","AFRM","PATH","BILL","U","AI","CVNA","TDOC","GRAB","KVUE","WOLF","APP","CHWY","LULU","EA","TTWO","RIVN","LCID","NIO","FSLR","MARA","UPST","SMCI","ENVX","OKLO"];
 
-        let FINNHUB_API_KEY = '';
+        // Your backend API (with Finnhub, Massive, FRED keys already configured)
+        const API_BASE = 'https://elite-trading-with-exclusive-ip.onrender.com/api';
+        
         let currentFilter = 'all';
         let liveStockData = [];
 
@@ -347,48 +349,18 @@
             if (statusEl) statusEl.textContent = message;
         }
 
-        function saveApiKey() {
-            const key = document.getElementById('finnhubKey').value.trim();
-            if (!key) {
-                alert('Please enter your Finnhub API key');
-                return;
-            }
-            
-            FINNHUB_API_KEY = key;
-            localStorage.setItem('finnhubKey', key);
-            document.getElementById('apiKeyBanner').style.display = 'none';
-            
-            loadTopPlays();
-        }
-
-        // Load saved API key
-        window.addEventListener('load', () => {
-            const savedKey = localStorage.getItem('finnhubKey');
-            if (savedKey) {
-                FINNHUB_API_KEY = savedKey;
-                document.getElementById('finnhubKey').value = savedKey;
-                document.getElementById('apiKeyBanner').style.display = 'none';
-                loadTopPlays();
-            }
-        });
-
-        // FINNHUB API: Fast and reliable
-        async function fetchFinnhubPrice(ticker, retries = 2) {
-            if (!FINNHUB_API_KEY) {
-                return { success: false, error: 'No API key' };
-            }
-
+        // Use YOUR backend which has all API keys configured
+        async function fetchFromBackend(ticker, retries = 2) {
             for (let attempt = 0; attempt <= retries; attempt++) {
                 try {
-                    const url = `https://finnhub.io/api/v1/quote?symbol=${ticker}&token=${FINNHUB_API_KEY}`;
-                    const res = await fetch(url, { signal: AbortSignal.timeout(10000) });
+                    // Your backend /quote endpoint (proxies to Finnhub)
+                    const res = await fetch(`${API_BASE}/quote?ticker=${ticker}`, { 
+                        signal: AbortSignal.timeout(12000) 
+                    });
                     
                     if (!res.ok) {
-                        if (res.status === 401) {
-                            return { success: false, error: 'Invalid API key' };
-                        }
                         if (attempt < retries) {
-                            await new Promise(resolve => setTimeout(resolve, 500));
+                            await new Promise(resolve => setTimeout(resolve, 1000));
                             continue;
                         }
                         return { success: false };
@@ -396,16 +368,29 @@
                     
                     const data = await res.json();
                     
-                    // Finnhub format: c=current, d=change, dp=change%, h=high, l=low, o=open, pc=prev close
+                    // Parse Alpha Vantage format (your backend currently returns this)
+                    if (data['Global Quote']) {
+                        const quote = data['Global Quote'];
+                        return {
+                            success: true,
+                            price: parseFloat(quote['05. price']),
+                            change: parseFloat(quote['10. change percent'].replace('%', '')),
+                            volume: parseInt(quote['06. volume']),
+                            high: parseFloat(quote['03. high']),
+                            low: parseFloat(quote['04. low']),
+                            isLive: true
+                        };
+                    }
+                    
+                    // Also support Finnhub format if your backend switches
                     if (data.c && data.c > 0) {
                         return {
                             success: true,
                             price: data.c,
-                            change: data.dp, // change percent
+                            change: data.dp,
                             high: data.h,
                             low: data.l,
-                            open: data.o,
-                            prevClose: data.pc,
+                            volume: data.v || 0,
                             isLive: true
                         };
                     }
@@ -415,34 +400,33 @@
                 } catch (error) {
                     console.error(`${ticker} attempt ${attempt + 1}:`, error.message);
                     if (attempt < retries) {
-                        await new Promise(resolve => setTimeout(resolve, 500));
+                        await new Promise(resolve => setTimeout(resolve, 1000));
                     }
                 }
             }
             return { success: false };
         }
 
-        async function loadTopPlays() {
-            if (!FINNHUB_API_KEY) {
-                alert('Please enter your Finnhub API key first');
-                return;
-            }
+        window.addEventListener('load', () => {
+            loadTopPlays();
+        });
 
+        async function loadTopPlays() {
             const grid = document.getElementById('playsGrid');
-            grid.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading 57 stocks with Finnhub (fast!)...</p></div>';
-            updateAPIStatus('🔄 Fetching live data from Finnhub...');
+            grid.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading 57 stocks from your backend...</p></div>';
+            updateAPIStatus('🔄 Fetching from backend (Finnhub + Massive + FRED)...');
             
             liveStockData = [];
             let successCount = 0;
             let failCount = 0;
             
-            // Finnhub allows 60/min, so we can go faster - batches of 5 with short delay
-            const batchSize = 5;
+            // Slower rate (2 at a time) to work with current backend rate limits
+            const batchSize = 2;
             for (let i = 0; i < WATCHLIST_TICKERS.length; i += batchSize) {
                 const batch = WATCHLIST_TICKERS.slice(i, i + batchSize);
                 
                 const promises = batch.map(async (ticker) => {
-                    const priceData = await fetchFinnhubPrice(ticker);
+                    const priceData = await fetchFromBackend(ticker);
                     
                     if (priceData.success) {
                         successCount++;
@@ -452,8 +436,7 @@
                             change: priceData.change,
                             high: priceData.high,
                             low: priceData.low,
-                            open: priceData.open,
-                            prevClose: priceData.prevClose,
+                            volume: priceData.volume,
                             isLive: true
                         };
                     } else {
@@ -461,8 +444,7 @@
                         return {
                             symbol: ticker,
                             price: null,
-                            isLive: false,
-                            error: priceData.error
+                            isLive: false
                         };
                     }
                 });
@@ -473,22 +455,17 @@
                 updateAPIStatus(`🔄 Progress: ${i + batch.length}/${WATCHLIST_TICKERS.length} | ✅ ${successCount} | ❌ ${failCount}`);
                 
                 // Show partial results
-                if ((i + batch.length) % 15 === 0) {
+                if ((i + batch.length) % 10 === 0) {
                     applyFilter(currentFilter);
                 }
                 
-                // 1 second delay between batches (60 calls/min = safe with batches of 5)
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                // 2 second delay between batches
+                await new Promise(resolve => setTimeout(resolve, 2000));
             }
             
-            updateAPIStatus(`✅ Complete: ${successCount}/${WATCHLIST_TICKERS.length} stocks loaded via Finnhub`);
+            updateAPIStatus(`✅ Complete: ${successCount}/${WATCHLIST_TICKERS.length} stocks loaded`);
             document.getElementById('marketNarrative').textContent = 
-                `"${successCount} stocks with live Finnhub pricing"`;
-            
-            if (failCount > 0 && failCount === WATCHLIST_TICKERS.length) {
-                updateAPIStatus('❌ All requests failed - check your API key');
-                alert('API key may be invalid. Please check your Finnhub API key.');
-            }
+                `"${successCount} stocks loaded from your multi-source backend"`;
             
             applyFilter(currentFilter);
         }
@@ -528,7 +505,7 @@
 
             grid.innerHTML = stocks.map(stock => {
                 const changeColor = stock.change >= 0 ? '#10b981' : '#ef4444';
-                const dayRange = ((stock.high - stock.low) / stock.low * 100).toFixed(2);
+                const dayRange = stock.high && stock.low ? ((stock.high - stock.low) / stock.low * 100).toFixed(2) : '0.00';
                 
                 return `
                     <div class="play-card" onclick="document.getElementById('tickerInput').value='${stock.symbol}'; analyzeStock();">
@@ -538,7 +515,7 @@
                         </div>
                         <div style="margin-bottom: 15px;">
                             <span style="color: #fff; font-size: 1.3em;">$${stock.price.toFixed(2)}</span>
-                            <span style="color: #10b981; font-size: 0.9em; margin-left: 10px;">● FINNHUB</span>
+                            <span style="color: #10b981; font-size: 0.9em; margin-left: 10px;">● LIVE</span>
                         </div>
                         <div class="play-metrics">
                             <div class="play-metric">
@@ -549,6 +526,7 @@
                                 <div class="metric-label">Change</div>
                                 <div class="metric-value" style="color: ${changeColor}">${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%</div>
                             </div>
+                            ${stock.high ? `
                             <div class="play-metric">
                                 <div class="metric-label">High</div>
                                 <div class="metric-value">$${stock.high.toFixed(2)}</div>
@@ -557,10 +535,11 @@
                                 <div class="metric-label">Low</div>
                                 <div class="metric-value">$${stock.low.toFixed(2)}</div>
                             </div>
+                            ` : ''}
                         </div>
                         <div style="margin-top: 15px; padding: 15px; background: rgba(16, 185, 129, 0.12); border-left: 4px solid ${changeColor}; border-radius: 8px;">
                             <strong style="color: ${changeColor}; font-size: 1.1em;">
-                                ${stock.change > 3 ? '🚀 STRONG BUY' : stock.change < -3 ? '📉 DIP OPPORTUNITY' : '📊 MONITOR'}
+                                ${stock.change > 3 ? '🚀 STRONG MOMENTUM' : stock.change < -3 ? '📉 DIP OPPORTUNITY' : '📊 MONITOR'}
                             </strong>
                         </div>
                     </div>
@@ -583,7 +562,7 @@
             document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
             
             try {
-                const priceData = await fetchFinnhubPrice(ticker);
+                const priceData = await fetchFromBackend(ticker);
                 if (!priceData.success) throw new Error('Unable to fetch price');
                 
                 const html = `
@@ -642,7 +621,7 @@
             const grid = document.getElementById('playsGrid');
             grid.innerHTML = `
                 <div style="background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%); border-radius: 25px; padding: 50px; max-width: 1200px; margin: 0 auto;">
-                    <h2 style="font-size: 2.5em; color: #667eea; text-align: center; margin-bottom: 30px;">📰 Live Market Brief (Finnhub)</h2>
+                    <h2 style="font-size: 2.5em; color: #667eea; text-align: center; margin-bottom: 30px;">📰 Live Market Brief</h2>
                     
                     <div style="background: rgba(102, 126, 234, 0.12); padding: 30px; border-radius: 15px; margin-bottom: 25px;">
                         <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">📊 Real-Time Overview</h3>
