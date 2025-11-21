@@ -361,7 +361,7 @@
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({
-                        model: 'llama-3.1-sonar-large-128k-online',
+                        model: 'sonar',
                         messages: [{
                             role: 'user',
                             content: `Analyze ${ticker}. Price: $${stock.price}. Mean Reversion: ${stock.meanRev}. RSI: ${stock.rsi}. Provide 3-4 sentence analysis with entry/target prices.`
