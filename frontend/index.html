@@ -1,3 +1,10 @@
+// On page load, fetch summary via Perplexity, pass all relevant metrics
+async function loadNewsletter() {
+    const csvData = await fetch('/latest-priority-data').then(r => r.json());
+    const promptText = `Write a market newsletter using this data: ${csvData.tickers.join(', ')} ... [insert metrics]`;
+    const newsletterResponse = await callPerplexity(promptText);
+    document.getElementById('newsletterBox').innerText = newsletterResponse;
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
