@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics - API Fixed</title>
+    <title>Elite Trading Analytics</title>
     <style>
         * {
             margin: 0;
@@ -130,10 +130,6 @@
             background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
         }
 
-        .btn-github {
-            background: linear-gradient(135deg, #6e5494 0%, #4c2889 100%);
-        }
-
         .filters {
             display: flex;
             gap: 15px;
@@ -251,38 +247,6 @@
             margin: 30px 0;
         }
 
-        .github-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-        }
-
-        .github-modal-content {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            padding: 40px;
-            border-radius: 20px;
-            max-width: 600px;
-            width: 90%;
-        }
-
-        .github-input {
-            width: 100%;
-            padding: 15px;
-            margin: 10px 0;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            color: white;
-            font-size: 1.1em;
-        }
-
         @media (max-width: 768px) {
             .story-title {
                 font-size: 1.8em;
@@ -326,9 +290,6 @@
                 <button onclick="viewNewsBrief()" class="btn btn-brief">
                     📰 MARKET BRIEF
                 </button>
-                <button onclick="showGitHubModal()" class="btn btn-github">
-                    📁 GITHUB
-                </button>
             </div>
 
             <div class="filters">
@@ -349,19 +310,6 @@
         </div>
     </div>
 
-    <div id="githubModal" class="github-modal hidden">
-        <div class="github-modal-content">
-            <h2 style="color: #667eea; margin-bottom: 20px;">Connect GitHub</h2>
-            <input type="text" id="githubUsername" class="github-input" placeholder="GitHub Username" />
-            <input type="password" id="githubToken" class="github-input" placeholder="Token" />
-            <input type="text" id="githubRepo" class="github-input" placeholder="Repo Name" />
-            <div style="display: flex; gap: 15px; margin-top: 25px;">
-                <button onclick="connectGitHub()" class="btn btn-github" style="flex: 1;">Connect</button>
-                <button onclick="closeGitHubModal()" class="btn btn-scanner" style="flex: 1;">Cancel</button>
-            </div>
-        </div>
-    </div>
-
     <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
 
     <script>
@@ -370,15 +318,12 @@
         const API_BASE = 'https://elite-trading-with-exclusive-ip.onrender.com/api';
         let currentFilter = 'all';
         let liveStockData = [];
-        let githubConfig = null;
 
-        // Simple indicator calculations using ONLY current price data
         class SimpleCalculator {
             static calculateFromPrice(currentPrice, historicalPrices) {
-                // If we have historical prices, use them; otherwise estimate
                 if (!historicalPrices || historicalPrices.length < 2) {
                     return {
-                        cusum: -1.5, // Default moderate buy signal
+                        cusum: -1.5,
                         rsi: 45,
                         macd: 0,
                         volatility: 50,
@@ -387,7 +332,6 @@
                     };
                 }
                 
-                // Calculate from available data
                 const returns = historicalPrices.slice(1).map((p, i) => (p - historicalPrices[i]) / historicalPrices[i]);
                 const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
                 let cusum = 0;
@@ -409,7 +353,6 @@
             if (statusEl) statusEl.textContent = message;
         }
 
-        // FIXED: Use correct /quote endpoint
         async function fetchLivePrice(ticker) {
             try {
                 const res = await fetch(`${API_BASE}/quote?ticker=${ticker}`, { 
@@ -423,7 +366,6 @@
                 
                 const data = await res.json();
                 
-                // Handle Alpha Vantage response format
                 if (data['Global Quote']) {
                     const quote = data['Global Quote'];
                     return {
@@ -435,7 +377,6 @@
                     };
                 }
                 
-                // Handle alternative format
                 if (data.price) {
                     return {
                         success: true,
@@ -457,12 +398,6 @@
 
         window.addEventListener('load', () => {
             loadTopPlays();
-            // Load saved GitHub config
-            const saved = localStorage.getItem('githubConfig');
-            if (saved) {
-                githubConfig = JSON.parse(saved);
-                updateAPIStatus('✅ GitHub connected');
-            }
         });
 
         async function loadTopPlays() {
@@ -474,7 +409,6 @@
             let successCount = 0;
             let failCount = 0;
             
-            // Process stocks in small batches
             const batchSize = 3;
             for (let i = 0; i < WATCHLIST_TICKERS.length; i += batchSize) {
                 const batch = WATCHLIST_TICKERS.slice(i, i + batchSize);
@@ -520,11 +454,6 @@
                 `"${successCount} stocks with live pricing ready"`;
             
             applyFilter(currentFilter);
-            
-            // Auto-push to GitHub if configured
-            if (githubConfig && successCount > 0) {
-                setTimeout(() => pushToGitHub(), 1000);
-            }
         }
 
         function filterStocks(filter) {
@@ -667,7 +596,6 @@
             document.getElementById('playsGrid').classList.remove('hidden');
         }
 
-        // MARKET BRIEF - FULLY WORKING
         function viewNewsBrief() {
             const liveStocks = liveStockData.filter(s => s.isLive);
             const strongBuys = liveStocks.filter(s => s.cusum < -2);
@@ -702,107 +630,6 @@
                     <button onclick="backToGrid()" class="btn btn-scanner" style="width: 100%; padding: 20px; font-size: 1.2em;">← BACK TO WATCHLIST</button>
                 </div>
             `;
-        }
-
-        // GitHub functions
-        function showGitHubModal() {
-            document.getElementById('githubModal').classList.remove('hidden');
-        }
-
-        function closeGitHubModal() {
-            document.getElementById('githubModal').classList.add('hidden');
-        }
-
-        async function connectGitHub() {
-            const username = document.getElementById('githubUsername').value.trim();
-            const token = document.getElementById('githubToken').value.trim();
-            const repo = document.getElementById('githubRepo').value.trim();
-            
-            if (!username || !token || !repo) return alert('Fill all fields');
-            
-            githubConfig = { username, token, repo };
-            localStorage.setItem('githubConfig', JSON.stringify(githubConfig));
-            closeGitHubModal();
-            updateAPIStatus('✅ GitHub connected');
-            pushToGitHub();
-        }
-
-        async function pushToGitHub() {
-            if (!githubConfig) return;
-            
-            try {
-                updateAPIStatus('📤 Pushing to GitHub...');
-                
-                const csvContent = generateCSV();
-                const newsletterContent = generateNewsletter();
-                
-                await pushFileToGitHub('watchlist-live.csv', csvContent);
-                await pushFileToGitHub('newsletter.md', newsletterContent);
-                
-                updateAPIStatus('✅ Pushed to GitHub!');
-            } catch (error) {
-                updateAPIStatus('❌ GitHub error: ' + error.message);
-            }
-        }
-
-        async function pushFileToGitHub(filename, content) {
-            const { username, token, repo } = githubConfig;
-            const url = `https://api.github.com/repos/${username}/${repo}/contents/${filename}`;
-            
-            let sha = null;
-            try {
-                const getRes = await fetch(url, {
-                    headers: { 'Authorization': `token ${token}` }
-                });
-                if (getRes.ok) {
-                    const data = await getRes.json();
-                    sha = data.sha;
-                }
-            } catch (e) {}
-            
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: `Update ${filename} - ${new Date().toISOString()}`,
-                    content: btoa(unescape(encodeURIComponent(content))),
-                    sha: sha
-                })
-            });
-            
-            if (!response.ok) throw new Error(`Failed ${filename}`);
-        }
-
-        function generateCSV() {
-            let csv = 'Symbol,Price,Change%,CUSUM,RSI,Volume,Timestamp\n';
-            liveStockData.filter(s => s.isLive).forEach(s => {
-                csv += `${s.symbol},${s.price},${s.change},${s.cusum},${s.rsi},${s.volume},${new Date().toISOString()}\n`;
-            });
-            return csv;
-        }
-
-        function generateNewsletter() {
-            const strongBuys = liveStockData.filter(s => s.isLive && s.cusum < -2);
-            return `# Trading Newsletter - ${new Date().toDateString()}
-
-## Market Overview
-- **Stocks Analyzed:** ${liveStockData.filter(s => s.isLive).length}
-- **Strong Buy Signals:** ${strongBuys.length}
-
-## Top Opportunities
-${strongBuys.slice(0, 5).map(s => `
-### ${s.symbol}
-- Price: $${s.price.toFixed(2)} (${s.change > 0 ? '+' : ''}${s.change.toFixed(2)}%)
-- CUSUM: ${s.cusum} (Strong Buy)
-- RSI: ${s.rsi}
-`).join('')}
-
----
-*Auto-generated from Elite Trading Analytics*
-`;
         }
     </script>
 </body>
