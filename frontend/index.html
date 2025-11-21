@@ -44,25 +44,6 @@
             color: #667eea;
         }
 
-        .nav-actions {
-            display: flex;
-            gap: 20px;
-        }
-
-        .nav-btn {
-            padding: 10px 20px;
-            background: rgba(102, 126, 234, 0.2);
-            border: 1px solid #667eea;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .nav-btn:hover {
-            background: rgba(102, 126, 234, 0.4);
-        }
-
         .container {
             max-width: 1800px;
             margin: 0 auto;
@@ -228,14 +209,6 @@
             color: #10b981;
         }
 
-        .chart-container {
-            background: #0a0a1a;
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            height: 500px;
-        }
-
         .ai-box {
             background: rgba(139, 92, 246, 0.15);
             border-left: 4px solid #8b5cf6;
@@ -281,16 +254,13 @@
             <span style="font-size: 2em;">📊</span>
             <span class="nav-logo-text">Elite Trading</span>
         </div>
-        <div class="nav-actions">
-            <button class="nav-btn" onclick="goHome()">🏠 Home</button>
-        </div>
     </div>
 
     <div class="container">
         <div id="homeView">
             <div class="header">
                 <h1 class="title">Elite Trading Analytics</h1>
-                <p style="font-size: 1.2em;">AI-Powered Stock Analysis</p>
+                <p style="font-size: 1.2em;">AI-Powered Stock Analysis + Live Data</p>
             </div>
 
             <div class="search-bar">
@@ -347,21 +317,13 @@
                         <span class="signal-badge">${s.signal}</span>
                         
                         <div class="metrics">
-                            <div class="metric">
-                                <strong>Mean Rev:</strong><br>${s.meanRev}
-                            </div>
-                            <div class="metric">
-                                <strong>Inst 33:</strong><br>${s.inst33}
-                            </div>
-                            <div class="metric">
-                                <strong>RSI:</strong><br>${s.rsi}
-                            </div>
-                            <div class="metric">
-                                <strong>Regime:</strong><br>${s.regime}%
-                            </div>
+                            <div class="metric"><strong>Mean Rev:</strong> ${s.meanRev}</div>
+                            <div class="metric"><strong>Inst 33:</strong> ${s.inst33}</div>
+                            <div class="metric"><strong>RSI:</strong> ${s.rsi}</div>
+                            <div class="metric"><strong>Regime:</strong> ${s.regime}%</div>
                         </div>
                         
-                        <div style="font-size: 0.9em; color: #8b5cf6; cursor: pointer;">
+                        <div style="font-size: 0.9em; color: #8b5cf6;">
                             Click for AI Analysis →
                         </div>
                     </div>
@@ -388,21 +350,11 @@
             let stock = WATCHLIST.find(s => s.symbol === ticker);
             if (!stock) {
                 stock = {
-                    symbol: ticker,
-                    price: 100,
-                    change: 0,
-                    meanRev: 0,
-                    rsi: 50,
-                    regime: 50,
-                    inst33: 50,
-                    signal: "RESEARCH",
-                    target1: 110,
-                    target2: 120,
-                    stop: 90
+                    symbol: ticker, price: 100, change: 0, meanRev: 0, rsi: 50,
+                    regime: 50, inst33: 50, signal: "RESEARCH", target1: 110, target2: 120, stop: 90
                 };
             }
 
-            // Get AI analysis
             let aiText = 'Getting AI analysis...';
             try {
                 const res = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
@@ -469,26 +421,9 @@
                         </div>
                     </div>
 
-                    <h3 style="margin-top: 30px; margin-bottom: 15px;">📈 Chart</h3>
-                    <div class="chart-container">
-                        <div id="tradingview_chart"></div>
-                    </div>
-
-                    <button class="btn back-btn" onclick="goHome()" style="width: 100%; padding: 15px; margin-top: 20px; font-size: 1.1em;">← Back to Watchlist</button>
+                    <button class="btn back-btn" onclick="goHome()" style="width: 100%; padding: 15px; margin-top: 20px; font-size: 1.1em;">← Back</button>
                 </div>
             `;
-
-            // Load TradingView chart
-            new TradingView.widget({
-                "width": "100%",
-                "height": "100%",
-                "symbol": ticker,
-                "interval": "D",
-                "timezone": "America/New_York",
-                "theme": "dark",
-                "style": "1",
-                "container_id": "tradingview_chart"
-            });
         }
     </script>
 </body>
