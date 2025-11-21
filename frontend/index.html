@@ -220,18 +220,32 @@
 
         .close-btn {
             background: rgba(255,255,255,0.1);
-            border: none;
+            border: 2px solid rgba(255,255,255,0.3);
             color: white;
             font-size: 2em;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.3s;
+            z-index: 1001;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
         }
 
         .close-btn:hover {
-            background: rgba(255,255,255,0.2);
+            background: rgba(239, 68, 68, 0.8);
+            border-color: rgba(255,255,255,0.5);
+            transform: scale(1.15);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
+        }
+
+        .close-btn:active {
+            background: rgba(220, 38, 38, 0.9);
+            transform: scale(1.05);
         }
 
         .newsletter-section {
@@ -489,8 +503,19 @@
         }
 
         function closeNewsletter() {
-            document.getElementById('newsletterModal').classList.add('hidden');
+            const modal = document.getElementById('newsletterModal');
+            modal.classList.add('hidden');
         }
+
+        // Close modal when clicking outside content
+        document.addEventListener('click', function(event) {
+            const modal = document.getElementById('newsletterModal');
+            const content = document.querySelector('.newsletter-content');
+            
+            if (event.target === modal && !modal.classList.contains('hidden')) {
+                closeNewsletter();
+            }
+        });
     </script>
 </body>
 </html>
