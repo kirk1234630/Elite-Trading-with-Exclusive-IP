@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics - Live + CSV Data</title>
+    <title>Elite Trading Analytics</title>
     <style>
         * {
             margin: 0;
@@ -16,6 +16,59 @@
             background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
             min-height: 100vh;
             color: #e0e0e0;
+        }
+
+        .top-nav {
+            background: rgba(0,0,0,0.3);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-logo-icon {
+            font-size: 2em;
+        }
+
+        .nav-logo-text {
+            font-size: 1.5em;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-btn {
+            padding: 10px 20px;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid #667eea;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px);
         }
 
         .container {
@@ -265,6 +318,34 @@
             padding: 20px;
             margin: 30px 0;
             min-height: 800px;
+            position: relative;
+        }
+
+        .chart-signals-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 12px;
+            z-index: 100;
+            border: 2px solid #667eea;
+        }
+
+        .signal-legend {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .signal-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .signal-arrow {
+            font-size: 1.5em;
         }
 
         .detailed-view {
@@ -333,29 +414,42 @@
     </style>
 </head>
 <body>
+    <!-- TOP NAVIGATION BAR -->
+    <div class="top-nav">
+        <div class="nav-logo" onclick="goToHome()">
+            <span class="nav-logo-icon">📊</span>
+            <span class="nav-logo-text">Elite Trading Analytics</span>
+        </div>
+        <div class="nav-actions">
+            <button class="nav-btn" onclick="goToHome()">🏠 Home</button>
+            <button class="nav-btn" onclick="viewNewsBrief()">📰 Brief</button>
+            <button class="nav-btn" onclick="showApiConfig()">⚙️ API</button>
+        </div>
+    </div>
+
     <div class="container">
-        <div class="api-config-banner" id="apiConfigBanner">
+        <div class="api-config-banner hidden" id="apiConfigBanner">
             <h3>🔑 Configure Live Data API (Optional)</h3>
             <p style="margin: 10px 0;">For live price updates, enter your Finnhub API key:</p>
             <input type="text" id="finnhubApiKey" class="api-input" placeholder="Finnhub API Key (optional)" />
             <button onclick="saveApiKey()" class="btn btn-brief" style="margin-left: 10px;">Save Key</button>
-            <button onclick="closeApiBanner()" class="btn" style="background: #666; margin-left: 10px;">Use CSV Data Only</button>
+            <button onclick="closeApiBanner()" class="btn" style="background: #666; margin-left: 10px;">Close</button>
         </div>
 
-        <div class="market-story-header">
-            <h1 class="story-title">📊 Elite Trading Analytics</h1>
+        <div class="market-story-header" id="homeHeader">
+            <h1 class="story-title">Elite Trading Analytics</h1>
             <div class="story-narrative">
-                "CSV Base Data + Live API Updates for Analysis"
+                "CSV Base Data + Live API Updates | Your Proprietary ThinkScript Edge"
             </div>
             <div>
                 <span class="proprietary-badge">Mean Reversion</span>
                 <span class="proprietary-badge">Inst 33 Flow</span>
                 <span class="proprietary-badge">Regime Detection</span>
-                <span class="proprietary-badge">Composite Score</span>
+                <span class="proprietary-badge">Buy/Sell Signals</span>
             </div>
         </div>
 
-        <div class="search-section">
+        <div class="search-section" id="searchSection">
             <div class="search-bar">
                 <input 
                     type="text" 
@@ -377,9 +471,9 @@
 
             <div class="filters">
                 <button class="filter-btn active" onclick="filterStocks('all')">All Stocks</button>
-                <button class="filter-btn" onclick="filterStocks('strongBuy')">Strong Buy (Mean Rev < -2.0)</button>
-                <button class="filter-btn" onclick="filterStocks('institutional')">Inst Flow (Inst 33 > 55)</button>
-                <button class="filter-btn" onclick="filterStocks('highVol')">High Vol (> 70%)</button>
+                <button class="filter-btn" onclick="filterStocks('strongBuy')">🔥 Strong Buy</button>
+                <button class="filter-btn" onclick="filterStocks('institutional')">🏦 Inst Flow</button>
+                <button class="filter-btn" onclick="filterStocks('highVol')">📈 High Vol</button>
             </div>
         </div>
 
@@ -393,15 +487,15 @@
     <script>
         // YOUR CSV DATA
         const STOCK_DATA = [
-            {symbol:"MU",price:201.37,change:-10.87,pct5Day:-15.02,meanRev:-2.47,rsi:41.24,volume:47420728,sellPct:94.29,volVsNormal:1.412,volatility:60.0,regime:75.6,inst33:53,masterScore:3.0,overallScore:0.0,composite:0.0,signal:"STRONG BUY"},
-            {symbol:"SE",price:130.99,change:-8.74,pct5Day:-6.46,meanRev:-2.46,rsi:27.72,volume:10163684,sellPct:96.29,volVsNormal:2.05,volatility:42.0,regime:51.7,inst33:38,masterScore:1.0,overallScore:0.0,composite:0.0,signal:"ACCUMULATE"},
-            {symbol:"MRVL",price:76.68,change:-5.71,pct5Day:-12.39,meanRev:-2.38,rsi:36.84,volume:23315865,sellPct:92.82,volVsNormal:1.399,volatility:71.0,regime:56.6,inst33:28,masterScore:1.0,overallScore:0.0,composite:0.0,signal:"ACCUMULATE"},
-            {symbol:"SNOW",price:244.66,change:-3.29,pct5Day:-4.77,meanRev:-2.30,rsi:39.87,volume:3669359,sellPct:77.23,volVsNormal:1.182,volatility:56.0,regime:91.1,inst33:63,masterScore:1.0,overallScore:0.0,composite:0.0,signal:"BUY"},
-            {symbol:"TTWO",price:216.23,change:-2.84,pct5Day:-2.35,meanRev:-2.28,rsi:43.08,volume:1632395,sellPct:81.52,volVsNormal:1.113,volatility:75.0,regime:68.5,inst33:58,masterScore:1.0,overallScore:0.0,composite:0.0,signal:"ACCUMULATE"},
-            {symbol:"RIVN",price:18.56,change:-1.96,pct5Day:7.74,meanRev:-1.75,rsi:58.91,volume:32859073,sellPct:88.24,volVsNormal:1.189,volatility:52.0,regime:99.1,inst33:65,masterScore:3.0,overallScore:0.0,composite:2.0,signal:"BUY"},
-            {symbol:"EA",price:194.94,change:-1.26,pct5Day:0.2,meanRev:-1.74,rsi:46.82,volume:1695881,sellPct:82.94,volVsNormal:0.793,volatility:72.0,regime:64.7,inst33:53,masterScore:2.0,overallScore:0.0,composite:0.0,signal:"MONITOR"},
-            {symbol:"LULU",price:456.78,change:-1.17,pct5Day:6.15,meanRev:-1.49,rsi:49.1,volume:1953854,sellPct:83.38,volVsNormal:1.231,volatility:80.0,regime:28.2,inst33:58,masterScore:2.0,overallScore:0.0,composite:0.0,signal:"MONITOR"},
-            {symbol:"ABNB",price:205.43,change:-1.06,pct5Day:-0.82,meanRev:-1.40,rsi:47.19,volume:4186831,sellPct:88.97,volVsNormal:1.165,volatility:82.0,regime:41.1,inst33:58,masterScore:2.0,overallScore:0.0,composite:0.0,signal:"MONITOR"}
+            {symbol:"MU",price:201.37,change:-10.87,pct5Day:-15.02,meanRev:-2.47,rsi:41.24,volume:47420728,sellPct:94.29,volVsNormal:1.412,volatility:60.0,regime:75.6,inst33:53,masterScore:3.0,signal:"STRONG BUY",buySignals:[{price:205,type:"accumulate"},{price:195,type:"strong"}],sellSignals:[{price:235,type:"target"}]},
+            {symbol:"SE",price:130.99,change:-8.74,pct5Day:-6.46,meanRev:-2.46,rsi:27.72,volume:10163684,sellPct:96.29,volVsNormal:2.05,volatility:42.0,regime:51.7,inst33:38,signal:"ACCUMULATE",buySignals:[{price:128,type:"strong"}],sellSignals:[{price:150,type:"target"}]},
+            {symbol:"MRVL",price:76.68,change:-5.71,pct5Day:-12.39,meanRev:-2.38,rsi:36.84,volume:23315865,sellPct:92.82,volVsNormal:1.399,volatility:71.0,regime:56.6,inst33:28,signal:"ACCUMULATE",buySignals:[{price:75,type:"strong"}],sellSignals:[{price:88,type:"target"}]},
+            {symbol:"SNOW",price:244.66,change:-3.29,pct5Day:-4.77,meanRev:-2.30,rsi:39.87,volume:3669359,sellPct:77.23,volVsNormal:1.182,volatility:56.0,regime:91.1,inst33:63,signal:"BUY",buySignals:[{price:240,type:"accumulate"}],sellSignals:[{price:270,type:"target"}]},
+            {symbol:"TTWO",price:216.23,change:-2.84,pct5Day:-2.35,meanRev:-2.28,rsi:43.08,volume:1632395,sellPct:81.52,volVsNormal:1.113,volatility:75.0,regime:68.5,inst33:58,signal:"ACCUMULATE",buySignals:[{price:212,type:"accumulate"}],sellSignals:[{price:240,type:"target"}]},
+            {symbol:"RIVN",price:18.56,change:-1.96,pct5Day:7.74,meanRev:-1.75,rsi:58.91,volume:32859073,sellPct:88.24,volVsNormal:1.189,volatility:52.0,regime:99.1,inst33:65,signal:"BUY",buySignals:[{price:18,type:"accumulate"}],sellSignals:[{price:22,type:"target"}]},
+            {symbol:"EA",price:194.94,change:-1.26,pct5Day:0.2,meanRev:-1.74,rsi:46.82,volume:1695881,sellPct:82.94,volVsNormal:0.793,volatility:72.0,regime:64.7,inst33:53,signal:"MONITOR",buySignals:[],sellSignals:[]},
+            {symbol:"LULU",price:456.78,change:-1.17,pct5Day:6.15,meanRev:-1.49,rsi:49.1,volume:1953854,sellPct:83.38,volVsNormal:1.231,volatility:80.0,regime:28.2,inst33:58,signal:"MONITOR",buySignals:[],sellSignals:[]},
+            {symbol:"ABNB",price:205.43,change:-1.06,pct5Day:-0.82,meanRev:-1.40,rsi:47.19,volume:4186831,sellPct:88.97,volVsNormal:1.165,volatility:82.0,regime:41.1,inst33:58,signal:"MONITOR",buySignals:[],sellSignals:[]}
         ];
 
         let FINNHUB_API_KEY = '';
@@ -413,10 +507,21 @@
             if (savedKey) {
                 FINNHUB_API_KEY = savedKey;
                 document.getElementById('finnhubApiKey').value = savedKey;
-                document.getElementById('apiConfigBanner').style.display = 'none';
             }
             displayStocks(currentStocks);
         });
+
+        function goToHome() {
+            document.getElementById('detailedView').classList.add('hidden');
+            document.getElementById('playsGrid').classList.remove('hidden');
+            document.getElementById('homeHeader').classList.remove('hidden');
+            document.getElementById('searchSection').classList.remove('hidden');
+            displayStocks(currentStocks);
+        }
+
+        function showApiConfig() {
+            document.getElementById('apiConfigBanner').classList.remove('hidden');
+        }
 
         function saveApiKey() {
             const key = document.getElementById('finnhubApiKey').value.trim();
@@ -424,17 +529,16 @@
                 FINNHUB_API_KEY = key;
                 localStorage.setItem('finnhubKey', key);
                 alert('✅ API key saved! Live prices will be fetched when you click Analyze.');
-                document.getElementById('apiConfigBanner').style.display = 'none';
+                closeApiBanner();
             } else {
                 alert('Please enter a valid API key');
             }
         }
 
         function closeApiBanner() {
-            document.getElementById('apiConfigBanner').style.display = 'none';
+            document.getElementById('apiConfigBanner').classList.add('hidden');
         }
 
-        // LIVE PRICE FETCHING
         async function fetchLivePrice(ticker) {
             if (!FINNHUB_API_KEY) {
                 return { success: false, message: 'No API key configured' };
@@ -459,15 +563,13 @@
                         high: data.h,
                         low: data.l,
                         open: data.o,
-                        prevClose: data.pc,
-                        timestamp: Date.now()
+                        prevClose: data.pc
                     };
                 }
                 
-                return { success: false, message: 'Invalid data format' };
+                return { success: false, message: 'Invalid data' };
                 
             } catch (error) {
-                console.error(`Finnhub error for ${ticker}:`, error);
                 return { success: false, message: error.message };
             }
         }
@@ -510,10 +612,9 @@
                         </div>
                         <div style="margin-bottom: 10px;">
                             <span style="font-size: 1.4em; color: #fff;">$${stock.price.toFixed(2)}</span>
-                            <span style="color: #aaa; font-size: 0.9em; margin-left: 10px;">(CSV Data)</span>
                         </div>
                         <span class="signal-badge ${signalClass}">
-                            ${stock.signal === 'STRONG BUY' ? '🔥 ' : ''}${stock.signal}
+                            ${stock.signal === 'STRONG BUY' ? '🔥 ' : stock.signal === 'BUY' ? '📈 ' : stock.signal === 'ACCUMULATE' ? '🎯 ' : ''}${stock.signal}
                         </span>
                         
                         <div class="play-metrics">
@@ -522,21 +623,23 @@
                                 <div class="metric-value" style="color: ${stock.meanRev < -2.0 ? '#10b981' : '#fff'}">${stock.meanRev}</div>
                             </div>
                             <div class="play-metric">
-                                <div class="metric-label">RSI</div>
-                                <div class="metric-value">${stock.rsi}</div>
-                            </div>
-                            <div class="play-metric">
-                                <div class="metric-label">Inst 33 Score</div>
+                                <div class="metric-label">Inst 33</div>
                                 <div class="metric-value" style="color: ${stock.inst33 > 55 ? '#10b981' : '#fff'}">${stock.inst33}</div>
                             </div>
                             <div class="play-metric">
                                 <div class="metric-label">Regime</div>
                                 <div class="metric-value">${stock.regime}%</div>
                             </div>
+                            <div class="play-metric">
+                                <div class="metric-label">RSI</div>
+                                <div class="metric-value">${stock.rsi}</div>
+                            </div>
                         </div>
                         
                         <div class="proprietary-insight">
-                            <strong>📊 Click to Analyze with LIVE Price</strong>
+                            ${stock.buySignals.length > 0 ? `<strong>⬆️ BUY:</strong> $${stock.buySignals.map(s => s.price).join(', $')}<br>` : ''}
+                            ${stock.sellSignals.length > 0 ? `<strong>⬇️ TARGET:</strong> $${stock.sellSignals.map(s => s.price).join(', $')}` : ''}
+                            ${stock.buySignals.length === 0 && stock.sellSignals.length === 0 ? '<strong>📊 Click to analyze with buy/sell signals</strong>' : ''}
                         </div>
                     </div>
                 `;
@@ -549,44 +652,74 @@
             }
             if (!ticker) return;
             
-            // Get CSV data for proprietary indicators
             const csvStock = STOCK_DATA.find(s => s.symbol === ticker);
             if (!csvStock) {
-                alert('Stock not found in watchlist. Please search one of: ' + STOCK_DATA.map(s => s.symbol).join(', '));
+                alert('Stock not found. Available: ' + STOCK_DATA.map(s => s.symbol).join(', '));
                 return;
             }
             
             const analyzeBtn = document.getElementById('analyzeBtn');
             analyzeBtn.disabled = true;
-            analyzeBtn.textContent = '⏳ FETCHING LIVE DATA...';
+            analyzeBtn.textContent = '⏳ FETCHING...';
             
+            document.getElementById('homeHeader').classList.add('hidden');
+            document.getElementById('searchSection').classList.add('hidden');
             document.getElementById('playsGrid').classList.add('hidden');
             document.getElementById('detailedView').classList.remove('hidden');
-            document.getElementById('detailedView').innerHTML = '<div style="text-align: center; padding: 100px;"><div class="loading-spinner"></div><p style="margin-top: 20px; font-size: 1.2em;">Fetching live price for ' + ticker + '...</p></div>';
+            document.getElementById('detailedView').innerHTML = '<div style="text-align: center; padding: 100px;"><div class="loading-spinner"></div><p style="margin-top: 20px;">Fetching live data...</p></div>';
             
-            // Fetch live price
             const liveData = await fetchLivePrice(ticker);
             
-            let finalPrice, finalChange, finalChangePercent, dataSource;
+            let finalPrice, finalChangePercent, dataSource;
             
             if (liveData.success) {
                 finalPrice = liveData.price;
-                finalChange = liveData.change;
                 finalChangePercent = liveData.changePercent;
                 dataSource = 'LIVE (Finnhub)';
             } else {
                 finalPrice = csvStock.price;
-                finalChange = csvStock.change;
                 finalChangePercent = csvStock.change;
                 dataSource = 'CSV Data';
-                console.log('Live fetch failed, using CSV:', liveData.message);
             }
             
             const changeColor = finalChangePercent >= 0 ? '#10b981' : '#ef4444';
             
+            // Generate buy/sell signal legend HTML
+            const signalLegendHTML = `
+                <div class="chart-signals-overlay">
+                    <h4 style="color: #667eea; margin-bottom: 15px;">📊 Trading Signals</h4>
+                    <div class="signal-legend">
+                        <div class="signal-legend-item">
+                            <span class="signal-arrow" style="color: #10b981;">⬆</span>
+                            <span>Strong Buy (Mean Rev < -2.0)</span>
+                        </div>
+                        <div class="signal-legend-item">
+                            <span class="signal-arrow" style="color: #f59e0b;">⬆</span>
+                            <span>Accumulate Zone</span>
+                        </div>
+                        <div class="signal-legend-item">
+                            <span class="signal-arrow" style="color: #ef4444;">⬇</span>
+                            <span>Target / Sell</span>
+                        </div>
+                    </div>
+                    ${csvStock.buySignals.length > 0 ? `
+                        <div style="margin-top: 15px; padding: 10px; background: rgba(16, 185, 129, 0.2); border-radius: 8px;">
+                            <strong style="color: #10b981;">BUY ZONES:</strong><br>
+                            ${csvStock.buySignals.map(s => `$${s.price} (${s.type})`).join(', ')}
+                        </div>
+                    ` : ''}
+                    ${csvStock.sellSignals.length > 0 ? `
+                        <div style="margin-top: 10px; padding: 10px; background: rgba(239, 68, 68, 0.2); border-radius: 8px;">
+                            <strong style="color: #ef4444;">TARGETS:</strong><br>
+                            ${csvStock.sellSignals.map(s => `$${s.price}`).join(', ')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
             document.getElementById('detailedView').innerHTML = `
                 <div class="detailed-view">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                         <div>
                             <div style="font-size: 3em; font-weight: 700;">${ticker}</div>
                             <span class="signal-badge ${csvStock.signal === 'STRONG BUY' ? 'signal-strong-buy' : 'signal-accumulate'}">
@@ -601,18 +734,9 @@
                             <div style="color: ${changeColor}; font-size: 1.2em;">
                                 ${finalChangePercent > 0 ? '+' : ''}${finalChangePercent.toFixed(2)}%
                             </div>
-                            <div style="color: #aaa; font-size: 0.9em; margin-top: 5px;">
-                                ${dataSource} ${liveData.success ? '• Real-time' : '• From CSV'}
-                            </div>
+                            <div style="color: #aaa; font-size: 0.9em;">${dataSource}</div>
                         </div>
                     </div>
-                    
-                    ${!liveData.success ? `
-                        <div style="background: rgba(245, 158, 11, 0.2); border-left: 4px solid #f59e0b; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                            <strong style="color: #f59e0b;">⚠️ Using CSV Data:</strong> 
-                            ${FINNHUB_API_KEY ? 'Live API call failed. ' + liveData.message : 'No API key configured. Add Finnhub key for live prices.'}
-                        </div>
-                    ` : ''}
                     
                     <div class="brief-section">
                         <h3>🎯 Your Proprietary Signals</h3>
@@ -620,26 +744,17 @@
                             <div class="play-metric">
                                 <div class="metric-label">Mean Reversion</div>
                                 <div class="metric-value" style="color: ${csvStock.meanRev < -2.0 ? '#10b981' : '#fff'}">${csvStock.meanRev}</div>
-                                <div style="font-size: 0.85em; color: #aaa; margin-top: 5px;">
-                                    ${csvStock.meanRev < -2.0 ? 'EXTREME OVERSOLD ✓' : 'Normal range'}
-                                </div>
                             </div>
                             <div class="play-metric">
-                                <div class="metric-label">Inst 33 Flow</div>
+                                <div class="metric-label">Inst 33</div>
                                 <div class="metric-value" style="color: ${csvStock.inst33 > 55 ? '#10b981' : '#fff'}">${csvStock.inst33}</div>
-                                <div style="font-size: 0.85em; color: #aaa; margin-top: 5px;">
-                                    ${csvStock.inst33 > 55 ? 'ACCUMULATION ✓' : 'Neutral'}
-                                </div>
                             </div>
                             <div class="play-metric">
-                                <div class="metric-label">Regime Detection</div>
+                                <div class="metric-label">Regime</div>
                                 <div class="metric-value">${csvStock.regime}%</div>
-                                <div style="font-size: 0.85em; color: #aaa; margin-top: 5px;">
-                                    ${csvStock.regime > 70 ? 'STRONG TREND ✓' : 'Developing'}
-                                </div>
                             </div>
                             <div class="play-metric">
-                                <div class="metric-label">RSI Wilder</div>
+                                <div class="metric-label">RSI</div>
                                 <div class="metric-value">${csvStock.rsi}</div>
                             </div>
                             <div class="play-metric">
@@ -650,44 +765,20 @@
                                 <div class="metric-label">Sell Pressure</div>
                                 <div class="metric-value">${csvStock.sellPct}%</div>
                             </div>
-                            <div class="play-metric">
-                                <div class="metric-label">Vol vs Normal</div>
-                                <div class="metric-value">${csvStock.volVsNormal}x</div>
-                            </div>
-                            <div class="play-metric">
-                                <div class="metric-label">Master Score</div>
-                                <div class="metric-value">${csvStock.masterScore}</div>
-                            </div>
-                            <div class="play-metric">
-                                <div class="metric-label">Composite</div>
-                                <div class="metric-value">${csvStock.composite}</div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="proprietary-insight" style="margin: 20px 0; padding: 25px;">
-                        <h3 style="color: #10b981; margin-bottom: 15px;">💡 Trade Setup Analysis</h3>
-                        <div style="line-height: 2;">
-                            ${csvStock.meanRev < -2.0 ? '<strong>✓ MEAN REVERSION EXTREME:</strong> Price at statistical extreme, high probability reversal zone<br>' : ''}
-                            ${csvStock.sellPct > 90 ? '<strong>✓ CAPITULATION SIGNAL:</strong> Sell pressure at ' + csvStock.sellPct + '% indicates panic selling exhaustion<br>' : ''}
-                            ${csvStock.inst33 > 55 ? '<strong>✓ INSTITUTIONAL ACCUMULATION:</strong> Smart money positioning with Inst 33 score of ' + csvStock.inst33 + '<br>' : ''}
-                            ${csvStock.regime > 70 ? '<strong>✓ REGIME STRENGTH:</strong> ' + csvStock.regime + '% regime indicates established trend structure<br>' : ''}
-                            ${csvStock.volatility > 70 ? '<strong>✓ HIGH VOLATILITY:</strong> Premium options environment - consider credit spreads<br>' : ''}
-                            ${csvStock.volVsNormal > 1.5 ? '<strong>✓ VOLUME SURGE:</strong> ' + csvStock.volVsNormal + 'x normal volume confirms conviction<br>' : ''}
                         </div>
                     </div>
                     
                     <div class="chart-container">
+                        ${signalLegendHTML}
                         <div id="tradingview_chart" style="height: 700px;"></div>
                     </div>
                     
-                    <button onclick="backToGrid()" class="btn btn-brief" style="width: 100%; padding: 20px; font-size: 1.2em;">
-                        ← BACK TO WATCHLIST
+                    <button onclick="goToHome()" class="btn btn-brief" style="width: 100%; padding: 20px; font-size: 1.2em;">
+                        ← BACK TO HOME
                     </button>
                 </div>
             `;
             
-            // Load TradingView chart
             new TradingView.widget({
                 "width": "100%",
                 "height": 700,
@@ -696,84 +787,47 @@
                 "timezone": "America/New_York",
                 "theme": "dark",
                 "style": "1",
-                "locale": "en",
-                "toolbar_bg": "#f1f3f6",
-                "enable_publishing": false,
                 "container_id": "tradingview_chart",
-                "studies": [
-                    "STD;MACD",
-                    "STD;RSI",
-                    "STD;Volume"
-                ]
+                "studies": ["STD;MACD", "STD;RSI", "STD;Volume"]
             });
             
             analyzeBtn.disabled = false;
             analyzeBtn.textContent = '🔍 ANALYZE LIVE';
         }
 
-        function backToGrid() {
-            document.getElementById('detailedView').classList.add('hidden');
-            document.getElementById('playsGrid').classList.remove('hidden');
-            displayStocks(currentStocks);
-        }
-
         function viewNewsBrief() {
+            document.getElementById('homeHeader').classList.add('hidden');
+            document.getElementById('searchSection').classList.add('hidden');
             document.getElementById('playsGrid').classList.add('hidden');
             document.getElementById('detailedView').classList.remove('hidden');
             
             const strongBuyStocks = STOCK_DATA.filter(s => s.meanRev < -2.0);
             const instStocks = STOCK_DATA.filter(s => s.inst33 > 55);
-            const highVolStocks = STOCK_DATA.filter(s => s.volatility > 70);
             
             document.getElementById('detailedView').innerHTML = `
                 <div class="market-brief">
                     <h2 style="font-size: 2.5em; color: #667eea; text-align: center; margin-bottom: 30px;">
                         📰 Elite Market Brief - November 20, 2025
                     </h2>
-                    <p style="text-align: center; color: #aaa; margin-bottom: 40px;">
-                        Powered by Your Proprietary ThinkScript Indicators
-                    </p>
                     
                     <div class="brief-section">
                         <h3>🔥 STRONG BUY SIGNALS (Mean Reversion < -2.0)</h3>
                         <ul class="brief-list">
                             ${strongBuyStocks.map(s => `
-                                <li>
-                                    <strong style="color: #10b981;">${s.symbol}</strong> @ $${s.price.toFixed(2)} 
-                                    <span style="color: ${s.change >= 0 ? '#10b981' : '#ef4444'}">(${s.change > 0 ? '+' : ''}${s.change.toFixed(2)}%)</span>
+                                <li onclick="analyzeStock('${s.symbol}')" style="cursor: pointer;">
+                                    <strong style="color: #10b981;">${s.symbol}</strong> @ $${s.price.toFixed(2)}
                                     <br>
                                     <span style="color: #aaa;">
-                                        • Mean Reversion: <strong>${s.meanRev}</strong> (extreme oversold)
-                                        • RSI: ${s.rsi} • Sell Pressure: ${s.sellPct}%
-                                        • Regime: ${s.regime}% • Inst 33: ${s.inst33}
-                                    </span>
-                                    <br>
-                                    <span style="color: #10b981;">
-                                        📊 Edge: Statistical extreme + ${s.sellPct > 90 ? 'capitulation' : 'heavy selling'} = high-probability reversal
+                                        Mean Rev: ${s.meanRev} | RSI: ${s.rsi} | Inst 33: ${s.inst33}
+                                        ${s.buySignals.length > 0 ? `<br>⬆️ Buy: $${s.buySignals.map(b => b.price).join(', $')}` : ''}
                                     </span>
                                 </li>
                             `).join('')}
                         </ul>
                     </div>
                     
-                    <div class="brief-section">
-                        <h3>🏦 INSTITUTIONAL ACCUMULATION (Inst 33 > 55)</h3>
-                        <ul class="brief-list">
-                            ${instStocks.map(s => `
-                                <li>
-                                    <strong style="color: #667eea;">${s.symbol}</strong> @ $${s.price.toFixed(2)}
-                                    <br>
-                                    <span style="color: #aaa;">
-                                        • Inst 33 Score: <strong>${s.inst33}</strong> (smart money positioning)
-                                        • Regime: ${s.regime}% • Composite: ${s.composite}
-                                    </span>
-                                </li>
-                            `).join('')}
-                        </ul>
-                    </div>
-                    
-                    <button onclick="backToGrid()" class="btn btn-brief" style="width: 100%; padding: 20px; font-size: 1.2em; margin-top: 30px;">
-                        ← BACK TO WATCHLIST
+                    <button onclick="goToHome()" class="btn btn-brief" style="width: 100%; padding: 20px; font-size: 1.2em; margin-top: 30px;">
+                        ← BACK TO HOME
                     </button>
                 </div>
             `;
@@ -781,5 +835,3 @@
     </script>
 </body>
 </html>
-
-                
