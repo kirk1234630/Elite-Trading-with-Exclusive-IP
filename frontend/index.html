@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics</title>
+    <title>API Diagnostic Tool</title>
     <style>
         * {
             margin: 0;
@@ -12,625 +12,462 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            min-height: 100vh;
+            font-family: 'Monaco', 'Courier New', monospace;
+            background: #1a1a2e;
             color: #e0e0e0;
+            padding: 40px;
+            line-height: 1.6;
         }
 
         .container {
-            max-width: 1800px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
         }
 
-        .market-story-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 40px 20px;
-            text-align: center;
-            color: white;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            margin-bottom: 10px;
         }
 
-        .story-title {
-            font-size: 2.8em;
-            font-weight: 700;
-            margin-bottom: 20px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        h2 {
+            color: #10b981;
+            font-size: 1.8em;
+            margin: 30px 0 15px 0;
+            border-bottom: 2px solid #10b981;
+            padding-bottom: 10px;
         }
 
-        .story-narrative {
-            max-width: 1000px;
-            margin: 0 auto;
-            font-size: 1.3em;
-            line-height: 1.8;
-            padding: 30px;
-            background: rgba(255, 255, 255, 0.15);
+        .test-section {
+            background: #2d2d44;
             border-radius: 15px;
-            backdrop-filter: blur(10px);
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #667eea;
         }
 
-        .api-status {
-            font-size: 0.9em;
-            color: rgba(255,255,255,0.7);
-            margin-top: 15px;
-        }
-
-        .search-section {
-            max-width: 900px;
-            margin: 30px auto;
-        }
-
-        .search-bar {
+        .input-group {
             display: flex;
             gap: 15px;
-            margin-bottom: 20px;
+            margin: 20px 0;
             flex-wrap: wrap;
         }
 
-        .search-input {
+        input {
             flex: 1;
-            min-width: 250px;
-            padding: 20px 28px;
-            font-size: 1.3em;
-            background: rgba(255,255,255,0.12);
-            border: 2px solid rgba(255,255,255,0.25);
-            border-radius: 15px;
+            min-width: 200px;
+            padding: 15px;
+            background: #1a1a2e;
+            border: 2px solid #667eea;
+            border-radius: 10px;
             color: white;
-            outline: none;
-            transition: all 0.3s;
+            font-size: 1.1em;
+            font-family: 'Monaco', monospace;
         }
 
-        .search-input::placeholder {
-            color: rgba(255,255,255,0.5);
-        }
-
-        .analyze-btn {
-            padding: 20px 45px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        button {
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border: none;
-            border-radius: 15px;
+            border-radius: 10px;
             color: white;
-            font-size: 1.3em;
+            font-size: 1.1em;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
         }
 
-        .analyze-btn:disabled {
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
 
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
+        .result {
+            background: #1a1a2e;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 5px solid #667eea;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 500px;
+            overflow-y: auto;
         }
 
-        .btn {
-            padding: 16px 32px;
-            border: none;
-            border-radius: 12px;
-            color: white;
+        .success {
+            border-left-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+        }
+
+        .error {
+            border-left-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 5px;
             font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1.05em;
-        }
-
-        .btn-scanner {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        .btn-brief {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .filters {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .filter-btn {
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .filter-btn:hover, .filter-btn.active {
-            background: rgba(102, 126, 234, 0.3);
-            border-color: #667eea;
-        }
-
-        .plays-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .play-card {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 20px;
-            padding: 30px;
-            cursor: pointer;
-            transition: all 0.4s ease;
-            border: 2px solid transparent;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-        }
-
-        .play-card:hover {
-            transform: translateY(-8px);
-            border-color: #667eea;
-        }
-
-        .play-ticker {
-            font-size: 2.2em;
-            font-weight: 700;
-            color: #fff;
             margin-bottom: 10px;
         }
 
-        .play-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+        .status-success {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-error {
+            background: #ef4444;
+            color: white;
+        }
+
+        .status-testing {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .endpoint-list {
+            background: #2d2d44;
+            border-radius: 10px;
+            padding: 20px;
             margin: 15px 0;
         }
 
-        .play-metric {
-            background: rgba(102, 126, 234, 0.12);
+        .endpoint-item {
             padding: 15px;
-            border-radius: 12px;
+            margin: 10px 0;
+            background: #1a1a2e;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
         }
 
-        .metric-label {
+        .code {
+            background: #0f0f1e;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: 'Monaco', monospace;
             font-size: 0.9em;
-            color: #999;
-            text-transform: uppercase;
-        }
-
-        .metric-value {
-            font-size: 1.4em;
-            font-weight: 700;
-            color: #fff;
-            margin-top: 5px;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 80px 20px;
+            color: #10b981;
         }
 
         .spinner {
-            border: 5px solid rgba(255, 255, 255, 0.1);
-            border-top: 5px solid #667eea;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top: 3px solid #667eea;
             border-radius: 50%;
-            width: 70px;
-            height: 70px;
+            width: 30px;
+            height: 30px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 25px;
+            display: inline-block;
+            margin-left: 10px;
         }
 
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-
-        .hidden {
-            display: none;
-        }
-
-        .chart-container-wrapper {
-            background: #0a0a1a;
-            border-radius: 20px;
-            padding: 20px;
-            margin: 30px 0;
-            min-height: 900px;
-        }
-
-        .detailed-analysis {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 25px;
-            padding: 40px;
-            margin: 30px 0;
-        }
-
-        @media (max-width: 768px) {
-            .story-title {
-                font-size: 1.8em;
-            }
-            .plays-grid {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="market-story-header">
-            <h1 class="story-title">📊 Elite Trading Analytics</h1>
-            <div class="story-narrative" id="marketNarrative">
-                "Loading live data for 57 stocks..."
-            </div>
-            <div class="api-status" id="apiStatus">
-                🔄 Initializing...
-            </div>
-        </div>
+        <h1>🔧 API Diagnostic Tool</h1>
+        <p style="font-size: 1.1em; color: #aaa; margin-bottom: 30px;">
+            Test all available endpoints to find which one works for stock price data
+        </p>
 
-        <div class="search-section">
-            <div class="search-bar">
+        <div class="test-section">
+            <h2>1. Configure API Base URL</h2>
+            <div class="input-group">
                 <input 
                     type="text" 
-                    id="tickerInput" 
-                    class="search-input"
-                    placeholder="Search ticker (e.g., META, NVDA)..." 
-                    onkeypress="if(event.key==='Enter') analyzeStock()"
+                    id="apiBase" 
+                    value="https://elite-trading-with-exclusive-ip.onrender.com/api"
+                    placeholder="Enter API base URL"
                 />
-                <button onclick="analyzeStock()" class="analyze-btn" id="analyzeBtn">
-                    🔍 ANALYZE
-                </button>
-            </div>
-            
-            <div class="action-buttons">
-                <button onclick="loadTopPlays()" class="btn btn-scanner">
-                    🔄 REFRESH ALL 57
-                </button>
-                <button onclick="viewNewsBrief()" class="btn btn-brief">
-                    📰 MARKET BRIEF
-                </button>
-            </div>
-
-            <div class="filters">
-                <button class="filter-btn active" onclick="filterStocks('all')">All (57)</button>
-                <button class="filter-btn" onclick="filterStocks('strongBuy')">Strong Buy</button>
-                <button class="filter-btn" onclick="filterStocks('accumulate')">Accumulate</button>
-                <button class="filter-btn" onclick="filterStocks('highVol')">High Vol</button>
             </div>
         </div>
 
-        <div id="detailedView" class="hidden"></div>
-        
-        <div class="plays-grid" id="playsGrid">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p style="font-size: 1.2em;">Loading stocks...</p>
+        <div class="test-section">
+            <h2>2. Test Stock Ticker</h2>
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="ticker" 
+                    value="AAPL"
+                    placeholder="Enter ticker (e.g., AAPL, TSLA)"
+                />
+                <button onclick="testAllEndpoints()">🚀 TEST ALL ENDPOINTS</button>
             </div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. Known Endpoints to Test</h2>
+            <div class="endpoint-list">
+                <div class="endpoint-item">
+                    <strong>1. /quote?ticker={ticker}</strong> - Alpha Vantage QUOTE_ENDPOINT
+                </div>
+                <div class="endpoint-item">
+                    <strong>2. /timeseries?ticker={ticker}</strong> - Alpha Vantage TIME_SERIES_DAILY
+                </div>
+                <div class="endpoint-item">
+                    <strong>3. /price/{ticker}</strong> - Simple price endpoint
+                </div>
+                <div class="endpoint-item">
+                    <strong>4. /stock/{ticker}</strong> - Stock data endpoint
+                </div>
+                <div class="endpoint-item">
+                    <strong>5. /data/{ticker}</strong> - Generic data endpoint
+                </div>
+            </div>
+        </div>
+
+        <div id="results"></div>
+
+        <div class="test-section" style="margin-top: 40px;">
+            <h2>4. Custom Endpoint Test</h2>
+            <p style="color: #aaa; margin-bottom: 15px;">Try a custom endpoint if none of the above work:</p>
+            <div class="input-group">
+                <input 
+                    type="text" 
+                    id="customEndpoint" 
+                    placeholder="/your-custom-endpoint"
+                />
+                <button onclick="testCustomEndpoint()">Test Custom</button>
+            </div>
+            <div id="customResult"></div>
         </div>
     </div>
 
-    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-
     <script>
-        const WATCHLIST_TICKERS = ["SNDK","OKLO","IONQ","MU","DDOG","SE","CRWV","MRNA","COIN","DASH","LYFT","SOFI","SMCI","ENVX","LCID","TSLA","NIO","UPST","NET","RKLB","FSLR","SNOW","TTWO","RIVN","EA","LULU","ABNB","SHOP","ROKU","PLTR","PATH","RDDT","ZS","SQ","CRWD","MARA","HOOD","BILL","U","AI","CVNA","TDOC","CELH","AFRM","GRAB","KVUE","ARM","META","PINS","WOLF","APP","NFLX","NVDA","DIS","CHWY","GOOGL","GOOG"];
-
-        const API_BASE = 'https://elite-trading-with-exclusive-ip.onrender.com/api';
-        let currentFilter = 'all';
-        let liveStockData = [];
-
-        class SimpleCalculator {
-            static calculateFromPrice(currentPrice, historicalPrices) {
-                if (!historicalPrices || historicalPrices.length < 2) {
-                    return {
-                        cusum: -1.5,
-                        rsi: 45,
-                        macd: 0,
-                        volatility: 50,
-                        instScore: 50,
-                        regime: 100
-                    };
-                }
-                
-                const returns = historicalPrices.slice(1).map((p, i) => (p - historicalPrices[i]) / historicalPrices[i]);
-                const mean = returns.reduce((a, b) => a + b, 0) / returns.length;
-                let cusum = 0;
-                returns.forEach(r => cusum += (r - mean));
-                
-                return {
-                    cusum: (cusum / returns.length).toFixed(2),
-                    rsi: 45,
-                    macd: 0,
-                    volatility: 50,
-                    instScore: 50,
-                    regime: 100
-                };
-            }
-        }
-
-        function updateAPIStatus(message) {
-            const statusEl = document.getElementById('apiStatus');
-            if (statusEl) statusEl.textContent = message;
-        }
-
-        async function fetchLivePrice(ticker) {
-            try {
-                const res = await fetch(`${API_BASE}/quote?ticker=${ticker}`, { 
-                    signal: AbortSignal.timeout(8000) 
-                });
-                
-                if (!res.ok) {
-                    console.error(`${ticker}: API returned ${res.status}`);
-                    return { success: false };
-                }
-                
-                const data = await res.json();
-                
-                if (data['Global Quote']) {
-                    const quote = data['Global Quote'];
-                    return {
-                        success: true,
-                        price: parseFloat(quote['05. price']),
-                        change: parseFloat(quote['10. change percent'].replace('%', '')),
-                        volume: parseInt(quote['06. volume']),
-                        isLive: true
-                    };
-                }
-                
-                if (data.price) {
-                    return {
-                        success: true,
-                        price: parseFloat(data.price),
-                        change: parseFloat(data.change || 0),
-                        volume: parseInt(data.volume || 0),
-                        isLive: true
-                    };
-                }
-                
-                console.error(`${ticker}: Unknown response format`);
-                return { success: false };
-                
-            } catch (error) {
-                console.error(`${ticker} error:`, error.message);
-                return { success: false };
-            }
-        }
-
-        window.addEventListener('load', () => {
-            loadTopPlays();
-        });
-
-        async function loadTopPlays() {
-            const grid = document.getElementById('playsGrid');
-            grid.innerHTML = '<div class="loading"><div class="spinner"></div><p>Loading 57 stocks with live prices...</p></div>';
-            updateAPIStatus('🔄 Fetching live data...');
-            
-            liveStockData = [];
-            let successCount = 0;
-            let failCount = 0;
-            
-            const batchSize = 3;
-            for (let i = 0; i < WATCHLIST_TICKERS.length; i += batchSize) {
-                const batch = WATCHLIST_TICKERS.slice(i, i + batchSize);
-                
-                const promises = batch.map(async (ticker) => {
-                    const priceData = await fetchLivePrice(ticker);
-                    
-                    if (priceData.success) {
-                        successCount++;
-                        const indicators = SimpleCalculator.calculateFromPrice(priceData.price, []);
-                        
+        const ENDPOINTS = [
+            {
+                name: 'Alpha Vantage Quote',
+                path: '/quote?ticker={ticker}',
+                parser: (data) => {
+                    if (data['Global Quote']) {
                         return {
-                            symbol: ticker,
-                            price: priceData.price,
-                            change: priceData.change,
-                            volume: priceData.volume,
-                            cusum: parseFloat(indicators.cusum),
-                            rsi: parseFloat(indicators.rsi),
-                            macd: parseFloat(indicators.macd),
-                            volatility: parseFloat(indicators.volatility),
-                            instScore: indicators.instScore,
-                            regime: parseFloat(indicators.regime),
-                            isLive: true
-                        };
-                    } else {
-                        failCount++;
-                        return {
-                            symbol: ticker,
-                            price: null,
-                            isLive: false
+                            price: data['Global Quote']['05. price'],
+                            change: data['Global Quote']['10. change percent'],
+                            volume: data['Global Quote']['06. volume']
                         };
                     }
-                });
-                
-                const results = await Promise.all(promises);
-                liveStockData.push(...results);
-                
-                updateAPIStatus(`🔄 Loaded ${successCount}/${WATCHLIST_TICKERS.length} (${failCount} failed)`);
+                    return null;
+                }
+            },
+            {
+                name: 'Alpha Vantage Time Series',
+                path: '/timeseries?ticker={ticker}',
+                parser: (data) => {
+                    if (data['Time Series (Daily)']) {
+                        const dates = Object.keys(data['Time Series (Daily)']);
+                        const latest = data['Time Series (Daily)'][dates[0]];
+                        return {
+                            price: latest['4. close'],
+                            volume: latest['5. volume'],
+                            date: dates[0]
+                        };
+                    }
+                    return null;
+                }
+            },
+            {
+                name: 'Simple Price',
+                path: '/price/{ticker}',
+                parser: (data) => {
+                    if (data.price) {
+                        return {
+                            price: data.price,
+                            change: data.change,
+                            volume: data.volume
+                        };
+                    }
+                    return null;
+                }
+            },
+            {
+                name: 'Stock Data',
+                path: '/stock/{ticker}',
+                parser: (data) => {
+                    if (data.price || data.currentPrice) {
+                        return {
+                            price: data.price || data.currentPrice,
+                            change: data.change || data.changePercent
+                        };
+                    }
+                    return null;
+                }
+            },
+            {
+                name: 'Generic Data',
+                path: '/data/{ticker}',
+                parser: (data) => {
+                    return data; // Return as-is
+                }
             }
-            
-            updateAPIStatus(`✅ Complete: ${successCount}/${WATCHLIST_TICKERS.length} stocks loaded`);
-            document.getElementById('marketNarrative').textContent = 
-                `"${successCount} stocks with live pricing ready"`;
-            
-            applyFilter(currentFilter);
-        }
+        ];
 
-        function filterStocks(filter) {
-            currentFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            applyFilter(filter);
-        }
-
-        function applyFilter(filter) {
-            let filtered = [...liveStockData].filter(s => s.isLive);
+        async function testAllEndpoints() {
+            const apiBase = document.getElementById('apiBase').value.trim();
+            const ticker = document.getElementById('ticker').value.trim().toUpperCase();
             
-            switch(filter) {
-                case 'strongBuy': 
-                    filtered = filtered.filter(s => s.cusum < -2); 
-                    break;
-                case 'accumulate': 
-                    filtered = filtered.filter(s => s.cusum < -1.5 && s.cusum >= -2); 
-                    break;
-                case 'highVol': 
-                    filtered = filtered.filter(s => s.volatility > 70); 
-                    break;
-            }
-            
-            displayPlays(filtered);
-        }
-
-        function displayPlays(stocks) {
-            const grid = document.getElementById('playsGrid');
-            
-            if (stocks.length === 0) {
-                grid.innerHTML = '<div class="loading"><p style="font-size: 1.3em;">No stocks match this filter or still loading...</p></div>';
+            if (!apiBase || !ticker) {
+                alert('Please enter both API base URL and ticker');
                 return;
             }
 
-            grid.innerHTML = stocks.map(stock => {
-                const changeColor = stock.change >= 0 ? '#10b981' : '#ef4444';
-                
-                return `
-                    <div class="play-card" onclick="document.getElementById('tickerInput').value='${stock.symbol}'; analyzeStock();">
-                        <div class="play-ticker">
-                            ${stock.symbol} 
-                            <span style="color: ${changeColor}; font-size: 0.6em;">${stock.change > 0 ? '+' : ''}${stock.change.toFixed(2)}%</span>
-                        </div>
-                        <div style="margin-bottom: 15px;">
-                            <span style="color: #fff; font-size: 1.3em;">$${stock.price.toFixed(2)}</span>
-                            <span style="color: #10b981; font-size: 0.9em; margin-left: 10px;">● LIVE</span>
-                        </div>
-                        <div class="play-metrics">
-                            <div class="play-metric">
-                                <div class="metric-label">CUSUM</div>
-                                <div class="metric-value">${stock.cusum}</div>
-                            </div>
-                            <div class="play-metric">
-                                <div class="metric-label">RSI</div>
-                                <div class="metric-value">${stock.rsi}</div>
-                            </div>
-                            <div class="play-metric">
-                                <div class="metric-label">Vol</div>
-                                <div class="metric-value">${stock.volatility}%</div>
-                            </div>
-                            <div class="play-metric">
-                                <div class="metric-label">Inst</div>
-                                <div class="metric-value">${stock.instScore}</div>
-                            </div>
-                        </div>
-                        <div style="margin-top: 15px; padding: 15px; background: rgba(16, 185, 129, 0.12); border-left: 4px solid #10b981; border-radius: 8px;">
-                            <strong style="color: #10b981; font-size: 1.1em;">
-                                ${stock.cusum < -2 ? '🔥 STRONG BUY' : stock.cusum < -1.5 ? '📈 ACCUMULATE' : '📊 MONITOR'}
-                            </strong>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            
-            updateAPIStatus(`📊 Showing ${stocks.length} stocks`);
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<h2>🔄 Testing Endpoints...</h2>';
+
+            for (const endpoint of ENDPOINTS) {
+                await testEndpoint(apiBase, ticker, endpoint, resultsDiv);
+            }
+
+            resultsDiv.innerHTML += '<h2 style="color: #10b981; margin-top: 40px;">✅ Testing Complete!</h2>';
         }
 
-        async function analyzeStock() {
-            const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
-            if (!ticker) return alert('Enter a ticker');
+        async function testEndpoint(apiBase, ticker, endpoint, resultsDiv) {
+            const testDiv = document.createElement('div');
+            testDiv.className = 'test-section';
             
-            const analyzeBtn = document.getElementById('analyzeBtn');
-            analyzeBtn.disabled = true;
-            analyzeBtn.textContent = '⏳ LOADING...';
+            const url = `${apiBase}${endpoint.path.replace('{ticker}', ticker)}`;
             
-            document.getElementById('playsGrid').classList.add('hidden');
-            document.getElementById('detailedView').classList.remove('hidden');
-            document.getElementById('detailedView').innerHTML = '<div class="loading"><div class="spinner"></div></div>';
+            testDiv.innerHTML = `
+                <h3 style="color: #667eea;">Testing: ${endpoint.name}</h3>
+                <div class="code">URL: ${url}</div>
+                <div>
+                    <span class="status status-testing">TESTING <span class="spinner"></span></span>
+                </div>
+                <div id="result-${endpoint.name.replace(/\s/g, '')}"></div>
+            `;
             
+            resultsDiv.appendChild(testDiv);
+
             try {
-                const priceData = await fetchLivePrice(ticker);
-                if (!priceData.success) throw new Error('Unable to fetch price');
+                const startTime = Date.now();
+                const response = await fetch(url, { 
+                    signal: AbortSignal.timeout(10000) 
+                });
+                const duration = Date.now() - startTime;
+
+                const resultDiv = document.getElementById(`result-${endpoint.name.replace(/\s/g, '')}`);
                 
-                const html = `
-                    <div class="detailed-analysis">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; flex-wrap: wrap;">
-                            <div style="font-size: 3em; font-weight: 700;">${ticker}</div>
-                            <div style="text-align: right;">
-                                <div style="font-size: 2.5em; font-weight: 700; color: ${priceData.change >= 0 ? '#10b981' : '#ef4444'}">
-                                    $${priceData.price.toFixed(2)}
-                                </div>
-                                <div style="color: ${priceData.change >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.2em;">
-                                    ${priceData.change > 0 ? '+' : ''}${priceData.change.toFixed(2)}%
-                                </div>
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                const parsed = endpoint.parser(data);
+
+                if (parsed) {
+                    resultDiv.innerHTML = `
+                        <span class="status status-success">✅ SUCCESS</span>
+                        <div style="color: #aaa; margin: 10px 0;">Response time: ${duration}ms</div>
+                        <div class="result success">
+                            <strong style="color: #10b981;">Parsed Data:</strong><br>
+                            ${JSON.stringify(parsed, null, 2)}
+                        </div>
+                        <details>
+                            <summary style="cursor: pointer; color: #667eea; margin: 10px 0;">Show Raw Response</summary>
+                            <div class="result">
+                                ${JSON.stringify(data, null, 2)}
+                            </div>
+                        </details>
+                        <div style="background: rgba(16, 185, 129, 0.2); padding: 15px; border-radius: 8px; margin-top: 15px;">
+                            <strong style="color: #10b981;">✅ THIS ENDPOINT WORKS!</strong><br>
+                            <span style="color: #ddd;">Use this endpoint in your trading app:</span>
+                            <div class="code" style="margin-top: 10px;">
+const API_BASE = '${apiBase}';<br>
+const endpoint = '${endpoint.path}';<br>
+const url = \`\${API_BASE}\${endpoint.replace('{ticker}', ticker)}\`;
                             </div>
                         </div>
-                        <div class="chart-container-wrapper">
-                            <div style="height: 800px; background: #1a1a2e; border-radius: 15px;" id="tradingview_chart"></div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <span class="status status-error">⚠️ UNEXPECTED FORMAT</span>
+                        <div style="color: #aaa; margin: 10px 0;">Response time: ${duration}ms</div>
+                        <div class="result">
+                            <strong>Raw Response:</strong><br>
+                            ${JSON.stringify(data, null, 2)}
                         </div>
-                        <button onclick="backToGrid()" class="btn btn-scanner" style="width: 100%; padding: 20px; margin-top: 20px;">← BACK TO WATCHLIST</button>
+                        <p style="color: #f59e0b; margin-top: 10px;">
+                            Response received but data format doesn't match expected structure.
+                        </p>
+                    `;
+                }
+
+            } catch (error) {
+                const resultDiv = document.getElementById(`result-${endpoint.name.replace(/\s/g, '')}`);
+                resultDiv.innerHTML = `
+                    <span class="status status-error">❌ FAILED</span>
+                    <div class="result error">
+                        <strong style="color: #ef4444;">Error:</strong><br>
+                        ${error.message}
                     </div>
                 `;
+            }
+
+            // Small delay between requests
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+
+        async function testCustomEndpoint() {
+            const apiBase = document.getElementById('apiBase').value.trim();
+            const ticker = document.getElementById('ticker').value.trim().toUpperCase();
+            const customPath = document.getElementById('customEndpoint').value.trim();
+            
+            if (!customPath) {
+                alert('Enter a custom endpoint path');
+                return;
+            }
+
+            const url = `${apiBase}${customPath.replace('{ticker}', ticker)}`;
+            const resultDiv = document.getElementById('customResult');
+            
+            resultDiv.innerHTML = `
+                <div class="result">
+                    <span class="status status-testing">TESTING <span class="spinner"></span></span>
+                    <div class="code">URL: ${url}</div>
+                </div>
+            `;
+
+            try {
+                const response = await fetch(url, { signal: AbortSignal.timeout(10000) });
                 
-                document.getElementById('detailedView').innerHTML = html;
-                
-                new TradingView.widget({
-                    "width": "100%",
-                    "height": 800,
-                    "symbol": ticker,
-                    "interval": "60",
-                    "timezone": "America/New_York",
-                    "theme": "dark",
-                    "style": "1",
-                    "container_id": "tradingview_chart",
-                    "studies": ["STD;MACD", "STD;RSI", "STD;Volume"]
-                });
-                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                resultDiv.innerHTML = `
+                    <div class="result success">
+                        <span class="status status-success">✅ SUCCESS</span>
+                        <pre style="margin-top: 15px;">${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                `;
+
             } catch (error) {
-                alert('Error: ' + error.message);
-                backToGrid();
-            } finally {
-                analyzeBtn.disabled = false;
-                analyzeBtn.textContent = '🔍 ANALYZE';
+                resultDiv.innerHTML = `
+                    <div class="result error">
+                        <span class="status status-error">❌ FAILED</span>
+                        <div style="margin-top: 15px;">${error.message}</div>
+                    </div>
+                `;
             }
         }
 
-        function backToGrid() {
-            document.getElementById('detailedView').classList.add('hidden');
-            document.getElementById('playsGrid').classList.remove('hidden');
-        }
-
-        function viewNewsBrief() {
-            const liveStocks = liveStockData.filter(s => s.isLive);
-            const strongBuys = liveStocks.filter(s => s.cusum < -2);
-            const avgPrice = (liveStocks.reduce((sum, s) => sum + s.price, 0) / liveStocks.length).toFixed(2);
-            
-            const grid = document.getElementById('playsGrid');
-            grid.innerHTML = `
-                <div style="background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%); border-radius: 25px; padding: 50px; max-width: 1200px; margin: 0 auto;">
-                    <h2 style="font-size: 2.5em; color: #667eea; text-align: center; margin-bottom: 30px;">📰 Live Market Brief</h2>
-                    
-                    <div style="background: rgba(102, 126, 234, 0.12); padding: 30px; border-radius: 15px; margin-bottom: 25px;">
-                        <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">📊 Real-Time Overview</h3>
-                        <p style="font-size: 1.15em; line-height: 2;">
-                            <strong>Total Watchlist:</strong> ${WATCHLIST_TICKERS.length} stocks<br>
-                            <strong>Live Data:</strong> ${liveStocks.length} stocks<br>
-                            <strong>Average Price:</strong> $${avgPrice}<br>
-                            <strong>Strong Buy Signals:</strong> ${strongBuys.length} stocks
-                        </p>
-                    </div>
-                    
-                    ${strongBuys.length > 0 ? `
-                        <div style="background: rgba(16, 185, 129, 0.12); padding: 30px; border-radius: 15px; margin-bottom: 25px;">
-                            <h3 style="color: #10b981; font-size: 1.6em; margin-bottom: 15px;">🔥 Top Opportunities</h3>
-                            <ul style="font-size: 1.1em; line-height: 2; padding-left: 25px;">
-                                ${strongBuys.slice(0, 10).map(s => `
-                                    <li><strong>${s.symbol}</strong>: $${s.price.toFixed(2)} (${s.change > 0 ? '+' : ''}${s.change.toFixed(2)}%) | CUSUM ${s.cusum}</li>
-                                `).join('')}
-                            </ul>
-                        </div>
-                    ` : ''}
-                    
-                    <button onclick="backToGrid()" class="btn btn-scanner" style="width: 100%; padding: 20px; font-size: 1.2em;">← BACK TO WATCHLIST</button>
-                </div>
-            `;
-        }
+        // Auto-test on load with a sample ticker
+        window.addEventListener('load', () => {
+            console.log('API Diagnostic Tool Ready');
+            console.log('Click "TEST ALL ENDPOINTS" to begin');
+        });
     </script>
 </body>
 </html>
