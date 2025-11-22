@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics</title>
+    <title>Elite Trading Analytics - EA Style</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://s3.tradingview.com/tv.js"></script>
     <style>
@@ -20,10 +20,11 @@
         .page { display: none; }
         .page.active { display: block; }
 
-        .btn-large { padding: 1rem 2rem; border: none; border-radius: 12px; font-size: 1.1em; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.8rem; }
+        .btn-large { padding: 1rem 2rem; border: none; border-radius: 12px; font-size: 1.1em; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.8rem; justify-content: center; }
         .btn-refresh { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
         .btn-brief { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; }
         .btn-newsletter { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: white; }
+        .btn-back { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; margin-top: 2rem; }
         .action-buttons { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
 
         /* AI CHAT */
@@ -53,38 +54,31 @@
         .newsletter-table td { padding: 0.8rem 1rem; border: 1px solid #444; color: #b0b8c1; cursor: pointer; }
         .newsletter-table tr:hover { background: rgba(0, 212, 255, 0.1); }
 
-        /* RESEARCH PAGE - CORRECT LAYOUT LIKE EA IMAGE */
-        .research-top-layout { display: grid; grid-template-columns: 1fr 380px; gap: 1.5rem; margin-bottom: 1.5rem; }
+        /* EA-STYLE RESEARCH PAGE LAYOUT */
+        .stock-banner { background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 15px; padding: 2rem; margin-bottom: 1.5rem; }
+        .stock-title { font-size: 3.5em; font-weight: 900; color: white; margin-bottom: 0.5rem; }
+        .stock-subtitle { background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 10px; color: white; line-height: 1.6; }
 
-        /* AI ANALYSIS SIDEBAR (RIGHT) */
-        .ai-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
-        .ai-box { background: rgba(30, 30, 60, 0.8); border: 2px solid #00d4ff; border-radius: 15px; padding: 1.5rem; }
-        .ai-box h3 { color: #00d4ff; margin-bottom: 1rem; font-size: 1.2em; }
-        .ai-box-content { color: #d1fae5; font-size: 0.9em; line-height: 1.6; }
+        /* DUAL CHARTS SIDE BY SIDE */
+        .charts-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .chart-card { background: rgba(26, 26, 64, 0.9); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
+        .chart-card h3 { color: #00d4ff; margin-bottom: 1rem; font-size: 1.2em; }
+        .chart-box { height: 400px; width: 100%; }
 
-        /* CHART (LEFT) */
-        .chart-main { background: rgba(30, 30, 60, 0.8); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
-        .chart-tabs { display: flex; gap: 1rem; margin-bottom: 1rem; }
-        .chart-tab { padding: 0.6rem 1.2rem; background: rgba(70, 70, 120, 0.6); border: 2px solid #444; color: #b0b8c1; border-radius: 8px; cursor: pointer; font-weight: 600; }
-        .chart-tab.active { background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); color: white; border-color: transparent; }
-        .chart-canvas { height: 500px; width: 100%; }
-
-        /* TECHNICAL SETUP & ENTRY/TARGETS BELOW CHART */
-        .detail-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
-        .detail-box { background: rgba(30, 30, 60, 0.8); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
-        .detail-box h3 { color: #00d4ff; margin-bottom: 1rem; font-size: 1.2em; }
+        /* TECHNICAL + ENTRY BOXES */
+        .info-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .info-box { background: rgba(26, 26, 64, 0.9); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
+        .info-box h3 { color: #00d4ff; margin-bottom: 1rem; font-size: 1.2em; }
+        .info-content { color: #b0b8c1; line-height: 1.8; }
 
         /* AI DEEP ANALYSIS AT BOTTOM */
-        .deep-analysis { background: linear-gradient(135deg, rgba(124, 58, 237, 0.15) 0%, rgba(6, 182, 212, 0.1) 100%); border: 2px solid #7c3aed; border-radius: 15px; padding: 2.5rem; margin-bottom: 1.5rem; }
-        .deep-analysis h2 { color: #00d4ff; font-size: 2em; margin-bottom: 1rem; }
-        .deep-analysis-text { color: #d1fae5; line-height: 1.8; font-size: 1em; }
-
-        /* BACK BUTTON AT BOTTOM */
-        .back-btn-bottom { width: 100%; }
+        .ai-deep-section { background: rgba(26, 26, 64, 0.9); border: 2px solid #00d4ff; border-radius: 15px; padding: 2rem; margin-bottom: 1.5rem; }
+        .ai-deep-section h2 { color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; }
+        .ai-deep-content { color: #d1fae5; line-height: 1.8; font-size: 1em; }
 
         @media (max-width: 1024px) {
-            .research-top-layout { grid-template-columns: 1fr; }
-            .detail-boxes { grid-template-columns: 1fr; }
+            .charts-row, .info-boxes { grid-template-columns: 1fr; }
+            .ai-chat-widget { width: calc(100% - 20px); right: 10px; left: 10px; }
         }
     </style>
 </head>
@@ -105,7 +99,7 @@
             <button onclick="toggleAIChat()" style="background: none; border: none; color: white; font-size: 1.2em; cursor: pointer;">✕</button>
         </div>
         <div class="ai-messages" id="aiMessages">
-            <div class="message ai">Ask me about stocks, strategies, or market conditions.</div>
+            <div class="message ai">Ask about stocks, strategies, or market conditions.</div>
         </div>
         <div class="ai-input">
             <input type="text" id="aiInput" placeholder="Ask AI..." onkeypress="if(event.key=='Enter') sendAIMessage()">
@@ -154,7 +148,7 @@
                 <div id="microSummary" style="color: #b0b8c1; line-height: 1.8;">Loading...</div>
             </div>
 
-            <button class="btn-large btn-refresh" onclick="goHome()" style="width: 100%; margin: 2rem 0;"><i class="fas fa-arrow-left"></i> BACK</button>
+            <button class="btn-large btn-back" onclick="goHome()"><i class="fas fa-arrow-left"></i> BACK TO DASHBOARD</button>
         </div>
     </div>
 
@@ -163,6 +157,7 @@
         <div class="container">
             <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
                 <h1 style="font-size: 2.8em; font-weight: 900;">📰 Newsletter Screener</h1>
+                <p>Stock Screening Newsletter - Institutional Analysis</p>
             </div>
 
             <div class="story-section" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%); border: 2px solid #7c3aed;">
@@ -171,7 +166,7 @@
             </div>
 
             <div class="story-section">
-                <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem;">VALUE SCREENING</h2>
+                <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem;">VALUE SCREENING - Oversold Opportunities</h2>
                 <table class="newsletter-table">
                     <thead><tr><th>Ticker</th><th>Price</th><th>Change</th><th>RSI</th><th>Regime</th><th>Inst</th><th>Signal</th><th>Action</th></tr></thead>
                     <tbody id="valueTable"><tr><td colspan="8">Loading...</td></tr></tbody>
@@ -179,103 +174,58 @@
             </div>
 
             <div class="story-section">
-                <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem;">MOMENTUM ANALYSIS</h2>
+                <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem;">MOMENTUM ANALYSIS - Top Performers</h2>
                 <table class="newsletter-table">
                     <thead><tr><th>Ticker</th><th>Price</th><th>5-Day %</th><th>RSI</th><th>Regime</th><th>Inst</th><th>Signal</th><th>Target</th></tr></thead>
                     <tbody id="momentumTable"><tr><td colspan="8">Loading...</td></tr></tbody>
                 </table>
             </div>
 
-            <button class="btn-large btn-refresh" onclick="goHome()" style="width: 100%; margin: 2rem 0;"><i class="fas fa-arrow-left"></i> BACK</button>
+            <button class="btn-large btn-back" onclick="goHome()"><i class="fas fa-arrow-left"></i> BACK TO DASHBOARD</button>
         </div>
     </div>
 
-    <!-- RESEARCH PAGE - CORRECT LAYOUT LIKE EA IMAGE -->
+    <!-- RESEARCH PAGE - EA STYLE LAYOUT -->
     <div id="researchPage" class="page">
         <div class="container">
-            <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 15px; padding: 2rem; margin-bottom: 1.5rem;">
-                <div style="font-size: 3.5em; font-weight: 900;" id="researchSymbol">TICKER</div>
-                <div style="background: rgba(255, 255, 255, 0.1); padding: 1rem; border-radius: 10px; margin-top: 1rem;" id="stockBrief">Loading...</div>
+            <!-- 1. STOCK BANNER AT TOP -->
+            <div class="stock-banner">
+                <div class="stock-title" id="researchSymbol">TICKER</div>
+                <div class="stock-subtitle" id="stockBrief">Loading stock analysis...</div>
             </div>
 
-            <!-- TOP LAYOUT: CHART (LEFT) + AI ANALYSIS (RIGHT) -->
-            <div class="research-top-layout">
-                <!-- CHART LEFT -->
-                <div class="chart-main">
-                    <div class="chart-tabs">
-                        <div class="chart-tab active" onclick="switchChart('1D')">1D Chart</div>
-                        <div class="chart-tab" onclick="switchChart('1W')">1W Chart</div>
-                    </div>
-                    <div id="chartCanvas" class="chart-canvas"></div>
+            <!-- 2. DUAL CHARTS SIDE BY SIDE -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <h3>📊 1D Chart</h3>
+                    <div id="chart1D" class="chart-box"></div>
                 </div>
-
-                <!-- AI ANALYSIS SIDEBAR RIGHT -->
-                <div class="ai-sidebar">
-                    <div class="ai-box">
-                        <h3>🤖 AI ANALYSIS</h3>
-                        <div class="ai-box-content" id="aiAnalysisBox">Loading AI insights...</div>
-                    </div>
-
-                    <div class="ai-box">
-                        <h3>📊 VOLATILITY</h3>
-                        <div class="ai-box-content">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin-top: 0.5rem;">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 0.8em; color: #b0b8c1;">IV Rank</div>
-                                    <div style="font-size: 1.4em; font-weight: 700; color: #00d4ff;" id="ivRank">--</div>
-                                </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 0.8em; color: #b0b8c1;">RV</div>
-                                    <div style="font-size: 1.4em; font-weight: 700; color: #00d4ff;" id="rv">--</div>
-                                </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 0.8em; color: #b0b8c1;">VRP</div>
-                                    <div style="font-size: 1.4em; font-weight: 700; color: #00d4ff;" id="vrp">--</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="ai-box">
-                        <h3>📈 30D PROJECTION</h3>
-                        <div class="ai-box-content">
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 0.5rem;">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 0.8em; color: #b0b8c1;">Low</div>
-                                    <div style="font-size: 1.3em; font-weight: 700; color: #ef4444;" id="proj30Low">$--</div>
-                                </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 0.8em; color: #b0b8c1;">High</div>
-                                    <div style="font-size: 1.3em; font-weight: 700; color: #10b981;" id="proj30High">$--</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div class="chart-card">
+                    <h3>📊 1W Chart</h3>
+                    <div id="chart1W" class="chart-box"></div>
                 </div>
             </div>
 
-            <!-- TECHNICAL SETUP & ENTRY/TARGETS BELOW CHART -->
-            <div class="detail-boxes">
-                <div class="detail-box">
+            <!-- 3. TECHNICAL SETUP + ENTRY & TARGETS BOXES -->
+            <div class="info-boxes">
+                <div class="info-box">
                     <h3>🔧 Technical Setup</h3>
-                    <div id="technicalSetup" style="color: #b0b8c1; font-size: 0.9em; line-height: 1.6;">Loading...</div>
+                    <div class="info-content" id="technicalSetup">Loading...</div>
                 </div>
-                <div class="detail-box">
+                <div class="info-box">
                     <h3>🎯 Entry & Targets</h3>
-                    <div id="entryTargets" style="color: #b0b8c1; font-size: 0.9em; line-height: 1.6;">Loading...</div>
+                    <div class="info-content" id="entryTargets">Loading...</div>
                 </div>
             </div>
 
-            <!-- AI DEEP ANALYSIS AT BOTTOM -->
-            <div class="deep-analysis">
+            <!-- 4. AI DEEP ANALYSIS AT BOTTOM -->
+            <div class="ai-deep-section">
                 <h2><i class="fas fa-brain"></i> AI Deep Analysis</h2>
-                <div class="deep-analysis-text" id="aiDeepAnalysis">Loading comprehensive market analysis...</div>
+                <div class="ai-deep-content" id="aiDeepAnalysis">Loading comprehensive AI analysis...</div>
             </div>
 
-            <!-- BACK BUTTON AT BOTTOM -->
-            <div class="back-btn-bottom">
-                <button class="btn-large btn-refresh" onclick="goHome()" style="width: 100%;"><i class="fas fa-arrow-left"></i> BACK TO DASHBOARD</button>
-            </div>
+            <!-- 5. BACK BUTTON AT VERY BOTTOM -->
+            <button class="btn-large btn-back" onclick="goHome()"><i class="fas fa-arrow-left"></i> BACK TO DASHBOARD</button>
         </div>
     </div>
 
@@ -291,9 +241,6 @@
             {Symbol:'AMD',Last:'142.35',Change:'4.2',RSIWilder:'68',RegimeDetection:'78',Inst33:'65',Signal:'STRONG BUY'},
         ];
 
-        let currentTicker = '';
-        let currentInterval = 'D';
-
         function loadAllStocks() {
             const grid = allStocks.map(s => {
                 const price = parseFloat(s.Last);
@@ -306,7 +253,7 @@
                             ${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)}%
                         </div>
                         <span style="display: inline-block; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 8px; font-weight: 700; color: white;">${s.Signal}</span>
-                        <div style="margin-top: 1rem; font-size: 0.85em; color: #b0b8c1;">RSI: ${s.RSIWilder} | Regime: ${s.RegimeDetection}%</div>
+                        <div style="margin-top: 1rem; font-size: 0.85em; color: #b0b8c1;">RSI: ${s.RSIWilder} | Regime: ${s.RegimeDetection}% | Inst: ${s.Inst33}</div>
                     </div>
                 `;
             }).join('');
@@ -323,8 +270,8 @@
             document.getElementById('microSummary').innerHTML = `
                 <strong>Market Sentiment:</strong> ${oversold > momentum ? 'Risk-off' : 'Risk-on'}<br>
                 <strong>Oversold Stocks:</strong> ${oversold} mean reversion setups<br>
-                <strong>Momentum Plays:</strong> ${momentum} breakout stocks<br>
-                <strong>Tech Sector:</strong> IV crush = buy opportunity<br>
+                <strong>Momentum Plays:</strong> ${momentum} breakout mode<br>
+                <strong>Tech Sector:</strong> IV crush opportunities<br>
                 <strong>VIX:</strong> 15.2 - complacency levels
             `;
         }
@@ -334,8 +281,9 @@
             document.getElementById('newsletterPage').classList.add('active');
 
             document.getElementById('marketStory').innerHTML = `
-                ${allStocks.filter(s => parseFloat(s.Change) < -2).length} stocks oversold, 
-                ${allStocks.filter(s => parseFloat(s.Change) > 3).length} momentum plays. IV crush = buy fear.
+                <strong>Current Setup:</strong> ${allStocks.filter(s => parseFloat(s.Change) < -2).length} oversold, 
+                ${allStocks.filter(s => parseFloat(s.Change) > 3).length} momentum.<br>
+                <strong style="color: #00d4ff;">IV crush = buy opportunity.</strong> Scale on dips.
             `;
 
             const valueStocks = allStocks.filter(s => parseFloat(s.Change) < 0);
@@ -345,7 +293,7 @@
                     <td>${s.RSIWilder}</td><td>${s.RegimeDetection}%</td><td>${s.Inst33}</td><td>${s.Signal}</td>
                     <td style="color: #10b981;"><strong>BUY DIPS</strong></td>
                 </tr>
-            `).join('') || '<tr><td colspan="8">None</td></tr>';
+            `).join('') || '<tr><td colspan="8">No oversold</td></tr>';
 
             const momentumStocks = allStocks.filter(s => parseFloat(s.Change) > 2);
             document.getElementById('momentumTable').innerHTML = momentumStocks.map(s => {
@@ -357,47 +305,34 @@
                         <td>$${Math.round(price * 1.1)}</td>
                     </tr>
                 `;
-            }).join('') || '<tr><td colspan="8">None</td></tr>';
+            }).join('') || '<tr><td colspan="8">No momentum</td></tr>';
         }
 
         function researchStock(ticker) {
             const stock = allStocks.find(s => s.Symbol === ticker);
             if (!stock) return;
 
-            currentTicker = ticker;
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('researchPage').classList.add('active');
 
             const price = parseFloat(stock.Last);
             const change = parseFloat(stock.Change);
 
+            // Stock Banner
             document.getElementById('researchSymbol').textContent = ticker;
             document.getElementById('stockBrief').innerHTML = `
-                <strong>${change < -5 ? 'The Fade' : change > 5 ? 'The Setup' : 'The Consolidation'}</strong><br>
-                Entry: $${price.toFixed(2)} → T1: $${(price * 1.05).toFixed(2)} → T2: $${(price * 1.10).toFixed(2)}
+                ${stock.Signal} | $${price.toFixed(2)} (${change}%)<br>
+                ${change < -5 ? 'The Fade | SELL PREMIUM - Weakness detected near support ~$200.61. Consider bearish strategies.' : 
+                  change > 5 ? 'The Setup | STRONG BUY - Bullish momentum with major moving averages support.' :
+                  'The Consolidation | HOLD - Trading sideways, await confirmation.'}
             `;
-
-            // AI Analysis Box (TOP RIGHT)
-            document.getElementById('aiAnalysisBox').innerHTML = `
-                <strong>Edge:</strong> ${change < 0 ? 'Oversold mean reversion' : 'Momentum breakout'}<br><br>
-                <strong>Trade:</strong> ${change < 0 ? 'Buy dips, scale position' : 'Buy pullbacks to VWAP'}<br><br>
-                <strong>Risk:</strong> Stop at $${(price * 0.95).toFixed(2)} (-5%)
-            `;
-
-            // Volatility
-            document.getElementById('ivRank').textContent = (25 + Math.random() * 40).toFixed(0);
-            document.getElementById('rv').textContent = (20 + Math.random() * 30).toFixed(0);
-            document.getElementById('vrp').textContent = (Math.random() * 20 - 10).toFixed(1);
-
-            // 30D Projection
-            document.getElementById('proj30Low').textContent = `$${Math.round(price * 0.9)}`;
-            document.getElementById('proj30High').textContent = `$${Math.round(price * 1.15)}`;
 
             // Technical Setup
             document.getElementById('technicalSetup').innerHTML = `
-                <strong>MACD:</strong> ${change > 0 ? 'Bullish crossover' : 'Bearish divergence'}<br>
-                <strong>RSI:</strong> ${stock.RSIWilder} ${parseFloat(stock.RSIWilder) < 30 ? '(Oversold)' : parseFloat(stock.RSIWilder) > 70 ? '(Overbought)' : '(Neutral)'}<br>
-                <strong>Regime:</strong> ${stock.RegimeDetection}% detection score
+                MACD: 12-close ${change > 0 ? 'bullish crossover' : 'bearish divergence'}<br>
+                RSI: ${stock.RSIWilder} ${parseFloat(stock.RSIWilder) < 30 ? '(Oversold)' : parseFloat(stock.RSIWilder) > 70 ? '(Overbought)' : '(Neutral)'}<br>
+                Regime Detection: ${stock.RegimeDetection}% trending strength<br>
+                Key levels: Support $${Math.round(price * 0.95)} | Resistance $${Math.round(price * 1.05)}
             `;
 
             // Entry & Targets
@@ -408,38 +343,19 @@
                 <strong>STOP:</strong> $${(price * 0.95).toFixed(2)}
             `;
 
-            // AI Deep Analysis (BOTTOM)
+            // AI Deep Analysis
             document.getElementById('aiDeepAnalysis').innerHTML = `
                 An Expert Advisor (EA) is an automated trading system that executes trades based on predefined rules, often derived from technical analysis indicators like moving averages, RSI, or MACD. 
-                ${ticker} exhibits ${change < 0 ? 'mean reversion characteristics with oversold RSI' : 'momentum characteristics with strong institutional support'}. 
-                Institutional score of ${stock.Inst33} indicates ${parseFloat(stock.Inst33) > 70 ? 'strong accumulation patterns' : 'moderate interest'}. 
-                Risk analysis shows ${change < -10 ? 'extreme volatility requiring careful position sizing' : 'standard market conditions with manageable risk'}. 
-                Trading style aligns with ${change < 0 ? 'swing/position trading for mean reversion' : 'trend-following momentum strategies'}.
+                ${ticker} help traders eliminate emotional bias, increase efficiency, and consistently apply strategies across various assets such as forex, indices, and commodities. 
+                They can be customized to suit individual risk tolerance, trading style, and market conditions, allowing for both simple and complex strategies, including trend-following, mean reversion, or multi-indicator confluence. 
+                However, risks such as over-optimization, curve fitting, and adjustment to changing market environments are essential to maintain performance and adapt to real-time shifts in volatility, backtesting, and adjustment of parameters are essential to maintain performance.
             `;
 
-            renderChart();
-        }
-
-        function switchChart(interval) {
-            currentInterval = interval;
-            document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-            renderChart();
-        }
-
-        function renderChart() {
-            document.getElementById('chartCanvas').innerHTML = '';
-            new TradingView.widget({
-                container_id: "chartCanvas",
-                width: "100%",
-                height: "100%",
-                symbol: currentTicker,
-                interval: currentInterval,
-                timezone: "America/New_York",
-                theme: "dark",
-                style: "1",
-                studies: ["BB@tv-basicstudies", "MACD@tv-basicstudies", "RSI@tv-basicstudies"]
-            });
+            // Render Charts
+            document.getElementById('chart1D').innerHTML = '';
+            document.getElementById('chart1W').innerHTML = '';
+            new TradingView.widget({container_id: "chart1D", width: "100%", height: "100%", symbol: ticker, interval: "D", timezone: "America/New_York", theme: "dark", style: "1", studies: ["BB@tv-basicstudies", "MACD@tv-basicstudies", "RSI@tv-basicstudies"]});
+            new TradingView.widget({container_id: "chart1W", width: "100%", height: "100%", symbol: ticker, interval: "W", timezone: "America/New_York", theme: "dark", style: "1", studies: ["BB@tv-basicstudies", "MACD@tv-basicstudies"]});
         }
 
         function goHome() {
@@ -475,9 +391,9 @@
             messagesDiv.innerHTML += `<div class="message user">${msg}</div>`;
             setTimeout(() => {
                 const lowerMsg = msg.toLowerCase();
-                let aiReply = lowerMsg.includes('nvda') ? 'NVDA at $178.88. RSI 70 = overbought but trending.' : 
-                              lowerMsg.includes('buy') ? 'Top: AMD (+4.2%), META (+2.1%).' : 
-                              `Check ${msg} stock card.`;
+                let aiReply = lowerMsg.includes('nvda') ? 'NVDA at $178.88. RSI 70 = overbought. Pullback to $175 = entry.' : 
+                              lowerMsg.includes('buy') ? 'Top buys: AMD (+4.2%), META (+2.1%).' : 
+                              `Analyzing ${msg}... Check stock card.`;
                 messagesDiv.innerHTML += `<div class="message ai">${aiReply}</div>`;
                 messagesDiv.scrollTop = messagesDiv.scrollHeight;
             }, 600);
