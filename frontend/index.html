@@ -8125,3 +8125,863 @@ Keep it 5-7 sentences, actionable.`;
 </body>
 </html>
 
+Verso 30
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Trading Analytics - Multi-API Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            min-height: 100vh;
+            color: #e0e0e0;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        .market-story-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+            text-align: center;
+            color: white;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .story-title {
+            font-size: 2.8em;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .story-narrative {
+            max-width: 1000px;
+            margin: 0 auto;
+            font-size: 1.3em;
+            line-height: 1.8;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .api-status {
+            font-size: 0.9em;
+            color: rgba(255,255,255,0.7);
+            margin-top: 15px;
+        }
+
+        /* Search Section */
+        .search-section {
+            max-width: 900px;
+            margin: 30px auto;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 20px 28px;
+            font-size: 1.3em;
+            background: rgba(255,255,255,0.12);
+            border: 2px solid rgba(255,255,255,0.25);
+            border-radius: 15px;
+            color: white;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-input:focus {
+            border-color: #667eea;
+            background: rgba(255,255,255,0.18);
+            box-shadow: 0 0 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .analyze-btn {
+            padding: 20px 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-size: 1.3em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .analyze-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 16px 32px;
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.05em;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+        }
+
+        .btn-scanner {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .btn-brief {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        /* Top Plays Grid */
+        .plays-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .play-card {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            border-radius: 20px;
+            padding: 30px;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            border: 2px solid transparent;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+        }
+
+        .play-card:hover {
+            transform: translateY(-8px);
+            border-color: #667eea;
+            box-shadow: 0 20px 45px rgba(102, 126, 234, 0.4);
+        }
+
+        .play-ticker {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .play-story-name {
+            font-size: 1.4em;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .play-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .play-metric {
+            background: rgba(102, 126, 234, 0.12);
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metric-value {
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #fff;
+            margin-top: 5px;
+        }
+
+        .play-signal {
+            background: rgba(16, 185, 129, 0.12);
+            border-left: 4px solid #10b981;
+            padding: 18px;
+            border-radius: 10px;
+            margin: 18px 0;
+        }
+
+        /* Loading States */
+        .loading {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .spinner {
+            border: 5px solid rgba(255, 255, 255, 0.1);
+            border-top: 5px solid #667eea;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 25px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid #ef4444;
+            padding: 20px;
+            border-radius: 12px;
+            color: #fca5a5;
+            margin: 20px 0;
+        }
+
+        /* Detailed Analysis View */
+        .detailed-analysis {
+            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
+            border-radius: 25px;
+            padding: 40px;
+            margin: 30px 0;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+        }
+
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .ticker-display {
+            font-size: 3em;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .price-display {
+            text-align: right;
+        }
+
+        .current-price {
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .story-title {
+                font-size: 2em;
+            }
+            
+            .plays-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .play-metrics {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="market-story-header">
+            <h1 class="story-title">📊 Elite Trading Analytics Platform</h1>
+            <div class="story-narrative" id="marketNarrative">
+                "Loading proprietary indicators from your CSV watchlist..."
+            </div>
+            <div class="api-status" id="apiStatus">
+                🔄 Initializing multi-API system...
+            </div>
+        </div>
+
+        <div class="search-section">
+            <div class="search-bar">
+                <input 
+                    type="text" 
+                    id="tickerInput" 
+                    class="search-input"
+                    placeholder="Enter ticker (e.g., NVDA, TSLA, AAPL...)" 
+                    onkeypress="if(event.key==='Enter') analyzeStock()"
+                />
+                <button onclick="analyzeStock()" class="analyze-btn" id="analyzeBtn">
+                    🔍 DEEP ANALYSIS
+                </button>
+            </div>
+            
+            <div class="action-buttons">
+                <button onclick="runFullScanner()" class="btn btn-scanner">
+                    🎯 SCAN MARKETS
+                </button>
+                <button onclick="viewNewsBrief()" class="btn btn-brief">
+                    📰 MARKET BRIEF
+                </button>
+            </div>
+        </div>
+
+        <div id="detailedView" class="hidden"></div>
+        
+        <div class="plays-grid" id="playsGrid">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p style="font-size: 1.2em;">Loading watchlist from CSV...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TradingView Widget Script -->
+    <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+
+    <script>
+        // Multi-API Configuration with Fallback Chain
+        const API_CONFIG = {
+            primary: {
+                name: 'Render Backend',
+                baseUrl: 'https://elite-trading-with-exclusive-ip.onrender.com/api',
+                quote: (ticker) => `/quote?ticker=${ticker}`,
+                analytics: (ticker) => `/analytics?ticker=${ticker}`
+            },
+            fallback1: {
+                name: 'Alpha Vantage',
+                baseUrl: 'https://www.alphavantage.co/query',
+                quote: (ticker) => `?function=GLOBAL_QUOTE&symbol=${ticker}&apikey=demo`
+            },
+            fallback2: {
+                name: 'Yahoo Finance (Direct)',
+                baseUrl: 'https://query1.finance.yahoo.com',
+                quote: (ticker) => `/v7/finance/quote?symbols=${ticker}`,
+                chart: (ticker) => `/v8/finance/chart/${ticker}?range=1mo&interval=1d`
+            },
+            fallback3: {
+                name: 'Yahoo Finance (Proxy)',
+                baseUrl: 'https://api.allorigins.win/raw?url=',
+                quote: (ticker) => encodeURIComponent(`https://query1.finance.yahoo.com/v7/finance/quote?symbols=${ticker}`)
+            }
+        };
+
+        let currentAPI = 'primary';
+        let watchlistData = [];
+
+        // Load watchlist from CSV data
+        const WATCHLIST_CSV_DATA = [
+            {symbol: 'SNDK', cusum: -0.84, instScore: 53, volatility: 43.0, regime: 149.2, macd: 24.57, rsi: 47.15},
+            {symbol: 'OKLO', cusum: -1.68, instScore: 38, volatility: 63.0, regime: 113.4, macd: -9.56, rsi: 35.97},
+            {symbol: 'IONQ', cusum: -2.18, instScore: 41, volatility: 98.0, regime: 97.4, macd: -4.64, rsi: 32.57},
+            {symbol: 'MU', cusum: -2.47, instScore: 53, volatility: 60.0, regime: 75.6, macd: 7.8, rsi: 41.24},
+            {symbol: 'DDOG', cusum: -0.84, instScore: 53, volatility: 69.0, regime: 'VOL CONTRACTION', macd: 5.54, rsi: 42.03},
+            {symbol: 'SE', cusum: -2.46, instScore: 38, volatility: 42.0, regime: 51.7, macd: -8.05, rsi: 27.72},
+            {symbol: 'MRNA', cusum: -2.08, instScore: 38, volatility: 38.0, regime: 77.4, macd: -0.61, rsi: 36.31},
+            {symbol: 'COIN', cusum: -2.02, instScore: 35, volatility: 23.0, regime: 76.9, macd: -22.19, rsi: 27.78}
+        ];
+
+        // Multi-API Fetch with Waterfall Fallback
+        async function fetchWithFallback(ticker) {
+            const apis = ['primary', 'fallback1', 'fallback2', 'fallback3'];
+            
+            for (const apiKey of apis) {
+                try {
+                    updateAPIStatus(`Trying ${API_CONFIG[apiKey].name}...`);
+                    const result = await attemptFetch(apiKey, ticker);
+                    
+                    if (result.success) {
+                        currentAPI = apiKey;
+                        updateAPIStatus(`✅ Connected: ${API_CONFIG[apiKey].name}`);
+                        return result;
+                    }
+                } catch (error) {
+                    console.log(`${API_CONFIG[apiKey].name} failed:`, error.message);
+                    continue;
+                }
+            }
+            
+            // All APIs failed - use CSV fallback
+            updateAPIStatus(`⚠️ Using CSV data (all APIs failed)`);
+            return await fetchFromCSV(ticker);
+        }
+
+        async function attemptFetch(apiKey, ticker) {
+            const config = API_CONFIG[apiKey];
+            
+            if (apiKey === 'primary') {
+                // Try Render backend
+                const quoteUrl = config.baseUrl + config.quote(ticker);
+                const response = await fetch(quoteUrl, { timeout: 5000 });
+                
+                if (!response.ok) throw new Error('API returned error');
+                
+                const data = await response.json();
+                const quote = data['Global Quote'];
+                
+                return {
+                    success: true,
+                    price: parseFloat(quote['05. price']),
+                    change: parseFloat(quote['10. change percent'].replace('%', '')),
+                    volume: parseInt(quote['06. volume']),
+                    source: config.name
+                };
+                
+            } else if (apiKey === 'fallback2') {
+                // Yahoo Finance direct
+                const quoteUrl = config.baseUrl + config.quote(ticker);
+                const response = await fetch(quoteUrl);
+                
+                if (!response.ok) throw new Error('API returned error');
+                
+                const data = await response.json();
+                const quote = data.quoteResponse.result[0];
+                
+                return {
+                    success: true,
+                    price: quote.regularMarketPrice,
+                    change: quote.regularMarketChangePercent,
+                    volume: quote.regularMarketVolume,
+                    afterHours: quote.postMarketPrice || quote.preMarketPrice,
+                    afterHoursChange: quote.postMarketChangePercent || quote.preMarketChangePercent,
+                    source: config.name
+                };
+                
+            } else if (apiKey === 'fallback3') {
+                // Yahoo with CORS proxy
+                const quoteUrl = config.baseUrl + config.quote(ticker);
+                const response = await fetch(quoteUrl);
+                
+                if (!response.ok) throw new Error('Proxy failed');
+                
+                const data = await response.json();
+                const quote = data.quoteResponse.result[0];
+                
+                return {
+                    success: true,
+                    price: quote.regularMarketPrice,
+                    change: quote.regularMarketChangePercent,
+                    volume: quote.regularMarketVolume,
+                    source: config.name
+                };
+            }
+            
+            throw new Error('Unsupported API key');
+        }
+
+        async function fetchFromCSV(ticker) {
+            const csvStock = WATCHLIST_CSV_DATA.find(s => s.symbol === ticker);
+            
+            if (csvStock) {
+                return {
+                    success: true,
+                    price: 0,
+                    change: 0,
+                    volume: 0,
+                    source: 'CSV Watchlist',
+                    csvData: csvStock
+                };
+            }
+            
+            return { success: false };
+        }
+
+        function updateAPIStatus(message) {
+            const statusEl = document.getElementById('apiStatus');
+            if (statusEl) {
+                statusEl.textContent = message;
+            }
+        }
+
+        // Load top plays on startup
+        window.addEventListener('load', () => {
+            loadTopPlays();
+        });
+
+        async function loadTopPlays() {
+            watchlistData = WATCHLIST_CSV_DATA;
+            const plays = [];
+
+            for (const stock of watchlistData.slice(0, 8)) {
+                try {
+                    const data = await fetchWithFallback(stock.symbol);
+                    
+                    plays.push({
+                        ticker: stock.symbol,
+                        price: data.price || 0,
+                        change: data.change || 0,
+                        cusum: stock.cusum,
+                        instScore: stock.instScore,
+                        volatility: stock.volatility,
+                        regime: stock.regime,
+                        macd: stock.macd,
+                        rsi: stock.rsi,
+                        source: data.source
+                    });
+                    
+                } catch (error) {
+                    console.error(`Error loading ${stock.symbol}:`, error);
+                    // Add with CSV data only
+                    plays.push({
+                        ticker: stock.symbol,
+                        price: 0,
+                        change: 0,
+                        ...stock,
+                        source: 'CSV Only'
+                    });
+                }
+            }
+
+            displayPlays(plays);
+            updateNarrative(plays);
+        }
+
+        function displayPlays(plays) {
+            const grid = document.getElementById('playsGrid');
+            
+            if (plays.length === 0) {
+                grid.innerHTML = '<div class="loading"><p style="font-size: 1.3em;">No opportunities in watchlist.</p></div>';
+                return;
+            }
+
+            grid.innerHTML = plays.map(play => {
+                const changeColor = play.change >= 0 ? '#10b981' : '#ef4444';
+                const regimeValue = typeof play.regime === 'number' ? `${play.regime}%` : play.regime;
+                
+                return `
+                    <div class="play-card" onclick="document.getElementById('tickerInput').value='${play.ticker}'; analyzeStock();">
+                        <div class="play-ticker">
+                            ${play.ticker} 
+                            ${play.price > 0 ? `<span style="color: ${changeColor}; font-size: 0.6em;">
+                                ${play.change > 0 ? '+' : ''}${play.change.toFixed(2)}%
+                            </span>` : ''}
+                        </div>
+                        <div class="play-story-name">"${getStoryName(play)}"</div>
+                        
+                        ${play.price > 0 ? `
+                            <div style="font-size: 0.9em; color: #888; margin-bottom: 10px;">
+                                $${play.price.toFixed(2)} • ${play.source}
+                            </div>
+                        ` : ''}
+                        
+                        <div class="play-metrics">
+                            <div class="play-metric">
+                                <div class="metric-label">CUSUM</div>
+                                <div class="metric-value">${play.cusum}</div>
+                            </div>
+                            <div class="play-metric">
+                                <div class="metric-label">Inst Score</div>
+                                <div class="metric-value">${play.instScore}</div>
+                            </div>
+                            <div class="play-metric">
+                                <div class="metric-label">Volatility</div>
+                                <div class="metric-value">${play.volatility}%</div>
+                            </div>
+                            <div class="play-metric">
+                                <div class="metric-label">Regime</div>
+                                <div class="metric-value">${regimeValue}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="play-signal">
+                            <strong style="color: #10b981; font-size: 1.1em;">
+                                ${play.cusum < -2 ? 'STRONG BUY' : play.cusum < -1.5 ? 'ACCUMULATE' : 'LONG'}
+                            </strong><br>
+                            <small style="color: #aaa;">MACD: ${play.macd} | RSI: ${play.rsi}</small>
+                        </div>
+                        
+                        <div style="margin-top: 18px; padding: 18px; background: rgba(102, 126, 234, 0.12); border-radius: 10px; font-size: 0.95em; line-height: 1.7;">
+                            <strong style="color: #667eea;">📊 Signal:</strong><br>
+                            ${getReasoningText(play)}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getStoryName(play) {
+            if (play.cusum < -2 && play.volatility > 80) return 'The Perfect Storm';
+            if (play.cusum < -2) return 'Deep Value Zone';
+            if (play.cusum < -1.5) return 'Mean Reversion Setup';
+            if (play.cusum < -1) return 'Accumulation Phase';
+            if (play.volatility > 100) return 'Volatility Explosion';
+            if (play.instScore > 50) return 'Institutional Favorite';
+            return 'High Probability Trade';
+        }
+
+        function getReasoningText(play) {
+            if (play.cusum < -2) {
+                return `Extreme Bear Deviation (${play.cusum}) with ${play.instScore} Inst Score. Volatility at ${play.volatility}% signals explosive reversal potential.`;
+            } else if (play.cusum < -1.5) {
+                return `Strong mean reversion setup with CUSUM ${play.cusum}. Regime detection at ${play.regime} shows institutional accumulation.`;
+            } else {
+                return `CUSUM ${play.cusum} with ${play.volatility}% volatility creates asymmetric risk/reward. RSI ${play.rsi} oversold.`;
+            }
+        }
+
+        function updateNarrative(plays) {
+            const narrative = plays.length > 0 
+                ? `"Loaded ${plays.length} opportunities from your CSV watchlist. Top pick: ${plays[0].ticker} with CUSUM ${plays[0].cusum} and Inst Score ${plays[0].instScore}."`
+                : '"Loading watchlist data..."';
+            
+            document.getElementById('marketNarrative').textContent = narrative;
+        }
+
+        async function analyzeStock() {
+            const ticker = document.getElementById('tickerInput').value.trim().toUpperCase();
+            if (!ticker) return alert('Please enter a ticker symbol');
+            
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            analyzeBtn.disabled = true;
+            analyzeBtn.textContent = '⏳ ANALYZING...';
+            
+            document.getElementById('playsGrid').classList.add('hidden');
+            document.getElementById('detailedView').classList.remove('hidden');
+            document.getElementById('detailedView').innerHTML = `
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p style="font-size: 1.3em;">Running deep analysis on ${ticker}...</p>
+                </div>
+            `;
+            
+            try {
+                const data = await fetchWithFallback(ticker);
+                
+                if (!data.success) {
+                    throw new Error('Unable to fetch data from any source');
+                }
+                
+                // Find CSV data if available
+                const csvData = WATCHLIST_CSV_DATA.find(s => s.symbol === ticker);
+                
+                displaySimpleAnalysis(ticker, data, csvData);
+                
+            } catch (error) {
+                console.error('Analysis error:', error);
+                document.getElementById('detailedView').innerHTML = `
+                    <div class="error-message">
+                        <h3>❌ Error Analyzing ${ticker}</h3>
+                        <p>${error.message}</p>
+                        <p>All API sources failed. Please check ticker symbol and try again.</p>
+                        <button onclick="backToGrid()" class="btn btn-scanner" style="margin-top: 20px;">
+                            ← BACK TO WATCHLIST
+                        </button>
+                    </div>
+                `;
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.textContent = '🔍 DEEP ANALYSIS';
+            }
+        }
+
+        function displaySimpleAnalysis(ticker, data, csvData) {
+            const changeColor = data.change >= 0 ? '#10b981' : '#ef4444';
+            
+            const html = `
+                <div class="detailed-analysis">
+                    <div class="analysis-header">
+                        <div class="ticker-display">${ticker}</div>
+                        <div class="price-display">
+                            ${data.price > 0 ? `
+                                <div class="current-price" style="color: ${changeColor}">
+                                    $${data.price.toFixed(2)} 
+                                    <span style="font-size: 0.6em">(${data.change > 0 ? '+' : ''}${data.change.toFixed(2)}%)</span>
+                                </div>
+                                <div style="font-size: 0.9em; color: #888; margin-top: 10px;">
+                                    Source: ${data.source}
+                                </div>
+                            ` : '<div class="current-price">Price Unavailable</div>'}
+                            
+                            ${data.afterHours ? `
+                                <div style="color: ${data.afterHoursChange >= 0 ? '#10b981' : '#ef4444'}; margin-top: 10px;">
+                                    After Hours: $${data.afterHours.toFixed(2)} (${data.afterHoursChange > 0 ? '+' : ''}${data.afterHoursChange.toFixed(2)}%)
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+
+                    ${csvData ? `
+                        <div style="background: rgba(102, 126, 234, 0.15); padding: 30px; border-radius: 15px; margin: 25px 0;">
+                            <h3 style="color: #667eea; font-size: 1.8em; margin-bottom: 20px;">📊 Your Proprietary Indicators</h3>
+                            
+                            <div class="play-metrics" style="grid-template-columns: repeat(3, 1fr);">
+                                <div class="play-metric">
+                                    <div class="metric-label">CUSUM</div>
+                                    <div class="metric-value">${csvData.cusum}</div>
+                                </div>
+                                <div class="play-metric">
+                                    <div class="metric-label">Inst Score</div>
+                                    <div class="metric-value">${csvData.instScore}</div>
+                                </div>
+                                <div class="play-metric">
+                                    <div class="metric-label">Volatility</div>
+                                    <div class="metric-value">${csvData.volatility}%</div>
+                                </div>
+                                <div class="play-metric">
+                                    <div class="metric-label">Regime</div>
+                                    <div class="metric-value">${csvData.regime}</div>
+                                </div>
+                                <div class="play-metric">
+                                    <div class="metric-label">MACD</div>
+                                    <div class="metric-value">${csvData.macd}</div>
+                                </div>
+                                <div class="play-metric">
+                                    <div class="metric-label">RSI</div>
+                                    <div class="metric-value">${csvData.rsi}</div>
+                                </div>
+                            </div>
+                            
+                            <div style="margin-top: 25px; padding: 20px; background: rgba(16, 185, 129, 0.12); border-left: 4px solid #10b981; border-radius: 10px;">
+                                <strong style="color: #10b981; font-size: 1.3em;">
+                                    ${csvData.cusum < -2 ? 'STRONG BUY SIGNAL' : csvData.cusum < -1.5 ? 'ACCUMULATE' : 'LONG POSITION'}
+                                </strong><br>
+                                <p style="margin-top: 15px; line-height: 1.8; color: #ddd;">
+                                    ${getReasoningText(csvData)}
+                                </p>
+                            </div>
+                        </div>
+                    ` : `
+                        <div style="background: rgba(245, 158, 11, 0.12); padding: 25px; border-radius: 12px; margin: 25px 0; border-left: 4px solid #f59e0b;">
+                            <p style="color: #fbbf24; font-size: 1.1em;">
+                                ⚠️ ${ticker} not found in your CSV watchlist. Showing live price data only.
+                            </p>
+                        </div>
+                    `}
+
+                    <!-- TradingView Chart -->
+                    <div style="background: #1a1a2e; border-radius: 15px; padding: 20px; margin: 30px 0; min-height: 500px;" id="tradingview_chart"></div>
+
+                    <button onclick="backToGrid()" class="btn btn-scanner" style="width: 100%; margin-top: 30px; font-size: 1.2em; padding: 20px;">
+                        ← BACK TO WATCHLIST
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('detailedView').innerHTML = html;
+            
+            // Initialize TradingView widget
+            new TradingView.widget({
+                "autosize": true,
+                "symbol": ticker,
+                "interval": "D",
+                "timezone": "America/New_York",
+                "theme": "dark",
+                "style": "1",
+                "locale": "en",
+                "enable_publishing": false,
+                "allow_symbol_change": true,
+                "container_id": "tradingview_chart",
+                "height": 500
+            });
+            
+            document.getElementById('marketNarrative').textContent = 
+                `"Analysis complete for ${ticker}. Data from: ${data.source}"`;
+        }
+
+        function backToGrid() {
+            document.getElementById('detailedView').classList.add('hidden');
+            document.getElementById('playsGrid').classList.remove('hidden');
+            loadTopPlays();
+        }
+
+        function runFullScanner() {
+            document.getElementById('playsGrid').innerHTML = '<div class="loading"><div class="spinner"></div><p style="font-size: 1.3em;">Scanning watchlist with multi-API system...</p></div>';
+            setTimeout(() => loadTopPlays(), 1000);
+        }
+
+        function viewNewsBrief() {
+            const grid = document.getElementById('playsGrid');
+            const stocks = watchlistData.slice(0, 8);
+            
+            const avgCUSUM = (stocks.reduce((sum, s) => sum + s.cusum, 0) / stocks.length).toFixed(2);
+            const avgInst = Math.round(stocks.reduce((sum, s) => sum + s.instScore, 0) / stocks.length);
+            const avgVol = Math.round(stocks.reduce((sum, s) => sum + s.volatility, 0) / stocks.length);
+            
+            const briefHTML = `
+                <div style="background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%); border-radius: 25px; padding: 50px; max-width: 1200px; margin: 0 auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+                    <h2 style="font-size: 2.5em; color: #667eea; margin-bottom: 35px; text-align: center;">📰 Elite Market Intelligence</h2>
+                    
+                    <div style="background: rgba(102, 126, 234, 0.12); padding: 30px; border-radius: 18px; margin-bottom: 30px; border-left: 5px solid #667eea;">
+                        <h3 style="color: #10b981; margin-bottom: 18px; font-size: 1.6em;">🌅 Your Watchlist Overview</h3>
+                        <p style="line-height: 2; font-size: 1.1em;">
+                            Currently tracking ${stocks.length} stocks from your CSV file (2025-11-20-watchlist.csv). 
+                            Average CUSUM: ${avgCUSUM} | Average Inst Score: ${avgInst} | Average Volatility: ${avgVol}%
+                        </p>
+                    </div>
+                    
+                    <div style="background: rgba(102, 126, 234, 0.12); padding: 30px; border-radius: 18px; margin-bottom: 30px; border-left: 5px solid #667eea;">
+                        <h3 style="color: #667eea; margin-bottom: 18px; font-size: 1.6em;">🎯 Top Opportunities</h3>
+                        <ul style="line-height: 2; padding-left: 25px; font-size: 1.1em;">
+                            ${stocks.slice(0, 4).map((s, i) => `
+                                <li><strong>${s.symbol}</strong>: CUSUM ${s.cusum} | Inst ${s.instScore} | Vol ${s.volatility}% | ${s.cusum < -2 ? '🔥 STRONG BUY' : s.cusum < -1.5 ? '📈 ACCUMULATE' : '📊 LONG'}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div style="background: rgba(239, 68, 68, 0.12); padding: 30px; border-radius: 18px; margin-bottom: 30px; border-left: 5px solid #ef4444;">
+                        <h3 style="color: #ef4444; margin-bottom: 18px; font-size: 1.6em;">⚠️ Risk Management</h3>
+                        <p style="line-height: 2; font-size: 1.1em;">
+                            Current watchlist shows elevated volatility (avg ${avgVol}%). All positions show negative CUSUM indicating Bear Deviation zones. 
+                            Use strict position sizing and ATR-based stops. Monitor regime detection for volatility expansion signals.
+                        </p>
+                    </div>
+                    
+                    <div style="background: rgba(245, 158, 11, 0.12); padding: 30px; border-radius: 18px; margin-bottom: 30px; border-left: 5px solid #f59e0b;">
+                        <h3 style="color: #f59e0b; margin-bottom: 18px; font-size: 1.6em;">💡 Strategy Notes</h3>
+                        <p style="line-height: 2; font-size: 1.1em;">
+                            Multi-API system active: ${currentAPI}. Data sources include your backend, Alpha Vantage, and Yahoo Finance with automatic fallback. 
+                            All indicators derived from your proprietary ThinkScript CSV export.
+                        </p>
+                    </div>
+                    
+                    <button onclick="backToGrid()" class="btn btn-scanner" style="width: 100%; margin-top: 25px; font-size: 1.3em; padding: 22px;">
+                        ← BACK TO WATCHLIST
+                    </button>
+                </div>
+            `;
+            
+            grid.innerHTML = briefHTML;
+            document.getElementById('marketNarrative').textContent = '"Reading market intelligence from your CSV watchlist..."';
+        }
+    </script>
+</body>
+</html>
