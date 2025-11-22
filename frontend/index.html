@@ -574,3 +574,1059 @@
 </html>
 
 
+Version 11
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Elite Trading Analytics - 57 Stocks</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://s3.tradingview.com/tv.js"></script>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #1a1a3e 0%, #16213e 50%, #0f3460 100%);
+      color: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      min-height: 100vh;
+    }
+
+    .header {
+      background: rgba(20, 20, 50, 0.95);
+      backdrop-filter: blur(10px);
+      border-bottom: 2px solid #00d4ff;
+      padding: 1.2rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .logo {
+      font-size: 1.8em;
+      font-weight: 900;
+      background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      cursor: pointer;
+    }
+
+    .search-bar {
+      flex: 1;
+      max-width: 500px;
+      margin: 0 2rem;
+      display: flex;
+      align-items: center;
+      background: rgba(30, 30, 60, 0.8);
+      border: 2px solid #444;
+      border-radius: 10px;
+      padding: 0.8rem 1rem;
+      gap: 0.8rem;
+    }
+
+    .search-bar input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: #fff;
+      outline: none;
+      font-size: 1em;
+    }
+
+    .search-bar button {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      border: none;
+      color: white;
+      padding: 0.7rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: all 0.3s;
+    }
+
+    .search-bar button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .btn-large {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+
+    .btn-refresh {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+    }
+
+    .btn-brief {
+      background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+      color: white;
+    }
+
+    .btn-large:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 0.8rem 1.5rem;
+      background: rgba(70, 70, 120, 0.6);
+      border: 2px solid #444;
+      color: #b0b8c1;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .filter-btn:hover {
+      border-color: #00d4ff;
+      color: #00d4ff;
+    }
+
+    .filter-btn.active {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      color: white;
+      border-color: transparent;
+    }
+
+    /* ============ NEWSLETTER PAGE STYLES ============ */
+    .newsletter-page {
+      display: none;
+    }
+
+    .newsletter-page.active {
+      display: block;
+    }
+
+    .newsletter-header {
+      text-align: center;
+      margin-bottom: 3rem;
+      border-bottom: 3px solid #00d4ff;
+      padding-bottom: 2rem;
+    }
+
+    .newsletter-header h1 {
+      font-size: 2.5em;
+      color: #00d4ff;
+      margin-bottom: 0.5rem;
+    }
+
+    .newsletter-section {
+      margin-bottom: 3rem;
+      padding: 2rem;
+      background: rgba(0, 212, 255, 0.05);
+      border-left: 4px solid #10b981;
+      border-radius: 10px;
+    }
+
+    .newsletter-section h2 {
+      color: #10b981;
+      font-size: 1.8em;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .newsletter-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1.5rem 0;
+      font-size: 0.9em;
+    }
+
+    .newsletter-table th {
+      background: rgba(124, 58, 237, 0.3);
+      color: #00d4ff;
+      padding: 1rem;
+      text-align: left;
+      font-weight: 700;
+      border: 1px solid #444;
+    }
+
+    .newsletter-table td {
+      padding: 0.8rem 1rem;
+      border: 1px solid #444;
+      color: #b0b8c1;
+    }
+
+    .newsletter-table tr:hover {
+      background: rgba(0, 212, 255, 0.1);
+    }
+
+    .stock-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .stock-card {
+      background: linear-gradient(145deg, #1a1a40 0%, #242850 100%);
+      border: 2px solid #333;
+      border-radius: 15px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .stock-card:hover {
+      border-color: #00d4ff;
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 212, 255, 0.2);
+    }
+
+    .stock-symbol {
+      font-size: 2.2em;
+      font-weight: 900;
+      color: white;
+      margin-bottom: 0.5rem;
+    }
+
+    .stock-price {
+      font-size: 1.8em;
+      color: #00d4ff;
+      font-weight: 900;
+      margin-bottom: 0.3rem;
+    }
+
+    .stock-change {
+      font-size: 1.1em;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    .stock-change.positive {
+      color: #10b981;
+    }
+
+    .stock-change.negative {
+      color: #ef4444;
+    }
+
+    .signal-badge {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.85em;
+      margin-bottom: 1rem;
+    }
+
+    .stock-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+      font-size: 0.9em;
+      margin: 1rem 0;
+    }
+
+    .metric {
+      background: rgba(0, 212, 255, 0.1);
+      padding: 0.8rem;
+      border-radius: 8px;
+      text-align: center;
+    }
+
+    .metric-label {
+      font-size: 0.8em;
+      color: #b0b8c1;
+      text-transform: uppercase;
+    }
+
+    .metric-value {
+      font-size: 1.2em;
+      color: #00d4ff;
+      font-weight: 700;
+    }
+
+    .edge-box {
+      background: rgba(16, 185, 129, 0.1);
+      border-left: 4px solid #10b981;
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+      font-size: 0.85em;
+      line-height: 1.6;
+      color: #d1fae5;
+    }
+
+    .edge-title {
+      font-weight: 700;
+      color: #10b981;
+      margin-bottom: 0.5rem;
+    }
+
+    /* RESEARCH PAGE */
+    .research-page {
+      display: none;
+    }
+
+    .research-page.active {
+      display: block;
+    }
+
+    .research-header {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      border-radius: 15px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .research-title {
+      font-size: 3.5em;
+      font-weight: 900;
+    }
+
+    .research-analysis {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 1.5rem;
+      border-radius: 10px;
+      margin-top: 1rem;
+      line-height: 1.8;
+    }
+
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .chart-box {
+      background: rgba(30, 30, 60, 0.8);
+      border: 2px solid #444;
+      border-radius: 15px;
+      padding: 1.5rem;
+      min-height: 450px;
+    }
+
+    .chart-box h3 {
+      color: #00d4ff;
+      margin-bottom: 1rem;
+      font-size: 1.3em;
+    }
+
+    .chart-container {
+      width: 100%;
+      height: 400px;
+      background: rgba(20, 20, 50, 0.5);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .commentary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .commentary-box {
+      background: rgba(30, 30, 60, 0.8);
+      border: 2px solid #444;
+      border-radius: 15px;
+      padding: 1.5rem;
+    }
+
+    .commentary-box h3 {
+      color: #06b6d4;
+      margin-bottom: 1rem;
+      font-size: 1.2em;
+    }
+
+    .commentary-text {
+      color: #b0b8c1;
+      line-height: 1.8;
+      font-size: 0.95em;
+    }
+
+    /* AI CHAT */
+    .ai-chat-widget {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 400px;
+      max-height: 600px;
+      background: rgba(30, 30, 60, 0.95);
+      border: 2px solid #00d4ff;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      z-index: 150;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+      transform: translateY(calc(100% + 20px));
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+    }
+
+    .ai-chat-widget.active {
+      transform: translateY(0);
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .ai-chat-header {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      color: white;
+      padding: 1.2rem;
+      border-radius: 13px 13px 0 0;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .ai-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .message {
+      padding: 0.9rem 1.2rem;
+      border-radius: 10px;
+      max-width: 90%;
+      word-wrap: break-word;
+      font-size: 0.9em;
+      line-height: 1.6;
+    }
+
+    .message.user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      color: white;
+    }
+
+    .message.ai {
+      align-self: flex-start;
+      background: rgba(0, 212, 255, 0.15);
+      color: #b0b8c1;
+      border: 1px solid #00d4ff;
+    }
+
+    .ai-input {
+      display: flex;
+      gap: 0.8rem;
+      padding: 1.2rem;
+      border-top: 1px solid #444;
+    }
+
+    .ai-input input {
+      flex: 1;
+      background: rgba(20, 20, 50, 0.8);
+      border: 1px solid #444;
+      color: white;
+      padding: 0.8rem;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    .ai-input button {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      border: none;
+      color: white;
+      padding: 0.8rem 1.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .ai-toggle {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      border: none;
+      border-radius: 50%;
+      color: white;
+      font-size: 1.8em;
+      cursor: pointer;
+      z-index: 140;
+      box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
+      transition: all 0.3s;
+    }
+
+    .ai-toggle:hover {
+      transform: scale(1.1);
+    }
+
+    .ai-toggle.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 2rem;
+      color: #00d4ff;
+    }
+
+    @media (max-width: 1024px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .commentary-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .ai-chat-widget {
+        width: calc(100% - 20px);
+        right: 10px;
+        left: 10px;
+        max-width: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="header">
+    <div class="logo" onclick="goHome()">📊 Elite Trading Analytics</div>
+    <div class="search-bar">
+      <i class="fas fa-search"></i>
+      <input type="text" id="searchInput" placeholder="Search ticker..." onkeypress="if(event.key==='Enter') searchAndResearch()">
+      <button onclick="searchAndResearch()">ANALYZE</button>
+    </div>
+    <button style="background: none; border: none; color: #00d4ff; font-size: 1.5em; cursor: pointer;" onclick="toggleAI()">
+      <i class="fas fa-comments"></i>
+    </button>
+  </div>
+
+  <!-- HOME PAGE -->
+  <div id="homePage">
+    <div class="container">
+      <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem; box-shadow: 0 12px 40px rgba(124, 58, 237, 0.3);">
+        <h1 style="font-size: 2.8em; font-weight: 900; margin-bottom: 0.5rem;">Elite Trading Analytics</h1>
+        <p style="font-size: 1.1em; opacity: 0.95;">57 Institutional-Grade Stock Recommendations</p>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn-large btn-refresh" onclick="loadAllStocks()">
+          <i class="fas fa-sync"></i> REFRESH ALL 57
+        </button>
+        <button class="btn-large btn-brief" onclick="showNewsletter()">
+          <i class="fas fa-newspaper"></i> MARKET BRIEF
+        </button>
+      </div>
+
+      <div class="filter-tabs">
+        <button class="filter-btn active" onclick="filterStocks('all')">All (57)</button>
+        <button class="filter-btn" onclick="filterStocks('value')">Value Plays</button>
+        <button class="filter-btn" onclick="filterStocks('momentum')">Momentum</button>
+        <button class="filter-btn" onclick="filterStocks('institutional')">High Inst Score</button>
+      </div>
+
+      <div class="loading" id="loadingIndicator">📊 Loading your stocks from CSV...</div>
+      <div class="stock-grid" id="stockGrid"></div>
+    </div>
+  </div>
+
+  <!-- NEWSLETTER PAGE -->
+  <div id="newsletterPage" class="newsletter-page">
+    <div class="container">
+      <div class="newsletter-header">
+        <h1>📰 Comprehensive Financial Analysis</h1>
+        <p>Value Screening & Momentum Analysis with Institutional Scoring</p>
+        <p style="font-size: 0.9em; margin-top: 1rem; color: #10b981;">Powered by Your Proprietary Trading Scripts (Results Only - Scripts Remain Private)</p>
+      </div>
+
+      <!-- VALUE SCREENING -->
+      <div class="newsletter-section">
+        <h2><i class="fas fa-chart-line"></i> VALUE SCREENING ANALYSIS</h2>
+        <p style="margin-bottom: 1rem; color: #b0b8c1;">12+ Large-Cap Stocks Near 52-Week Lows with Favorable P/E Ratios</p>
+        <table class="newsletter-table">
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Company</th>
+              <th>Price</th>
+              <th>52W Low</th>
+              <th>% to Low</th>
+              <th>P/E</th>
+              <th>Market Cap</th>
+              <th>Quality</th>
+            </tr>
+          </thead>
+          <tbody id="valueTableBody">
+            <tr><td colspan="8" class="loading">Loading value analysis...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- MOMENTUM ANALYSIS -->
+      <div class="newsletter-section">
+        <h2><i class="fas fa-rocket"></i> MOMENTUM ANALYSIS - TOP 10 PERFORMERS</h2>
+        <p style="margin-bottom: 1rem; color: #b0b8c1;">5 Trading Days Performance with Institutional Scoring</p>
+        <table class="newsletter-table">
+          <thead>
+            <tr>
+              <th>Ticker</th>
+              <th>Company</th>
+              <th>YTD Return</th>
+              <th>5-Day Perf</th>
+              <th>RSI</th>
+              <th>Sector</th>
+              <th>Inst Score</th>
+            </tr>
+          </thead>
+          <tbody id="momentumTableBody">
+            <tr><td colspan="7" class="loading">Loading momentum analysis...</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <button class="btn-large" onclick="goHome()" style="width: 100%; margin: 2rem 0; background: #10b981;">
+        ← BACK TO WATCHLIST
+      </button>
+    </div>
+  </div>
+
+  <!-- RESEARCH PAGE -->
+  <div id="researchPage" class="research-page">
+    <div class="container">
+      <div class="research-header">
+        <div class="research-title" id="researchSymbol">TICKER</div>
+        <div class="research-analysis" id="stockAnalysis">Loading AI analysis...</div>
+      </div>
+
+      <div class="charts-grid">
+        <div class="chart-box">
+          <h3>📊 1D Chart</h3>
+          <div class="chart-container" id="chart1D"></div>
+        </div>
+        <div class="chart-box">
+          <h3>📈 1W Chart</h3>
+          <div class="chart-container" id="chart1W"></div>
+        </div>
+      </div>
+
+      <div class="commentary-grid">
+        <div class="commentary-box">
+          <h3><i class="fas fa-lightbulb"></i> Technical Setup</h3>
+          <div class="commentary-text" id="technicalComment">Loading...</div>
+        </div>
+        <div class="commentary-box">
+          <h3><i class="fas fa-target"></i> Entry & Targets</h3>
+          <div class="commentary-text" id="entryTargets">Loading...</div>
+        </div>
+      </div>
+
+      <div class="commentary-box">
+        <h3><i class="fas fa-brain"></i> AI Deep Analysis</h3>
+        <div class="commentary-text" id="aiAnalysis">Loading...</div>
+      </div>
+
+      <button class="btn-large" onclick="goHome()" style="width: 100%; margin: 2rem 0; background: #10b981;">
+        ← BACK TO DASHBOARD
+      </button>
+    </div>
+  </div>
+
+  <!-- AI CHAT -->
+  <button class="ai-toggle" id="aiToggle" onclick="toggleAI()">
+    <i class="fas fa-comments"></i>
+  </button>
+
+  <div class="ai-chat-widget" id="aiChatWidget">
+    <div class="ai-chat-header">
+      <span><i class="fas fa-robot"></i> Trading AI</span>
+      <button style="background: none; border: none; color: white; font-size: 1.4em; cursor: pointer;" onclick="toggleAI()">−</button>
+    </div>
+    <div class="ai-messages" id="aiMessages"></div>
+    <div class="ai-input">
+      <input type="text" id="aiInput" placeholder="Ask AI..." onkeypress="if(event.key==='Enter') sendAI()">
+      <button onclick="sendAI()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
+  <script>
+    const BACKEND_URL = 'https://elite-trading-with-exclusive-ip.onrender.com';
+    
+    // STOCK DATA FROM YOUR CSVS
+    let allStocks = [];
+
+    window.addEventListener('load', async () => {
+      await loadStocksFromCSV();
+    });
+
+    // ============ LOAD STOCKS FROM CSV ============
+    async function loadStocksFromCSV() {
+      try {
+        // Fetch your CSV files from Netlify public folder
+        const csvFiles = [
+          '2025-11-20-watchlist.csv',
+          '2025-11-20-watchlist-Priority.csv',
+          '2025-11-20-watchlist-GN1.csv',
+          '2025-11-20-watchlist-GN2.csv'
+        ];
+
+        for (let csvFile of csvFiles) {
+          try {
+            const res = await fetch(`/${csvFile}`);
+            if (res.ok) {
+              const csv = await res.text();
+              const rows = parseCSV(csv);
+              allStocks.push(...rows);
+            }
+          } catch (e) {
+            console.log(`CSV ${csvFile} not found (optional)`);
+          }
+        }
+
+        if (allStocks.length === 0) {
+          // Fallback: use hardcoded watchlist
+          allStocks = generateFallbackWatchlist();
+        }
+
+        document.getElementById('loadingIndicator').style.display = 'none';
+        renderStocks('all');
+        populateNewsletterTables();
+      } catch (e) {
+        console.error('Error loading stocks:', e);
+        allStocks = generateFallbackWatchlist();
+        document.getElementById('loadingIndicator').style.display = 'none';
+        renderStocks('all');
+      }
+    }
+
+    function parseCSV(csv) {
+      const lines = csv.trim().split('\n');
+      const headers = lines[0].split(',').map(h => h.trim());
+      const rows = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        const values = lines[i].split(',').map(v => v.trim());
+        if (values[0]) {
+          const row = {};
+          headers.forEach((header, idx) => {
+            row[header] = values[idx] || '';
+          });
+          rows.push(row);
+        }
+      }
+      return rows;
+    }
+
+    function generateFallbackWatchlist() {
+      return [
+        {Symbol:'MU','Last':201.37,Change:-10.87,'mean revision':-2.47,RSIWIlder:41.24,'Regime Detection':75.6,'Inst 33':53,Signal:'STRONG BUY'},
+        {Symbol:'SE','Last':130.99,Change:-8.74,'mean revision':-2.46,RSIWIlder:27.72,'Regime Detection':51.7,'Inst 33':38,Signal:'ACCUMULATE'},
+        {Symbol:'RIVN','Last':14.66,Change:-0.41,'mean revision':-1.75,RSIWIlder:58.91,'Regime Detection':99.1,'Inst 33':65,Signal:'BUY'},
+        {Symbol:'EA','Last':201.12,Change:-0.23,'mean revision':-1.74,RSIWIlder:46.82,'Regime Detection':64.7,'Inst 33':53,Signal:'MONITOR'},
+        {Symbol:'LULU','Last':164.69,Change:-0.82,'mean revision':-1.49,RSIWIlder:49.1,'Regime Detection':28.2,'Inst 33':58,Signal:'MONITOR'},
+        {Symbol:'TTWO','Last':216.23,Change:-2.84,'mean revision':-2.28,RSIWIlder:43.08,'Regime Detection':68.5,'Inst 33':58,Signal:'ACCUMULATE'},
+        {Symbol:'MRVL','Last':76.68,Change:-5.71,'mean revision':-2.38,RSIWIlder:36.84,'Regime Detection':56.6,'Inst 33':28,Signal:'ACCUMULATE'},
+        {Symbol:'HOOD','Last':79.82,Change:12.3,'mean revision':0.5,RSIWIlder:72,'Regime Detection':85,'Inst 33':78,Signal:'STRONG BUY'},
+        {Symbol:'WDC','Last':220.5,Change:15.2,'mean revision':1.2,RSIWIlder:75,'Regime Detection':88,'Inst 33':75,Signal:'BUY'},
+        {Symbol:'RKLB','Last':14.5,Change:18.5,'mean revision':1.8,RSIWIlder:78,'Regime Detection':92,'Inst 33':72,Signal:'BUY'},
+        {Symbol:'PLTR','Last':155,Change:-9.52,'mean revision':-1.2,RSIWIlder:27.8,'Regime Detection':55,'Inst 33':58,Signal:'OVERSOLD'},
+        {Symbol:'NEM','Last':66,Change:8.5,'mean revision':0.8,RSIWIlder:65,'Regime Detection':70,'Inst 33':70,Signal:'BUY'},
+        {Symbol:'BAX','Last':17.42,Change:-2.1,'mean revision':-2.1,RSIWIlder:35,'Regime Detection':45,'Inst 33':42,Signal:'VALUE'},
+        {Symbol:'ADBE','Last':318.11,Change:-2.7,'mean revision':-1.8,RSIWIlder:38,'Regime Detection':52,'Inst 33':62,Signal:'VALUE'},
+        {Symbol:'CPRT','Last':70.15,Change:17.9,'mean revision':1.5,RSIWIlder:68,'Regime Detection':75,'Inst 33':70,Signal:'BUY'},
+        {Symbol:'AAPL','Last':289.45,Change:-1.15,'mean revision':-0.5,RSIWIlder:52,'Regime Detection':60,'Inst 33':65,Signal:'HOLD'},
+        {Symbol:'MSFT','Last':425.30,Change:0.85,'mean revision':0.3,RSIWIlder:58,'Regime Detection':65,'Inst 33':72,Signal:'BUY'},
+        {Symbol:'NVDA','Last':485.22,Change:3.5,'mean revision':1.2,RSIWIlder:70,'Regime Detection':82,'Inst 33':85,Signal:'STRONG BUY'},
+        {Symbol:'META','Last':512.15,Change:2.1,'mean revision':0.9,RSIWIlder:66,'Regime Detection':75,'Inst 33':80,Signal:'BUY'},
+        {Symbol:'TSLA','Last':342.80,Change:-2.3,'mean revision':-1.1,RSIWIlder:42,'Regime Detection':50,'Inst 33':60,Signal:'HOLD'},
+      ];
+    }
+
+    // ============ POPULATE NEWSLETTER TABLES ============
+    function populateNewsletterTables() {
+      const valueStocks = allStocks
+        .filter(s => parseFloat(s.Change || 0) < -1.5)
+        .sort((a, b) => parseFloat(a.Change) - parseFloat(b.Change))
+        .slice(0, 12);
+
+      const momentumStocks = allStocks
+        .filter(s => parseFloat(s.Change || 0) > 5)
+        .sort((a, b) => parseFloat(b.Change) - parseFloat(a.Change))
+        .slice(0, 10);
+
+      // VALUE TABLE
+      document.getElementById('valueTableBody').innerHTML = valueStocks.map(s => `
+        <tr>
+          <td><strong>${s.Symbol || s['Symbol.1']}</strong></td>
+          <td>${s['Company'] || 'N/A'}</td>
+          <td>$${parseFloat(s['Last'] || s.Price || 0).toFixed(2)}</td>
+          <td>${s['52W Low'] || 'N/A'}</td>
+          <td>${s['% to Low'] || 'N/A'}</td>
+          <td>${s['P/E'] || 'N/A'}</td>
+          <td>${s['Market Cap'] || 'N/A'}</td>
+          <td>${(parseFloat(s['Inst 33'] || 0) / 100).toFixed(1)}/10</td>
+        </tr>
+      `).join('') || '<tr><td colspan="8">No value stocks found</td></tr>';
+
+      // MOMENTUM TABLE
+      document.getElementById('momentumTableBody').innerHTML = momentumStocks.map(s => `
+        <tr>
+          <td><strong>${s.Symbol || s['Symbol.1']}</strong></td>
+          <td>${s['Company'] || 'N/A'}</td>
+          <td>${s['YTD Return'] || 'N/A'}</td>
+          <td>${s.Change || 'N/A'}%</td>
+          <td>${s.RSIWIlder || s['RSI'] || 'N/A'}</td>
+          <td>${s['Sector'] || 'N/A'}</td>
+          <td>${s['Inst 33'] || 'N/A'}</td>
+        </tr>
+      `).join('') || '<tr><td colspan="7">No momentum stocks found</td></tr>';
+    }
+
+    function renderStocks(filter) {
+      const filtered = allStocks.filter(s => {
+        const change = parseFloat(s.Change || 0);
+        if (filter === 'value') return change < -1.5;
+        if (filter === 'momentum') return change > 5;
+        if (filter === 'institutional') return parseFloat(s['Inst 33'] || 0) > 65;
+        return true;
+      });
+
+      const grid = document.getElementById('stockGrid');
+      grid.innerHTML = filtered.slice(0, 57).map(s => {
+        const symbol = s.Symbol || s['Symbol.1'];
+        const price = parseFloat(s['Last'] || s.Price || 0);
+        const change = parseFloat(s.Change || 0);
+        const meanRev = parseFloat(s['mean revision'] || 0);
+        const rsi = parseFloat(s.RSIWIlder || s['RSI'] || 0);
+        const inst33 = parseFloat(s['Inst 33'] || 0);
+        const regime = parseFloat(s['Regime Detection'] || 0);
+
+        return `
+          <div class="stock-card" onclick="researchStock('${symbol}')">
+            <div class="stock-symbol">${symbol}</div>
+            <div class="stock-price">$${price.toFixed(2)}</div>
+            <div class="stock-change ${change >= 0 ? 'positive' : 'negative'}">
+              ${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)}%
+            </div>
+            <span class="signal-badge">${s.Signal || 'MONITOR'}</span>
+            <div class="stock-metrics">
+              <div class="metric">
+                <div class="metric-label">Mean Rev</div>
+                <div class="metric-value">${meanRev}</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">RSI</div>
+                <div class="metric-value">${rsi.toFixed(1)}</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Inst Score</div>
+                <div class="metric-value">${inst33}</div>
+              </div>
+              <div class="metric">
+                <div class="metric-label">Regime</div>
+                <div class="metric-value">${regime}%</div>
+              </div>
+            </div>
+            <div class="edge-box">
+              <div class="edge-title">📊 Your Edge:</div>
+              • Institutional Score: ${inst33}/100<br>
+              • ${meanRev < -2 ? 'Extreme mean reversion' : 'Technical momentum'}<br>
+              • ${inst33 > 70 ? 'Strong institutional flow' : 'Developing setup'}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterStocks(type) {
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+      renderStocks(type);
+    }
+
+    function goHome() {
+      document.getElementById('homePage').style.display = 'block';
+      document.getElementById('newsletterPage').classList.remove('active');
+      document.getElementById('researchPage').classList.remove('active');
+    }
+
+    function showNewsletter() {
+      document.getElementById('homePage').style.display = 'none';
+      document.getElementById('newsletterPage').classList.add('active');
+      document.getElementById('researchPage').classList.remove('active');
+      populateNewsletterTables();
+    }
+
+    function loadAllStocks() {
+      renderStocks('all');
+    }
+
+    async function researchStock(ticker) {
+      document.getElementById('homePage').style.display = 'none';
+      document.getElementById('newsletterPage').classList.remove('active');
+      document.getElementById('researchPage').classList.add('active');
+
+      let stock = allStocks.find(s => (s.Symbol || s['Symbol.1']) === ticker);
+      if (!stock) stock = {Symbol: ticker, Last: 0, Change: 0};
+
+      document.getElementById('researchSymbol').textContent = ticker;
+      
+      const analysisPrompt = `Brief 2-sentence stock analysis for ${ticker} at $${stock.Last}: current setup and key levels.`;
+      const analysis = await callAI(analysisPrompt);
+      document.getElementById('stockAnalysis').textContent = analysis;
+
+      renderCharts(ticker);
+
+      const technicalPrompt = `Technical analysis for ${ticker}. 2 sentences on setup.`;
+      const tech = await callAI(technicalPrompt);
+      document.getElementById('technicalComment').textContent = tech;
+
+      document.getElementById('entryTargets').innerHTML = `
+        <strong>ENTRY:</strong> $${parseFloat(stock.Last || 0).toFixed(2)}<br>
+        <strong>T1 (5%):</strong> $${(parseFloat(stock.Last || 0) * 1.05).toFixed(2)}<br>
+        <strong>T2 (10%):</strong> $${(parseFloat(stock.Last || 0) * 1.10).toFixed(2)}<br>
+        <strong>STOP:</strong> $${(parseFloat(stock.Last || 0) * 0.95).toFixed(2)}
+      `;
+
+      const deepPrompt = `Comprehensive trading analysis for ${ticker} (5-7 sentences).`;
+      const deep = await callAI(deepPrompt);
+      document.getElementById('aiAnalysis').textContent = deep;
+
+      toggleAI(true);
+    }
+
+    function renderCharts(ticker) {
+      document.getElementById('chart1D').innerHTML = '';
+      document.getElementById('chart1W').innerHTML = '';
+
+      new TradingView.widget({
+        "container_id": "chart1D",
+        "width": "100%",
+        "height": "100%",
+        "symbol": ticker,
+        "interval": "1",
+        "timezone": "America/New_York",
+        "theme": "dark",
+        "style": "1",
+        "studies": ["BB@tv-basicstudies", "MACD@tv-basicstudies", "RSI@tv-basicstudies", "Vol@tv-basicstudies"]
+      });
+
+      new TradingView.widget({
+        "container_id": "chart1W",
+        "width": "100%",
+        "height": "100%",
+        "symbol": ticker,
+        "interval": "W",
+        "timezone": "America/New_York",
+        "theme": "dark",
+        "style": "1",
+        "studies": ["BB@tv-basicstudies", "MACD@tv-basicstudies", "RSI@tv-basicstudies"]
+      });
+    }
+
+    async function callAI(prompt) {
+      try {
+        const res = await fetch(`${BACKEND_URL}/api/ai-analyze`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            model: 'sonar',
+            messages: [{role: 'user', content: prompt}],
+            temperature: 0.3,
+            max_tokens: 500
+          })
+        });
+        if (!res.ok) return `AI Error: ${res.status}`;
+        const data = await res.json();
+        return data.choices?.[0]?.message?.content || 'No AI response';
+      } catch (e) {
+        return `AI Error: ${e.message}`;
+      }
+    }
+
+    function toggleAI(force = null) {
+      const widget = document.getElementById('aiChatWidget');
+      const toggle = document.getElementById('aiToggle');
+      
+      if (force === true) {
+        widget.classList.add('active');
+        toggle.classList.add('hidden');
+      } else if (force === false) {
+        widget.classList.remove('active');
+        toggle.classList.remove('hidden');
+      } else {
+        widget.classList.toggle('active');
+        toggle.classList.toggle('hidden');
+      }
+    }
+
+    async function sendAI() {
+      const inp = document.getElementById('aiInput');
+      const msg = inp.value.trim();
+      if (!msg) return;
+
+      const box = document.getElementById('aiMessages');
+      box.innerHTML += `<div class="message user">${msg}</div>`;
+      inp.value = '';
+      box.scrollTop = box.scrollHeight;
+
+      const resp = await callAI(msg);
+      box.innerHTML += `<div class="message ai">${resp}</div>`;
+      box.scrollTop = box.scrollHeight;
+    }
+
+    function searchAndResearch() {
+      const ticker = document.getElementById('searchInput').value.toUpperCase().trim();
+      if (ticker) {
+        researchStock(ticker);
+        document.getElementById('searchInput').value = '';
+      }
+    }
+  </script>
+</body>
+</html>
+
+
