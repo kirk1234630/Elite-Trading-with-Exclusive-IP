@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -28,7 +27,6 @@
         .btn-back { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; margin-top: 2rem; }
         .action-buttons { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
 
-        /* TOP 3 PLAYS */
         .top-plays-section { margin-bottom: 3rem; padding: 2rem; background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff; border-radius: 15px; }
         .top-plays-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
         .play-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; }
@@ -48,373 +46,6 @@
         .play-targets-title { font-size: 0.85em; color: #10b981; font-weight: 700; margin-bottom: 0.5rem; }
         .play-targets-content { font-size: 0.85em; color: #b0b8c1; line-height: 1.6; }
 
-        <!-- ============================================ -->
-<!-- ENHANCED NEWSLETTER PAGE - COMPLETE VERSION -->
-<!-- ============================================ -->
-
-<!-- ADD THIS HTML TO YOUR NEWSLETTER PAGE SECTION -->
-
-<div id="newsletterPage" class="page">
-    <div class="container">
-        <!-- HEADER -->
-        <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
-            <h1 style="font-size: 2.8em; font-weight: 900;">📰 Elite Trading Newsletter</h1>
-            <p style="font-size: 1.1em;">Daily Market Brief | <span id="newsletterDate"></span></p>
-        </div>
-
-        <!-- EXECUTIVE SUMMARY -->
-        <div class="story-section" style="background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff;">
-            <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
-                <i class="fas fa-bullseye"></i> Executive Summary
-            </h2>
-            <div id="executiveSummary" style="color: #b0b8c1; line-height: 1.8; font-size: 1em;"></div>
-        </div>
-
-        <!-- MARKET OVERVIEW -->
-        <div class="story-section">
-            <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
-                <i class="fas fa-chart-line"></i> Market Overview
-            </h2>
-            <div id="marketOverview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;"></div>
-        </div>
-
-        <!-- MACRO ECONOMICS -->
-        <div class="story-section">
-            <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
-                <i class="fas fa-globe"></i> Macro Economics (FRED API)
-            </h2>
-            <div id="macroData" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;"></div>
-        </div>
-
-        <!-- TOP 3 HIGH-CONVICTION PICKS -->
-        <div class="story-section">
-            <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
-                <i class="fas fa-star"></i> Top 3 High-Conviction Picks
-            </h2>
-            <div id="topPicksNewsletter" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;"></div>
-        </div>
-
-        <!-- VALUE SCREENING -->
-        <div class="story-section">
-            <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
-                <i class="fas fa-gem"></i> VALUE SCREENING - Oversold Opportunities
-            </h2>
-            <table class="newsletter-table">
-                <thead>
-                    <tr>
-                        <th>Ticker</th>
-                        <th>Price</th>
-                        <th>Change</th>
-                        <th>RSI</th>
-                        <th>Regime</th>
-                        <th>Inst Flow</th>
-                        <th>Signal</th>
-                        <th>Strategy</th>
-                    </tr>
-                </thead>
-                <tbody id="valueTable"></tbody>
-            </table>
-        </div>
-
-        <!-- MOMENTUM ANALYSIS -->
-        <div class="story-section">
-            <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
-                <i class="fas fa-rocket"></i> MOMENTUM ANALYSIS - Breakout Plays
-            </h2>
-            <table class="newsletter-table">
-                <thead>
-                    <tr>
-                        <th>Ticker</th>
-                        <th>Price</th>
-                        <th>5-Day %</th>
-                        <th>RSI</th>
-                        <th>Regime</th>
-                        <th>Inst Flow</th>
-                        <th>Signal</th>
-                        <th>Target</th>
-                    </tr>
-                </thead>
-                <tbody id="momentumTable"></tbody>
-            </table>
-        </div>
-
-        <!-- TRADING STRATEGIES -->
-        <div class="story-section">
-            <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
-                <i class="fas fa-chess"></i> Active Trading Strategies
-            </h2>
-            <div id="tradingStrategies" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;"></div>
-        </div>
-
-        <!-- SECTOR ROTATION -->
-        <div class="story-section">
-            <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
-                <i class="fas fa-sync-alt"></i> Sector Rotation Analysis
-            </h2>
-            <div id="sectorRotation" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;"></div>
-        </div>
-
-        <!-- WATCHLIST -->
-        <div class="story-section">
-            <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
-                <i class="fas fa-eye"></i> Next Week's Watchlist
-            </h2>
-            <div id="watchlistData" style="color: #b0b8c1; line-height: 1.8;"></div>
-        </div>
-
-        <!-- RISK DISCLAIMER -->
-        <div class="story-section" style="background: rgba(239, 68, 68, 0.1); border-color: #ef4444;">
-            <h2 style="color: #ef4444; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
-                <i class="fas fa-exclamation-triangle"></i> Risk Disclaimer
-            </h2>
-            <div style="color: #b0b8c1; line-height: 1.8; font-size: 0.9em;">
-                This newsletter is for informational purposes only and does not constitute investment advice. Trading involves substantial risk of loss. Past performance does not guarantee future results. All analysis based on proprietary signals (RSI, Regime Detection, Institutional Flow) should be independently verified. Always use proper risk management. Consult a licensed financial advisor before making investment decisions.
-            </div>
-        </div>
-
-        <button class="btn-large btn-back" onclick="goHome()"><i class="fas fa-arrow-left"></i> BACK TO DASHBOARD</button>
-    </div>
-</div>
-
-<!-- ============================================ -->
-<!-- ENHANCED NEWSLETTER JAVASCRIPT - ADD TO <script> SECTION -->
-<!-- ============================================ -->
-
-<script>
-function showNewsletter() {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('newsletterPage').classList.add('active');
-
-    // SET DATE
-    const today = new Date();
-    const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    document.getElementById('newsletterDate').textContent = dateStr;
-
-    // CALCULATE MARKET STATS
-    const oversoldCount = allStocks.filter(s => parseFloat(s.Change) < -2).length;
-    const momentumCount = allStocks.filter(s => parseFloat(s.Change) > 3).length;
-    const strongBuyCount = allStocks.filter(s => s.Signal === 'STRONG BUY').length;
-    const avgRSI = (allStocks.reduce((sum, s) => sum + parseFloat(s.RSIWilder), 0) / allStocks.length).toFixed(1);
-    const avgRegime = (allStocks.reduce((sum, s) => sum + parseFloat(s.RegimeDetection), 0) / allStocks.length).toFixed(1);
-
-    // EXECUTIVE SUMMARY
-    const topStock = allStocks.reduce((prev, curr) => {
-        const prevScore = parseFloat(prev.RSIWilder) + parseFloat(prev.RegimeDetection) + parseFloat(prev.Inst33);
-        const currScore = parseFloat(curr.RSIWilder) + parseFloat(curr.RegimeDetection) + parseFloat(curr.Inst33);
-        return currScore > prevScore ? curr : prev;
-    });
-
-    document.getElementById('executiveSummary').innerHTML = `
-        <strong style="color: #00d4ff;">Market Regime:</strong> ${oversoldCount > momentumCount ? 'Risk-off' : 'Risk-on'} momentum with ${momentumCount} strong momentum plays and ${oversoldCount} oversold value opportunities. Institutional flows confirm ${avgRegime > 60 ? 'bullish' : 'neutral'} bias in tech and growth sectors. Average market regime: ${avgRegime}%, Average RSI: ${avgRSI}.<br><br>
-        <strong style="color: #00d4ff;">Top Conviction:</strong> ${topStock.Symbol} "${topStock.Story}" (RSI ${topStock.RSIWilder}, Regime ${topStock.RegimeDetection}%, Inst ${topStock.Inst33}) - Strong technical momentum with institutional backing. Entry $${parseFloat(topStock.Last).toFixed(2)}, T1 $${(parseFloat(topStock.Last) * 1.05).toFixed(2)}, T2 $${(parseFloat(topStock.Last) * 1.10).toFixed(2)}.<br><br>
-        <strong style="color: #00d4ff;">Risk Management:</strong> Watch VIX (15.2) and Fed policy signals. Use stops on all positions. ${strongBuyCount} STRONG BUY signals identified. IV crush opportunities in select names post-earnings.<br><br>
-        <strong style="color: #00d4ff;">Portfolio Allocation:</strong> ${momentumCount > 5 ? 'Increase growth exposure' : 'Defensive positioning'}. Oversold setups provide mean-reversion opportunities. Scale positions 25% increments.
-    `;
-
-    // MARKET OVERVIEW
-    const marketData = [
-        { name: 'S&P 500', value: '4,785', change: '+1.2%', positive: true },
-        { name: 'NASDAQ', value: '15,340', change: '+1.8%', positive: true },
-        { name: 'VIX', value: '15.2', change: '-2.3%', positive: false },
-        { name: '10Y Treasury', value: '4.45%', change: '+5bps', positive: true },
-        { name: 'DXY (Dollar)', value: '103.8', change: '-0.4%', positive: false },
-        { name: 'Gold', value: '$2,042', change: '+0.8%', positive: true }
-    ];
-
-    document.getElementById('marketOverview').innerHTML = marketData.map(m => `
-        <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #444; border-radius: 12px; padding: 1.5rem; text-align: center; transition: all 0.3s;" onmouseover="this.style.borderColor='#00d4ff'; this.style.transform='translateY(-5px)';" onmouseout="this.style.borderColor='#444'; this.style.transform='translateY(0)';">
-            <div style="color: #b0b8c1; font-size: 0.85em; margin-bottom: 0.5rem;">${m.name}</div>
-            <div style="color: #00d4ff; font-size: 2em; font-weight: 900; margin-bottom: 0.3rem;">${m.value}</div>
-            <div style="color: ${m.positive ? '#10b981' : '#ef4444'}; font-size: 0.95em; font-weight: 700;">${m.positive ? '▲' : '▼'} ${m.change}</div>
-        </div>
-    `).join('');
-
-    // MACRO ECONOMICS
-    const macroData = [
-        { label: 'GDP Growth (Q3 2025)', value: '+2.8% QoQ' },
-        { label: 'Unemployment Rate', value: '3.9%' },
-        { label: 'Core CPI (YoY)', value: '3.2%' },
-        { label: 'Fed Funds Rate', value: '5.25-5.50%' },
-        { label: 'PCE Inflation', value: '2.8% YoY' },
-        { label: 'Consumer Confidence', value: '102.3' },
-        { label: 'ISM Manufacturing', value: '48.7' },
-        { label: 'Retail Sales (MoM)', value: '+0.7%' }
-    ];
-
-    document.getElementById('macroData').innerHTML = macroData.map(m => `
-        <div style="background: rgba(0, 212, 255, 0.05); padding: 1rem; border-radius: 8px; border: 1px solid #444;">
-            <div style="color: #b0b8c1; font-size: 0.85em; margin-bottom: 0.3rem;">${m.label}</div>
-            <div style="color: #00d4ff; font-size: 1.3em; font-weight: 700;">${m.value}</div>
-        </div>
-    `).join('');
-
-    // TOP 3 PICKS
-    const top3 = allStocks.slice(0, 3);
-    const pickColors = ['#10b981', '#f59e0b', '#00d4ff'];
-    const pickButtons = ['STRONG BUY', 'SELL PREMIUM', 'ACCUMULATE'];
-
-    document.getElementById('topPicksNewsletter').innerHTML = top3.map((s, i) => {
-        const price = parseFloat(s.Last);
-        const change = parseFloat(s.Change);
-        const t1 = (price * 1.05).toFixed(2);
-        const t2 = (price * 1.10).toFixed(2);
-        const stop = (price * 0.95).toFixed(2);
-
-        const analysis = [
-            'Positive momentum. Technically strong setup with institutional inflows. Buy on support pullbacks. Hold core position.',
-            'Pullback detected. IV likely depressed. Mean reversion candidate. Scale into position. Monitor for reversal confirmation.',
-            'Strong institutional buying. Sell calls for income. Hold core position. Watch for exhaustion signals at resistance.'
-        ];
-
-        return `
-            <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid ${pickColors[i]}; border-radius: 12px; padding: 1.5rem; cursor: pointer; transition: all 0.3s;" onclick="researchStock('${s.Symbol}')" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 24px rgba(0, 212, 255, 0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
-                <div style="font-size: 1.8em; font-weight: 900; color: white; margin-bottom: 0.3rem;">${s.Symbol}</div>
-                <div style="font-style: italic; color: #00d4ff; margin-bottom: 0.8rem;">"${s.Story}"</div>
-                <div style="color: ${change >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.3em; font-weight: 900; margin: 0.5rem 0;">$${price.toFixed(2)} ${change >= 0 ? '▲' : '▼'} ${Math.abs(change)}%</div>
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 1rem 0;">
-                    <div style="text-align: center; padding: 0.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 6px;">
-                        <div style="font-size: 0.7em; color: #b0b8c1;">RSI</div>
-                        <div style="font-size: 1em; color: #00d4ff; font-weight: 700; margin-top: 0.2rem;">${s.RSIWilder}</div>
-                    </div>
-                    <div style="text-align: center; padding: 0.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 6px;">
-                        <div style="font-size: 0.7em; color: #b0b8c1;">Regime</div>
-                        <div style="font-size: 1em; color: #00d4ff; font-weight: 700; margin-top: 0.2rem;">${s.RegimeDetection}%</div>
-                    </div>
-                    <div style="text-align: center; padding: 0.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 6px;">
-                        <div style="font-size: 0.7em; color: #b0b8c1;">Inst</div>
-                        <div style="font-size: 1em; color: #00d4ff; font-weight: 700; margin-top: 0.2rem;">${s.Inst33}</div>
-                    </div>
-                </div>
-                <button style="width: 100%; padding: 0.7rem; background: ${pickColors[i]}; border: none; color: white; border-radius: 8px; font-weight: 700; cursor: pointer; margin: 0.5rem 0;" onclick="event.stopPropagation(); researchStock('${s.Symbol}')">${pickButtons[i]}</button>
-                <div style="background: rgba(0, 212, 255, 0.05); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
-                    <strong style="color: #00d4ff;">Analysis:</strong><br>
-                    <span style="color: #b0b8c1; font-size: 0.9em; line-height: 1.6;">${analysis[i]}</span>
-                </div>
-                <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 3px solid #10b981;">
-                    <strong style="color: #10b981;">Targets:</strong><br>
-                    <span style="color: #b0b8c1; font-size: 0.85em;">Entry: $${price.toFixed(2)} | T1: $${t1} | T2: $${t2} | Stop: $${stop}</span>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    // VALUE SCREENING TABLE
-    const valueStocks = allStocks.filter(s => parseFloat(s.Change) < 0);
-    document.getElementById('valueTable').innerHTML = valueStocks.map(s => {
-        const strategy = parseFloat(s.RSIWilder) < 30 ? 'STRONG BUY - Extreme oversold' : 
-                        parseFloat(s.RSIWilder) < 40 ? 'Mean reversion play. Scale 25% entries.' :
-                        parseFloat(s.Change) < -3 ? 'Buy dips on support. Monitor for reversal.' :
-                        'Consolidation. Wait for support test.';
-        return `
-            <tr onclick="researchStock('${s.Symbol}')" style="cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(0, 212, 255, 0.1)'" onmouseout="this.style.background='transparent'">
-                <td class="ticker-cell">${s.Symbol}</td>
-                <td>$${parseFloat(s.Last).toFixed(2)}</td>
-                <td style="color: #ef4444; font-weight: 700;">${s.Change}%</td>
-                <td>${s.RSIWilder}</td>
-                <td>${s.RegimeDetection}%</td>
-                <td>${s.Inst33}</td>
-                <td><span style="padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 700; font-size: 0.8em; background: ${s.Signal === 'STRONG BUY' ? '#10b981' : s.Signal === 'BUY' ? '#00d4ff' : '#f59e0b'}; color: ${s.Signal === 'BUY' ? '#1a1a3e' : 'white'};">${s.Signal}</span></td>
-                <td style="color: #b0b8c1; font-size: 0.9em;">${strategy}</td>
-            </tr>
-        `;
-    }).join('') || '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #b0b8c1;">No oversold opportunities at this time</td></tr>';
-
-    // MOMENTUM TABLE
-    const momentumStocks = allStocks.filter(s => parseFloat(s.Change) > 2);
-    document.getElementById('momentumTable').innerHTML = momentumStocks.map(s => {
-        const price = parseFloat(s.Last);
-        const target = Math.round(price * 1.1);
-        const upside = (((target - price) / price) * 100).toFixed(1);
-        return `
-            <tr onclick="researchStock('${s.Symbol}')" style="cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(0, 212, 255, 0.1)'" onmouseout="this.style.background='transparent'">
-                <td class="ticker-cell">${s.Symbol}</td>
-                <td>$${price.toFixed(2)}</td>
-                <td style="color: #10b981; font-weight: 700;">+${s.Change}%</td>
-                <td>${s.RSIWilder}</td>
-                <td>${s.RegimeDetection}%</td>
-                <td>${s.Inst33}</td>
-                <td><span style="padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 700; font-size: 0.8em; background: ${s.Signal === 'STRONG BUY' ? '#10b981' : '#00d4ff'}; color: ${s.Signal === 'STRONG BUY' ? 'white' : '#1a1a3e'};">${s.Signal}</span></td>
-                <td style="color: #10b981; font-weight: 700;">$${target} (+${upside}%)</td>
-            </tr>
-        `;
-    }).join('') || '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #b0b8c1;">No strong momentum plays at this time</td></tr>';
-
-    // TRADING STRATEGIES
-    const longSetups = allStocks.filter(s => s.Signal === 'STRONG BUY' || s.Signal === 'BUY').slice(0, 4);
-    const optionsPlays = allStocks.filter(s => parseFloat(s.RSIWilder) > 60 || parseFloat(s.RSIWilder) < 40).slice(0, 4);
-
-    document.getElementById('tradingStrategies').innerHTML = `
-        <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #10b981; border-radius: 12px; padding: 1.5rem;">
-            <h3 style="color: #10b981; font-size: 1.2em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-arrow-up"></i> LONG SETUPS</h3>
-            <ul style="list-style: none; padding: 0;">
-                ${longSetups.map(s => {
-                    const price = parseFloat(s.Last);
-                    const stop = (price * 0.95).toFixed(2);
-                    return `<li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> ${s.Symbol}: Buy $${price.toFixed(2)} support, T1 $${(price * 1.05).toFixed(2)}, T2 $${(price * 1.10).toFixed(2)}, Stop $${stop}</li>`;
-                }).join('')}
-            </ul>
-        </div>
-        <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 1.5rem;">
-            <h3 style="color: #f59e0b; font-size: 1.2em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-chart-pie"></i> OPTIONS PLAYS</h3>
-            <ul style="list-style: none; padding: 0;">
-                ${optionsPlays.map(s => {
-                    const price = parseFloat(s.Last);
-                    const rsi = parseFloat(s.RSIWilder);
-                    const strategy = rsi > 60 ? `Covered calls $${Math.round(price + 5)}, weekly theta` : `Cash-secured puts $${Math.round(price - 5)}, collect premium`;
-                    return `<li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> ${s.Symbol}: ${strategy}</li>`;
-                }).join('')}
-            </ul>
-        </div>
-        <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #ef4444; border-radius: 12px; padding: 1.5rem;">
-            <h3 style="color: #ef4444; font-size: 1.2em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-shield-alt"></i> RISK MANAGEMENT</h3>
-            <ul style="list-style: none; padding: 0;">
-                <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> Use 2% position sizing on all new entries</li>
-                <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> Set stops 5-7% below entry on all positions</li>
-                <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> Take profits at T1 (50% position), trail T2</li>
-                <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> Monitor VIX > 20 for increased hedging needs</li>
-                <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> Scale positions 25% on entries, never all-in</li>
-            </ul>
-        </div>
-    `;
-
-    // SECTOR ROTATION
-    const techStocks = allStocks.filter(s => ['NVDA', 'AMD', 'MSFT', 'GOOGL', 'META'].includes(s.Symbol));
-    const techPerf = techStocks.length > 0 ? (techStocks.reduce((sum, s) => sum + parseFloat(s.Change), 0) / techStocks.length).toFixed(1) : 0;
-
-    const sectors = [
-        { name: 'Technology (XLK)', status: techPerf > 2 ? 'STRONG ↑' : techPerf > 0 ? 'MODERATE ↑' : 'WEAK ↓', change: `${techPerf > 0 ? '+' : ''}${techPerf}% this week`, positive: techPerf > 0 },
-        { name: 'Consumer Disc (XLY)', status: 'STRONG ↑', change: '+1.8% this week', positive: true },
-        { name: 'Financials (XLF)', status: 'NEUTRAL →', change: '+0.3% this week', positive: true },
-        { name: 'Energy (XLE)', status: 'WEAK ↓', change: '-1.2% this week', positive: false }
-    ];
-
-    document.getElementById('sectorRotation').innerHTML = sectors.map(s => `
-        <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #444; border-radius: 12px; padding: 1.5rem; text-align: center;">
-            <div style="color: #b0b8c1; font-size: 0.85em; margin-bottom: 0.5rem;">${s.name}</div>
-            <div style="color: ${s.positive ? '#10b981' : '#ef4444'}; font-size: 1.5em; font-weight: 900; margin-bottom: 0.3rem;">${s.status}</div>
-            <div style="color: ${s.positive ? '#10b981' : '#ef4444'}; font-size: 0.9em; font-weight: 700;">${s.change}</div>
-        </div>
-    `).join('');
-
-    // WATCHLIST
-    const upcomingEarnings = allStocks.slice(0, 3).map(s => s.Symbol).join(', ');
-    document.getElementById('watchlistData').innerHTML = `
-        <div style="background: rgba(0, 212, 255, 0.05); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #00d4ff; margin-bottom: 1rem;">
-            <strong style="color: #00d4ff;">Earnings Calendar:</strong> ${upcomingEarnings} (This week). Watch for IV crush opportunities post-announcement.<br><br>
-            <strong style="color: #00d4ff;">Economic Data:</strong> Fed Minutes (Tue), Jobless Claims (Thu), PCE Inflation (Fri), Consumer Confidence (Next Mon).<br><br>
-            <strong style="color: #00d4ff;">Technical Setups:</strong> Watch ${allStocks[1].Symbol} $${Math.round(parseFloat(allStocks[1].Last) * 1.05)} resistance, ${allStocks[2].Symbol} $${Math.round(parseFloat(allStocks[2].Last) * 0.95)} support, ${allStocks[0].Symbol} consolidation above $${Math.round(parseFloat(allStocks[0].Last) * 0.98)}.<br><br>
-            <strong style="color: #00d4ff;">Catalyst Watch:</strong> AI chip demand trends (${allStocks[0].Symbol}), Fed policy signals (rates), China reopening momentum (global equities).<br><br>
-            <strong style="color: #00d4ff;">Volatility Watch:</strong> VIX at 15.2 suggests low fear. Consider calendar spreads and iron condors. Watch for VIX spike > 20 for hedging.
-        </div>
-    `;
-}
-</script>
-
-<!-- ============================================ -->
-<!-- END OF ENHANCED NEWSLETTER CODE -->
-<!-- ============================================ -->
-
-        /* AI CHAT */
         .ai-chat-toggle { position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px; background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border: none; border-radius: 50%; color: white; font-size: 1.8em; cursor: pointer; z-index: 200; box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4); transition: all 0.3s; }
         .ai-chat-toggle:hover { transform: scale(1.1); }
         .ai-chat-toggle.hidden { opacity: 0; pointer-events: none; }
@@ -429,19 +60,16 @@ function showNewsletter() {
         .ai-input input { flex: 1; background: rgba(20, 20, 50, 0.8); border: 1px solid #444; color: white; padding: 0.8rem; border-radius: 8px; outline: none; }
         .ai-input button { background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border: none; color: white; padding: 0.8rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 700; }
 
-        /* STOCK CARDS */
         .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
         .stock-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; }
         .stock-card:hover { border-color: #00d4ff; transform: translateY(-5px); }
 
-        /* NEWSLETTER */
         .story-section { margin-bottom: 3rem; padding: 2rem; background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff; border-radius: 15px; }
         .newsletter-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
         .newsletter-table th { background: rgba(124, 58, 237, 0.3); color: #00d4ff; padding: 1rem; text-align: left; font-weight: 700; border: 1px solid #444; }
         .newsletter-table td { padding: 0.8rem 1rem; border: 1px solid #444; color: #b0b8c1; cursor: pointer; }
         .newsletter-table tr:hover { background: rgba(0, 212, 255, 0.1); }
 
-        /* RESEARCH PAGE WITH LEFT SIDEBAR */
         .research-layout { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; }
         .left-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
         .sidebar-card { background: rgba(26, 26, 64, 0.95); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
@@ -459,7 +87,6 @@ function showNewsletter() {
         .greeks-table th { background: rgba(124, 58, 237, 0.2); color: #00d4ff; padding: 0.6rem; font-size: 0.8em; border: 1px solid #444; }
         .greeks-table td { padding: 0.6rem; font-size: 0.85em; text-align: center; border: 1px solid #444; color: #b0b8c1; }
 
-        /* SINGLE CHART WITH TIMEFRAME SELECTOR */
         .main-content { display: flex; flex-direction: column; gap: 1.5rem; }
         .chart-card { background: rgba(26, 26, 64, 0.9); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
         .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
@@ -478,11 +105,14 @@ function showNewsletter() {
         .ai-deep-section h2 { color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; }
         .ai-deep-content { color: #d1fae5; line-height: 1.8; font-size: 1em; }
 
+        .ticker-cell { font-weight: 700; color: white; font-size: 1.1em; }
+
         @media (max-width: 1200px) {
             .research-layout { grid-template-columns: 1fr; }
-            .info-boxes, .top-plays-grid { grid-template-columns: 1fr; }
+            .info-boxes { grid-template-columns: 1fr; }
             .ai-chat-widget { width: calc(100% - 20px); right: 10px; left: 10px; }
             .timeframe-buttons { flex-wrap: wrap; }
+            .top-plays-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -552,31 +182,124 @@ function showNewsletter() {
         </div>
     </div>
 
-    <!-- NEWSLETTER SCREENER PAGE -->
+    <!-- ENHANCED NEWSLETTER PAGE -->
     <div id="newsletterPage" class="page">
         <div class="container">
             <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
-                <h1 style="font-size: 2.8em; font-weight: 900;">📰 Newsletter Screener</h1>
-                <p>Stock Screening Newsletter - Institutional Analysis</p>
+                <h1 style="font-size: 2.8em; font-weight: 900;">📰 Elite Trading Newsletter</h1>
+                <p style="font-size: 1.1em;">Daily Market Brief | <span id="newsletterDate"></span></p>
             </div>
-            <div class="story-section" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%); border: 2px solid #7c3aed;">
-                <h2 style="color: #7c3aed; font-size: 1.8em; margin-bottom: 1rem;"><i class="fas fa-brain"></i> AI Market Intelligence</h2>
-                <div id="marketStory" style="color: #b0b8c1; line-height: 1.8;">Loading...</div>
+
+            <!-- EXECUTIVE SUMMARY -->
+            <div class="story-section" style="background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff;">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
+                    <i class="fas fa-bullseye"></i> Executive Summary
+                </h2>
+                <div id="executiveSummary" style="color: #b0b8c1; line-height: 1.8; font-size: 1em;"></div>
             </div>
+
+            <!-- MARKET OVERVIEW -->
             <div class="story-section">
-                <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem;">VALUE SCREENING - Oversold Opportunities</h2>
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
+                    <i class="fas fa-chart-line"></i> Market Overview
+                </h2>
+                <div id="marketOverview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;"></div>
+            </div>
+
+            <!-- MACRO ECONOMICS -->
+            <div class="story-section">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
+                    <i class="fas fa-globe"></i> Macro Economics (FRED API)
+                </h2>
+                <div id="macroData" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;"></div>
+            </div>
+
+            <!-- TOP 3 PICKS -->
+            <div class="story-section">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
+                    <i class="fas fa-star"></i> Top 3 High-Conviction Picks
+                </h2>
+                <div id="topPicksNewsletter" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;"></div>
+            </div>
+
+            <!-- VALUE SCREENING -->
+            <div class="story-section">
+                <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
+                    <i class="fas fa-gem"></i> VALUE SCREENING - Oversold Opportunities
+                </h2>
                 <table class="newsletter-table">
-                    <thead><tr><th>Ticker</th><th>Price</th><th>Change</th><th>RSI</th><th>Regime</th><th>Inst</th><th>Signal</th><th>Action</th></tr></thead>
-                    <tbody id="valueTable"><tr><td colspan="8">Loading...</td></tr></tbody>
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th>Price</th>
+                            <th>Change</th>
+                            <th>RSI</th>
+                            <th>Regime</th>
+                            <th>Inst Flow</th>
+                            <th>Signal</th>
+                            <th>Strategy</th>
+                        </tr>
+                    </thead>
+                    <tbody id="valueTable"></tbody>
                 </table>
             </div>
+
+            <!-- MOMENTUM ANALYSIS -->
             <div class="story-section">
-                <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem;">MOMENTUM ANALYSIS - Top Performers</h2>
+                <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
+                    <i class="fas fa-rocket"></i> MOMENTUM ANALYSIS - Breakout Plays
+                </h2>
                 <table class="newsletter-table">
-                    <thead><tr><th>Ticker</th><th>Price</th><th>5-Day %</th><th>RSI</th><th>Regime</th><th>Inst</th><th>Signal</th><th>Target</th></tr></thead>
-                    <tbody id="momentumTable"><tr><td colspan="8">Loading...</td></tr></tbody>
+                    <thead>
+                        <tr>
+                            <th>Ticker</th>
+                            <th>Price</th>
+                            <th>5-Day %</th>
+                            <th>RSI</th>
+                            <th>Regime</th>
+                            <th>Inst Flow</th>
+                            <th>Signal</th>
+                            <th>Target</th>
+                        </tr>
+                    </thead>
+                    <tbody id="momentumTable"></tbody>
                 </table>
             </div>
+
+            <!-- TRADING STRATEGIES -->
+            <div class="story-section">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
+                    <i class="fas fa-chess"></i> Active Trading Strategies
+                </h2>
+                <div id="tradingStrategies" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;"></div>
+            </div>
+
+            <!-- SECTOR ROTATION -->
+            <div class="story-section">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
+                    <i class="fas fa-sync-alt"></i> Sector Rotation Analysis
+                </h2>
+                <div id="sectorRotation" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;"></div>
+            </div>
+
+            <!-- WATCHLIST -->
+            <div class="story-section">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
+                    <i class="fas fa-eye"></i> Next Week's Watchlist
+                </h2>
+                <div id="watchlistData" style="color: #b0b8c1; line-height: 1.8;"></div>
+            </div>
+
+            <!-- RISK DISCLAIMER -->
+            <div class="story-section" style="background: rgba(239, 68, 68, 0.1); border-color: #ef4444;">
+                <h2 style="color: #ef4444; font-size: 1.8em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;">
+                    <i class="fas fa-exclamation-triangle"></i> Risk Disclaimer
+                </h2>
+                <div style="color: #b0b8c1; line-height: 1.8; font-size: 0.9em;">
+                    This newsletter is for informational purposes only and does not constitute investment advice. Trading involves substantial risk of loss. Past performance does not guarantee future results. All analysis based on proprietary signals (RSI, Regime Detection, Institutional Flow) should be independently verified. Always use proper risk management. Consult a licensed financial advisor before making investment decisions.
+                </div>
+            </div>
+
             <button class="btn-large btn-back" onclick="goHome()"><i class="fas fa-arrow-left"></i> BACK TO DASHBOARD</button>
         </div>
     </div>
@@ -772,19 +495,233 @@ function showNewsletter() {
             document.getElementById('microSummary').innerHTML = `<strong>Market Sentiment:</strong> ${oversold > momentum ? 'Risk-off' : 'Risk-on'}<br><strong>Oversold:</strong> ${oversold} setups<br><strong>Momentum:</strong> ${momentum} breakouts<br><strong>Tech:</strong> IV crush opportunities<br><strong>VIX:</strong> 15.2`;
         }
 
+        // ===== ENHANCED NEWSLETTER FUNCTION =====
         function showNewsletter() {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('newsletterPage').classList.add('active');
-            document.getElementById('marketStory').innerHTML = `<strong>Setup:</strong> ${allStocks.filter(s => parseFloat(s.Change) < -2).length} oversold, ${allStocks.filter(s => parseFloat(s.Change) > 3).length} momentum.<br><strong>IV crush = opportunity.</strong>`;
 
+            // SET DATE
+            const today = new Date();
+            const dateStr = today.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+            document.getElementById('newsletterDate').textContent = dateStr;
+
+            // CALCULATE MARKET STATS
+            const oversoldCount = allStocks.filter(s => parseFloat(s.Change) < -2).length;
+            const momentumCount = allStocks.filter(s => parseFloat(s.Change) > 3).length;
+            const strongBuyCount = allStocks.filter(s => s.Signal === 'STRONG BUY').length;
+            const avgRSI = (allStocks.reduce((sum, s) => sum + parseFloat(s.RSIWilder), 0) / allStocks.length).toFixed(1);
+            const avgRegime = (allStocks.reduce((sum, s) => sum + parseFloat(s.RegimeDetection), 0) / allStocks.length).toFixed(1);
+
+            // EXECUTIVE SUMMARY
+            const topStock = allStocks.reduce((prev, curr) => {
+                const prevScore = parseFloat(prev.RSIWilder) + parseFloat(prev.RegimeDetection) + parseFloat(prev.Inst33);
+                const currScore = parseFloat(curr.RSIWilder) + parseFloat(curr.RegimeDetection) + parseFloat(curr.Inst33);
+                return currScore > prevScore ? curr : prev;
+            });
+
+            document.getElementById('executiveSummary').innerHTML = `
+                <strong style="color: #00d4ff;">Market Regime:</strong> ${oversoldCount > momentumCount ? 'Risk-off' : 'Risk-on'} momentum with ${momentumCount} strong momentum plays and ${oversoldCount} oversold value opportunities. Institutional flows confirm ${avgRegime > 60 ? 'bullish' : 'neutral'} bias in tech and growth sectors. Average market regime: ${avgRegime}%, Average RSI: ${avgRSI}.<br><br>
+                <strong style="color: #00d4ff;">Top Conviction:</strong> ${topStock.Symbol} "${topStock.Story}" (RSI ${topStock.RSIWilder}, Regime ${topStock.RegimeDetection}%, Inst ${topStock.Inst33}) - Strong technical momentum with institutional backing. Entry $${parseFloat(topStock.Last).toFixed(2)}, T1 $${(parseFloat(topStock.Last) * 1.05).toFixed(2)}, T2 $${(parseFloat(topStock.Last) * 1.10).toFixed(2)}.<br><br>
+                <strong style="color: #00d4ff;">Risk Management:</strong> Watch VIX (15.2) and Fed policy signals. Use stops on all positions. ${strongBuyCount} STRONG BUY signals identified. IV crush opportunities in select names post-earnings.<br><br>
+                <strong style="color: #00d4ff;">Portfolio Allocation:</strong> ${momentumCount > 5 ? 'Increase growth exposure' : 'Defensive positioning'}. Oversold setups provide mean-reversion opportunities. Scale positions 25% increments.
+            `;
+
+            // MARKET OVERVIEW
+            const marketData = [
+                { name: 'S&P 500', value: '4,785', change: '+1.2%', positive: true },
+                { name: 'NASDAQ', value: '15,340', change: '+1.8%', positive: true },
+                { name: 'VIX', value: '15.2', change: '-2.3%', positive: false },
+                { name: '10Y Treasury', value: '4.45%', change: '+5bps', positive: true },
+                { name: 'DXY (Dollar)', value: '103.8', change: '-0.4%', positive: false },
+                { name: 'Gold', value: '$2,042', change: '+0.8%', positive: true }
+            ];
+
+            document.getElementById('marketOverview').innerHTML = marketData.map(m => `
+                <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #444; border-radius: 12px; padding: 1.5rem; text-align: center; transition: all 0.3s;" onmouseover="this.style.borderColor='#00d4ff'; this.style.transform='translateY(-5px)';" onmouseout="this.style.borderColor='#444'; this.style.transform='translateY(0)';">
+                    <div style="color: #b0b8c1; font-size: 0.85em; margin-bottom: 0.5rem;">${m.name}</div>
+                    <div style="color: #00d4ff; font-size: 2em; font-weight: 900; margin-bottom: 0.3rem;">${m.value}</div>
+                    <div style="color: ${m.positive ? '#10b981' : '#ef4444'}; font-size: 0.95em; font-weight: 700;">${m.positive ? '▲' : '▼'} ${m.change}</div>
+                </div>
+            `).join('');
+
+            // MACRO ECONOMICS
+            const macroData = [
+                { label: 'GDP Growth (Q3 2025)', value: '+2.8% QoQ' },
+                { label: 'Unemployment Rate', value: '3.9%' },
+                { label: 'Core CPI (YoY)', value: '3.2%' },
+                { label: 'Fed Funds Rate', value: '5.25-5.50%' },
+                { label: 'PCE Inflation', value: '2.8% YoY' },
+                { label: 'Consumer Confidence', value: '102.3' },
+                { label: 'ISM Manufacturing', value: '48.7' },
+                { label: 'Retail Sales (MoM)', value: '+0.7%' }
+            ];
+
+            document.getElementById('macroData').innerHTML = macroData.map(m => `
+                <div style="background: rgba(0, 212, 255, 0.05); padding: 1rem; border-radius: 8px; border: 1px solid #444;">
+                    <div style="color: #b0b8c1; font-size: 0.85em; margin-bottom: 0.3rem;">${m.label}</div>
+                    <div style="color: #00d4ff; font-size: 1.3em; font-weight: 700;">${m.value}</div>
+                </div>
+            `).join('');
+
+            // TOP 3 PICKS
+            const top3 = allStocks.slice(0, 3);
+            const pickColors = ['#10b981', '#f59e0b', '#00d4ff'];
+            const pickButtons = ['STRONG BUY', 'SELL PREMIUM', 'ACCUMULATE'];
+
+            document.getElementById('topPicksNewsletter').innerHTML = top3.map((s, i) => {
+                const price = parseFloat(s.Last);
+                const change = parseFloat(s.Change);
+                const t1 = (price * 1.05).toFixed(2);
+                const t2 = (price * 1.10).toFixed(2);
+                const stop = (price * 0.95).toFixed(2);
+
+                const analysis = [
+                    'Positive momentum. Technically strong setup with institutional inflows. Buy on support pullbacks. Hold core position.',
+                    'Pullback detected. IV likely depressed. Mean reversion candidate. Scale into position. Monitor for reversal confirmation.',
+                    'Strong institutional buying. Sell calls for income. Hold core position. Watch for exhaustion signals at resistance.'
+                ];
+
+                return `
+                    <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid ${pickColors[i]}; border-radius: 12px; padding: 1.5rem; cursor: pointer; transition: all 0.3s;" onclick="researchStock('${s.Symbol}')" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 8px 24px rgba(0, 212, 255, 0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                        <div style="font-size: 1.8em; font-weight: 900; color: white; margin-bottom: 0.3rem;">${s.Symbol}</div>
+                        <div style="font-style: italic; color: #00d4ff; margin-bottom: 0.8rem;">"${s.Story}"</div>
+                        <div style="color: ${change >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.3em; font-weight: 900; margin: 0.5rem 0;">$${price.toFixed(2)} ${change >= 0 ? '▲' : '▼'} ${Math.abs(change)}%</div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 1rem 0;">
+                            <div style="text-align: center; padding: 0.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 6px;">
+                                <div style="font-size: 0.7em; color: #b0b8c1;">RSI</div>
+                                <div style="font-size: 1em; color: #00d4ff; font-weight: 700; margin-top: 0.2rem;">${s.RSIWilder}</div>
+                            </div>
+                            <div style="text-align: center; padding: 0.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 6px;">
+                                <div style="font-size: 0.7em; color: #b0b8c1;">Regime</div>
+                                <div style="font-size: 1em; color: #00d4ff; font-weight: 700; margin-top: 0.2rem;">${s.RegimeDetection}%</div>
+                            </div>
+                            <div style="text-align: center; padding: 0.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 6px;">
+                                <div style="font-size: 0.7em; color: #b0b8c1;">Inst</div>
+                                <div style="font-size: 1em; color: #00d4ff; font-weight: 700; margin-top: 0.2rem;">${s.Inst33}</div>
+                            </div>
+                        </div>
+                        <button style="width: 100%; padding: 0.7rem; background: ${pickColors[i]}; border: none; color: white; border-radius: 8px; font-weight: 700; cursor: pointer; margin: 0.5rem 0;" onclick="event.stopPropagation(); researchStock('${s.Symbol}')">${pickButtons[i]}</button>
+                        <div style="background: rgba(0, 212, 255, 0.05); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                            <strong style="color: #00d4ff;">Analysis:</strong><br>
+                            <span style="color: #b0b8c1; font-size: 0.9em; line-height: 1.6;">${analysis[i]}</span>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 3px solid #10b981;">
+                            <strong style="color: #10b981;">Targets:</strong><br>
+                            <span style="color: #b0b8c1; font-size: 0.85em;">Entry: $${price.toFixed(2)} | T1: $${t1} | T2: $${t2} | Stop: $${stop}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // VALUE SCREENING TABLE
             const valueStocks = allStocks.filter(s => parseFloat(s.Change) < 0);
-            document.getElementById('valueTable').innerHTML = valueStocks.map(s => `<tr onclick="researchStock('${s.Symbol}')"><td><strong>${s.Symbol}</strong></td><td>$${parseFloat(s.Last).toFixed(2)}</td><td style="color: #ef4444;">${s.Change}%</td><td>${s.RSIWilder}</td><td>${s.RegimeDetection}%</td><td>${s.Inst33}</td><td>${s.Signal}</td><td style="color: #10b981;"><strong>BUY DIPS</strong></td></tr>`).join('') || '<tr><td colspan="8">No oversold</td></tr>';
+            document.getElementById('valueTable').innerHTML = valueStocks.map(s => {
+                const strategy = parseFloat(s.RSIWilder) < 30 ? 'STRONG BUY - Extreme oversold' : 
+                                parseFloat(s.RSIWilder) < 40 ? 'Mean reversion play. Scale 25% entries.' :
+                                parseFloat(s.Change) < -3 ? 'Buy dips on support. Monitor for reversal.' :
+                                'Consolidation. Wait for support test.';
+                return `
+                    <tr onclick="researchStock('${s.Symbol}')" style="cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(0, 212, 255, 0.1)'" onmouseout="this.style.background='transparent'">
+                        <td class="ticker-cell">${s.Symbol}</td>
+                        <td>$${parseFloat(s.Last).toFixed(2)}</td>
+                        <td style="color: #ef4444; font-weight: 700;">${s.Change}%</td>
+                        <td>${s.RSIWilder}</td>
+                        <td>${s.RegimeDetection}%</td>
+                        <td>${s.Inst33}</td>
+                        <td><span style="padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 700; font-size: 0.8em; background: ${s.Signal === 'STRONG BUY' ? '#10b981' : s.Signal === 'BUY' ? '#00d4ff' : '#f59e0b'}; color: ${s.Signal === 'BUY' ? '#1a1a3e' : 'white'};">${s.Signal}</span></td>
+                        <td style="color: #b0b8c1; font-size: 0.9em;">${strategy}</td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #b0b8c1;">No oversold opportunities at this time</td></tr>';
 
+            // MOMENTUM TABLE
             const momentumStocks = allStocks.filter(s => parseFloat(s.Change) > 2);
             document.getElementById('momentumTable').innerHTML = momentumStocks.map(s => {
                 const price = parseFloat(s.Last);
-                return `<tr onclick="researchStock('${s.Symbol}')"><td><strong>${s.Symbol}</strong></td><td>$${price.toFixed(2)}</td><td style="color: #10b981;">+${s.Change}%</td><td>${s.RSIWilder}</td><td>${s.RegimeDetection}%</td><td>${s.Inst33}</td><td>${s.Signal}</td><td>$${Math.round(price * 1.1)}</td></tr>`;
-            }).join('') || '<tr><td colspan="8">No momentum</td></tr>';
+                const target = Math.round(price * 1.1);
+                const upside = (((target - price) / price) * 100).toFixed(1);
+                return `
+                    <tr onclick="researchStock('${s.Symbol}')" style="cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(0, 212, 255, 0.1)'" onmouseout="this.style.background='transparent'">
+                        <td class="ticker-cell">${s.Symbol}</td>
+                        <td>$${price.toFixed(2)}</td>
+                        <td style="color: #10b981; font-weight: 700;">+${s.Change}%</td>
+                        <td>${s.RSIWilder}</td>
+                        <td>${s.RegimeDetection}%</td>
+                        <td>${s.Inst33}</td>
+                        <td><span style="padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 700; font-size: 0.8em; background: ${s.Signal === 'STRONG BUY' ? '#10b981' : '#00d4ff'}; color: ${s.Signal === 'STRONG BUY' ? 'white' : '#1a1a3e'};">${s.Signal}</span></td>
+                        <td style="color: #10b981; font-weight: 700;">$${target} (+${upside}%)</td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="8" style="text-align: center; padding: 2rem; color: #b0b8c1;">No strong momentum plays at this time</td></tr>';
+
+            // TRADING STRATEGIES
+            const longSetups = allStocks.filter(s => s.Signal === 'STRONG BUY' || s.Signal === 'BUY').slice(0, 4);
+            const optionsPlays = allStocks.filter(s => parseFloat(s.RSIWilder) > 60 || parseFloat(s.RSIWilder) < 40).slice(0, 4);
+
+            document.getElementById('tradingStrategies').innerHTML = `
+                <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #10b981; border-radius: 12px; padding: 1.5rem;">
+                    <h3 style="color: #10b981; font-size: 1.2em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-arrow-up"></i> LONG SETUPS</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        ${longSetups.map(s => {
+                            const price = parseFloat(s.Last);
+                            const stop = (price * 0.95).toFixed(2);
+                            return `<li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> ${s.Symbol}: Buy $${price.toFixed(2)} support, T1 $${(price * 1.05).toFixed(2)}, T2 $${(price * 1.10).toFixed(2)}, Stop $${stop}</li>`;
+                        }).join('')}
+                    </ul>
+                </div>
+                <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 1.5rem;">
+                    <h3 style="color: #f59e0b; font-size: 1.2em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-chart-pie"></i> OPTIONS PLAYS</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        ${optionsPlays.map(s => {
+                            const price = parseFloat(s.Last);
+                            const rsi = parseFloat(s.RSIWilder);
+                            const strategy = rsi > 60 ? `Covered calls $${Math.round(price + 5)}, weekly theta` : `Cash-secured puts $${Math.round(price - 5)}, collect premium`;
+                            return `<li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> ${s.Symbol}: ${strategy}</li>`;
+                        }).join('')}
+                    </ul>
+                </div>
+                <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #ef4444; border-radius: 12px; padding: 1.5rem;">
+                    <h3 style="color: #ef4444; font-size: 1.2em; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;"><i class="fas fa-shield-alt"></i> RISK MANAGEMENT</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> Use 2% position sizing on all new entries</li>
+                        <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> Set stops 5-7% below entry on all positions</li>
+                        <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> Take profits at T1 (50% position), trail T2</li>
+                        <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> Monitor VIX > 20 for increased hedging needs</li>
+                        <li style="padding: 0.5rem 0; padding-left: 1.5rem; position: relative; color: #b0b8c1; line-height: 1.6;"><span style="position: absolute; left: 0; color: #00d4ff; font-weight: 700;">→</span> Scale positions 25% on entries, never all-in</li>
+                    </ul>
+                </div>
+            `;
+
+            // SECTOR ROTATION
+            const techStocks = allStocks.filter(s => ['NVDA', 'AMD', 'MSFT', 'GOOGL', 'META'].includes(s.Symbol));
+            const techPerf = techStocks.length > 0 ? (techStocks.reduce((sum, s) => sum + parseFloat(s.Change), 0) / techStocks.length).toFixed(1) : 0;
+
+            const sectors = [
+                { name: 'Technology (XLK)', status: techPerf > 2 ? 'STRONG ↑' : techPerf > 0 ? 'MODERATE ↑' : 'WEAK ↓', change: `${techPerf > 0 ? '+' : ''}${techPerf}% this week`, positive: techPerf > 0 },
+                { name: 'Consumer Disc (XLY)', status: 'STRONG ↑', change: '+1.8% this week', positive: true },
+                { name: 'Financials (XLF)', status: 'NEUTRAL →', change: '+0.3% this week', positive: true },
+                { name: 'Energy (XLE)', status: 'WEAK ↓', change: '-1.2% this week', positive: false }
+            ];
+
+            document.getElementById('sectorRotation').innerHTML = sectors.map(s => `
+                <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #444; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                    <div style="color: #b0b8c1; font-size: 0.85em; margin-bottom: 0.5rem;">${s.name}</div>
+                    <div style="color: ${s.positive ? '#10b981' : '#ef4444'}; font-size: 1.5em; font-weight: 900; margin-bottom: 0.3rem;">${s.status}</div>
+                    <div style="color: ${s.positive ? '#10b981' : '#ef4444'}; font-size: 0.9em; font-weight: 700;">${s.change}</div>
+                </div>
+            `).join('');
+
+            // WATCHLIST
+            const upcomingEarnings = allStocks.slice(0, 3).map(s => s.Symbol).join(', ');
+            document.getElementById('watchlistData').innerHTML = `
+                <div style="background: rgba(0, 212, 255, 0.05); padding: 1.5rem; border-radius: 8px; border-left: 4px solid #00d4ff; margin-bottom: 1rem;">
+                    <strong style="color: #00d4ff;">Earnings Calendar:</strong> ${upcomingEarnings} (This week). Watch for IV crush opportunities post-announcement.<br><br>
+                    <strong style="color: #00d4ff;">Economic Data:</strong> Fed Minutes (Tue), Jobless Claims (Thu), PCE Inflation (Fri), Consumer Confidence (Next Mon).<br><br>
+                    <strong style="color: #00d4ff;">Technical Setups:</strong> Watch ${allStocks[1].Symbol} $${Math.round(parseFloat(allStocks[1].Last) * 1.05)} resistance, ${allStocks[2].Symbol} $${Math.round(parseFloat(allStocks[2].Last) * 0.95)} support, ${allStocks[0].Symbol} consolidation above $${Math.round(parseFloat(allStocks[0].Last) * 0.98)}.<br><br>
+                    <strong style="color: #00d4ff;">Catalyst Watch:</strong> AI chip demand trends (${allStocks[0].Symbol}), Fed policy signals (rates), China reopening momentum (global equities).<br><br>
+                    <strong style="color: #00d4ff;">Volatility Watch:</strong> VIX at 15.2 suggests low fear. Consider calendar spreads and iron condors. Watch for VIX spike > 20 for hedging.
+                </div>
+            `;
         }
 
         function researchStock(ticker) {
