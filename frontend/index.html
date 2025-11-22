@@ -14,6 +14,13 @@ Godknows 4
       padding: 0;
       box-sizing: border-box;
     }
+    async function showNewsletter() {
+  document.getElementById('homePage').style.display = 'none';
+  document.getElementById('newsletterPage').classList.add('active');
+  document.getElementById('researchPage').classList.remove('active');
+  await populateNewsletterTables();  // Fills all data
+}
+
 <!-- NEWSLETTER PAGE -->
 <div id="newsletterPage" class="newsletter-page">
   <div class="container">
