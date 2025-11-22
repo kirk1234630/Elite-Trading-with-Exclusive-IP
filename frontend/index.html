@@ -1,4 +1,3 @@
-Version 11
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -353,11 +352,39 @@ Version 11
       line-height: 1.8;
     }
 
-    .charts-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 1.5rem;
+    /* SINGLE CHART SECTION */
+    .chart-section {
       margin-bottom: 2rem;
+    }
+
+    .chart-controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .timeframe-btn {
+      padding: 0.8rem 1.5rem;
+      background: rgba(70, 70, 120, 0.6);
+      border: 2px solid #444;
+      color: #b0b8c1;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .timeframe-btn:hover {
+      border-color: #00d4ff;
+      color: #00d4ff;
+    }
+
+    .timeframe-btn.active {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      color: white;
+      border-color: transparent;
     }
 
     .chart-box {
@@ -365,18 +392,21 @@ Version 11
       border: 2px solid #444;
       border-radius: 15px;
       padding: 1.5rem;
-      min-height: 450px;
+      min-height: 600px;
     }
 
     .chart-box h3 {
       color: #00d4ff;
       margin-bottom: 1rem;
-      font-size: 1.3em;
+      font-size: 1.5em;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     .chart-container {
       width: 100%;
-      height: 400px;
+      height: 600px;
       background: rgba(20, 20, 50, 0.5);
       border-radius: 10px;
       overflow: hidden;
@@ -536,10 +566,6 @@ Version 11
     }
 
     @media (max-width: 1024px) {
-      .charts-grid {
-        grid-template-columns: 1fr;
-      }
-
       .commentary-grid {
         grid-template-columns: 1fr;
       }
@@ -666,14 +692,21 @@ Version 11
         <div class="research-analysis" id="stockAnalysis">Loading AI analysis...</div>
       </div>
 
-      <div class="charts-grid">
-        <div class="chart-box">
-          <h3>📊 1D Chart</h3>
-          <div class="chart-container" id="chart1D"></div>
+      <!-- SINGLE CHART SECTION -->
+      <div class="chart-section">
+        <div class="chart-controls">
+          <button class="timeframe-btn active" onclick="changeTimeframe('1')">1D</button>
+          <button class="timeframe-btn" onclick="changeTimeframe('5')">5D</button>
+          <button class="timeframe-btn" onclick="changeTimeframe('15')">15M</button>
+          <button class="timeframe-btn" onclick="changeTimeframe('60')">1H</button>
+          <button class="timeframe-btn" onclick="changeTimeframe('D')">1D</button>
+          <button class="timeframe-btn" onclick="changeTimeframe('W')">1W</button>
+          <button class="timeframe-btn" onclick="changeTimeframe('M')">1M</button>
         </div>
+
         <div class="chart-box">
-          <h3>📈 1W Chart</h3>
-          <div class="chart-container" id="chart1W"></div>
+          <h3><i class="fas fa-chart-candlestick"></i> <span id="chartTitle">Price Chart</span></h3>
+          <div class="chart-container" id="mainChart"></div>
         </div>
       </div>
 
@@ -721,6 +754,9 @@ Version 11
     
     // STOCK DATA FROM YOUR CSVS
     let allStocks = [];
+    let currentTicker = '';
+    let currentTimeframe = 'D';
+    let chartWidget = null;
 
     window.addEventListener('load', async () => {
       await loadStocksFromCSV();
@@ -729,7 +765,6 @@ Version 11
     // ============ LOAD STOCKS FROM CSV ============
     async function loadStocksFromCSV() {
       try {
-        // Fetch your CSV files from Netlify public folder
         const csvFiles = [
           '2025-11-20-watchlist.csv',
           '2025-11-20-watchlist-Priority.csv',
@@ -751,7 +786,6 @@ Version 11
         }
 
         if (allStocks.length === 0) {
-          // Fallback: use hardcoded watchlist
           allStocks = generateFallbackWatchlist();
         }
 
@@ -770,7 +804,7 @@ Version 11
       const lines = csv.trim().split('\n');
       const headers = lines[0].split(',').map(h => h.trim());
       const rows = [];
-
+      
       for (let i = 1; i < lines.length; i++) {
         const values = lines[i].split(',').map(v => v.trim());
         if (values[0]) {
@@ -933,6 +967,7 @@ Version 11
       document.getElementById('newsletterPage').classList.remove('active');
       document.getElementById('researchPage').classList.add('active');
 
+      currentTicker = ticker;
       let stock = allStocks.find(s => (s.Symbol || s['Symbol.1']) === ticker);
       if (!stock) stock = {Symbol: ticker, Last: 0, Change: 0};
 
@@ -942,7 +977,7 @@ Version 11
       const analysis = await callAI(analysisPrompt);
       document.getElementById('stockAnalysis').textContent = analysis;
 
-      renderCharts(ticker);
+      renderChart(ticker, 'D');
 
       const technicalPrompt = `Technical analysis for ${ticker}. 2 sentences on setup.`;
       const tech = await callAI(technicalPrompt);
@@ -962,33 +997,59 @@ Version 11
       toggleAI(true);
     }
 
-    function renderCharts(ticker) {
-      document.getElementById('chart1D').innerHTML = '';
-      document.getElementById('chart1W').innerHTML = '';
+    function renderChart(ticker, timeframe) {
+      currentTimeframe = timeframe;
+      
+      // Clear existing chart
+      document.getElementById('mainChart').innerHTML = '';
 
-      new TradingView.widget({
-        "container_id": "chart1D",
+      // Update chart title
+      const timeframeMap = {
+        '1': '1 Minute',
+        '5': '5 Minutes',
+        '15': '15 Minutes',
+        '60': '1 Hour',
+        'D': 'Daily',
+        'W': 'Weekly',
+        'M': 'Monthly'
+      };
+      document.getElementById('chartTitle').textContent = `${ticker} - ${timeframeMap[timeframe] || timeframe}`;
+
+      // Create new chart
+      chartWidget = new TradingView.widget({
+        "container_id": "mainChart",
         "width": "100%",
         "height": "100%",
         "symbol": ticker,
-        "interval": "1",
+        "interval": timeframe,
         "timezone": "America/New_York",
         "theme": "dark",
         "style": "1",
-        "studies": ["BB@tv-basicstudies", "MACD@tv-basicstudies", "RSI@tv-basicstudies", "Vol@tv-basicstudies"]
+        "locale": "en",
+        "toolbar_bg": "#1a1a3e",
+        "enable_publishing": false,
+        "hide_top_toolbar": false,
+        "hide_legend": false,
+        "save_image": true,
+        "studies": [
+          "BB@tv-basicstudies",
+          "MACD@tv-basicstudies", 
+          "RSI@tv-basicstudies",
+          "Volume@tv-basicstudies"
+        ],
+        "show_popup_button": true,
+        "popup_width": "1000",
+        "popup_height": "650"
       });
+    }
 
-      new TradingView.widget({
-        "container_id": "chart1W",
-        "width": "100%",
-        "height": "100%",
-        "symbol": ticker,
-        "interval": "W",
-        "timezone": "America/New_York",
-        "theme": "dark",
-        "style": "1",
-        "studies": ["BB@tv-basicstudies", "MACD@tv-basicstudies", "RSI@tv-basicstudies"]
-      });
+    function changeTimeframe(timeframe) {
+      // Update button states
+      document.querySelectorAll('.timeframe-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      // Render chart with new timeframe
+      renderChart(currentTicker, timeframe);
     }
 
     async function callAI(prompt) {
@@ -1052,500 +1113,3 @@ Version 11
   </script>
 </body>
 </html>
-
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics - Production</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
-            min-height: 100vh;
-            color: #e0e0e0;
-        }
-
-        .top-nav {
-            background: rgba(0,0,0,0.3);
-            padding: 15px 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .nav-logo {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            cursor: pointer;
-        }
-
-        .nav-logo-text {
-            font-size: 1.5em;
-            font-weight: 700;
-            color: #667eea;
-        }
-
-        .nav-actions {
-            display: flex;
-            gap: 20px;
-        }
-
-        .nav-btn {
-            padding: 10px 20px;
-            background: rgba(102, 126, 234, 0.2);
-            border: 1px solid #667eea;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-
-        .nav-btn:hover {
-            background: rgba(102, 126, 234, 0.4);
-        }
-
-        .ai-chat-bar {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1500;
-        }
-
-        .chat-toggle-btn {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            border: none;
-            color: white;
-            font-size: 1.8em;
-            cursor: pointer;
-            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.5);
-            transition: all 0.3s;
-            position: relative;
-        }
-
-        .chat-toggle-btn:hover {
-            transform: scale(1.1);
-        }
-
-        .ai-pulse {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            width: 20px;
-            height: 20px;
-            background: #10b981;
-            border-radius: 50%;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.5; transform: scale(1.2); }
-        }
-
-        .chat-panel {
-            position: fixed;
-            bottom: 100px;
-            right: 30px;
-            width: 400px;
-            max-height: 600px;
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 20px;
-            border: 2px solid #8b5cf6;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-            display: none;
-            flex-direction: column;
-        }
-
-        .chat-panel.active {
-            display: flex;
-        }
-
-        .chat-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .chat-title {
-            font-size: 1.3em;
-            font-weight: 700;
-            color: #8b5cf6;
-        }
-
-        .chat-close {
-            background: none;
-            border: none;
-            color: #aaa;
-            font-size: 1.5em;
-            cursor: pointer;
-        }
-
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            max-height: 400px;
-        }
-
-        .chat-message {
-            margin-bottom: 15px;
-            padding: 12px;
-            border-radius: 10px;
-            line-height: 1.6;
-            font-size: 0.9em;
-        }
-
-        .chat-message.user {
-            background: rgba(102, 126, 234, 0.2);
-            margin-left: 20px;
-        }
-
-        .chat-message.ai {
-            background: rgba(139, 92, 246, 0.2);
-            margin-right: 20px;
-        }
-
-        .chat-input-area {
-            padding: 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            display: flex;
-            gap: 10px;
-        }
-
-        .chat-input {
-            flex: 1;
-            padding: 12px;
-            background: rgba(255,255,255,0.1);
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 10px;
-            color: white;
-            outline: none;
-        }
-
-        .chat-send-btn {
-            padding: 12px 20px;
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-            border: none;
-            border-radius: 10px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .container {
-            max-width: 1800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        .market-story-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 40px 20px;
-            text-align: center;
-            color: white;
-            border-radius: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
-        }
-
-        .story-title {
-            font-size: 2.8em;
-            font-weight: 700;
-            margin-bottom: 20px;
-        }
-
-        .story-narrative {
-            font-size: 1.2em;
-            line-height: 1.6;
-            padding: 20px;
-        }
-
-        .api-status {
-            font-size: 0.9em;
-            color: rgba(255,255,255,0.7);
-            margin-top: 15px;
-        }
-
-        .proprietary-badge {
-            display: inline-block;
-            background: rgba(16, 185, 129, 0.2);
-            padding: 8px 20px;
-            border-radius: 20px;
-            border: 2px solid #10b981;
-            color: #10b981;
-            font-weight: 700;
-            margin: 10px 5px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .proprietary-badge:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
-        }
-
-        .search-section {
-            max-width: 900px;
-            margin: 30px auto;
-        }
-
-        .search-bar {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-
-        .search-input {
-            flex: 1;
-            min-width: 250px;
-            padding: 20px 28px;
-            font-size: 1.3em;
-            background: rgba(255,255,255,0.12);
-            border: 2px solid rgba(255,255,255,0.25);
-            border-radius: 15px;
-            color: white;
-            outline: none;
-        }
-
-        .analyze-btn {
-            padding: 20px 45px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border: none;
-            border-radius: 15px;
-            color: white;
-            font-size: 1.3em;
-            font-weight: 700;
-            cursor: pointer;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 16px 32px;
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-weight: 700;
-            cursor: pointer;
-            font-size: 1.05em;
-            transition: all 0.3s;
-        }
-
-        .btn-scanner {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        }
-
-        .btn-brief {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-        }
-
-        .btn-ai {
-            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
-        }
-
-        .filter-buttons {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin: 20px 0;
-            justify-content: center;
-        }
-
-        .filter-btn {
-            padding: 10px 20px;
-            border-radius: 20px;
-            border: 2px solid #667eea;
-            background: transparent;
-            color: #667eea;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: 600;
-        }
-
-        .filter-btn:hover {
-            background: rgba(102, 126, 234, 0.2);
-        }
-
-        .filter-btn.active {
-            background: #667eea;
-            color: white;
-        }
-
-        .plays-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
-            margin-top: 30px;
-        }
-
-        .play-card {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 20px;
-            padding: 30px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            transition: all 0.3s;
-        }
-
-        .play-card:hover {
-            transform: translateY(-5px);
-            border-color: #667eea;
-        }
-
-        .play-ticker {
-            font-size: 2.2em;
-            font-weight: 700;
-            color: #fff;
-            margin-bottom: 10px;
-        }
-
-        .signal-badge {
-            display: inline-block;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.9em;
-            margin: 5px 5px 15px 0;
-        }
-
-        .signal-strong-buy {
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: white;
-        }
-
-        .signal-accumulate {
-            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-            color: white;
-        }
-
-        .play-metrics {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin: 15px 0;
-        }
-
-        .play-metric {
-            background: rgba(102, 126, 234, 0.12);
-            padding: 12px;
-            border-radius: 10px;
-        }
-
-        .metric-label {
-            font-size: 0.85em;
-            color: #999;
-            text-transform: uppercase;
-        }
-
-        .metric-value {
-            font-size: 1.3em;
-            font-weight: 700;
-            color: #fff;
-            margin-top: 5px;
-        }
-
-        .proprietary-insight {
-            background: rgba(16, 185, 129, 0.15);
-            border-left: 4px solid #10b981;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            font-size: 0.9em;
-            line-height: 1.5;
-        }
-
-        .ai-insight-box {
-            background: rgba(139, 92, 246, 0.15);
-            border-left: 4px solid #8b5cf6;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            line-height: 1.8;
-        }
-
-        .newsletter-section {
-            background: linear-gradient(145deg, #2d2d44 0%, #1f1f2e 100%);
-            border-radius: 25px;
-            padding: 50px;
-            margin: 30px 0;
-        }
-
-        .newsletter-header {
-            text-align: center;
-            margin-bottom: 40px;
-            padding-bottom: 30px;
-            border-bottom: 2px solid rgba(102, 126, 234, 0.3);
-        }
-
-        .newsletter-title {
-            font-size: 2.5em;
-            color: #667eea;
-            margin-bottom: 15px;
-        }
-
-        .tldr-box {
-            background: rgba(16, 185, 129, 0.15);
-            border-left: 5px solid #10b981;
-            padding: 25px;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-
-        .section-header {
-            background: rgba(102, 126, 234, 0.15);
-            padding: 20px 30px;
-            border-radius: 15px;
-            margin: 30px 0 20px 0;
-            border-left: 5px solid #667eea;
-        }
-
-        .stock-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .stock-list li {
-            padding: 20px;
-            margin: 15px 0;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 12px;
-            border-left: 4px solid #10b981;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .stock-list li:hover {
-            background: rgba(102, 126, 234, 0.2);
-            transform: translateX(10px);
-        }
-
-        .table-container {
-            overflow-x: auto;
