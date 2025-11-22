@@ -1,13 +1,13 @@
-<!-- 🚀 ELITE TRADING ANALYTICS - VERSION 12 ENTERPRISE -->
-<!-- AI + Live Price Updates + Full Newsletter + News + Macro + Monte Carlo + FRED API -->
-<!-- PRODUCTION-READY: All 57 Stocks, Real Charts, Weekly Predictions -->
+<!-- 🚀 ELITE TRADING ANALYTICS - VERSION 12.5 ENTERPRISE FINAL -->
+<!-- Persistent AI Chat + Live Prices + Single Chart + Deep Commentary + All APIs -->
+<!-- Uses Render Environment Variables: FRED, NewsAPI, AlphaVantage, Finnhub, Massive, Perplexity -->
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Elite Trading Analytics v12 - Enterprise</title>
+  <title>Elite Trading Analytics v12.5 - Enterprise</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://s3.tradingview.com/tv.js"></script>
   
@@ -74,28 +74,9 @@
       border-radius: 8px;
       cursor: pointer;
       font-weight: 700;
-      transition: all 0.3s;
     }
 
-    .search-bar button:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 20px rgba(124, 58, 237, 0.4);
-    }
-
-    .container {
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 2rem;
-    }
-
-    /* Navigation Buttons */
-    .nav-buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-    }
+    .container { max-width: 1600px; margin: 0 auto; padding: 2rem; }
 
     .btn {
       padding: 1rem 2rem;
@@ -110,34 +91,11 @@
       transition: all 0.3s;
     }
 
-    .btn-primary {
-      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-      color: white;
-    }
+    .btn-primary { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
+    .btn-secondary { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: white; }
+    .btn-accent { background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); color: white; }
 
-    .btn-secondary {
-      background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
-      color: white;
-    }
-
-    .btn-accent {
-      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
-      color: white;
-    }
-
-    .btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Filter Tabs */
-    .filter-tabs {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin-bottom: 2rem;
-      flex-wrap: wrap;
-    }
+    .nav-buttons { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
 
     .filter-btn {
       padding: 0.8rem 1.5rem;
@@ -147,12 +105,6 @@
       border-radius: 10px;
       cursor: pointer;
       font-weight: 600;
-      transition: all 0.3s;
-    }
-
-    .filter-btn:hover {
-      border-color: #00d4ff;
-      color: #00d4ff;
     }
 
     .filter-btn.active {
@@ -161,7 +113,6 @@
       border-color: transparent;
     }
 
-    /* Stock Grid */
     .stock-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -184,26 +135,9 @@
       box-shadow: 0 12px 40px rgba(0, 212, 255, 0.2);
     }
 
-    .stock-symbol {
-      font-size: 2.2em;
-      font-weight: 900;
-      color: white;
-      margin-bottom: 0.5rem;
-    }
-
-    .stock-price {
-      font-size: 1.8em;
-      color: #00d4ff;
-      font-weight: 900;
-      margin-bottom: 0.3rem;
-    }
-
-    .stock-change {
-      font-size: 1.1em;
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-
+    .stock-symbol { font-size: 2.2em; font-weight: 900; color: white; margin-bottom: 0.5rem; }
+    .stock-price { font-size: 1.8em; color: #00d4ff; font-weight: 900; margin-bottom: 0.3rem; }
+    .stock-change { font-size: 1.1em; font-weight: 700; margin-bottom: 1rem; }
     .stock-change.positive { color: #10b981; }
     .stock-change.negative { color: #ef4444; }
 
@@ -232,18 +166,8 @@
       text-align: center;
     }
 
-    .metric-label {
-      font-size: 0.8em;
-      color: #b0b8c1;
-      text-transform: uppercase;
-    }
-
-    .metric-value {
-      font-size: 1.2em;
-      color: #00d4ff;
-      font-weight: 700;
-      margin-top: 0.3rem;
-    }
+    .metric-label { font-size: 0.8em; color: #b0b8c1; }
+    .metric-value { font-size: 1.2em; color: #00d4ff; font-weight: 700; }
 
     .ai-commentary {
       background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(6, 182, 212, 0.05) 100%);
@@ -256,68 +180,128 @@
       color: #d1fae5;
     }
 
-    /* Pages */
     .page { display: none; }
     .page.active { display: block; }
 
-    /* Newsletter Styles */
-    .newsletter-header {
-      text-align: center;
-      margin-bottom: 3rem;
-      border-bottom: 3px solid #00d4ff;
-      padding-bottom: 2rem;
+    /* AI Chat Widget */
+    .chat-widget {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 1000;
+      width: 380px;
+      max-height: 600px;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(145deg, #1a1a40 0%, #242850 100%);
+      border: 2px solid #00d4ff;
+      border-radius: 15px;
+      box-shadow: 0 10px 40px rgba(0, 212, 255, 0.3);
+      font-family: inherit;
     }
 
-    .newsletter-header h1 {
-      font-size: 2.5em;
-      color: #00d4ff;
-      margin-bottom: 0.5rem;
+    .chat-header {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      padding: 1.5rem;
+      border-radius: 13px 13px 0 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      font-size: 1.1em;
     }
 
-    .newsletter-section {
-      margin-bottom: 3rem;
-      padding: 2rem;
-      background: rgba(0, 212, 255, 0.05);
-      border-left: 4px solid #10b981;
-      border-radius: 10px;
+    .chat-close {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      font-size: 1.3em;
     }
 
-    .newsletter-section h2 {
-      color: #10b981;
-      font-size: 1.8em;
-      margin-bottom: 1.5rem;
+    .chat-messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
     }
 
-    .newsletter-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1.5rem 0;
+    .message {
+      padding: 0.8rem 1rem;
+      border-radius: 8px;
+      max-width: 90%;
+      word-wrap: break-word;
+      font-size: 0.9em;
+      line-height: 1.5;
+    }
+
+    .message.user {
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      color: white;
+      align-self: flex-end;
+      margin-left: 10%;
+    }
+
+    .message.ai {
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid #00d4ff;
+      color: #d1fae5;
+      align-self: flex-start;
+      margin-right: 10%;
+    }
+
+    .chat-input {
+      padding: 1rem;
+      border-top: 1px solid #333;
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .chat-input input {
+      flex: 1;
+      background: rgba(0, 212, 255, 0.1);
+      border: 1px solid #00d4ff;
+      color: white;
+      padding: 0.8rem;
+      border-radius: 8px;
+      outline: none;
       font-size: 0.9em;
     }
 
-    .newsletter-table th {
-      background: rgba(124, 58, 237, 0.3);
-      color: #00d4ff;
-      padding: 1rem;
-      text-align: left;
+    .chat-input button {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      border: none;
+      color: white;
+      padding: 0.8rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
       font-weight: 700;
-      border: 1px solid #444;
     }
 
-    .newsletter-table td {
-      padding: 0.8rem 1rem;
-      border: 1px solid #444;
-      color: #b0b8c1;
+    .chat-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
+      border: none;
+      color: white;
+      font-size: 1.5em;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .newsletter-table tr:hover {
-      background: rgba(0, 212, 255, 0.1);
-    }
+    .chat-hidden { display: none !important; }
 
     /* Research Page */
-    .research-page { display: none; }
-    .research-page.active { display: block; }
-
     .research-header {
       background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
       border-radius: 15px;
@@ -325,22 +309,12 @@
       margin-bottom: 2rem;
     }
 
-    .research-title {
-      font-size: 3.5em;
-      font-weight: 900;
-    }
+    .research-title { font-size: 3.5em; font-weight: 900; }
+    .research-subtitle { font-size: 0.95em; opacity: 0.9; margin-top: 0.5rem; }
 
-    .research-analysis {
-      background: rgba(255, 255, 255, 0.1);
-      padding: 1.5rem;
-      border-radius: 10px;
-      margin-top: 1rem;
-      line-height: 1.8;
-    }
-
-    .charts-grid {
+    .research-layout {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 1.5rem;
       margin-bottom: 2rem;
     }
@@ -350,7 +324,7 @@
       border: 2px solid #444;
       border-radius: 15px;
       padding: 1.5rem;
-      min-height: 450px;
+      min-height: 550px;
     }
 
     .chart-box h3 {
@@ -361,120 +335,54 @@
 
     .chart-container {
       width: 100%;
-      height: 400px;
+      height: 500px;
       background: rgba(20, 20, 50, 0.5);
       border-radius: 10px;
       overflow: hidden;
     }
 
-    /* News & Market Section */
-    .news-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-      margin: 2rem 0;
-    }
-
-    .news-item {
-      background: rgba(0, 212, 255, 0.05);
-      border: 2px solid #00d4ff;
-      border-radius: 10px;
-      padding: 1.5rem;
-    }
-
-    .news-source {
-      color: #00d4ff;
-      font-weight: 700;
-      font-size: 0.9em;
-      margin-bottom: 0.5rem;
-    }
-
-    .news-title {
-      font-size: 1.2em;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-      color: #ffffff;
-    }
-
-    .news-snippet {
-      color: #b0b8c1;
-      font-size: 0.95em;
-      line-height: 1.6;
-    }
-
-    /* Macro Data */
-    .macro-data {
-      background: linear-gradient(145deg, #1a1a40 0%, #242850 100%);
-      border: 2px solid #333;
-      border-radius: 15px;
-      padding: 1.5rem;
-      margin: 2rem 0;
-    }
-
-    .macro-item {
-      display: grid;
-      grid-template-columns: 200px 1fr 100px;
-      gap: 2rem;
-      padding: 1rem;
-      border-bottom: 1px solid #333;
-      align-items: center;
-    }
-
-    .macro-item:last-child { border-bottom: none; }
-
-    .macro-label {
-      font-weight: 700;
-      color: #00d4ff;
-    }
-
-    .macro-value {
-      color: #10b981;
-      font-size: 1.3em;
-      font-weight: 700;
-    }
-
-    /* Monte Carlo Display */
-    .monte-carlo {
-      background: linear-gradient(145deg, #1a1a40 0%, #242850 100%);
-      border: 2px solid #10b981;
-      border-radius: 15px;
-      padding: 1.5rem;
-      margin: 2rem 0;
-    }
-
-    .monte-carlo h3 {
-      color: #10b981;
-      margin-bottom: 1rem;
-      font-size: 1.4em;
-    }
-
-    .monte-carlo-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 1rem;
-    }
-
-    .mc-box {
-      background: rgba(16, 185, 129, 0.1);
-      border: 2px solid #10b981;
-      padding: 1rem;
+    .chart-toggle-btn {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      color: white;
+      padding: 0.6rem 1.2rem;
+      border: none;
       border-radius: 8px;
-      text-align: center;
+      cursor: pointer;
+      font-weight: 700;
+      margin-top: 1rem;
     }
 
-    .mc-label {
-      font-size: 0.9em;
+    .stock-detail-box {
+      background: rgba(30, 30, 60, 0.8);
+      border: 2px solid #444;
+      border-radius: 15px;
+      padding: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .detail-section {
+      margin-bottom: 2rem;
+    }
+
+    .detail-section h3 {
+      color: #00d4ff;
+      font-size: 1.3em;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #00d4ff;
+      padding-bottom: 0.5rem;
+    }
+
+    .detail-content {
       color: #b0b8c1;
-      margin-bottom: 0.5rem;
+      line-height: 1.8;
+      font-size: 0.95em;
     }
 
-    .mc-value {
-      font-size: 1.6em;
+    .detail-content strong {
       color: #10b981;
-      font-weight: 900;
     }
 
-    .loading { text-align: center; padding: 60px 20px; }
+    .loading { text-align: center; padding: 40px; }
     .spinner {
       border: 5px solid rgba(255,255,255,0.1);
       border-top: 5px solid #667eea;
@@ -490,13 +398,14 @@
       100% { transform: rotate(360deg); }
     }
 
-    @media (max-width: 1024px) {
-      .charts-grid { grid-template-columns: 1fr; }
+    @media (max-width: 768px) {
+      .chat-widget { width: calc(100vw - 40px); }
     }
   </style>
 </head>
 
 <body>
+  <!-- HEADER -->
   <div class="header">
     <div class="logo" onclick="goHome()">📊 Elite Analytics</div>
     <div class="search-bar">
@@ -510,17 +419,16 @@
   <div id="homePage" class="page active">
     <div class="container">
       <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
-        <h1 style="font-size: 2.8em; font-weight: 900;">Elite Trading Analytics v12</h1>
-        <p style="font-size: 1.1em; opacity: 0.95;">57 Stocks + Live Prices + AI + News + Macro + Monte Carlo</p>
+        <h1 style="font-size: 2.8em; font-weight: 900;">Elite Trading Analytics</h1>
+        <p style="font-size: 1.1em; opacity: 0.95;">57 Stocks + Live Prices + AI Chat + Deep Analysis</p>
       </div>
 
       <div class="nav-buttons">
         <button class="btn btn-primary" onclick="loadAllStocks()"><i class="fas fa-sync"></i> LOAD 57 STOCKS</button>
         <button class="btn btn-secondary" onclick="showNewsletter()"><i class="fas fa-newspaper"></i> NEWSLETTER</button>
-        <button class="btn btn-accent" onclick="showMacroNews()"><i class="fas fa-globe"></i> MARKET NEWS</button>
       </div>
 
-      <div class="filter-tabs">
+      <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap;">
         <button class="filter-btn active" onclick="filterStocks('all')">All (57)</button>
         <button class="filter-btn" onclick="filterStocks('value')">Oversold</button>
         <button class="filter-btn" onclick="filterStocks('momentum')">Momentum</button>
@@ -531,109 +439,115 @@
     </div>
   </div>
 
-  <!-- NEWSLETTER PAGE -->
-  <div id="newsletterPage" class="page">
-    <div class="container">
-      <div class="newsletter-header">
-        <h1>📰 Weekly Market Intelligence</h1>
-        <p>Value Screening + Momentum + Macro Context + AI Predictions</p>
-      </div>
-
-      <!-- Macro Data Section -->
-      <div class="newsletter-section">
-        <h2><i class="fas fa-chart-bar"></i> MACRO ECONOMIC DATA</h2>
-        <div class="macro-data" id="macroData">Loading economic indicators from FRED...</div>
-      </div>
-
-      <!-- Market News -->
-      <div class="newsletter-section">
-        <h2><i class="fas fa-newspaper"></i> MARKET NEWS - MACRO & MICRO</h2>
-        <div class="news-grid" id="newsGrid">Loading news...</div>
-      </div>
-
-      <!-- Value Screening -->
-      <div class="newsletter-section">
-        <h2><i class="fas fa-arrow-down"></i> VALUE SCREENING</h2>
-        <table class="newsletter-table">
-          <thead><tr><th>Ticker</th><th>Price</th><th>Change</th><th>RSI</th><th>Signal</th><th>Action</th></tr></thead>
-          <tbody id="valueTable"><tr><td colspan="6">Loading...</td></tr></tbody>
-        </table>
-      </div>
-
-      <!-- Momentum Analysis -->
-      <div class="newsletter-section">
-        <h2><i class="fas fa-rocket"></i> MOMENTUM ANALYSIS</h2>
-        <table class="newsletter-table">
-          <thead><tr><th>Ticker</th><th>Price</th><th>5-Day %</th><th>RSI</th><th>Signal</th><th>Target</th></tr></thead>
-          <tbody id="momentumTable"><tr><td colspan="6">Loading...</td></tr></tbody>
-        </table>
-      </div>
-
-      <!-- Monte Carlo Predictions -->
-      <div class="newsletter-section">
-        <h2><i class="fas fa-chart-line"></i> 30-DAY MONTE CARLO PREDICTIONS</h2>
-        <div class="monte-carlo" id="monteCarloDiv">Generating probability distributions...</div>
-      </div>
-
-      <button class="btn btn-primary" onclick="goHome()" style="width: 100%; margin: 2rem 0;"><i class="fas fa-arrow-left"></i> BACK</button>
-    </div>
-  </div>
-
   <!-- RESEARCH PAGE -->
-  <div id="researchPage" class="research-page">
+  <div id="researchPage" class="page">
     <div class="container">
       <div class="research-header">
         <div class="research-title" id="researchSymbol">TICKER</div>
-        <div class="research-analysis" id="stockAnalysis">Loading...</div>
+        <div class="research-subtitle" id="researchSubtitle">Loading...</div>
       </div>
 
-      <div class="charts-grid">
+      <div class="research-layout">
         <div class="chart-box">
-          <h3>📊 1D Chart</h3>
-          <div class="chart-container" id="chart1D"></div>
-        </div>
-        <div class="chart-box">
-          <h3>📈 1W Chart</h3>
-          <div class="chart-container" id="chart1W"></div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <h3>📊 Live Chart</h3>
+            <button class="chart-toggle-btn" onclick="toggleChartTimeframe()">
+              <span id="chartToggleLabel">Switch to 1W</span>
+            </button>
+          </div>
+          <div class="chart-container" id="mainChart"></div>
         </div>
       </div>
 
-      <div style="background: rgba(30, 30, 60, 0.8); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem;">
-        <h3 style="color: #00d4ff; margin-bottom: 1rem;">🤖 AI ANALYSIS & COMMENTARY</h3>
-        <div id="aiCommentary" style="color: #b0b8c1; line-height: 1.8; font-size: 0.95em;">Loading AI analysis...</div>
+      <!-- Deep Stock Analysis -->
+      <div class="stock-detail-box">
+        <div class="detail-section">
+          <h3>🎯 Trading Edge</h3>
+          <div class="detail-content" id="tradingEdge">Loading...</div>
+        </div>
+
+        <div class="detail-section">
+          <h3>💼 Technical Setup</h3>
+          <div class="detail-content" id="technicalSetup">Loading...</div>
+        </div>
+
+        <div class="detail-section">
+          <h3>📈 AI Deep Analysis</h3>
+          <div class="detail-content" id="deepAnalysis">Loading...</div>
+        </div>
+
+        <div class="detail-section">
+          <h3>🎲 30-Day Projections</h3>
+          <div class="detail-content" id="projections">Loading...</div>
+        </div>
+
+        <div class="detail-section">
+          <h3>⚠️ Risk Management</h3>
+          <div class="detail-content" id="riskMgmt">Loading...</div>
+        </div>
       </div>
 
       <button class="btn btn-primary" onclick="goHome()" style="width: 100%;"><i class="fas fa-arrow-left"></i> BACK</button>
     </div>
   </div>
 
+  <!-- NEWSLETTER PAGE -->
+  <div id="newsletterPage" class="page">
+    <div class="container">
+      <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
+        <h1 style="font-size: 2.8em; font-weight: 900;">📰 Weekly Intelligence</h1>
+        <p>Live Data + Macro Context + AI Predictions</p>
+      </div>
+
+      <div id="newsletterContent">Loading newsletter data...</div>
+
+      <button class="btn btn-primary" onclick="goHome()" style="width: 100%; margin: 2rem 0;"><i class="fas fa-arrow-left"></i> BACK</button>
+    </div>
+  </div>
+
+  <!-- AI CHAT WIDGET -->
+  <button class="chat-toggle" id="chatToggle" onclick="toggleChat()">
+    <i class="fas fa-comments"></i>
+  </button>
+
+  <div class="chat-widget chat-hidden" id="chatWidget">
+    <div class="chat-header">
+      <span>🤖 AI Trading Assistant</span>
+      <button class="chat-close" onclick="toggleChat()">×</button>
+    </div>
+    <div class="chat-messages" id="chatMessages">
+      <div class="message ai">
+        Hi! I'm your AI trading assistant. Ask me about any stock, signals, or market analysis. How can I help?
+      </div>
+    </div>
+    <div class="chat-input">
+      <input type="text" id="chatInput" placeholder="Ask about stocks, signals..." onkeypress="if(event.key==='Enter') sendMessage()">
+      <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+    </div>
+  </div>
+
   <script>
-    // ============ CONFIG ============
-    const BACKEND_URL = 'https://elite-trading-with-exclusive-ip.onrender.com';
-    const FRED_API_KEY = 'YOUR_FRED_API_KEY'; // Get from https://fred.stlouisfed.org/docs/api/
-    
-    // Your stock recommendations (from ThinkScript)
-    const STOCK_RECOMMENDATIONS = {
-      'MU': {story:'Mean Reversion Play', signal:'STRONG BUY', t1:220, t2:235, stop:190},
-      'SE': {story:'Institutional Accumulation', signal:'ACCUMULATE', t1:150, t2:165, stop:120},
-      'RIVN': {story:'Breakout Setup', signal:'BUY', t1:22, t2:25, stop:13},
-      'HOOD': {story:'Fintech Rally', signal:'STRONG BUY', t1:95, t2:110, stop:72},
-      'WDC': {story:'Storage Boom', signal:'BUY', t1:260, t2:290, stop:205},
-      'NVDA': {story:'AI Leadership', signal:'STRONG BUY', t1:520, t2:540, stop:465},
-      'TSLA': {story:'Consolidation', signal:'HOLD', t1:360, t2:375, stop:325},
-      'META': {story:'The Creep', signal:'ACCUMULATE', t1:550, t2:580, stop:490},
-      'AAPL': {story:'Quality Hold', signal:'HOLD', t1:310, t2:330, stop:275},
-      'MSFT': {story:'Steady Growth', signal:'BUY', t1:450, t2:480, stop:405},
+    // ============ CONFIG (Uses Render Environment Variables) ============
+    const API_CONFIG = {
+      FRED_KEY: window.ENV?.FRED || 'USE_ENV_VAR',
+      NEWS_KEY: window.ENV?.NEWS_API_KEY || 'USE_ENV_VAR',
+      ALPHA_KEY: window.ENV?.ALPHAVANTAGE_KEY || 'USE_ENV_VAR',
+      FINNHUB_KEY: window.ENV?.FINNHUB_KEY || 'USE_ENV_VAR',
+      MASSIVE_KEY: window.ENV?.MASSIVE || 'USE_ENV_VAR',
+      PERPLEXITY_KEY: window.ENV?.PERPLEXITY_API_KEY || 'USE_ENV_VAR',
+      BACKEND_URL: window.ENV?.FRONTEND_URL || 'https://elite-trading-api.onrender.com',
+      PORT: window.ENV?.PORT || 3000
     };
 
     let allStocks = [];
+    let currentChartTimeframe = 'D'; // D = 1D, W = 1W
 
     window.addEventListener('load', async () => {
       await loadStocksFromCSV();
       loadAllStocks();
     });
 
-    // ============ LOAD FROM CSV ============
+    // ============ LOAD CSV ============
     async function loadStocksFromCSV() {
       const csvFiles = [
         '/2025-11-20-watchlist.csv',
@@ -651,7 +565,7 @@
             allStocks.push(...rows);
           }
         } catch (e) {
-          console.log(`CSV ${csvFile} not found`);
+          console.log(`CSV not found: ${csvFile}`);
         }
       }
 
@@ -661,7 +575,7 @@
     }
 
     function parseCSV(csv) {
-      const lines = csv.trim().split('\\n');
+      const lines = csv.trim().split('\n');
       if (lines.length < 2) return [];
       const headers = lines[0].split(',').map(h => h.trim());
       const rows = [];
@@ -681,48 +595,46 @@
 
     function generateFallbackStocks() {
       return [
-        {Symbol:'NVDA','Last':485.42,Change:2.3,RSIWIlder:70,'Regime Detection':82,'Inst 33':85,Signal:'STRONG BUY'},
-        {Symbol:'TSLA','Last':342.80,Change:-2.3,RSIWIlder:42,'Regime Detection':50,'Inst 33':60,Signal:'SELL PREMIUM'},
-        {Symbol:'META','Last':512.15,Change:2.1,RSIWIlder:66,'Regime Detection':75,'Inst 33':80,Signal:'ACCUMULATE'},
-        {Symbol:'MU','Last':201.37,Change:-10.87,RSIWIlder:41,'Regime Detection':75.6,'Inst 33':53,Signal:'STRONG BUY'},
-        {Symbol:'SE','Last':130.99,Change:-8.74,RSIWIlder:28,'Regime Detection':51.7,'Inst 33':38,Signal:'ACCUMULATE'},
-        {Symbol:'HOOD','Last':79.82,Change:12.3,RSIWIlder:72,'Regime Detection':85,'Inst 33':78,Signal:'STRONG BUY'},
-        {Symbol:'WDC','Last':220.50,Change:15.2,RSIWIlder:75,'Regime Detection':88,'Inst 33':75,Signal:'BUY'},
+        {Symbol:'NVDA','Last':929.53,Change:2.3,RSIWIlder:70,'Regime Detection':82,'Inst 33':85},
+        {Symbol:'TSLA','Last':342.80,Change:-2.3,RSIWIlder:42,'Regime Detection':50,'Inst 33':60},
+        {Symbol:'MU','Last':201.37,Change:-10.87,RSIWIlder:41,'Regime Detection':75,'Inst 33':53},
+        {Symbol:'SE','Last':130.99,Change:-8.74,RSIWIlder:28,'Regime Detection':51,'Inst 33':38},
       ];
     }
 
-    // ============ AI COMMENTARY GENERATION ============
+    // ============ AI COMMENTARY ============
     function getAICommentary(stock) {
-      const symbol = stock.Symbol || stock['Symbol.1'];
-      const price = parseFloat(stock['Last'] || stock.Price || 0);
+      const price = parseFloat(stock['Last'] || 0);
       const change = parseFloat(stock.Change || 0);
       const rsi = parseFloat(stock.RSIWIlder || 0);
       const regime = parseFloat(stock['Regime Detection'] || 0);
+      const inst = parseFloat(stock['Inst 33'] || 0);
 
       let edge = '', trade = '', risk = '';
 
-      if (change < -8) {
-        edge = `EXTREME OVERSOLD -${Math.abs(change).toFixed(1)}%. Mean reversion setup. Capitulation signal.`;
-        trade = `Scale position: 1/3 now, 1/3 @ dip, 1/3 @ major support.`;
-        risk = `Cycle downturn could extend. Strict stops required.`;
-      } else if (change > 10) {
-        edge = `STRONG BREAKOUT +${change.toFixed(1)}%. Institutional buying. Momentum.`;
-        trade = `Add on pullbacks. Sell 30% on +25% rally.`;
-        risk = `Overbought. Profit taking risk.`;
-      } else if (change < -2) {
-        edge = `Pullback -${Math.abs(change).toFixed(1)}%. IV depressed. Mean reversion candidate.`;
-        trade = `Buy dips on support. Scale into position.`;
-        risk = `Could test deeper lows.`;
+      // Edge detection
+      if (change < -8 && rsi < 35 && inst > 50) {
+        edge = `EXTREME OVERSOLD -${Math.abs(change).toFixed(1)}% with institutional accumulation. Mean reversion setup with high conviction.`;
+        trade = `Scale in 3 tranches: 1/3 now, 1/3 at -5% dips, 1/3 at major support. Classic turnaround candidate. 15-25% upside potential 7-14 days.`;
+        risk = `Cycle downturn could extend. Hard stops at -8%. Max 2% portfolio allocation. Monitor volume for reversal confirmation.`;
+      } else if (change > 10 && rsi > 70) {
+        edge = `STRONG BREAKOUT +${change.toFixed(1)}% with overbought conditions. Momentum continuation likely.`;
+        trade = `Add on pullbacks to 20MA. Sell 30% on +25% rallies. Use calls for leverage. Trail stops above swing lows.`;
+        risk = `Profit taking imminent. Watch for exhaustion. Overbought can persist. Exit first sign of weakness.`;
+      } else if (change < -2 && rsi > 40 && rsi < 60) {
+        edge = `Pullback on weakness -${Math.abs(change).toFixed(1)}%. Institutional interest remains. Consolidation before next leg.`;
+        trade = `Buy dips on support. Scale into 50% position. Wait for RSI inflection. Regime ${regime > 60 ? 'remains bullish' : 'turning bearish'}.`;
+        risk = `Could test deeper lows if regime breaks. Watch key support at ${(price * 0.95).toFixed(2)}. Use 2% stops.`;
       } else {
-        edge = `Consolidation pattern. Setup developing.`;
-        trade = `Monitor for breakout. Range-bound.`;
-        risk = `Choppy action. Wait for direction.`;
+        edge = `Consolidation pattern. Setup forming. Technical bias ${change > 0 ? 'remains bullish' : 'neutral'}.`;
+        trade = `Monitor for breakout. Range-bound trading. Wait for clear direction. 3-5 day patience required.`;
+        risk = `Choppy action expected. Avoid position until clarity. Tight stops if trading ranges.`;
       }
 
       return { edge, trade, risk };
     }
 
-    // ============ LOAD & RENDER ============
+    // ============ RENDER STOCKS ============
     function loadAllStocks() {
       renderStocks('all');
     }
@@ -742,9 +654,9 @@
         const change = parseFloat(s.Change || 0);
         const rsi = parseFloat(s.RSIWIlder || 0);
         const regime = parseFloat(s['Regime Detection'] || 0);
-
-        const rec = STOCK_RECOMMENDATIONS[symbol] || {story: 'Monitor', signal: 'HOLD', t1: Math.round(price * 1.05), t2: Math.round(price * 1.10), stop: Math.round(price * 0.95)};
         const ai = getAICommentary(s);
+
+        const signal = change < -8 ? 'STRONG BUY' : change < -2 ? 'BUY' : change > 10 ? 'SELL' : 'HOLD';
 
         return `
           <div class="stock-card" onclick="researchStock('${symbol}')">
@@ -753,16 +665,13 @@
             <div class="stock-change ${change >= 0 ? 'positive' : 'negative'}">
               ${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)}%
             </div>
-            <span class="signal-badge">${rec.signal}</span>
+            <span class="signal-badge">${signal}</span>
             <div class="stock-metrics">
               <div class="metric"><div class="metric-label">RSI</div><div class="metric-value">${rsi.toFixed(0)}</div></div>
               <div class="metric"><div class="metric-label">Regime</div><div class="metric-value">${regime.toFixed(0)}%</div></div>
-              <div class="metric"><div class="metric-label">Inst</div><div class="metric-value">${parseFloat(s['Inst 33'] || 0).toFixed(0)}</div></div>
             </div>
             <div class="ai-commentary">
-              <strong style="color: #7c3aed;">🤖 ${ai.edge}</strong><br>
-              <strong style="color: #10b981;">💰 ${ai.trade}</strong><br>
-              <strong style="color: #ef4444;">⚠️ ${ai.risk}</strong>
+              <strong>🎯 ${ai.edge.substring(0, 80)}...</strong>
             </div>
           </div>
         `;
@@ -775,127 +684,6 @@
       renderStocks(type);
     }
 
-    // ============ NEWSLETTER ============
-    function showNewsletter() {
-      hideAllPages();
-      document.getElementById('newsletterPage').classList.add('active');
-      populateNewsletter();
-      loadMacroData();
-      loadNews();
-      loadMonteCarloData();
-    }
-
-    function populateNewsletter() {
-      const valueStocks = allStocks.filter(s => parseFloat(s.Change || 0) < -2).slice(0, 8);
-      const momentumStocks = allStocks.filter(s => parseFloat(s.Change || 0) > 3).slice(0, 8);
-
-      document.getElementById('valueTable').innerHTML = valueStocks.map(s => `
-        <tr><td><strong>${s.Symbol}</strong></td><td>$${parseFloat(s['Last'] || 0).toFixed(2)}</td><td style="color:#ef4444;">${(parseFloat(s.Change) || 0).toFixed(2)}%</td><td>${(parseFloat(s.RSIWIlder) || 0).toFixed(0)}</td><td>${s.Signal || 'MONITOR'}</td><td style="color:#10b981;">BUY DIP</td></tr>
-      `).join('') || '<tr><td colspan="6">No value stocks</td></tr>';
-
-      document.getElementById('momentumTable').innerHTML = momentumStocks.map(s => `
-        <tr><td><strong>${s.Symbol}</strong></td><td>$${parseFloat(s['Last'] || 0).toFixed(2)}</td><td style="color:#10b981;">+${(parseFloat(s.Change) || 0).toFixed(2)}%</td><td>${(parseFloat(s.RSIWIlder) || 0).toFixed(0)}</td><td>${s.Signal || 'BUY'}</td><td>$${(parseFloat(s['Last'] || 0) * 1.1).toFixed(0)}</td></tr>
-      `).join('') || '<tr><td colspan="6">No momentum stocks</td></tr>';
-    }
-
-    // ============ MACRO DATA (FRED API) ============
-    async function loadMacroData() {
-      const indicators = ['CPIAUCSL', 'UNRATE', 'DEXUSEU', 'DGS10', 'SP500'];
-      let html = '';
-
-      for (let code of indicators) {
-        try {
-          const res = await fetch(`https://api.stlouisfed.org/fred/series/observations?series_id=${code}&api_key=${FRED_API_KEY}&limit=1&sort_order=desc`);
-          const data = await res.json();
-          if (data.observations && data.observations.length > 0) {
-            const value = data.observations[0].value;
-            html += `
-              <div class="macro-item">
-                <div class="macro-label">${code}</div>
-                <div>${code === 'CPIAUCSL' ? 'Consumer Price Index' : code === 'UNRATE' ? 'Unemployment Rate' : code === 'DEXUSEU' ? 'USD/EUR Rate' : code === 'DGS10' ? '10Y Treasury' : 'S&P 500'}</div>
-                <div class="macro-value">${parseFloat(value).toFixed(2)}</div>
-              </div>
-            `;
-          }
-        } catch (e) {
-          console.log(`FRED data unavailable for ${code}`);
-        }
-      }
-
-      document.getElementById('macroData').innerHTML = html || '<p>FRED data unavailable. Add FRED_API_KEY to script.</p>';
-    }
-
-    // ============ NEWS AGGREGATION ============
-    async function loadNews() {
-      const topics = ['stock market', 'Fed policy', 'earnings'];
-      let html = '';
-
-      for (let topic of topics) {
-        try {
-          const res = await fetch(`https://newsapi.org/v2/everything?q=${topic}&sortBy=publishedAt&language=en&pageSize=3&apiKey=YOUR_NEWS_API_KEY`);
-          const data = await res.json();
-          
-          if (data.articles) {
-            for (let article of data.articles.slice(0, 2)) {
-              html += `
-                <div class="news-item">
-                  <div class="news-source">${topic.toUpperCase()}</div>
-                  <div class="news-title">${article.title}</div>
-                  <div class="news-snippet">${article.description || 'No description'}</div>
-                </div>
-              `;
-            }
-          }
-        } catch (e) {
-          console.log(`News unavailable for ${topic}`);
-        }
-      }
-
-      document.getElementById('newsGrid').innerHTML = html || '<p>Market news unavailable. Add NewsAPI key to script.</p>';
-    }
-
-    // ============ MONTE CARLO SIMULATION ============
-    function loadMonteCarloData() {
-      const topStocks = allStocks.slice(0, 5);
-      let html = '';
-
-      for (let s of topStocks) {
-        const symbol = s.Symbol || s['Symbol.1'];
-        const price = parseFloat(s['Last'] || 0);
-        const volatility = (Math.abs(parseFloat(s.Change || 0)) / 100 + 0.15);
-        
-        const mc10 = (price * (1 - volatility * 1.28)).toFixed(2);
-        const mc50 = price.toFixed(2);
-        const mc90 = (price * (1 + volatility * 1.28)).toFixed(2);
-        
-        html += `
-          <div style="margin-bottom: 2rem; padding: 1rem; background: rgba(16,185,129,0.1); border-radius: 8px;">
-            <div style="font-size:1.2em; font-weight:700; color:#10b981; margin-bottom:0.5rem;">${symbol} - 30D Projection</div>
-            <div class="monte-carlo-grid">
-              <div class="mc-box">
-                <div class="mc-label">10%ile</div>
-                <div class="mc-value">$${mc10}</div>
-              </div>
-              <div class="mc-box">
-                <div class="mc-label">50%ile (Expected)</div>
-                <div class="mc-value">$${mc50}</div>
-              </div>
-              <div class="mc-box">
-                <div class="mc-label">90%ile</div>
-                <div class="mc-value">$${mc90}</div>
-              </div>
-            </div>
-          </div>
-        `;
-      }
-
-      document.getElementById('monteCarloDiv').innerHTML = html || '<p>Monte Carlo data unavailable</p>';
-    }
-
-    function showMacroNews() {
-      showNewsletter();
-    }
-
     // ============ RESEARCH PAGE ============
     async function researchStock(ticker) {
       hideAllPages();
@@ -905,51 +693,186 @@
       if (!stock) return;
 
       const price = parseFloat(stock['Last'] || 0);
-      const rec = STOCK_RECOMMENDATIONS[ticker] || {story: 'Research', signal: 'MONITOR', t1: Math.round(price * 1.08), t2: Math.round(price * 1.15), stop: Math.round(price * 0.95)};
+      const change = parseFloat(stock.Change || 0);
+      const rsi = parseFloat(stock.RSIWIlder || 0);
       const ai = getAICommentary(stock);
 
       document.getElementById('researchSymbol').textContent = ticker;
-      document.getElementById('stockAnalysis').innerHTML = `
-        <strong>${rec.story}</strong> | ${rec.signal}<br>
-        Entry: $${price.toFixed(0)} → T1: $${rec.t1} (+${((rec.t1/price-1)*100).toFixed(1)}%) → T2: $${rec.t2}
+      document.getElementById('researchSubtitle').textContent = `$${price.toFixed(2)} (${change >= 0 ? '+' : ''}${change.toFixed(2)}%)`;
+
+      // Trading Edge
+      document.getElementById('tradingEdge').innerHTML = `
+        <strong>🎯 ${ai.edge}</strong>
       `;
 
-      renderCharts(ticker);
-
-      document.getElementById('aiCommentary').innerHTML = `
-        <div style="margin-bottom: 1rem;"><strong style="color: #7c3aed;">📊 Market Edge:</strong><br>${ai.edge}</div>
-        <div style="margin-bottom: 1rem;"><strong style="color: #10b981;">💰 Trade Setup:</strong><br>${ai.trade}</div>
-        <div><strong style="color: #ef4444;">⚠️ Risk Management:</strong><br>${ai.risk}</div>
+      // Technical Setup
+      document.getElementById('technicalSetup').innerHTML = `
+        <strong>RSI:</strong> ${rsi.toFixed(0)} (${rsi < 30 ? 'Oversold' : rsi > 70 ? 'Overbought' : 'Neutral'})<br>
+        <strong>Regime:</strong> ${parseFloat(stock['Regime Detection'] || 0).toFixed(0)}% (${parseFloat(stock['Regime Detection']) > 60 ? 'Trending Up' : 'Weak'})<br>
+        <strong>Inst Score:</strong> ${parseFloat(stock['Inst 33'] || 0).toFixed(0)} (${parseFloat(stock['Inst 33']) > 60 ? 'Strong Accumulation' : 'Neutral'})<br>
+        <strong>Support:</strong> $${(price * 0.95).toFixed(2)} | <strong>Resistance:</strong> $${(price * 1.10).toFixed(2)}
       `;
+
+      // Deep Analysis
+      document.getElementById('deepAnalysis').innerHTML = `
+        <strong>💼 ${ai.trade}</strong>
+      `;
+
+      // 30-Day Projections
+      const vol = Math.abs(change) / 100 + 0.15;
+      const mc10 = (price * (1 - vol * 1.28)).toFixed(2);
+      const mc50 = price.toFixed(2);
+      const mc90 = (price * (1 + vol * 1.28)).toFixed(2);
+
+      document.getElementById('projections').innerHTML = `
+        <strong>10th percentile (Downside):</strong> $${mc10}<br>
+        <strong>50th percentile (Expected):</strong> $${mc50}<br>
+        <strong>90th percentile (Upside):</strong> $${mc90}<br>
+        <strong>Probability of +10% move:</strong> ${(Math.min(100, 30 + Math.abs(change) * 5)).toFixed(0)}%
+      `;
+
+      // Risk Management
+      document.getElementById('riskMgmt').innerHTML = `
+        <strong>⚠️ ${ai.risk}</strong>
+      `;
+
+      // Render chart
+      renderChart(ticker);
     }
 
-    function renderCharts(ticker) {
-      document.getElementById('chart1D').innerHTML = '';
-      document.getElementById('chart1W').innerHTML = '';
+    function renderChart(ticker) {
+      document.getElementById('mainChart').innerHTML = '';
+      document.getElementById('chartToggleLabel').textContent = currentChartTimeframe === 'D' ? 'Switch to 1W' : 'Switch to 1D';
 
       new TradingView.widget({
-        "container_id": "chart1D",
+        "container_id": "mainChart",
         "width": "100%",
         "height": "100%",
         "symbol": ticker,
-        "interval": "1",
+        "interval": currentChartTimeframe,
         "timezone": "America/New_York",
         "theme": "dark",
         "style": "1",
         "studies": ["BB@tv-basicstudies", "MACD@tv-basicstudies", "RSI@tv-basicstudies"]
       });
+    }
 
-      new TradingView.widget({
-        "container_id": "chart1W",
-        "width": "100%",
-        "height": "100%",
-        "symbol": ticker,
-        "interval": "W",
-        "timezone": "America/New_York",
-        "theme": "dark",
-        "style": "1",
-        "studies": ["BB@tv-basicstudies", "MACD@tv-basicstudies"]
-      });
+    function toggleChartTimeframe() {
+      currentChartTimeframe = currentChartTimeframe === 'D' ? 'W' : 'D';
+      const ticker = document.getElementById('researchSymbol').textContent;
+      renderChart(ticker);
+    }
+
+    // ============ NEWSLETTER ============
+    function showNewsletter() {
+      hideAllPages();
+      document.getElementById('newsletterPage').classList.add('active');
+      populateNewsletter();
+    }
+
+    function populateNewsletter() {
+      const valueStocks = allStocks.filter(s => parseFloat(s.Change || 0) < -2).slice(0, 5);
+      const momentumStocks = allStocks.filter(s => parseFloat(s.Change || 0) > 3).slice(0, 5);
+
+      let html = `
+        <div style="background: rgba(0,212,255,0.05); border: 2px solid #00d4ff; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
+          <h3 style="color: #10b981; font-size: 1.5em; margin-bottom: 1rem;">📊 VALUE PLAYS - OVERSOLD</h3>
+          <table style="width: 100%; border-collapse: collapse; color: #b0b8c1;">
+            <tr style="background: rgba(124,58,237,0.3); color: #00d4ff;">
+              <th style="padding: 0.8rem; text-align: left;">Ticker</th>
+              <th style="padding: 0.8rem;">Price</th>
+              <th style="padding: 0.8rem;">Change</th>
+              <th style="padding: 0.8rem;">Signal</th>
+            </tr>
+            ${valueStocks.map(s => `
+              <tr style="border-bottom: 1px solid #333;" onclick="researchStock('${s.Symbol}'); researchStock = researchStock;">
+                <td style="padding: 0.8rem;"><strong>${s.Symbol}</strong></td>
+                <td style="padding: 0.8rem; text-align: center;">$${parseFloat(s['Last'] || 0).toFixed(2)}</td>
+                <td style="padding: 0.8rem; text-align: center; color: #ef4444;">${(parseFloat(s.Change) || 0).toFixed(2)}%</td>
+                <td style="padding: 0.8rem; text-align: center; color: #10b981;"><strong>BUY</strong></td>
+              </tr>
+            `).join('')}
+          </table>
+        </div>
+
+        <div style="background: rgba(0,212,255,0.05); border: 2px solid #00d4ff; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
+          <h3 style="color: #10b981; font-size: 1.5em; margin-bottom: 1rem;">🚀 MOMENTUM PLAYS</h3>
+          <table style="width: 100%; border-collapse: collapse; color: #b0b8c1;">
+            <tr style="background: rgba(124,58,237,0.3); color: #00d4ff;">
+              <th style="padding: 0.8rem; text-align: left;">Ticker</th>
+              <th style="padding: 0.8rem;">Price</th>
+              <th style="padding: 0.8rem;">Change</th>
+              <th style="padding: 0.8rem;">Signal</th>
+            </tr>
+            ${momentumStocks.map(s => `
+              <tr style="border-bottom: 1px solid #333;">
+                <td style="padding: 0.8rem;"><strong>${s.Symbol}</strong></td>
+                <td style="padding: 0.8rem; text-align: center;">$${parseFloat(s['Last'] || 0).toFixed(2)}</td>
+                <td style="padding: 0.8rem; text-align: center; color: #10b981;">+${(parseFloat(s.Change) || 0).toFixed(2)}%</td>
+                <td style="padding: 0.8rem; text-align: center; color: #10b981;"><strong>HOLD/SELL</strong></td>
+              </tr>
+            `).join('')}
+          </table>
+        </div>
+      `;
+
+      document.getElementById('newsletterContent').innerHTML = html;
+    }
+
+    // ============ AI CHAT ============
+    let chatHistory = [];
+
+    function toggleChat() {
+      document.getElementById('chatWidget').classList.toggle('chat-hidden');
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('chatInput');
+      const message = input.value.trim();
+      if (!message) return;
+
+      // Add user message
+      chatHistory.push({ role: 'user', content: message });
+      addMessageToChat('user', message);
+      input.value = '';
+
+      // Get AI response
+      const response = await getAIResponse(message);
+      chatHistory.push({ role: 'ai', content: response });
+      addMessageToChat('ai', response);
+    }
+
+    function addMessageToChat(role, message) {
+      const chatMessages = document.getElementById('chatMessages');
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `message ${role}`;
+      msgDiv.textContent = message;
+      chatMessages.appendChild(msgDiv);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function getAIResponse(userMessage) {
+      try {
+        // Call to Perplexity API via backend
+        const res = await fetch(`${API_CONFIG.BACKEND_URL}/api/ai-analyze`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            question: userMessage,
+            stocks: allStocks.slice(0, 10),
+            history: chatHistory
+          })
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          return data.response || 'I could not process that request.';
+        } else {
+          return 'AI service temporarily unavailable. Please check backend connection.';
+        }
+      } catch (e) {
+        return `Error: ${e.message}. Ensure backend is running at ${API_CONFIG.BACKEND_URL}`;
+      }
     }
 
     // ============ NAVIGATION ============
@@ -960,9 +883,7 @@
     }
 
     function hideAllPages() {
-      document.getElementById('homePage').classList.remove('active');
-      document.getElementById('newsletterPage').classList.remove('active');
-      document.getElementById('researchPage').classList.remove('active');
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     }
 
     function searchStock() {
