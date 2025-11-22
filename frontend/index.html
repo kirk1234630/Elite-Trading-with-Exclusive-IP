@@ -1,9 +1,10 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics - Final</title>
+    <title>Elite Trading Analytics</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://s3.tradingview.com/tv.js"></script>
     <style>
@@ -27,19 +28,34 @@
         .btn-back { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; width: 100%; margin-top: 2rem; }
         .action-buttons { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
 
-        /* TOP 3 PLAYS SECTION */
+        /* TOP 3 PLAYS - COMPLEX (Image 1 style) */
         .top-plays-section { margin-bottom: 3rem; padding: 2rem; background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff; border-radius: 15px; }
-        .top-plays-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+        .top-plays-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
         .play-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; }
         .play-card:hover { border-color: #00d4ff; transform: translateY(-5px); }
-        .play-title { font-size: 1.6em; font-weight: 900; color: white; margin-bottom: 0.5rem; }
-        .play-subtitle { font-style: italic; color: #00d4ff; margin-bottom: 1rem; }
-        .play-ticker { font-size: 1.3em; color: #10b981; font-weight: 700; margin-bottom: 0.5rem; }
-        .play-price { font-size: 1.5em; color: #00d4ff; font-weight: 900; margin-bottom: 0.3rem; }
-        .play-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem; margin-top: 1rem; }
-        .metric-mini { background: rgba(0, 212, 255, 0.1); padding: 0.5rem; border-radius: 8px; text-align: center; }
-        .metric-mini-label { font-size: 0.75em; color: #b0b8c1; }
-        .metric-mini-value { font-size: 1em; color: #00d4ff; font-weight: 700; margin-top: 0.2rem; }
+        .play-title { font-size: 1.5em; font-weight: 900; color: white; margin-bottom: 0.5rem; }
+        .play-subtitle { font-style: italic; color: #00d4ff; margin-bottom: 0.8rem; font-size: 0.95em; }
+        .play-price-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .play-price { font-size: 1.5em; color: #00d4ff; font-weight: 900; }
+        .play-change { font-size: 1.1em; font-weight: 700; }
+        .play-button { width: 100%; padding: 0.7rem 1.5rem; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; color: white; font-size: 0.95em; margin: 0.8rem 0; }
+
+        /* Metrics Grid - 3 boxes */
+        .play-metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin: 1rem 0; }
+        .metric-box-sm { background: rgba(0, 212, 255, 0.1); border: 1px solid #444; padding: 0.6rem; border-radius: 8px; text-align: center; }
+        .metric-label-sm { font-size: 0.7em; color: #b0b8c1; }
+        .metric-value-sm { font-size: 1em; color: #00d4ff; font-weight: 700; margin-top: 0.2rem; }
+
+        /* Analysis bullets */
+        .play-analysis { margin: 1rem 0; padding: 1rem; background: rgba(0, 212, 255, 0.05); border-left: 3px solid; border-radius: 5px; }
+        .play-analysis ul { list-style: none; padding: 0; margin: 0; }
+        .play-analysis li { font-size: 0.85em; line-height: 1.6; margin: 0.4rem 0; padding-left: 1.5rem; position: relative; }
+        .play-analysis li:before { position: absolute; left: 0; }
+
+        /* Targets box */
+        .play-targets { margin-top: 1rem; padding: 1rem; background: rgba(0, 212, 255, 0.05); border-left: 3px solid #10b981; border-radius: 5px; }
+        .play-targets-title { font-size: 0.85em; color: #10b981; font-weight: 700; margin-bottom: 0.5rem; }
+        .play-targets-content { font-size: 0.85em; color: #b0b8c1; line-height: 1.6; }
 
         /* AI CHAT */
         .ai-chat-toggle { position: fixed; bottom: 30px; right: 30px; width: 70px; height: 70px; background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border: none; border-radius: 50%; color: white; font-size: 1.8em; cursor: pointer; z-index: 200; box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4); transition: all 0.3s; }
@@ -145,7 +161,7 @@
                 <button class="btn-large btn-newsletter" onclick="showNewsletter()"><i class="fas fa-newspaper"></i> NEWSLETTER SCREENER</button>
             </div>
 
-            <!-- TOP 3 HIGH-CONVICTION PLAYS -->
+            <!-- TOP 3 HIGH-CONVICTION PLAYS - COMPLEX -->
             <div class="top-plays-section">
                 <h2 style="color: #00d4ff; font-size: 1.8em;"><i class="fas fa-star"></i> Top 3 High-Conviction Plays</h2>
                 <div class="top-plays-grid" id="topPlays">Loading...</div>
@@ -281,56 +297,68 @@
             {Symbol:'AMD',Last:'142.35',Change:'4.2',RSIWilder:'68',RegimeDetection:'78',Inst33:'65',Signal:'STRONG BUY',Story:'Breakout Play'},
         ];
 
-        // AI-POWERED STOCK DATA GENERATOR for ANY ticker
         function generateStockData(ticker) {
             const basePrice = 50 + Math.random() * 500;
             const change = (Math.random() - 0.5) * 10;
             const rsi = 30 + Math.random() * 40;
             const regime = 50 + Math.random() * 40;
             const inst = 60 + Math.random() * 30;
-
             let signal = 'HOLD';
             if (change < -3 && rsi < 35) signal = 'STRONG BUY';
             else if (change > 5 && rsi > 65) signal = 'STRONG BUY';
             else if (change > 2) signal = 'BUY';
             else if (change < -5) signal = 'SELL';
-
             const stories = ['The Setup', 'The Fade', 'The Creep', 'Breakout Play', 'Quality Hold', 'Consolidation'];
-
-            return {
-                Symbol: ticker.toUpperCase(),
-                Last: basePrice.toFixed(2),
-                Change: change.toFixed(2),
-                RSIWilder: rsi.toFixed(0),
-                RegimeDetection: regime.toFixed(0),
-                Inst33: inst.toFixed(0),
-                Signal: signal,
-                Story: stories[Math.floor(Math.random() * stories.length)]
-            };
+            return {Symbol: ticker.toUpperCase(), Last: basePrice.toFixed(2), Change: change.toFixed(2), RSIWilder: rsi.toFixed(0), RegimeDetection: regime.toFixed(0), Inst33: inst.toFixed(0), Signal: signal, Story: stories[Math.floor(Math.random() * stories.length)]};
         }
 
         function loadAllStocks() {
-            // Load top 3 plays
+            // Load top 3 plays - COMPLEX VERSION (Image 1)
             const topPlaysHTML = allStocks.slice(0, 3).map((s, i) => {
                 const price = parseFloat(s.Last);
                 const change = parseFloat(s.Change);
                 const buttons = ['STRONG BUY', 'SELL PREMIUM', 'ACCUMULATE'];
-                const colors = ['#10b981', '#ef4444', '#00d4ff'];
+                const colors = ['#10b981', '#f59e0b', '#00d4ff'];
+                const borderColors = ['#7c3aed', '#7c3aed', '#7c3aed'];
+                const bullets = [
+                    ['🟣 Positive momentum. Technically strong setup. Institutional inflows.',
+                     '🟡 Buy on support. Sell calls for income. Hold core position.',
+                     '⚠️ Watch for exhaustion. Profit taking potential. Monitor key resistance.'],
+                    ['🟣 Pullback detected -2.3%. IV likely depressed. Mean reversion candidate.',
+                     '🟡 Buy dips on support. Scale into position. Monitor for reversal confirmation.',
+                     '⚠️ Could test deeper lows. Watch key support levels. Use stops.'],
+                    ['🟣 Positive momentum. Technically strong setup. Institutional inflows.',
+                     '🟡 Buy on support. Sell calls for income. Hold core position.',
+                     '⚠️ Watch for exhaustion. Profit taking potential. Monitor key resistance.']
+                ];
+                const targets = [
+                    'Entry: $146 | T1: $520 | T2: $540<br>Stop: $405',
+                    'Entry: $343 | T1: $360 | T2: $375<br>Stop: $325',
+                    'Entry: $512 | T1: $550 | T2: $580<br>Stop: $490'
+                ];
+
                 return `
                     <div class="play-card" onclick="researchStock('${s.Symbol}')">
                         <div class="play-title">${s.Story}</div>
-                        <div class="play-ticker">${s.Symbol} @ $${price.toFixed(2)} (${change >= 0 ? '+' : ''}${change}%)</div>
-                        <div style="color: ${change >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.3em; font-weight: 900; margin: 0.5rem 0;">${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)}%</div>
-                        <button style="background: ${colors[i]}; border: none; color: white; padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 700; cursor: pointer; width: 100%; margin: 0.5rem 0;">${buttons[i]}</button>
-                        <div class="play-metrics">
-                            <div class="metric-mini"><div class="metric-mini-label">RSI</div><div class="metric-mini-value">${s.RSIWilder}</div></div>
-                            <div class="metric-mini"><div class="metric-mini-label">Inst</div><div class="metric-mini-value">${s.Inst33}</div></div>
-                            <div class="metric-mini"><div class="metric-mini-label">Regime</div><div class="metric-mini-value">${s.RegimeDetection}%</div></div>
+                        <div class="play-subtitle">${s.Symbol} @ $${price.toFixed(2)} (${change >= 0 ? '+' : ''}${change}%)</div>
+                        <div class="play-change" style="color: ${change >= 0 ? '#10b981' : '#ef4444'};">${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)}%</div>
+                        <button class="play-button" style="background: ${colors[i]};">${buttons[i]}</button>
+
+                        <div class="play-metrics-grid">
+                            <div class="metric-box-sm"><div class="metric-label-sm">RSI</div><div class="metric-value-sm">${s.RSIWilder}</div></div>
+                            <div class="metric-box-sm"><div class="metric-label-sm">Regime</div><div class="metric-value-sm">${s.RegimeDetection}%</div></div>
+                            <div class="metric-box-sm"><div class="metric-label-sm">Inst</div><div class="metric-value-sm">${s.Inst33}</div></div>
                         </div>
-                        <div style="margin-top: 1rem; font-size: 0.85em; color: #b0b8c1; line-height: 1.6;">
-                            ${i === 0 ? 'Positive momentum. Technically strong setup. Institutional bullish.' : 
-                              i === 1 ? 'Pullback detected. -3.3% IV likely depressed. Mean reversion candidate.' : 
-                              'Buy on support. Sell calls for income. Hold core position.'}
+
+                        <div class="play-analysis" style="border-color: ${borderColors[i]};">
+                            <ul>
+                                ${bullets[i].map(b => `<li>${b}</li>`).join('')}
+                            </ul>
+                        </div>
+
+                        <div class="play-targets">
+                            <div class="play-targets-title">🎯 Targets</div>
+                            <div class="play-targets-content">${targets[i]}</div>
                         </div>
                     </div>
                 `;
@@ -379,11 +407,10 @@
         }
 
         function researchStock(ticker) {
-            // Check if stock exists in CSV, if not generate AI data
             let stock = allStocks.find(s => s.Symbol === ticker.toUpperCase());
             if (!stock) {
                 stock = generateStockData(ticker);
-                allStocks.push(stock); // Add to dataset
+                allStocks.push(stock);
             }
 
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
