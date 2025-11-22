@@ -1,9 +1,8 @@
-<!-- ELITE TRADING ANALYTICS - FULL VERSION WITH CHARTS & AI -->
-<!-- ✅ TradingView Live Charts -->
+<!-- ELITE TRADING ANALYTICS - SINGLE CHART VERSION -->
+<!-- ✅ ONE Large Chart (1D Default) -->
 <!-- ✅ AI Deep Analysis -->
 <!-- ✅ Advanced Filters -->
 <!-- ✅ Research Page -->
-<!-- ✅ Newsletter Export -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -42,7 +41,7 @@
     @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
     
     .story-section { margin-bottom: 3rem; padding: 2rem; background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff; border-radius: 15px; }
-    .story-title { font-size: 1.8em; color: #00d4ff; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.8rem; }
+    .story-title { font-size: 1.8em; color: #00d4ff; margin-bottom: 1.5rem; }
     
     .plays-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
     .play-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; }
@@ -86,11 +85,10 @@
     .research-left { display: flex; flex-direction: column; gap: 1.5rem; }
     .research-right { display: flex; flex-direction: column; gap: 1.5rem; }
     
-    .chart-container { background: rgba(30, 30, 60, 0.8); border: 2px solid #444; border-radius: 15px; padding: 1rem; height: 350px; }
-    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .chart-container { background: rgba(30, 30, 60, 0.8); border: 2px solid #444; border-radius: 15px; padding: 1rem; min-height: 500px; }
     
     .info-box { background: rgba(30, 30, 60, 0.8); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
-    .info-box-title { color: #00d4ff; font-weight: 700; margin-bottom: 1rem; }
+    .info-box-title { color: #00d4ff; font-weight: 700; margin-bottom: 1rem; font-size: 1.1em; }
     .info-box-content { font-size: 0.9em; line-height: 1.6; color: #b0b8c1; }
     
     .entry-targets { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-top: 1rem; }
@@ -98,20 +96,12 @@
     .entry-label { font-size: 0.7em; color: #b0b8c1; }
     .entry-value { font-size: 1.3em; color: #10b981; font-weight: 700; }
     
-    .modal { display: none; position: fixed; z-index: 200; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); }
-    .modal.show { display: flex; align-items: center; justify-content: center; }
-    .modal-content { background: linear-gradient(135deg, #1a1a3e 0%, #242850 100%); border: 2px solid #00d4ff; border-radius: 15px; width: 90%; max-height: 90vh; overflow-y: auto; max-width: 1200px; }
-    .modal-header { background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); padding: 2rem; display: flex; justify-content: space-between; align-items: center; border-radius: 13px 13px 0 0; }
-    .modal-body { padding: 2rem; }
-    .modal-close { background: none; border: none; color: white; font-size: 2em; cursor: pointer; }
-    
     .connecting-status { text-align: center; padding: 2rem; }
     .connecting-spinner { display: inline-block; width: 40px; height: 40px; border: 4px solid rgba(0, 212, 255, 0.3); border-top: 4px solid #00d4ff; border-radius: 50%; animation: spin 1s linear infinite; }
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     
     @media (max-width: 1024px) { 
       .research-layout { grid-template-columns: 1fr; } 
-      .charts-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -180,21 +170,10 @@
       </div>
 
       <div class="research-layout">
-        <!-- LEFT SIDE: Charts -->
+        <!-- LEFT SIDE: Single Large Chart -->
         <div class="research-left">
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-            <div class="chart-container">
-              <div style="text-align: center; padding: 1rem; color: #00d4ff;">
-                <strong>1D Chart</strong>
-                <div id="chart1D" style="width: 100%; height: 300px; background: rgba(0,212,255,0.05); border-radius: 10px; margin-top: 0.5rem;"></div>
-              </div>
-            </div>
-            <div class="chart-container">
-              <div style="text-align: center; padding: 1rem; color: #00d4ff;">
-                <strong>1W Chart</strong>
-                <div id="chart1W" style="width: 100%; height: 300px; background: rgba(0,212,255,0.05); border-radius: 10px; margin-top: 0.5rem;"></div>
-              </div>
-            </div>
+          <div class="chart-container">
+            <div id="chartContainer" style="width: 100%; height: 100%;"></div>
           </div>
         </div>
 
@@ -258,19 +237,6 @@
       </div>
 
       <button class="btn-large btn-refresh" onclick="goHome()" style="width: 100%; margin: 2rem 0; background: #10b981;"><i class="fas fa-arrow-left"></i> BACK</button>
-    </div>
-  </div>
-
-  <!-- DEEP DIVE MODAL -->
-  <div id="deepDiveModal" class="modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <div style="font-size: 2em; font-weight: 900;" id="modalSymbol">TICKER</div>
-        <button class="modal-close" onclick="closeModal()">&times;</button>
-      </div>
-      <div class="modal-body">
-        <div id="modalContent">Loading...</div>
-      </div>
     </div>
   </div>
 
@@ -392,35 +358,23 @@
 
       document.getElementById('technicalSetup').textContent = `Regime: ${stock['Regime Detection'].toFixed(0)}% | RSI: ${stock.RSIWIlder.toFixed(0)} | Support: $${(stock.Last * 0.95).toFixed(2)} | Resistance: $${(stock.Last * 1.10).toFixed(2)}`;
 
-      // Load charts
+      // Load single chart
+      document.getElementById('chartContainer').innerHTML = '';
       try {
         new TradingView.widget({
-          "container_id": "chart1D",
+          "container_id": "chartContainer",
           "width": "100%",
-          "height": "300",
+          "height": "100%",
           "symbol": ticker,
-          "interval": "1",
+          "interval": "D",
           "timezone": "America/New_York",
           "theme": "dark",
           "style": "1",
           "locale": "en",
-          "studies": ["MACD@tv-basicstudies", "RSI@tv-basicstudies"]
-        });
-        
-        new TradingView.widget({
-          "container_id": "chart1W",
-          "width": "100%",
-          "height": "300",
-          "symbol": ticker,
-          "interval": "W",
-          "timezone": "America/New_York",
-          "theme": "dark",
-          "style": "1",
-          "locale": "en",
-          "studies": ["MACD@tv-basicstudies"]
+          "studies": ["MACD@tv-basicstudies", "RSI@tv-basicstudies", "BB@tv-basicstudies"]
         });
       } catch (e) {
-        console.log('TradingView charts not available');
+        console.log('TradingView chart loading...');
       }
 
       // Show research page
@@ -452,10 +406,6 @@
     function goHome() {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.getElementById('homePage').classList.add('active');
-    }
-
-    function openDeepDive(ticker) {
-      openDeepDive(ticker);
     }
   </script>
 </body>
