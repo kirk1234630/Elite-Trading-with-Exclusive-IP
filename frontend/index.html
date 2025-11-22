@@ -1,16 +1,15 @@
-<!-- 🚀 ELITE TRADING ANALYTICS - VERSION 12.6 (AI System Replicated) -->
-<!-- Uses the EXACT AI commentary system from the original script -->
-<!-- getAICommentary() function with Edge/Trade/Risk logic -->
+<!-- 🚀 ELITE TRADING ANALYTICS - VERSION 12.7 FINAL (AI COMMENTARY VISIBLE) -->
+<!-- EXACT REPLICA: AI commentary displays on every stock card -->
+<!-- getAICommentary() fully functional - Edge/Trade/Risk on landing page -->
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Elite Trading Analytics v12.6</title>
+  <title>Elite Trading Analytics</title>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <script src="https://s3.tradingview.com/tv.js"></script>
-  
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: linear-gradient(135deg, #1a1a3e 0%, #16213e 50%, #0f3460 100%); color: #ffffff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; min-height: 100vh; }
@@ -30,17 +29,17 @@
     .story-section { margin-bottom: 3rem; padding: 2rem; background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff; border-radius: 15px; }
     .story-title { font-size: 1.8em; color: #00d4ff; margin-bottom: 1.5rem; }
     .plays-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; }
-    .play-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; }
+    .play-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; }
     .play-card:hover { border-color: #00d4ff; transform: translateY(-5px); }
     .play-narrative { font-size: 1.4em; font-weight: 900; color: #00d4ff; margin-bottom: 0.5rem; }
     .play-ticker { font-size: 1.1em; color: #b0b8c1; margin-bottom: 1rem; }
-    .play-signal { display: inline-block; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; font-weight: 700; font-size: 0.9em; margin-bottom: 1rem; }
+    .play-signal { display: inline-block; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 8px; font-weight: 700; font-size: 0.9em; margin-bottom: 1rem; color: white; }
     .play-metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin-bottom: 1rem; font-size: 0.9em; }
     .play-metric { background: rgba(0, 212, 255, 0.1); padding: 0.8rem; border-radius: 8px; text-align: center; }
     .play-metric-label { font-size: 0.8em; color: #b0b8c1; }
     .play-metric-value { font-size: 1.2em; color: #00d4ff; font-weight: 700; margin-top: 0.3rem; }
-    .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
-    .stock-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; }
+    .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
+    .stock-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; min-height: 600px; }
     .stock-card:hover { border-color: #00d4ff; transform: translateY(-5px); }
     .stock-symbol { font-size: 2.2em; font-weight: 900; color: white; margin-bottom: 0.5rem; }
     .stock-price { font-size: 1.8em; color: #00d4ff; font-weight: 900; margin-bottom: 0.3rem; }
@@ -48,7 +47,7 @@
     .stock-change { font-size: 1.1em; font-weight: 700; margin-bottom: 1rem; }
     .stock-change.positive { color: #10b981; }
     .stock-change.negative { color: #ef4444; }
-    .signal-badge { display: inline-block; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 8px; font-weight: 700; font-size: 0.85em; margin-bottom: 1rem; }
+    .signal-badge { display: inline-block; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 8px; font-weight: 700; font-size: 0.85em; margin-bottom: 1rem; color: white; }
     .stock-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.6rem; font-size: 0.85em; margin: 1rem 0; }
     .metric { background: rgba(0, 212, 255, 0.1); padding: 0.6rem; border-radius: 8px; text-align: center; }
     .metric-label { font-size: 0.7em; color: #b0b8c1; }
@@ -76,63 +75,6 @@
     .newsletter-table th { background: rgba(124, 58, 237, 0.3); color: #00d4ff; padding: 1rem; text-align: left; font-weight: 700; border: 1px solid #444; }
     .newsletter-table td { padding: 0.8rem 1rem; border: 1px solid #444; color: #b0b8c1; cursor: pointer; }
     .newsletter-table tr:hover { background: rgba(0, 212, 255, 0.1); }
-    
-    /* AI Chat Widget - GUARANTEED VISIBLE */
-    .chat-toggle {
-      position: fixed !important;
-      bottom: 20px !important;
-      right: 20px !important;
-      width: 70px !important;
-      height: 70px !important;
-      border-radius: 50% !important;
-      background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%) !important;
-      border: none !important;
-      color: white !important;
-      font-size: 1.8em !important;
-      cursor: pointer !important;
-      box-shadow: 0 8px 30px rgba(0, 212, 255, 0.6) !important;
-      z-index: 9999 !important;
-      display: flex !important;
-      align-items: center !important;
-      justify-content: center !important;
-    }
-
-    .chat-widget {
-      position: fixed !important;
-      bottom: 100px !important;
-      right: 20px !important;
-      z-index: 9998 !important;
-      width: 400px !important;
-      max-height: 600px !important;
-      display: flex !important;
-      flex-direction: column !important;
-      background: linear-gradient(145deg, #1a1a40 0%, #242850 100%) !important;
-      border: 3px solid #00d4ff !important;
-      border-radius: 15px !important;
-      box-shadow: 0 15px 50px rgba(0, 212, 255, 0.4) !important;
-    }
-
-    .chat-header {
-      background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%) !important;
-      padding: 1.5rem !important;
-      border-radius: 12px 12px 0 0 !important;
-      display: flex !important;
-      justify-content: space-between !important;
-      align-items: center !important;
-      font-weight: 700 !important;
-      color: white !important;
-    }
-
-    .chat-close { background: none !important; border: none !important; color: white !important; cursor: pointer !important; font-size: 1.5em !important; }
-    .chat-messages { flex: 1 !important; overflow-y: auto !important; padding: 1rem !important; display: flex !important; flex-direction: column !important; gap: 0.8rem !important; }
-    .message { padding: 0.8rem 1rem !important; border-radius: 8px !important; max-width: 85% !important; font-size: 0.9em !important; line-height: 1.5 !important; }
-    .message.user { background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%) !important; color: white !important; align-self: flex-end !important; }
-    .message.ai { background: rgba(0, 212, 255, 0.1) !important; border: 1px solid #00d4ff !important; color: #d1fae5 !important; align-self: flex-start !important; }
-    .chat-input { padding: 1rem !important; border-top: 1px solid #333 !important; display: flex !important; gap: 0.8rem !important; }
-    .chat-input input { flex: 1 !important; background: rgba(0, 212, 255, 0.1) !important; border: 1px solid #00d4ff !important; color: white !important; padding: 0.8rem !important; border-radius: 8px !important; outline: none !important; }
-    .chat-input button { background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important; border: none !important; color: white !important; padding: 0.8rem 1rem !important; border-radius: 8px !important; cursor: pointer !important; font-weight: 700 !important; }
-    .chat-hidden { display: none !important; }
-    
     @media (max-width: 1024px) { .research-layout { grid-template-columns: 1fr; } }
   </style>
 </head>
@@ -270,30 +212,8 @@
     </div>
   </div>
 
-  <!-- AI CHAT WIDGET -->
-  <button class="chat-toggle" id="chatToggle" onclick="toggleChat()">
-    <i class="fas fa-comments"></i>
-  </button>
-
-  <div class="chat-widget chat-hidden" id="chatWidget">
-    <div class="chat-header">
-      <span>🤖 AI Trading Assistant</span>
-      <button class="chat-close" onclick="toggleChat()">✕</button>
-    </div>
-    <div class="chat-messages" id="chatMessages">
-      <div class="message ai">
-        Hi! Ask me about any stock, signals, or market setup.
-      </div>
-    </div>
-    <div class="chat-input">
-      <input type="text" id="chatInput" placeholder="Ask about stocks..." onkeypress="if(event.key==='Enter') sendMessage()">
-      <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
-    </div>
-  </div>
-
   <script>
-    // ============ EXACT AI SYSTEM FROM ORIGINAL SCRIPT ============
-    
+    // ============ EXACT STOCK RECOMMENDATIONS ============
     const STOCK_RECOMMENDATIONS = {
       'NVDA': {story:'The Setup', signal:'STRONG BUY', t1:520, t2:540, stop:465},
       'TSLA': {story:'The Fade', signal:'SELL PREMIUM', t1:360, t2:375, stop:325},
@@ -319,6 +239,7 @@
       loadAllStocks();
     });
 
+    // ============ LOAD FROM CSV FILES ============
     async function loadStocksFromCSV() {
       const csvFiles = [
         '/2025-11-20-watchlist.csv',
@@ -375,14 +296,21 @@
         {Symbol:'AMZN','Last':195.20,Change:1.2,RSIWIlder:62,'Regime Detection':72,'Inst 33':70,Signal:'BUY'},
         {Symbol:'AMD','Last':142.35,Change:4.2,RSIWIlder:68,'Regime Detection':78,'Inst 33':65,Signal:'STRONG BUY'},
         {Symbol:'NFLX','Last':682.40,Change:1.8,RSIWIlder:64,'Regime Detection':75,'Inst 33':62,Signal:'BUY'},
+        {Symbol:'CRM','Last':298.75,Change:-0.5,RSIWIlder:54,'Regime Detection':60,'Inst 33':68,Signal:'HOLD'},
         {Symbol:'MU','Last':201.37,Change:-10.87,RSIWIlder:41,'Regime Detection':75.6,'Inst 33':53,Signal:'STRONG BUY'},
         {Symbol:'SE','Last':130.99,Change:-8.74,RSIWIlder:28,'Regime Detection':51.7,'Inst 33':38,Signal:'ACCUMULATE'},
-        {Symbol:'HOOD','Last':79.82,Change:12.3,RSIWIlder:72,'Regime Detection':85,'Inst 33':78,Signal:'STRONG BUY'},
+        {Symbol:'PLTR','Last':155.00,Change:-9.52,RSIWIlder:28,'Regime Detection':45,'Inst 33':58,Signal:'OVERSOLD'},
+        {Symbol:'HOOD','Last':79.82,Change:12.3,RSIWIlder:72,'Regime Detection':80,'Inst 33':78,Signal:'STRONG BUY'},
         {Symbol:'WDC','Last':220.50,Change:15.2,RSIWIlder:75,'Regime Detection':82,'Inst 33':75,Signal:'BUY'},
+        {Symbol:'RKLB','Last':14.50,Change:18.5,RSIWIlder:78,'Regime Detection':85,'Inst 33':72,Signal:'BUY'},
+        {Symbol:'NEM','Last':66.00,Change:8.5,RSIWIlder:65,'Regime Detection':72,'Inst 33':60,Signal:'BUY'},
+        {Symbol:'ORCL','Last':152.90,Change:2.4,RSIWIlder:62,'Regime Detection':68,'Inst 33':70,Signal:'BUY'},
+        {Symbol:'INTC','Last':38.25,Change:-1.8,RSIWIlder:40,'Regime Detection':45,'Inst 33':52,Signal:'ACCUMULATE'},
+        {Symbol:'QCOM','Last':168.40,Change:3.2,RSIWIlder:68,'Regime Detection':75,'Inst 33':68,Signal:'BUY'},
       ];
     }
 
-    // ============ EXACT getAICommentary() FUNCTION ============
+    // ============ EXACT getAICommentary FUNCTION ============
     function getAICommentary(stock) {
       const symbol = stock.Symbol || stock['Symbol.1'];
       const price = parseFloat(stock['Last'] || stock.Price || 0);
@@ -417,7 +345,7 @@
       return { edge, trade, risk };
     }
 
-    // ============ RENDER FUNCTIONS ============
+    // ============ LOAD & RENDER ============
     function loadAllStocks() {
       renderStocks('all');
       populateStoryPlays();
@@ -506,7 +434,8 @@
 
       document.getElementById('marketStory').innerHTML = `
         <strong>🎯 Current Setup:</strong> ${allStocks.filter(s => parseFloat(s.Change) < -5).length} stocks oversold, ${allStocks.filter(s => parseFloat(s.Change) > 5).length} momentum plays. 
-        <strong style="color: #00d4ff;">IV crush on tech = buy fear opportunity.</strong> Mean reversion candidates in semiconductor. Scale into dips, sell into strength.
+        <strong style="color: #00d4ff;">IV crush on tech giants = buy fear opportunity.</strong> Mean reversion candidates in semiconductor sector. 
+        Scale into positions on dips. Sell into strength. Risk management first.
       `;
     }
 
@@ -531,7 +460,7 @@
             <td style="font-size: 0.9em; color: #10b981;"><strong>BUY DIPS</strong></td>
           </tr>
         `;
-      }).join('');
+      }).join('') || '<tr><td colspan="6">No oversold stocks</td></tr>';
 
       document.getElementById('momentumTable').innerHTML = momentumStocks.map(s => {
         const symbol = s.Symbol || s['Symbol.1'];
@@ -550,7 +479,7 @@
             <td>$${rec.t1 || price}</td>
           </tr>
         `;
-      }).join('');
+      }).join('') || '<tr><td colspan="6">No momentum stocks</td></tr>';
     }
 
     function showNewsletter() {
@@ -591,10 +520,15 @@
       document.getElementById('callT').textContent = (-0.035 - Math.random() * 0.025).toFixed(2);
 
       const volatility = Math.abs(change) / 100 + 0.15;
-      document.getElementById('mc10').textContent = '$' + (price * (1 - volatility * 1.28)).toFixed(0);
-      document.getElementById('mc50').textContent = '$' + price.toFixed(0);
-      document.getElementById('mc90').textContent = '$' + (price * (1 + volatility * 1.28)).toFixed(0);
-      document.getElementById('mcMax').textContent = '$' + (price * (1 + volatility * 1.65)).toFixed(0);
+      const mc10 = (price * (1 - volatility * 1.28)).toFixed(0);
+      const mc50 = price.toFixed(0);
+      const mc90 = (price * (1 + volatility * 1.28)).toFixed(0);
+      const mcMax = (price * (1 + volatility * 1.65)).toFixed(0);
+
+      document.getElementById('mc10').textContent = '$' + mc10;
+      document.getElementById('mc50').textContent = '$' + mc50;
+      document.getElementById('mc90').textContent = '$' + mc90;
+      document.getElementById('mcMax').textContent = '$' + mcMax;
 
       document.getElementById('dispIV').textContent = (25 + Math.random() * 40).toFixed(0) + '%';
       document.getElementById('dispRV').textContent = (20 + Math.random() * 30).toFixed(0) + '%';
@@ -628,51 +562,6 @@
       if (ticker) {
         researchStock(ticker);
         document.getElementById('searchInput').value = '';
-      }
-    }
-
-    // ============ AI CHAT ============
-    function toggleChat() {
-      document.getElementById('chatWidget').classList.toggle('chat-hidden');
-    }
-
-    async function sendMessage() {
-      const input = document.getElementById('chatInput');
-      const message = input.value.trim();
-      if (!message) return;
-
-      addMessageToChat('user', message);
-      input.value = '';
-
-      const response = await getAIResponse(message);
-      addMessageToChat('ai', response);
-    }
-
-    function addMessageToChat(role, message) {
-      const chatMessages = document.getElementById('chatMessages');
-      const msgDiv = document.createElement('div');
-      msgDiv.className = `message ${role}`;
-      msgDiv.textContent = message;
-      chatMessages.appendChild(msgDiv);
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    async function getAIResponse(userMessage) {
-      try {
-        const res = await fetch('https://elite-trading-with-exclusive-ip.onrender.com/api/ai-analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ question: userMessage, stocks: allStocks.slice(0, 10) })
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          return data.response || 'AI service responding...';
-        } else {
-          return '✅ I understand your question. Try analyzing a specific stock like NVDA or MU for deep insights.';
-        }
-      } catch (e) {
-        return '💡 Quick tip: Click any stock card to see AI Edge/Trade/Risk analysis, or ask me about specific setups!';
       }
     }
   </script>
