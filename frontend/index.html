@@ -150,7 +150,30 @@
     <div id="briefPage" class="page">
         <div class="container">
             <h1 style="color: #00d4ff; font-size: 2.5em; margin-bottom: 2rem;">📰 Market Brief</h1>
-            <p style="color: #b0b8c1; font-size: 1.2em;">Quick market overview placeholder...</p>
+            <div id="briefContent" style="color: #b0b8c1; font-size: 1.1em; line-height: 1.8;">
+                <div style="background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
+                    <h2 style="color: #00d4ff; margin-bottom: 1rem;">📊 Market Overview</h2>
+                    <p>Today's trading session shows mixed signals across major indices. Tech sector showing strength while traditional value stocks consolidate.</p>
+                    <div style="margin-top: 1rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                        <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 8px;">
+                            <div style="font-size: 0.85em; color: #10b981;">Bullish Setups</div>
+                            <div style="font-size: 1.5em; font-weight: 700; color: #10b981;" id="bullishCount">0</div>
+                        </div>
+                        <div style="background: rgba(239, 68, 68, 0.1); padding: 1rem; border-radius: 8px;">
+                            <div style="font-size: 0.85em; color: #ef4444;">Bearish Setups</div>
+                            <div style="font-size: 1.5em; font-weight: 700; color: #ef4444;" id="bearishCount">0</div>
+                        </div>
+                        <div style="background: rgba(0, 212, 255, 0.1); padding: 1rem; border-radius: 8px;">
+                            <div style="font-size: 0.85em; color: #00d4ff;">Neutral/Hold</div>
+                            <div style="font-size: 1.5em; font-weight: 700; color: #00d4ff;" id="neutralCount">0</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="background: rgba(124, 58, 237, 0.05); border: 2px solid #7c3aed; border-radius: 15px; padding: 2rem;">
+                    <h2 style="color: #7c3aed; margin-bottom: 1rem;">🎯 Key Opportunities</h2>
+                    <div id="keyOpportunities">Loading opportunities...</div>
+                </div>
+            </div>
             <button class="btn-large btn-back" onclick="goHome()">← BACK TO DASHBOARD</button>
         </div>
     </div>
@@ -158,7 +181,36 @@
     <div id="newsletterPage" class="page">
         <div class="container">
             <h1 style="color: #00d4ff; font-size: 2.5em; margin-bottom: 2rem;">📋 Newsletter Screener</h1>
-            <p style="color: #b0b8c1; font-size: 1.2em;">Newsletter screener placeholder...</p>
+            <div style="background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
+                <p style="color: #b0b8c1; font-size: 1.1em; margin-bottom: 1.5rem;">Filter stocks by strategy and signal strength</p>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+                    <select id="strategyFilter" style="padding: 0.8rem; background: rgba(30, 30, 60, 0.8); border: 2px solid #444; color: white; border-radius: 8px; font-size: 1em;">
+                        <option value="all">All Strategies</option>
+                        <option value="STRONG BUY">Strong Buy</option>
+                        <option value="BUY">Buy</option>
+                        <option value="HOLD">Hold</option>
+                        <option value="SELL">Sell</option>
+                    </select>
+                    <button onclick="applyNewsletterFilter()" style="padding: 0.8rem 1.5rem; background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border: none; color: white; border-radius: 8px; cursor: pointer; font-weight: 700;">Apply Filter</button>
+                    <button onclick="resetNewsletterFilter()" style="padding: 0.8rem 1.5rem; background: rgba(0, 212, 255, 0.1); border: 1px solid #00d4ff; color: #00d4ff; border-radius: 8px; cursor: pointer; font-weight: 700;">Reset</button>
+                </div>
+                <div id="newsletterResults" style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 1rem;">
+                        <thead>
+                            <tr style="background: rgba(124, 58, 237, 0.3); border-bottom: 2px solid #00d4ff;">
+                                <th style="padding: 1rem; text-align: left; color: #00d4ff; font-weight: 700;">Symbol</th>
+                                <th style="padding: 1rem; text-align: left; color: #00d4ff; font-weight: 700;">Price</th>
+                                <th style="padding: 1rem; text-align: left; color: #00d4ff; font-weight: 700;">Change</th>
+                                <th style="padding: 1rem; text-align: left; color: #00d4ff; font-weight: 700;">Signal</th>
+                                <th style="padding: 1rem; text-align: left; color: #00d4ff; font-weight: 700;">Story</th>
+                            </tr>
+                        </thead>
+                        <tbody id="newsletterTableBody">
+                            <tr><td colspan="5" style="padding: 2rem; text-align: center; color: #b0b8c1;">Loading stocks...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
             <button class="btn-large btn-back" onclick="goHome()">← BACK TO DASHBOARD</button>
         </div>
     </div>
@@ -429,12 +481,80 @@
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('briefPage').classList.add('active');
         document.getElementById('aiChatToggle').classList.add('hidden');
+        populateBrief();
     }
 
     function showNewsletter() {
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
         document.getElementById('newsletterPage').classList.add('active');
         document.getElementById('aiChatToggle').classList.add('hidden');
+        populateNewsletter();
+    }
+
+    function populateBrief() {
+        const bullish = allStocks.filter(s => s.Signal.includes('BUY')).length;
+        const bearish = allStocks.filter(s => s.Signal === 'SELL').length;
+        const neutral = allStocks.filter(s => s.Signal === 'HOLD').length;
+        
+        document.getElementById('bullishCount').textContent = bullish;
+        document.getElementById('bearishCount').textContent = bearish;
+        document.getElementById('neutralCount').textContent = neutral;
+        
+        const topOpportunities = allStocks
+            .filter(s => s.Signal.includes('BUY'))
+            .slice(0, 5)
+            .map(s => `
+                <div style="padding: 1rem; border-bottom: 1px solid rgba(124, 58, 237, 0.3); cursor: pointer;" onclick="researchStock('${s.Symbol}')">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="font-weight: 700; color: white; font-size: 1.2em;">${s.Symbol}</span>
+                            <span style="margin-left: 1rem; color: #b0b8c1;">"${s.Story}"</span>
+                        </div>
+                        <div>
+                            <span style="color: ${parseFloat(s.Change) >= 0 ? '#10b981' : '#ef4444'}; font-weight: 700;">${parseFloat(s.Change) >= 0 ? '▲' : '▼'} ${Math.abs(parseFloat(s.Change)).toFixed(2)}%</span>
+                            <span style="margin-left: 1rem; padding: 0.4rem 0.8rem; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 6px; color: white; font-size: 0.85em;">${s.Signal}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        
+        document.getElementById('keyOpportunities').innerHTML = topOpportunities || '<p style="color: #b0b8c1;">No strong opportunities at this time.</p>';
+    }
+
+    function populateNewsletter() {
+        renderNewsletterTable(allStocks);
+    }
+
+    function renderNewsletterTable(stocks) {
+        const tbody = document.getElementById('newsletterTableBody');
+        tbody.innerHTML = stocks.map(s => {
+            const price = parseFloat(s.Last);
+            const change = parseFloat(s.Change);
+            return `
+                <tr style="border-bottom: 1px solid #444; cursor: pointer; transition: background 0.2s;" onclick="researchStock('${s.Symbol}')" onmouseover="this.style.background='rgba(0, 212, 255, 0.05)'" onmouseout="this.style.background='transparent'">
+                    <td style="padding: 1rem; font-weight: 700; color: white;">${s.Symbol}</td>
+                    <td style="padding: 1rem; color: #00d4ff;">$${price.toFixed(2)}</td>
+                    <td style="padding: 1rem; color: ${change >= 0 ? '#10b981' : '#ef4444'}; font-weight: 700;">${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)}%</td>
+                    <td style="padding: 1rem;"><span style="padding: 0.4rem 0.8rem; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 6px; color: white; font-size: 0.85em; font-weight: 700;">${s.Signal}</span></td>
+                    <td style="padding: 1rem; color: #b0b8c1; font-style: italic;">"${s.Story}"</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function applyNewsletterFilter() {
+        const filterValue = document.getElementById('strategyFilter').value;
+        if (filterValue === 'all') {
+            renderNewsletterTable(allStocks);
+        } else {
+            const filtered = allStocks.filter(s => s.Signal === filterValue);
+            renderNewsletterTable(filtered);
+        }
+    }
+
+    function resetNewsletterFilter() {
+        document.getElementById('strategyFilter').value = 'all';
+        renderNewsletterTable(allStocks);
     }
 
     function researchStock(symbol) {
