@@ -408,3 +408,31 @@ def server_error(error):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port, debug=False)
+# Add this new endpoint to server.py:
+
+@app.route('/api/stock-news/<ticker>', methods=['GET'])
+def get_stock_news(ticker):
+    """Get latest news for a specific stock"""
+    if not FINNHUB_KEY:
+        return jsonify({'error': 'Finnhub not configured'}), 500
+    
+    try:
+        # Get last 7 days of news
+        from_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+        to_date = datetime.now().strftime('%Y-%m-%d')
+        
+        url = f'https://finnhub.io/api/v1/company-news?symbol={ticker}&from={from_date}&to={to_date}&token={FINNHUB_KEY}'
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code == 200:
+            news = response.json()
+            return jsonify({
+                'ticker': ticker,
+                'news_count': len(news),
+                'articles': news[:5]  # Return top 5 most recent
+            })
+        else:
+            return jsonify({'error': 'Failed to fetch news'}), 500
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
