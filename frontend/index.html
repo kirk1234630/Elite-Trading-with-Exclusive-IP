@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Elite Trading Analytics</title>
+    <title>Elite Trading Analytics - Mobile Optimized</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://s3.tradingview.com/tv.js"></script>
     <style>
+        /* ===== ORIGINAL STYLES ===== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: linear-gradient(135deg, #1a1a3e 0%, #16213e 50%, #0f3460 100%); color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
+        body { background: linear-gradient(135deg, #1a1a3e 0%, #16213e 50%, #0f3460 100%); color: #fff; font-family: -apple-system, sans-serif; min-height: 100vh; }
 
         .header { background: rgba(20, 20, 50, 0.95); backdrop-filter: blur(10px); border-bottom: 2px solid #00d4ff; padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
         .logo { font-size: 1.8em; font-weight: 900; background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
@@ -64,28 +65,328 @@
         .stock-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; }
         .stock-card:hover { border-color: #00d4ff; transform: translateY(-5px); }
 
-        .loading-spinner {
-            border: 4px solid #1e293b;
-            border-top: 4px solid #3b82f6;
-            border-radius: 50%;
-            width: 56px;
-            height: 56px;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto;
-        }
+        .story-section { margin-bottom: 3rem; padding: 2rem; background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff; border-radius: 15px; }
+        .newsletter-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
+        .newsletter-table th { background: rgba(124, 58, 237, 0.3); color: #00d4ff; padding: 1rem; text-align: left; font-weight: 700; border: 1px solid #444; }
+        .newsletter-table td { padding: 0.8rem 1rem; border: 1px solid #444; color: #b0b8c1; cursor: pointer; }
+        .newsletter-table tr:hover { background: rgba(0, 212, 255, 0.1); }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
+        .research-layout { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; }
+        .left-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+        .sidebar-card { background: rgba(26, 26, 64, 0.95); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
+        .sidebar-card h3 { color: #00d4ff; margin-bottom: 1rem; font-size: 1.1em; }
+        .sidebar-content { color: #b0b8c1; line-height: 1.8; font-size: 0.9em; }
+        .price-banner { background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+        .price-ticker { font-size: 1.8em; font-weight: 900; color: white; }
+        .price-value { font-size: 2em; color: #00d4ff; font-weight: 900; margin: 0.5rem 0; }
+        .price-story { font-style: italic; color: rgba(255, 255, 255, 0.9); font-size: 0.9em; }
+        .metric-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin-top: 1rem; }
+        .metric-box { background: rgba(0, 212, 255, 0.1); border: 1px solid #444; padding: 0.8rem; border-radius: 8px; text-align: center; }
+        .metric-label { font-size: 0.75em; color: #b0b8c1; }
+        .metric-value { font-size: 1.2em; color: #00d4ff; font-weight: 700; margin-top: 0.3rem; }
+        .greeks-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .greeks-table th { background: rgba(124, 58, 237, 0.2); color: #00d4ff; padding: 0.6rem; font-size: 0.8em; border: 1px solid #444; }
+        .greeks-table td { padding: 0.6rem; font-size: 0.85em; text-align: center; border: 1px solid #444; color: #b0b8c1; }
 
+        .main-content { display: flex; flex-direction: column; gap: 1.5rem; }
+        .chart-card { background: rgba(26, 26, 64, 0.9); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .chart-header h3 { color: #00d4ff; font-size: 1.2em; }
+        .timeframe-buttons { display: flex; gap: 0.5rem; }
+        .timeframe-btn { background: rgba(0, 212, 255, 0.1); border: 1px solid #444; color: #b0b8c1; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.3s; }
+        .timeframe-btn:hover { border-color: #00d4ff; color: #00d4ff; }
+        .timeframe-btn.active { background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-color: #00d4ff; color: white; }
+        .chart-box { height: 500px; width: 100%; }
+
+        .info-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .info-box { background: rgba(26, 26, 64, 0.9); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
+        .info-box h3 { color: #00d4ff; margin-bottom: 1rem; font-size: 1.2em; }
+        .info-content { color: #b0b8c1; line-height: 1.8; }
+        .ai-deep-section { background: rgba(26, 26, 64, 0.9); border: 2px solid #00d4ff; border-radius: 15px; padding: 2rem; }
+        .ai-deep-section h2 { color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; }
+        .ai-deep-content { color: #d1fae5; line-height: 1.8; font-size: 1em; }
+
+        .ticker-cell { font-weight: 700; color: white; font-size: 1.1em; }
+
+        /* ===== ENHANCED MOBILE RESPONSIVENESS ===== */
+        /* Tablets and smaller laptops */
         @media (max-width: 1200px) {
+            .research-layout { grid-template-columns: 1fr; }
+            .left-sidebar { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+            .info-boxes { grid-template-columns: 1fr; }
             .ai-chat-widget { width: calc(100% - 20px); right: 10px; left: 10px; }
+            .timeframe-buttons { flex-wrap: wrap; }
             .top-plays-grid { grid-template-columns: 1fr; }
+            .macro-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Mobile devices */
+        @media (max-width: 768px) {
+            body { padding: 0; }
+
+            /* Header */
+            .header { 
+                flex-direction: column; 
+                padding: 1rem; 
+                gap: 1rem;
+                position: relative;
+            }
+            .logo { font-size: 1.5em; }
+            .search-bar { 
+                width: 100%; 
+                max-width: none; 
+                margin: 0;
+            }
+
+            /* Container */
+            .container { padding: 1rem; }
+
+            /* Hero sections */
+            .container > div:first-child {
+                padding: 2rem 1rem !important;
+            }
+            .container > div:first-child h1 {
+                font-size: 2em !important;
+            }
+            .container > div:first-child p {
+                font-size: 0.95em !important;
+            }
+
+            /* Action buttons */
+            .action-buttons { 
+                flex-direction: column; 
+                width: 100%;
+            }
+            .btn-large { 
+                width: 100%; 
+                font-size: 1em;
+            }
+
+            /* Stock cards */
+            .stock-grid { 
+                grid-template-columns: 1fr; 
+            }
+
+            /* Newsletter sections */
+            .story-section { 
+                padding: 1rem; 
+                margin-bottom: 1.5rem;
+            }
+            .story-section h2 {
+                font-size: 1.4em !important;
+                flex-wrap: wrap;
+            }
+
+            /* Tables */
+            .newsletter-table { 
+                font-size: 0.75em;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+            }
+            .newsletter-table th,
+            .newsletter-table td {
+                padding: 0.5rem;
+            }
+
+            /* Market overview cards */
+            #marketOverview,
+            #sectorRotation {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Macro data */
+            #macroData {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Top picks */
+            #topPicksNewsletter {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Trading strategies */
+            #tradingStrategies {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* Sidebar on research page */
+            .left-sidebar { 
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            /* Chart */
+            .chart-box { 
+                height: 300px; 
+            }
+            .timeframe-buttons {
+                justify-content: center;
+            }
+            .timeframe-btn {
+                padding: 0.4rem 0.8rem;
+                font-size: 0.75em;
+            }
+
+            /* AI Chat */
+            .ai-chat-toggle {
+                width: 60px;
+                height: 60px;
+                font-size: 1.5em;
+                bottom: 20px;
+                right: 20px;
+            }
+            .ai-chat-widget {
+                width: calc(100% - 20px);
+                max-height: 500px;
+                bottom: 90px;
+                right: 10px;
+                left: 10px;
+            }
+            .ai-messages {
+                max-height: 250px;
+                min-height: 200px;
+            }
+
+            /* Info boxes */
+            .info-boxes {
+                grid-template-columns: 1fr;
+            }
+
+            /* Metrics */
+            .metric-row {
+                gap: 0.5rem;
+            }
+            .metric-box {
+                padding: 0.6rem;
+            }
+            .metric-value {
+                font-size: 1em;
+            }
+
+            /* Top plays */
+            .play-card {
+                padding: 1rem;
+            }
+            .play-title {
+                font-size: 1.3em;
+            }
+
+            /* Price banner */
+            .price-banner {
+                padding: 1rem;
+            }
+            .price-ticker {
+                font-size: 1.5em;
+            }
+            .price-value {
+                font-size: 1.6em;
+            }
+        }
+
+        /* Very small mobile devices */
+        @media (max-width: 480px) {
+            .logo {
+                font-size: 1.2em;
+            }
+
+            .search-bar input {
+                font-size: 0.9em;
+            }
+
+            .search-bar button {
+                padding: 0.6rem 1rem;
+                font-size: 0.9em;
+            }
+
+            .container > div:first-child h1 {
+                font-size: 1.6em !important;
+            }
+
+            .story-section h2 {
+                font-size: 1.2em !important;
+            }
+
+            .newsletter-table {
+                font-size: 0.65em;
+            }
+
+            .btn-large {
+                font-size: 0.95em;
+                padding: 0.9rem 1.5rem;
+            }
+
+            .chart-box {
+                height: 250px;
+            }
+
+            .timeframe-btn {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.7em;
+            }
+
+            #marketOverview > div,
+            #sectorRotation > div {
+                padding: 1rem;
+            }
+
+            #marketOverview .market-card-value,
+            #sectorRotation > div > div:nth-child(2) {
+                font-size: 1.5em;
+            }
+        }
+
+        /* Landscape mobile */
+        @media (max-width: 896px) and (orientation: landscape) {
+            .header {
+                flex-direction: row;
+                padding: 0.8rem 1.5rem;
+            }
+
+            .search-bar {
+                max-width: 400px;
+                margin: 0 1rem;
+            }
+
+            .chart-box {
+                height: 350px;
+            }
+        }
+
+        /* Touch device optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            /* Increase tap targets */
+            .stock-card,
+            .play-card,
+            .market-card,
+            .btn-large,
+            .timeframe-btn {
+                cursor: pointer;
+                -webkit-tap-highlight-color: rgba(0, 212, 255, 0.2);
+            }
+
+            /* Remove hover effects on touch */
+            .stock-card:hover,
+            .play-card:hover {
+                transform: none;
+            }
+
+            /* Active states for touch */
+            .stock-card:active,
+            .play-card:active {
+                transform: scale(0.98);
+                opacity: 0.9;
+            }
+
+            .btn-large:active {
+                transform: scale(0.95);
+            }
         }
     </style>
 </head>
 <body>
+    <!-- HEADER -->
     <div class="header">
         <div class="logo" onclick="goHome()">📊 Elite Trading</div>
         <div class="search-bar">
@@ -95,6 +396,7 @@
         </div>
     </div>
 
+    <!-- AI CHAT WIDGET -->
     <button class="ai-chat-toggle" onclick="toggleAIChat()" id="aiChatToggle"><i class="fas fa-robot"></i></button>
     <div class="ai-chat-widget" id="aiChatWidget">
         <div class="ai-chat-header">
@@ -110,6 +412,7 @@
         </div>
     </div>
 
+    <!-- HOME PAGE -->
     <div id="homePage" class="page active">
         <div class="container">
             <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
@@ -120,369 +423,368 @@
             <div class="action-buttons">
                 <button class="btn-large btn-refresh" onclick="loadAllStocks()"><i class="fas fa-sync"></i> LOAD 57 STOCKS</button>
                 <button class="btn-large btn-brief" onclick="showBrief()"><i class="fas fa-bolt"></i> MARKET BRIEF</button>
-                <button class="btn-large btn-newsletter" onclick="showNewsletter()"><i class="fas fa-newspaper"></i> NEWSLETTER SCREENER</button>
+                <button class="btn-large btn-newsletter" onclick="showNewsletter()"><i class="fas fa-newspaper"></i> NEWSLETTER</button>
             </div>
 
             <div class="top-plays-section">
-                <h2 style="color: #00d4ff; font-size: 1.8em;"><i class="fas fa-star"></i> Top 3 High-Conviction Plays</h2>
+                <h2 style="color: #00d4ff; font-size: 1.8em;"><i class="fas fa-star"></i> Top 3 Plays</h2>
                 <div class="top-plays-grid" id="topPlays">Loading...</div>
             </div>
 
-            <div id="loadingState" style="display: none; text-align: center; padding: 80px 20px;">
-                <div class="loading-spinner"></div>
-                <h3 style="color: #e2e8f0; margin-top: 24px; font-size: 20px;">Loading Market Analysis...</h3>
-                <p style="color: #94a3b8; margin-top: 8px;">Fetching latest 110-signal recommendations</p>
-            </div>
-
-            <div id="errorState" style="display: none; text-align: center; padding: 80px 20px;">
-                <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
-                <h3 style="color: #ef4444; margin-bottom: 12px; font-size: 20px;">Unable to Load Data</h3>
-                <p style="color: #94a3b8; margin-bottom: 24px; font-size: 14px;" id="errorMessage">Connection error</p>
-                <button onclick="retryLoad()" style="background: #3b82f6; color: white; border: none; padding: 12px 28px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600;">
-                    🔄 Retry
-                </button>
-            </div>
-
-            <div id="stockGrid" class="stock-grid"></div>
+            <div class="stock-grid" id="stockGrid">Click LOAD 57 STOCKS</div>
         </div>
     </div>
 
+    <!-- MARKET BRIEF PAGE -->
     <div id="briefPage" class="page">
         <div class="container">
-            <h1 style="color: #00d4ff; font-size: 2.5em; margin-bottom: 2rem;">📰 Market Brief</h1>
-            <p style="color: #b0b8c1; font-size: 1.2em;">Quick market overview placeholder...</p>
-            <button class="btn-large btn-back" onclick="goHome()">← BACK TO DASHBOARD</button>
+            <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 2.8em; font-weight: 900;">📊 Market Brief</h1>
+            </div>
+            <div class="story-section">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem;">Macro Summary</h2>
+                <div style="color: #b0b8c1; line-height: 1.8;"><strong>GDP:</strong> +2.8%<br><strong>Unemployment:</strong> 3.9%<br><strong>CPI:</strong> 3.2%<br><strong>Fed Rate:</strong> 5.25-5.50%<br><strong>10Y:</strong> 4.45%</div>
+            </div>
+            <div class="story-section">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem;">Micro Summary</h2>
+                <div id="microSummary" style="color: #b0b8c1; line-height: 1.8;">Loading...</div>
+            </div>
+            <button class="btn-large btn-back" onclick="goHome()"><i class="fas fa-arrow-left"></i> BACK</button>
         </div>
     </div>
 
+    <!-- NEWSLETTER PAGE -->
     <div id="newsletterPage" class="page">
         <div class="container">
-            <h1 style="color: #00d4ff; font-size: 2.5em; margin-bottom: 2rem;">📋 Newsletter Screener</h1>
-            <p style="color: #b0b8c1; font-size: 1.2em;">Newsletter screener placeholder...</p>
-            <button class="btn-large btn-back" onclick="goHome()">← BACK TO DASHBOARD</button>
+            <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 2.8em; font-weight: 900;">📰 Newsletter</h1>
+                <p><span id="newsletterDate"></span></p>
+            </div>
+
+            <!-- EXECUTIVE SUMMARY -->
+            <div class="story-section">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem;">🎯 Summary</h2>
+                <div id="executiveSummary" style="color: #b0b8c1; line-height: 1.8;"></div>
+            </div>
+
+            <!-- MARKET OVERVIEW -->
+            <div class="story-section">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem;">📈 Market Overview</h2>
+                <div id="marketOverview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;"></div>
+            </div>
+
+            <!-- MACRO DATA -->
+            <div class="story-section">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem;">🌍 Macro</h2>
+                <div id="macroData" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;"></div>
+            </div>
+
+            <!-- TOP 3 PICKS -->
+            <div class="story-section">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem;">⭐ Top 3 Picks</h2>
+                <div id="topPicksNewsletter" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;"></div>
+            </div>
+
+            <!-- VALUE TABLE -->
+            <div class="story-section">
+                <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem;">💎 Value Opportunities</h2>
+                <table class="newsletter-table">
+                    <thead><tr><th>Ticker</th><th>Price</th><th>Change</th><th>RSI</th><th>Signal</th></tr></thead>
+                    <tbody id="valueTable"></tbody>
+                </table>
+            </div>
+
+            <!-- MOMENTUM TABLE -->
+            <div class="story-section">
+                <h2 style="color: #10b981; font-size: 1.8em; margin-bottom: 1rem;">🚀 Momentum</h2>
+                <table class="newsletter-table">
+                    <thead><tr><th>Ticker</th><th>Price</th><th>Change</th><th>RSI</th><th>Target</th></tr></thead>
+                    <tbody id="momentumTable"></tbody>
+                </table>
+            </div>
+
+            <!-- TRADING STRATEGIES -->
+            <div class="story-section">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem;">🎯 Strategies</h2>
+                <div id="tradingStrategies" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem;"></div>
+            </div>
+
+            <!-- SECTOR ROTATION -->
+            <div class="story-section">
+                <h2 style="color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem;">🔄 Sectors</h2>
+                <div id="sectorRotation" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;"></div>
+            </div>
+
+            <button class="btn-large btn-back" onclick="goHome()"><i class="fas fa-arrow-left"></i> BACK</button>
         </div>
     </div>
 
+    <!-- RESEARCH PAGE -->
     <div id="researchPage" class="page">
         <div class="container">
-            <h1 style="color: #00d4ff; font-size: 2.5em; margin-bottom: 2rem;">🔍 Stock Research</h1>
-            <div id="researchContent"></div>
-            <button class="btn-large btn-back" onclick="goHome()">← BACK TO DASHBOARD</button>
+            <div class="research-layout">
+                <div class="left-sidebar">
+                    <div class="price-banner">
+                        <div class="price-ticker" id="sidebarTicker">TICKER</div>
+                        <div class="price-value" id="sidebarPrice">$0.00</div>
+                        <div class="price-story" id="sidebarStory">"Story"</div>
+                    </div>
+                    <div class="sidebar-card">
+                        <h3>🤖 AI ANALYSIS</h3>
+                        <div class="sidebar-content" id="sidebarAI">
+                            <strong style="color: #00d4ff;">💡 Edge:</strong><br><span id="aiEdge">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="main-content">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>📊 Chart</h3>
+                            <div class="timeframe-buttons">
+                                <button class="timeframe-btn active" onclick="changeTimeframe('D', this)">1D</button>
+                                <button class="timeframe-btn" onclick="changeTimeframe('M', this)">1M</button>
+                                <button class="timeframe-btn" onclick="changeTimeframe('12M', this)">1Y</button>
+                            </div>
+                        </div>
+                        <div id="chartMain" class="chart-box"></div>
+                    </div>
+                    <button class="btn-large btn-back" onclick="goHome()"><i class="fas fa-arrow-left"></i> BACK</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-    // ============================================
-    // API CONFIGURATION - Step 1
-    // ============================================
-    const API_CONFIG = {
-        baseUrl: 'https://elite-trading-with-exclusive-ip.onrender.com',
-        endpoints: {
-            recommendations: '/api/recommendations',
-            triggerScan: '/api/trigger-scan'
-        },
-        refreshInterval: 5 * 60 * 1000,
-        fallbackToLocal: true
-    };
+        let allStocks = [
+            {Symbol:'NVDA',Last:'178.88',Change:'-0.97',RSIWilder:'70',RegimeDetection:'82',Inst33:'85',Signal:'STRONG BUY',Story:'The Setup'},
+            {Symbol:'TSLA',Last:'342.80',Change:'-2.3',RSIWilder:'42',RegimeDetection:'50',Inst33:'60',Signal:'HOLD',Story:'The Fade'},
+            {Symbol:'META',Last:'512.15',Change:'2.1',RSIWilder:'66',RegimeDetection:'75',Inst33:'80',Signal:'BUY',Story:'The Creep'},
+            {Symbol:'AAPL',Last:'289.45',Change:'-1.15',RSIWilder:'52',RegimeDetection:'65',Inst33:'75',Signal:'HOLD',Story:'Quality Hold'},
+            {Symbol:'MSFT',Last:'425.30',Change:'0.85',RSIWilder:'58',RegimeDetection:'70',Inst33:'72',Signal:'BUY',Story:'Steady Growth'},
+            {Symbol:'GOOGL',Last:'178.50',Change:'-0.9',RSIWilder:'48',RegimeDetection:'55',Inst33:'68',Signal:'HOLD',Story:'Consolidation'},
+            {Symbol:'AMZN',Last:'195.20',Change:'1.2',RSIWilder:'62',RegimeDetection:'72',Inst33:'70',Signal:'BUY',Story:'Cloud Strength'},
+            {Symbol:'AMD',Last:'142.35',Change:'4.2',RSIWilder:'68',RegimeDetection:'78',Inst33:'65',Signal:'STRONG BUY',Story:'Breakout Play'},
+        ];
 
-    function testAPIConfig() {
-        console.log('✅ API Config loaded:', API_CONFIG);
-        console.log('🔗 Recommendations endpoint:', API_CONFIG.baseUrl + API_CONFIG.endpoints.recommendations);
-        return API_CONFIG;
-    }
+        let currentTicker = '';
+        let chartWidget = null;
 
-    // ============================================
-    // API SERVICE FUNCTIONS - Step 2
-    // ============================================
-    const TradingAPI = {
-        async getRecommendations() {
-            console.log('🔄 Fetching recommendations from API...');
-            
-            try {
-                const url = API_CONFIG.baseUrl + API_CONFIG.endpoints.recommendations;
-                console.log('📡 Calling:', url);
-                
-                const response = await fetch(url);
-                
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                console.log('✅ Received', data.length, 'stocks from API');
-                
-                return {
-                    success: true,
-                    data: data,
-                    timestamp: new Date().toISOString()
-                };
-            } catch (error) {
-                console.error('❌ API Error:', error);
-                
-                if (API_CONFIG.fallbackToLocal) {
-                    console.log('⚠️ Using local data as fallback');
-                    return {
-                        success: false,
-                        error: error.message,
-                        data: allStocks,
-                        usingFallback: true
-                    };
-                }
-                
-                return {
-                    success: false,
-                    error: error.message,
-                    data: []
-                };
-            }
-        },
-
-        async testConnection() {
-            console.log('🧪 Testing API connection...');
-            const result = await this.getRecommendations();
-            
-            if (result.success) {
-                console.log('✅ API connection successful!');
-                console.log('📊 Sample stock:', result.data[0]);
-            } else if (result.usingFallback) {
-                console.log('⚠️ API unavailable, using fallback data');
-            } else {
-                console.log('❌ API connection failed:', result.error);
-            }
-            
-            return result;
-        }
-    };
-
-    function testAPIService() {
-        console.log('🧪 Testing API Service...');
-        return TradingAPI.testConnection();
-    }
-
-    // ============================================
-    // UI STATE MANAGEMENT - Step 3
-    // ============================================
-    function showLoadingState() {
-        document.getElementById('loadingState').style.display = 'block';
-        document.getElementById('errorState').style.display = 'none';
-        document.getElementById('stockGrid').style.display = 'none';
-    }
-
-    function hideLoadingState() {
-        document.getElementById('loadingState').style.display = 'none';
-        document.getElementById('stockGrid').style.display = 'grid';
-    }
-
-    function showErrorState(message) {
-        document.getElementById('loadingState').style.display = 'none';
-        document.getElementById('errorState').style.display = 'block';
-        document.getElementById('stockGrid').style.display = 'none';
-        document.getElementById('errorMessage').textContent = message || 'Failed to load data';
-    }
-
-    function testLoadingState() {
-        console.log('Testing loading state...');
-        showLoadingState();
-        setTimeout(() => {
-            console.log('✅ Loading state shown for 2 seconds');
-            hideLoadingState();
-        }, 2000);
-    }
-
-    function testErrorState() {
-        console.log('Testing error state...');
-        showErrorState('This is a test error message');
-        setTimeout(() => {
-            console.log('✅ Error state shown for 3 seconds');
-            hideLoadingState();
-        }, 3000);
-    }
-
-    // ============================================
-    // DATA - Fallback Stock Data
-    // ============================================
-    let allStocks = [
-        {Symbol:'NVDA',Last:'178.88',Change:'-0.97',RSIWilder:'70',RegimeDetection:'82',Inst33:'85',Signal:'STRONG BUY',Story:'The Setup'},
-        {Symbol:'TSLA',Last:'342.80',Change:'-2.3',RSIWilder:'42',RegimeDetection:'50',Inst33:'60',Signal:'HOLD',Story:'The Fade'},
-        {Symbol:'META',Last:'512.15',Change:'2.1',RSIWilder:'66',RegimeDetection:'75',Inst33:'80',Signal:'BUY',Story:'The Creep'},
-        {Symbol:'AAPL',Last:'289.45',Change:'-1.15',RSIWilder:'52',RegimeDetection:'65',Inst33:'75',Signal:'HOLD',Story:'Quality Hold'},
-        {Symbol:'MSFT',Last:'425.30',Change:'0.85',RSIWilder:'58',RegimeDetection:'70',Inst33:'72',Signal:'BUY',Story:'Steady Growth'},
-        {Symbol:'GOOGL',Last:'178.50',Change:'-0.9',RSIWilder:'48',RegimeDetection:'55',Inst33:'68',Signal:'HOLD',Story:'Consolidation'},
-        {Symbol:'AMZN',Last:'195.20',Change:'1.2',RSIWilder:'62',RegimeDetection:'72',Inst33:'70',Signal:'BUY',Story:'Cloud Strength'},
-        {Symbol:'AMD',Last:'142.35',Change:'4.2',RSIWilder:'68',RegimeDetection:'78',Inst33:'65',Signal:'STRONG BUY',Story:'Breakout Play'}
-    ];
-
-    // ============================================
-    // STEP 4: API-DRIVEN DATA LOADING
-    // ============================================
-    let lastUpdateTime = null;
-
-    async function loadAllStocks() {
-        console.log('🔄 Loading stocks from API...');
-        showLoadingState();
-        
-        try {
-            const result = await TradingAPI.getRecommendations();
-            
-            if (result.success || result.usingFallback) {
-                allStocks = result.data;
-                lastUpdateTime = new Date();
-                renderStocks();
-                hideLoadingState();
-                
-                if (result.success) {
-                    console.log('✅ Loaded from API:', allStocks.length, 'stocks');
-                } else {
-                    console.log('⚠️ Using fallback data:', allStocks.length, 'stocks');
-                }
-            } else {
-                showErrorState(result.error || 'Failed to load stock data');
-            }
-        } catch (error) {
-            console.error('💥 Unexpected error:', error);
-            showErrorState('Unexpected error loading data');
-        }
-    }
-
-    function renderStocks() {
-        const topPlaysHTML = allStocks.slice(0, 3).map((s, i) => {
-            const price = parseFloat(s.Last);
-            const change = parseFloat(s.Change);
-            const buttons = ['STRONG BUY', 'SELL PREMIUM', 'ACCUMULATE'];
-            const colors = ['#10b981', '#f59e0b', '#00d4ff'];
-            const borderColors = ['#7c3aed', '#7c3aed', '#7c3aed'];
-            const bullets = [
-                ['🟣 Positive momentum. Technically strong setup. Institutional inflows.',
-                 '🟡 Buy on support. Sell calls for income. Hold core position.',
-                 '⚠️ Watch for exhaustion. Profit taking potential. Monitor key resistance.'],
-                ['🟣 Pullback detected -2.3%. IV likely depressed. Mean reversion candidate.',
-                 '🟡 Buy dips on support. Scale into position. Monitor for reversal confirmation.',
-                 '⚠️ Could test deeper lows. Watch key support levels. Use stops.'],
-                ['🟣 Positive momentum. Technically strong setup. Institutional inflows.',
-                 '🟡 Buy on support. Sell calls for income. Hold core position.',
-                 '⚠️ Watch for exhaustion. Profit taking potential. Monitor key resistance.']
-            ];
-            const targets = ['Entry: $146 | T1: $520 | T2: $540<br>Stop: $405', 'Entry: $343 | T1: $360 | T2: $375<br>Stop: $325', 'Entry: $512 | T1: $550 | T2: $580<br>Stop: $490'];
-
-            return `
-                <div class="play-card" onclick="researchStock('${s.Symbol}')">
-                    <div class="play-title">${s.Story}</div>
-                    <div class="play-subtitle">${s.Symbol} @ $${price.toFixed(2)} (${change >= 0 ? '+' : ''}${change}%)</div>
-                    <div class="play-change" style="color: ${change >= 0 ? '#10b981' : '#ef4444'};">${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)}%</div>
-                    <button class="play-button" style="background: ${colors[i]};">${buttons[i]}</button>
-                    <div class="play-metrics-grid">
-                        <div class="metric-box-sm"><div class="metric-label-sm">RSI</div><div class="metric-value-sm">${s.RSIWilder}</div></div>
-                        <div class="metric-box-sm"><div class="metric-label-sm">Regime</div><div class="metric-value-sm">${s.RegimeDetection}%</div></div>
-                        <div class="metric-box-sm"><div class="metric-label-sm">Inst</div><div class="metric-value-sm">${s.Inst33}</div></div>
+        function loadAllStocks() {
+            const topPlaysHTML = allStocks.slice(0, 3).map((s, i) => {
+                const price = parseFloat(s.Last);
+                const change = parseFloat(s.Change);
+                const colors = ['#10b981', '#f59e0b', '#00d4ff'];
+                return `
+                    <div class="play-card" onclick="researchStock('${s.Symbol}')">
+                        <div class="play-title">${s.Story}</div>
+                        <div style="color: ${change >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.3em; font-weight: 900; margin: 0.5rem 0;">$${price.toFixed(2)} ${change >= 0 ? '▲' : '▼'} ${Math.abs(change)}%</div>
+                        <button class="play-button" style="background: ${colors[i]};">${s.Signal}</button>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin: 1rem 0;">
+                            <div style="text-align: center; padding: 0.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 6px;">
+                                <div style="font-size: 0.7em; color: #b0b8c1;">RSI</div>
+                                <div style="font-size: 1em; color: #00d4ff; font-weight: 700;">${s.RSIWilder}</div>
+                            </div>
+                            <div style="text-align: center; padding: 0.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 6px;">
+                                <div style="font-size: 0.7em; color: #b0b8c1;">Regime</div>
+                                <div style="font-size: 1em; color: #00d4ff; font-weight: 700;">${s.RegimeDetection}%</div>
+                            </div>
+                            <div style="text-align: center; padding: 0.5rem; background: rgba(0, 212, 255, 0.1); border-radius: 6px;">
+                                <div style="font-size: 0.7em; color: #b0b8c1;">Inst</div>
+                                <div style="font-size: 1em; color: #00d4ff; font-weight: 700;">${s.Inst33}</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="play-analysis" style="border-color: ${borderColors[i]};"><ul>${bullets[i].map(b => `<li>${b}</li>`).join('')}</ul></div>
-                    <div class="play-targets"><div class="play-targets-title">🎯 Targets</div><div class="play-targets-content">${targets[i]}</div></div>
-                </div>
-            `;
-        }).join('');
-        document.getElementById('topPlays').innerHTML = topPlaysHTML;
+                `;
+            }).join('');
+            document.getElementById('topPlays').innerHTML = topPlaysHTML;
 
-        const grid = allStocks.map(s => {
-            const price = parseFloat(s.Last);
-            const change = parseFloat(s.Change);
-            return `
-                <div class="stock-card" onclick="researchStock('${s.Symbol}')">
-                    <div style="font-size: 2.2em; font-weight: 900; color: white;">${s.Symbol}</div>
-                    <div style="font-size: 1.8em; color: #00d4ff; font-weight: 900;">$${price.toFixed(2)}</div>
-                    <div style="font-style: italic; color: #b0b8c1; margin: 0.3rem 0;">"${s.Story}"</div>
-                    <div style="color: ${change >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.1em; font-weight: 700; margin: 0.5rem 0;">${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)}%</div>
-                    <span style="display: inline-block; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 8px; font-weight: 700; color: white;">${s.Signal}</span>
-                    <div style="margin-top: 1rem; font-size: 0.85em; color: #b0b8c1;">RSI: ${s.RSIWilder} | Regime: ${s.RegimeDetection}% | Inst: ${s.Inst33}</div>
-                </div>
-            `;
-        }).join('');
-        document.getElementById('stockGrid').innerHTML = grid;
-    }
-
-    function retryLoad() {
-        console.log('🔄 Retry triggered by user');
-        loadAllStocks();
-    }
-
-    // Auto-refresh every 5 minutes
-    setInterval(() => {
-        console.log('🔄 Auto-refresh: Reloading from API...');
-        loadAllStocks();
-    }, API_CONFIG.refreshInterval);
-
-    // Initialize on page load
-    window.addEventListener('load', () => {
-        console.log('🚀 Dashboard initializing...');
-        loadAllStocks();
-    });
-
-    // ============================================
-    // NAVIGATION & UI FUNCTIONS
-    // ============================================
-    function goHome() {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('homePage').classList.add('active');
-        document.getElementById('aiChatToggle').classList.remove('hidden');
-    }
-
-    function showBrief() {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('briefPage').classList.add('active');
-        document.getElementById('aiChatToggle').classList.add('hidden');
-    }
-
-    function showNewsletter() {
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('newsletterPage').classList.add('active');
-        document.getElementById('aiChatToggle').classList.add('hidden');
-    }
-
-    function researchStock(symbol) {
-        const stock = allStocks.find(s => s.Symbol === symbol);
-        if (!stock) return;
-        
-        document.getElementById('researchContent').innerHTML = `
-            <div style="padding: 2rem; background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff; border-radius: 15px;">
-                <h2 style="color: #00d4ff; font-size: 2em; margin-bottom: 1rem;">${symbol}</h2>
-                <p style="color: #b0b8c1; font-size: 1.2em;">Price: $${parseFloat(stock.Last).toFixed(2)}</p>
-                <p style="color: #b0b8c1; font-size: 1.2em;">Change: ${stock.Change}%</p>
-                <p style="color: #b0b8c1; font-size: 1.2em;">Signal: ${stock.Signal}</p>
-            </div>
-        `;
-        
-        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-        document.getElementById('researchPage').classList.add('active');
-        document.getElementById('aiChatToggle').classList.add('hidden');
-    }
-
-    function searchStock() {
-        const symbol = document.getElementById('searchInput').value.toUpperCase().trim();
-        if (symbol) {
-            researchStock(symbol);
+            const grid = allStocks.map(s => {
+                const price = parseFloat(s.Last);
+                const change = parseFloat(s.Change);
+                return `
+                    <div class="stock-card" onclick="researchStock('${s.Symbol}')">
+                        <div style="font-size: 2.2em; font-weight: 900; color: white;">${s.Symbol}</div>
+                        <div style="font-size: 1.8em; color: #00d4ff; font-weight: 900;">$${price.toFixed(2)}</div>
+                        <div style="color: ${change >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.1em; font-weight: 700; margin: 0.5rem 0;">${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)}%</div>
+                        <span style="display: inline-block; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 8px; font-weight: 700; color: white;">${s.Signal}</span>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('stockGrid').innerHTML = grid;
         }
-    }
 
-    // ============================================
-    // AI CHAT FUNCTIONS
-    // ============================================
-    function toggleAIChat() {
-        document.getElementById('aiChatWidget').classList.toggle('active');
-    }
+        function showNewsletter() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('newsletterPage').classList.add('active');
 
-    function sendAIMessage() {
-        const input = document.getElementById('aiInput');
-        const message = input.value.trim();
-        if (!message) return;
-        
-        const messagesDiv = document.getElementById('aiMessages');
-        messagesDiv.innerHTML += `<div class="message user">${message}</div>`;
-        input.value = '';
-        
-        setTimeout(() => {
-            messagesDiv.innerHTML += `<div class="message ai">I'm analyzing "${message}"... This is a placeholder AI response.</div>`;
-            messagesDiv.scrollTop = messagesDiv.scrollHeight;
-        }, 500);
-    }
+            const today = new Date();
+            document.getElementById('newsletterDate').textContent = today.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+            const topStock = allStocks.reduce((a, b) => (parseFloat(a.RSIWilder) + parseFloat(a.Inst33)) > (parseFloat(b.RSIWilder) + parseFloat(b.Inst33)) ? a : b);
+            document.getElementById('executiveSummary').innerHTML = `<strong>Top Pick:</strong> ${topStock.Symbol} at $${topStock.Last} - ${topStock.Story}. RSI: ${topStock.RSIWilder}, Regime: ${topStock.RegimeDetection}%, Inst: ${topStock.Inst33}.`;
+
+            const marketData = [
+                { name: 'S&P 500', value: '4,785', change: '+1.2%', positive: true },
+                { name: 'NASDAQ', value: '15,340', change: '+1.8%', positive: true },
+                { name: 'VIX', value: '15.2', change: '-2.3%', positive: false },
+                { name: '10Y', value: '4.45%', change: '+5bps', positive: true }
+            ];
+
+            document.getElementById('marketOverview').innerHTML = marketData.map(m => `
+                <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #444; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                    <div style="color: #b0b8c1; font-size: 0.85em; margin-bottom: 0.5rem;">${m.name}</div>
+                    <div style="color: #00d4ff; font-size: 2em; font-weight: 900;">${m.value}</div>
+                    <div style="color: ${m.positive ? '#10b981' : '#ef4444'}; font-size: 0.95em; font-weight: 700;">${m.positive ? '▲' : '▼'} ${m.change}</div>
+                </div>
+            `).join('');
+
+            const macroData = [
+                { label: 'GDP', value: '+2.8%' },
+                { label: 'CPI', value: '3.2%' },
+                { label: 'Jobs', value: '3.9%' },
+                { label: 'Fed', value: '5.25%' }
+            ];
+
+            document.getElementById('macroData').innerHTML = macroData.map(m => `
+                <div style="background: rgba(0, 212, 255, 0.05); padding: 1rem; border-radius: 8px; border: 1px solid #444;">
+                    <div style="color: #b0b8c1; font-size: 0.85em;">${m.label}</div>
+                    <div style="color: #00d4ff; font-size: 1.3em; font-weight: 700;">${m.value}</div>
+                </div>
+            `).join('');
+
+            const top3 = allStocks.slice(0, 3);
+            const pickColors = ['#10b981', '#f59e0b', '#00d4ff'];
+
+            document.getElementById('topPicksNewsletter').innerHTML = top3.map((s, i) => {
+                const price = parseFloat(s.Last);
+                const change = parseFloat(s.Change);
+                const t1 = (price * 1.05).toFixed(2);
+                const t2 = (price * 1.10).toFixed(2);
+                return `
+                    <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid ${pickColors[i]}; border-radius: 12px; padding: 1.5rem;">
+                        <div style="font-size: 1.8em; font-weight: 900; color: white; margin-bottom: 0.3rem;">${s.Symbol}</div>
+                        <div style="font-style: italic; color: #00d4ff; margin-bottom: 0.8rem;">"${s.Story}"</div>
+                        <div style="color: ${change >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.3em; font-weight: 900; margin: 0.5rem 0;">$${price.toFixed(2)} ${change >= 0 ? '▲' : '▼'} ${Math.abs(change)}%</div>
+                        <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 8px; margin-top: 1rem; border-left: 3px solid #10b981;">
+                            <strong style="color: #10b981;">Targets:</strong><br>
+                            <span style="color: #b0b8c1; font-size: 0.85em;">T1: $${t1} | T2: $${t2}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            const valueStocks = allStocks.filter(s => parseFloat(s.Change) < 0);
+            document.getElementById('valueTable').innerHTML = valueStocks.map(s => `
+                <tr onclick="researchStock('${s.Symbol}')" style="cursor: pointer;">
+                    <td class="ticker-cell">${s.Symbol}</td>
+                    <td>$${parseFloat(s.Last).toFixed(2)}</td>
+                    <td style="color: #ef4444;">${s.Change}%</td>
+                    <td>${s.RSIWilder}</td>
+                    <td><span style="background: #00d4ff; color: #1a1a3e; padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 700;">${s.Signal}</span></td>
+                </tr>
+            `).join('');
+
+            const momentumStocks = allStocks.filter(s => parseFloat(s.Change) > 2);
+            document.getElementById('momentumTable').innerHTML = momentumStocks.map(s => {
+                const price = parseFloat(s.Last);
+                const target = Math.round(price * 1.1);
+                return `
+                    <tr onclick="researchStock('${s.Symbol}')" style="cursor: pointer;">
+                        <td class="ticker-cell">${s.Symbol}</td>
+                        <td>$${price.toFixed(2)}</td>
+                        <td style="color: #10b981;">+${s.Change}%</td>
+                        <td>${s.RSIWilder}</td>
+                        <td style="color: #10b981; font-weight: 700;">$${target}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('tradingStrategies').innerHTML = `
+                <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #10b981; border-radius: 12px; padding: 1.5rem;">
+                    <h3 style="color: #10b981; font-size: 1.2em; margin-bottom: 1rem;">🟢 LONGS</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 0.5rem 0; color: #b0b8c1;">→ Buy on support dips</li>
+                        <li style="padding: 0.5rem 0; color: #b0b8c1;">→ Scale 25% position</li>
+                    </ul>
+                </div>
+                <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #f59e0b; border-radius: 12px; padding: 1.5rem;">
+                    <h3 style="color: #f59e0b; font-size: 1.2em; margin-bottom: 1rem;">🟡 OPTIONS</h3>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="padding: 0.5rem 0; color: #b0b8c1;">→ Sell puts on dips</li>
+                        <li style="padding: 0.5rem 0; color: #b0b8c1;">→ Collect premium</li>
+                    </ul>
+                </div>
+            `;
+
+            document.getElementById('sectorRotation').innerHTML = `
+                <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                    <div style="color: #b0b8c1; font-size: 0.85em;">Tech</div>
+                    <div style="color: #10b981; font-size: 1.5em; font-weight: 900;">STRONG ↑</div>
+                </div>
+                <div style="background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                    <div style="color: #b0b8c1; font-size: 0.85em;">Finance</div>
+                    <div style="color: #f59e0b; font-size: 1.5em; font-weight: 900;">NEUTRAL →</div>
+                </div>
+            `;
+        }
+
+        function changeTimeframe(interval, btn) {
+            document.querySelectorAll('.timeframe-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+
+        function researchStock(ticker) {
+            let stock = allStocks.find(s => s.Symbol === ticker);
+            if (!stock) return;
+
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('researchPage').classList.add('active');
+
+            currentTicker = ticker;
+            const price = parseFloat(stock.Last);
+            const change = parseFloat(stock.Change);
+
+            document.getElementById('sidebarTicker').textContent = ticker;
+            document.getElementById('sidebarPrice').textContent = `$${price.toFixed(2)}`;
+            document.getElementById('sidebarStory').textContent = `"${stock.Story}"`;
+            document.getElementById('aiEdge').textContent = change < -5 ? 'EXTREME OVERSOLD. Mean reversion.' : change > 5 ? 'STRONG BREAKOUT. Momentum confirmed.' : 'Consolidation pattern.';
+        }
+
+        function goHome() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('homePage').classList.add('active');
+        }
+
+        function searchStock() {
+            const ticker = document.getElementById('searchInput').value.toUpperCase().trim();
+            if (ticker) {
+                researchStock(ticker);
+                document.getElementById('searchInput').value = '';
+            }
+        }
+
+        function showBrief() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('briefPage').classList.add('active');
+        }
+
+        function toggleAIChat() {
+            document.getElementById('aiChatWidget').classList.toggle('active');
+            document.getElementById('aiChatToggle').classList.toggle('hidden');
+        }
+
+        function sendAIMessage() {
+            const input = document.getElementById('aiInput');
+            const msg = input.value.trim();
+            if (!msg) return;
+            document.getElementById('aiMessages').innerHTML += `<div class="message user">${msg}</div>`;
+            setTimeout(() => {
+                document.getElementById('aiMessages').innerHTML += `<div class="message ai">Analyzing: ${msg}</div>`;
+            }, 600);
+            input.value = '';
+        }
+
+        window.addEventListener('load', loadAllStocks);
     </script>
 </body>
 </html>
