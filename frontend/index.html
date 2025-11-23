@@ -405,9 +405,86 @@
     // END API CONFIGURATION
     // ============================================
 
-  
+      // ============================================
+    // END API CONFIGURATION
+    // ============================================
 
-        let allStocks = [
+    // ============================================
+    // API SERVICE FUNCTIONS - Step 2
+    // ============================================
+    const TradingAPI = {
+        // Fetch recommendations from backend
+        async getRecommendations() {
+            console.log('🔄 Fetching recommendations from API...');
+            
+            try {
+                const url = API_CONFIG.baseUrl + API_CONFIG.endpoints.recommendations;
+                console.log('📡 Calling:', url);
+                
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('✅ Received', data.length, 'stocks from API');
+                
+                return {
+                    success: true,
+                    data: data,
+                    timestamp: new Date().toISOString()
+                };
+            } catch (error) {
+                console.error('❌ API Error:', error);
+                
+                // Fallback to local data if API fails
+                if (API_CONFIG.fallbackToLocal) {
+                    console.log('⚠️ Using local data as fallback');
+                    return {
+                        success: false,
+                        error: error.message,
+                        data: allStocks, // Use existing hardcoded data
+                        usingFallback: true
+                    };
+                }
+                
+                return {
+                    success: false,
+                    error: error.message,
+                    data: []
+                };
+            }
+        },
+
+        // Test function - call this to test API connection
+        async testConnection() {
+            console.log('🧪 Testing API connection...');
+            const result = await this.getRecommendations();
+            
+            if (result.success) {
+                console.log('✅ API connection successful!');
+                console.log('📊 Sample stock:', result.data[0]);
+            } else if (result.usingFallback) {
+                console.log('⚠️ API unavailable, using fallback data');
+            } else {
+                console.log('❌ API connection failed:', result.error);
+            }
+            
+            return result;
+        }
+    };
+
+    // Test function for Step 2
+    function testAPIService() {
+        console.log('🧪 Testing API Service...');
+        return TradingAPI.testConnection();
+    }
+    // ============================================
+    // END API SERVICE FUNCTIONS
+    // ============================================
+
+           let allStocks = [
             {Symbol:'NVDA',Last:'178.88',Change:'-0.97',RSIWilder:'70',RegimeDetection:'82',Inst33:'85',Signal:'STRONG BUY',Story:'The Setup'},
             {Symbol:'TSLA',Last:'342.80',Change:'-2.3',RSIWilder:'42',RegimeDetection:'50',Inst33:'60',Signal:'HOLD',Story:'The Fade'},
             {Symbol:'META',Last:'512.15',Change:'2.1',RSIWilder:'66',RegimeDetection:'75',Inst33:'80',Signal:'BUY',Story:'The Creep'},
