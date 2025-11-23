@@ -160,8 +160,28 @@
                 <div class="top-plays-grid" id="topPlays">Loading...</div>
             </div>
 
-            <div class="stock-grid" id="stockGrid">Click LOAD 57 STOCKS</div>
-        </div>
+            <!-- Loading State -->
+<div id="loadingState" style="display: none; text-align: center; padding: 80px 20px;">
+    <div class="loading-spinner"></div>
+    <h3 style="color: #e2e8f0; margin-top: 24px; font-size: 20px;">Loading Market Analysis...</h3>
+    <p style="color: #94a3b8; margin-top: 8px;">Fetching latest 110-signal recommendations</p>
+</div>
+
+<!-- Error State -->
+<div id="errorState" style="display: none; text-align: center; padding: 80px 20px;">
+    <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
+    <h3 style="color: #ef4444; margin-bottom: 12px; font-size: 20px;">Unable to Load Data</h3>
+    <p style="color: #94a3b8; margin-bottom: 24px; font-size: 14px;" id="errorMessage">Connection error</p>
+    <button onclick="retryLoad()" style="background: #3b82f6; color: white; border: none; padding: 12px 28px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; transition: all 0.2s;">
+        🔄 Retry
+    </button>
+</div>
+
+<!-- Stock Grid (existing) -->
+<div id="stockGrid" class="stock-grid">
+    <!-- Stocks will load here -->
+</div>
+
     </div>
 
     <!-- MARKET BRIEF PAGE -->
