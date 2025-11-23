@@ -5,8 +5,9 @@ import os
 from datetime import datetime, timedelta
 import json
 import threading
-import re
+import time
 from functools import lru_cache
+import concurrent.futures
 
 app = Flask(__name__)
 CORS(app)
@@ -31,6 +32,10 @@ news_cache = {
     'timestamp': None
 }
 
+# Price cache to reduce API calls
+price_cache = {}
+PRICE_CACHE_TTL = 60  # 60 seconds
+
 TICKERS = [
     'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'AMD', 'CRM', 'ADBE',
     'NFLX', 'PYPL', 'SHOP', 'RBLX', 'DASH', 'ZOOM', 'SNOW', 'CRWD', 'NET', 'ABNB',
@@ -45,7 +50,6 @@ TICKERS = [
 def should_update_news():
     """Check if we should update news based on schedule"""
     now = datetime.now()
-    pst = now.astimezone().strftime('%z')
     
     # PST times for updates
     pre_market = 6.5  # 6:30 AM
@@ -64,11 +68,17 @@ def should_update_news():
                (datetime.now() - news_cache['last_updated']).total_seconds() > 600:  # 10 min cooldown
                 return True
     
-    return False
-
+    # Also update if cache is older than 1 hour
+    if news_cache['last_updated'] is None:
+        return True
+    
+    cache_age = (datetime.now() - news_cache['last_updated']).total_seconds()
+    return cache_age > 3600  # 1 hour
+    
 def update_market_news_cache():
     """Fetch and cache market news"""
     if not FINNHUB_KEY:
+        print("[CACHE] Skipping news update - no Finnhub key")
         return
     
     try:
@@ -97,7 +107,7 @@ def update_market_news_cache():
             news_cache['last_updated'] = datetime.now()
             news_cache['timestamp'] = datetime.now().isoformat()
             
-            print(f"[CACHE] Market news updated at {news_cache['timestamp']}")
+            print(f"[CACHE] Market news updated at {news_cache['timestamp']} - {len(formatted_articles)} articles")
             
     except Exception as e:
         print(f"[CACHE_ERROR] Failed to update news cache: {e}")
@@ -106,7 +116,7 @@ def analyze_sentiment_from_headline(headline):
     """Simple sentiment analysis from headline keywords"""
     headline_lower = headline.lower()
     
-    positive_keywords = ['surge', 'jump', 'rally', 'beat', 'record', 'gain', 'soar', 'bull', 'profit', 'growth', 'surge']
+    positive_keywords = ['surge', 'jump', 'rally', 'beat', 'record', 'gain', 'soar', 'bull', 'profit', 'growth']
     negative_keywords = ['crash', 'plunge', 'drop', 'miss', 'loss', 'decline', 'bear', 'risk', 'warning', 'fell']
     
     positive_count = sum(1 for word in positive_keywords if word in headline_lower)
@@ -155,6 +165,18 @@ def summarize_news_ai(headline, summary, detail_level='concise'):
 
 # ==================== STOCK PRICE FETCHING ====================
 
+def get_cached_price(ticker):
+    """Check if we have a recent cached price"""
+    if ticker in price_cache:
+        cached_data, cached_time = price_cache[ticker]
+        if (time.time() - cached_time) < PRICE_CACHE_TTL:
+            return cached_data
+    return None
+
+def cache_price(ticker, price_data):
+    """Cache price data"""
+    price_cache[ticker] = (price_data, time.time())
+
 def get_stock_price_massive(ticker):
     """Try Massive.com API first"""
     if not MASSIVE_KEY:
@@ -166,11 +188,11 @@ def get_stock_price_massive(ticker):
         
         if response.status_code == 200:
             data = response.json()
-            if data.get('status') == 'OK' and 'result' in data:
-                result = data['result']
+            if data.get('status') == 'OK' and 'results' in data:
+                result = data['results']
                 return {
                     'price': result.get('p', 0),
-                    'source': 'Massive',
+                    'source': 'Polygon',
                     'change': 0
                 }
     except Exception as e:
@@ -225,25 +247,60 @@ def get_stock_price_alphavantage(ticker):
     return None
 
 def get_stock_price_waterfall(ticker):
-    """Try APIs in priority order"""
+    """Try APIs in priority order with caching"""
+    # Check cache first
+    cached = get_cached_price(ticker)
+    if cached:
+        return cached
+    
+    # Try APIs in order
     result = get_stock_price_massive(ticker)
     if result:
+        cache_price(ticker, result)
         return result
     
     result = get_stock_price_finnhub(ticker)
     if result:
+        cache_price(ticker, result)
         return result
     
     result = get_stock_price_alphavantage(ticker)
     if result:
+        cache_price(ticker, result)
         return result
     
     # Fallback
-    return {
+    fallback = {
         'price': 0.0,
         'source': 'Unavailable',
         'change': 0
     }
+    cache_price(ticker, fallback)
+    return fallback
+
+def fetch_prices_concurrent(tickers):
+    """Fetch multiple stock prices concurrently"""
+    results = []
+    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+        future_to_ticker = {executor.submit(get_stock_price_waterfall, ticker): ticker for ticker in tickers}
+        for future in concurrent.futures.as_completed(future_to_ticker):
+            ticker = future_to_ticker[future]
+            try:
+                price_data = future.result(timeout=10)
+                if price_data['price'] > 0:
+                    results.append({
+                        'Symbol': ticker,
+                        'Last': round(price_data['price'], 2),
+                        'Change': round(price_data['change'], 2),
+                        'Source': price_data['source'],
+                        'RSI': 50,
+                        'Signal': 'HOLD',
+                        'Strategy': 'Momentum'
+                    })
+            except Exception as e:
+                print(f"[CONCURRENT] Error fetching {ticker}: {e}")
+    
+    return results
 
 # ==================== API ENDPOINTS ====================
 
@@ -251,7 +308,7 @@ def get_stock_price_waterfall(ticker):
 def home():
     return jsonify({
         'status': 'online',
-        'version': '2.0',
+        'version': '2.1',
         'endpoints': [
             '/api/recommendations',
             '/api/stock-news/<ticker>',
@@ -278,27 +335,19 @@ def get_config():
 @app.route('/api/recommendations', methods=['GET'])
 def get_recommendations():
     """Get stock recommendations with REAL prices (no hardcoded!)"""
-    recommendations = []
-    
-    for ticker in TICKERS[:20]:  # Fetch top 20 to avoid rate limits
-        price_data = get_stock_price_waterfall(ticker)
-        
-        if price_data['price'] > 0:
-            recommendations.append({
-                'Symbol': ticker,
-                'Last': round(price_data['price'], 2),
-                'Change': round(price_data['change'], 2),
-                'Source': price_data['source'],
-                'RSI': 50,
-                'Signal': 'HOLD',
-                'Strategy': 'Momentum'
-            })
-    
-    return jsonify(recommendations)
+    try:
+        recommendations = fetch_prices_concurrent(TICKERS[:20])
+        return jsonify(recommendations)
+    except Exception as e:
+        print(f"[ERROR] /api/recommendations: {e}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/stock-news/<ticker>', methods=['GET'])
 def get_stock_news(ticker):
     """Get latest news for a specific stock"""
+    if not ticker or len(ticker) > 10:
+        return jsonify({'error': 'Invalid ticker'}), 400
+        
     if not FINNHUB_KEY:
         return jsonify({'error': 'Finnhub not configured'}), 500
     
@@ -329,82 +378,87 @@ def get_stock_news(ticker):
                 'news_count': len(formatted_news),
                 'articles': formatted_news
             })
+        else:
+            return jsonify({'error': f'API returned status {response.status_code}'}), 500
+            
     except Exception as e:
+        print(f"[ERROR] /api/stock-news/{ticker}: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/market-news', methods=['GET'])
 def get_market_news():
     """Get cached market news (auto-refreshes)"""
-    # Check if we should update cache
-    if should_update_news():
-        print("[AUTO-UPDATE] Triggering news cache update...")
-        update_market_news_cache()
-    
-    return jsonify({
-        'articles': news_cache['market_news'][:30],
-        'news_count': len(news_cache['market_news']),
-        'last_updated': news_cache['timestamp'],
-        'cache_age_seconds': (datetime.now() - news_cache['last_updated']).total_seconds() if news_cache['last_updated'] else None
-    })
+    try:
+        # Check if we should update cache
+        if should_update_news():
+            print("[AUTO-UPDATE] Triggering news cache update...")
+            update_market_news_cache()
+        
+        return jsonify({
+            'articles': news_cache['market_news'][:30],
+            'news_count': len(news_cache['market_news']),
+            'last_updated': news_cache['timestamp'],
+            'cache_age_seconds': (datetime.now() - news_cache['last_updated']).total_seconds() if news_cache['last_updated'] else None
+        })
+    except Exception as e:
+        print(f"[ERROR] /api/market-news: {e}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/market-news/dashboard', methods=['GET'])
 def get_market_news_dashboard():
     """Concise news for dashboard (5 articles max)"""
-    if should_update_news():
-        update_market_news_cache()
-    
-    concise_articles = []
-    for article in news_cache['market_news'][:5]:
-        concise_summary = summarize_news_ai(
-            article['headline'],
-            article['summary'],
-            detail_level='concise'
-        )
+    try:
+        if should_update_news():
+            update_market_news_cache()
         
-        concise_articles.append({
-            'headline': article['headline'],
-            'summary': concise_summary[:100],  # Max 100 chars
-            'sentiment': article.get('sentiment', 'neutral'),
-            'source': article['source'],
-            'url': article['url']
+        concise_articles = []
+        for article in news_cache['market_news'][:5]:
+            concise_summary = article['summary'][:100] if article.get('summary') else article.get('headline', '')[:100]
+            
+            concise_articles.append({
+                'headline': article['headline'],
+                'summary': concise_summary,
+                'sentiment': article.get('sentiment', 'neutral'),
+                'source': article['source'],
+                'url': article['url']
+            })
+        
+        return jsonify({
+            'articles': concise_articles,
+            'news_count': len(concise_articles),
+            'last_updated': news_cache['timestamp']
         })
-    
-    return jsonify({
-        'articles': concise_articles,
-        'news_count': len(concise_articles),
-        'last_updated': news_cache['timestamp']
-    })
+    except Exception as e:
+        print(f"[ERROR] /api/market-news/dashboard: {e}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/market-news/newsletter', methods=['GET'])
 def get_market_news_newsletter():
     """Detailed news for newsletter (10 articles)"""
-    if should_update_news():
-        update_market_news_cache()
-    
-    detailed_articles = []
-    for article in news_cache['market_news'][:10]:
-        detailed_summary = summarize_news_ai(
-            article['headline'],
-            article['summary'],
-            detail_level='detailed'
-        )
+    try:
+        if should_update_news():
+            update_market_news_cache()
         
-        detailed_articles.append({
-            'headline': article['headline'],
-            'summary': article['summary'],
-            'ai_analysis': detailed_summary,
-            'sentiment': article.get('sentiment', 'neutral'),
-            'source': article['source'],
-            'url': article['url'],
-            'datetime': article['datetime']
+        detailed_articles = []
+        for article in news_cache['market_news'][:10]:
+            detailed_articles.append({
+                'headline': article['headline'],
+                'summary': article['summary'],
+                'sentiment': article.get('sentiment', 'neutral'),
+                'source': article['source'],
+                'url': article['url'],
+                'datetime': article['datetime']
+            })
+        
+        return jsonify({
+            'articles': detailed_articles,
+            'news_count': len(detailed_articles),
+            'last_updated': news_cache['timestamp'],
+            'timestamp': datetime.now().isoformat()
         })
-    
-    return jsonify({
-        'articles': detailed_articles,
-        'news_count': len(detailed_articles),
-        'last_updated': news_cache['timestamp'],
-        'timestamp': datetime.now().isoformat()
-    })
+    except Exception as e:
+        print(f"[ERROR] /api/market-news/newsletter: {e}")
+        return jsonify({'error': str(e)}), 500
 
 # ==================== STARTUP & THREADING ====================
 
@@ -413,17 +467,17 @@ def scheduled_news_updater():
     while True:
         try:
             if should_update_news():
+                print("[SCHEDULER] Updating news cache...")
                 update_market_news_cache()
             
-            # Check every minute
-            import time
-            time.sleep(60)
+            # Check every 2 minutes
+            time.sleep(120)
         except Exception as e:
             print(f"[SCHEDULER_ERROR] {e}")
+            time.sleep(120)
 
-# Start background scheduler on app startup
-@app.before_first_request
-def startup():
+# Initialize app data on startup (Flask 3.0 compatible)
+def init_app_data():
     """Initialize cache and start scheduler"""
     print("[INIT] Fetching initial news cache...")
     update_market_news_cache()
@@ -433,5 +487,11 @@ def startup():
     scheduler_thread.start()
     print("[INIT] News scheduler started")
 
+# Call initialization before first request using application context
+with app.app_context():
+    init_app_data()
+
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
+    port = int(os.environ.get('PORT', 10000))
+    app.run(debug=False, host='0.0.0.0', port=port)
+
