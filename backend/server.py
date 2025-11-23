@@ -2,9 +2,8 @@ from flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
-
 
 app = Flask(__name__)
 CORS(app)
@@ -13,406 +12,183 @@ PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
 FRED_KEY = os.environ.get('FRED_API_KEY', '')
 ALPHAVANTAGE_KEY = os.environ.get('ALPHAVANTAGE_API_KEY', '')
+MASSIVE_KEY = os.environ.get('MASSIVE_API_KEY', '')
 
 print(f"[STARTUP] Finnhub Key: {'✓' if FINNHUB_KEY else '✗'}")
 print(f"[STARTUP] Perplexity Key: {'✓' if PERPLEXITY_KEY else '✗'}")
 print(f"[STARTUP] FRED Key: {'✓' if FRED_KEY else '✗'}")
 print(f"[STARTUP] AlphaVantage Key: {'✓' if ALPHAVANTAGE_KEY else '✗'}")
+print(f"[STARTUP] Massive Key: {'✓' if MASSIVE_KEY else '✗'}")
 
-STOCK_LIST = [
-    'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'AMD',
-    'CRM', 'ADBE', 'NFLX', 'PYPL', 'SQUARE', 'SHOP', 'RBLX', 'DASH',
-    'ZOOM', 'SNOW', 'CRWD', 'NET', 'ABNB', 'UPST', 'COIN', 'RIOT',
-    'MARA', 'CLSK', 'MSTR', 'SQ', 'PLTR', 'ASML', 'INTU', 'SNPS',
-    'CADX', 'MU', 'QCOM', 'AVGO', 'LRCX', 'ASML', 'TSM', 'INTC',
-    'VMW', 'CrowdStrike', 'SEMR', 'SGRY', 'PSTG', 'DDOG', 'OKTA',
-    'ZS', 'CHKP', 'PALO', 'PANW', 'SMAR', 'NOW', 'VEEV', 'TWLO',
-    'GTLB', 'ORCL', 'IBM'
+# Stock tickers list
+TICKERS = [
+    'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'AMD', 'CRM', 'ADBE',
+    'NFLX', 'PYPL', 'SHOP', 'RBLX', 'DASH', 'ZOOM', 'SNOW', 'CRWD', 'NET', 'ABNB',
+    'UPST', 'COIN', 'RIOT', 'MARA', 'CLSK', 'MSTR', 'SQ', 'PLTR', 'ASML', 'INTU',
+    'SNPS', 'MU', 'QCOM', 'AVGO', 'LRCX', 'TSM', 'INTC', 'VMW', 'CRWD', 'SEMR',
+    'SGRY', 'PSTG', 'DDOG', 'OKTA', 'ZS', 'CHKP', 'PANW', 'SMAR', 'NOW', 'VEEV',
+    'TWLO', 'GTLB', 'ORCL', 'IBM', 'HPE', 'DELL', 'CSCO'
 ]
 
-@app.route('/')
-def home():
-    return jsonify({
-        'app': 'Stock Newsletter Backend',
-        'version': '1.0.0',
-        'status': 'Live',
-        'endpoints': ['/api/config', '/api/quote', '/api/recommendations', '/api/macro-data', '/api/market-overview', '/api/ai-analyze']
-    })
-
-@app.route('/api/config')
-def get_config():
-    return jsonify({
-        'perplexity_enabled': bool(PERPLEXITY_KEY),
-        'finnhub_enabled': bool(FINNHUB_KEY),
-        'fred_enabled': bool(FRED_KEY),
-        'alphavantage_enabled': bool(ALPHAVANTAGE_KEY),
-        'timestamp': datetime.now().isoformat()
-    })
-
-@app.route('/api/quote')
-def get_quote():
-    ticker = request.args.get('ticker', 'AAPL').upper()
-    if FINNHUB_KEY:
-        try:
-            url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
-            r = requests.get(url, timeout=5)
-            data = r.json()
-            if data.get('c'):
-                return jsonify({
-                    'symbol': ticker,
-                    'price': data.get('c'),
-                    'change': data.get('d', 0),
-                    'change_percent': data.get('dp', 0),
-                    'high': data.get('h'),
-                    'low': data.get('l'),
-                    'open': data.get('o'),
-                    'previous_close': data.get('pc'),
-                    'source': 'Finnhub',
-                    'timestamp': datetime.now().isoformat()
-                })
-        except Exception as e:
-            print(f"Finnhub error for {ticker}: {str(e)}")
-    return jsonify({'error': 'Quote unavailable'}), 404
-
-@app.route('/api/recommendations')
-def get_recommendations():
-    stocks = []
+def get_stock_price_massive(ticker):
+    """Try Massive.com API first (100 calls/day free tier)"""
+    if not MASSIVE_KEY:
+        return None
     
-    for ticker in STOCK_LIST:
-        price = None
-        change = None
-        change_pct = None
-        source = 'Unknown'
+    try:
+        url = f'https://api.polygon.io/v2/last/trade/{ticker}?apiKey={MASSIVE_KEY}'
+        response = requests.get(url, timeout=10)
         
-        # Try Finnhub
-        if FINNHUB_KEY:
-            try:
-                print(f"[FINNHUB] Trying {ticker}...")
-                url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
-                r = requests.get(url, timeout=10)
-                print(f"[FINNHUB] Status {r.status_code} for {ticker}")
-                
-                if r.status_code != 200:
-                    print(f"[FINNHUB] ERROR {r.status_code}: {r.text[:200]}")
-                    
-                quote = r.json()
-                print(f"[FINNHUB] Response: {quote}")
-                
-                if quote.get('c') and quote.get('c') > 0:
-                    price = float(quote.get('c'))
-                    change = float(quote.get('d', 0))
-                    change_pct = float(quote.get('dp', 0))
-                    source = 'Finnhub'
-                    print(f"[OK] {ticker}: ${price} from Finnhub")
-                else:
-                    print(f"[FINNHUB] No price in response: {quote}")
-            except Exception as e:
-                print(f"[FINNHUB_ERROR] {ticker}: {str(e)}")
-        else:
-            print(f"[FINNHUB] No API key configured")
+        if response.status_code == 200:
+            data = response.json()
+            if 'results' in data:
+                return {
+                    'price': data['results']['p'],
+                    'source': 'Massive (Real-time)',
+                    'timestamp': data['results']['t']
+                }
+    except Exception as e:
+        print(f"[MASSIVE] Error for {ticker}: {e}")
+    
+    return None
+
+def get_stock_price_finnhub(ticker):
+    """Try Finnhub API (60 calls/min free tier)"""
+    if not FINNHUB_KEY:
+        return None
+    
+    try:
+        url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
+        response = requests.get(url, timeout=10)
         
-        # Try AlphaVantage
-        if price is None and ALPHAVANTAGE_KEY:
-            try:
-                print(f"[ALPHAVANTAGE] Trying {ticker}...")
-                url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={ALPHAVANTAGE_KEY}'
-                r = requests.get(url, timeout=10)
-                print(f"[ALPHAVANTAGE] Status {r.status_code} for {ticker}")
-                
-                data = r.json()
-                print(f"[ALPHAVANTAGE] Response: {data}")
-                
-                if data.get('Global Quote', {}).get('05. price'):
-                    price = float(data['Global Quote']['05. price'])
-                    change = float(data['Global Quote'].get('09. change', 0))
-                    change_pct_str = data['Global Quote'].get('10. change percent', '0').replace('%', '')
-                    change_pct = float(change_pct_str) if change_pct_str else 0
-                    source = 'AlphaVantage'
-                    print(f"[OK] {ticker}: ${price} from AlphaVantage")
-            except Exception as e:
-                print(f"[ALPHAVANTAGE_ERROR] {ticker}: {str(e)}")
-        else:
-            if price is None:
-                print(f"[ALPHAVANTAGE] No API key configured")
+        if response.status_code == 200:
+            data = response.json()
+            if 'c' in data and data['c'] > 0:
+                return {
+                    'price': data['c'],
+                    'source': 'Finnhub (Real-time)',
+                    'change': data.get('dp', 0)
+                }
+    except Exception as e:
+        print(f"[FINNHUB] Error for {ticker}: {e}")
+    
+    return None
+
+def get_stock_price_alphavantage(ticker):
+    """Try Alpha Vantage API (25 calls/day free tier)"""
+    if not ALPHAVANTAGE_KEY:
+        return None
+    
+    try:
+        url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={ALPHAVANTAGE_KEY}'
+        response = requests.get(url, timeout=10)
         
-        # Try Perplexity
-        if price is None and PERPLEXITY_KEY:
-            try:
-                print(f"[PERPLEXITY] Trying {ticker}...")
-                response = requests.post(
-                    'https://api.perplexity.ai/chat/completions',
-                    headers={
-                        'Authorization': f'Bearer {PERPLEXITY_KEY}',
-                        'Content-Type': 'application/json'
-                    },
-                    json={
-                        'model': 'sonar',
-                        'messages': [
-                            {
-                                'role': 'user',
-                                'content': f'What is the current stock price of {ticker}? Return ONLY the number.'
-                            }
-                        ]
-                    },
-                    timeout=15
-                )
-                
-                print(f"[PERPLEXITY] Status {response.status_code} for {ticker}")
-                
-                if response.status_code == 200:
-                    content = response.json()['choices'][0]['message']['content'].strip()
-                    print(f"[PERPLEXITY] Response: {content}")
-                    try:
-                        price_str = ''.join(c for c in content if c.isdigit() or c == '.')
-                        if price_str:
-                            price = float(price_str)
-                            change = 0
-                            change_pct = 0
-                            source = 'Perplexity'
-                            print(f"[OK] {ticker}: ${price} from Perplexity")
-                    except Exception as parse_e:
-                        print(f"[PERPLEXITY_PARSE_ERROR] {ticker}: {str(parse_e)}")
-                else:
-                    print(f"[PERPLEXITY] ERROR {response.status_code}: {response.text[:200]}")
-            except Exception as e:
-                print(f"[PERPLEXITY_ERROR] {ticker}: {str(e)}")
-        else:
-            if price is None:
-                print(f"[PERPLEXITY] No API key configured")
-        
-        # Fallback
-        if price is None:
-            base_price = 150
-            price = base_price + (hash(ticker) % 100) - 50
-            change = 0
-            change_pct = 0
-            source = 'Fallback'
-            print(f"[FALLBACK] {ticker}: ${price}")
-        
-        rsi = (hash(ticker) % 100)
-        regime = (hash(ticker) % 100)
-        inst = (hash(ticker) % 100)
-        
-        if rsi > 70:
-            signal = 'STRONG BUY'
-        elif rsi > 60:
-            signal = 'BUY'
-        elif rsi < 30:
-            signal = 'STRONG SELL'
-        elif rsi < 40:
-            signal = 'SELL'
-        else:
-            signal = 'HOLD'
-        
-        stories = ['The Setup', 'The Fade', 'The Creep', 'Quality Hold', 'Steady Growth', 'Consolidation', 'Cloud Strength', 'Breakout Play']
-        story = stories[hash(ticker) % len(stories)]
-        
-        stock = {
-            'Symbol': ticker,
-            'Last': f'{price:.2f}',
-            'Change': f'{change:.2f}',
-            'ChangePct': f'{change_pct:.2f}',
-            'RSIWilder': str(rsi),
-            'RegimeDetection': str(regime),
-            'Inst33': str(inst),
-            'Signal': signal,
-            'Story': story,
-            'Source': source,
-            'Timestamp': datetime.now().isoformat()
+        if response.status_code == 200:
+            data = response.json()
+            if 'Global Quote' in data:
+                quote = data['Global Quote']
+                if '05. price' in quote:
+                    return {
+                        'price': float(quote['05. price']),
+                        'source': 'Alpha Vantage',
+                        'change': float(quote.get('10. change percent', '0%').replace('%', ''))
+                    }
+    except Exception as e:
+        print(f"[ALPHAVANTAGE] Error for {ticker}: {e}")
+    
+    return None
+
+def get_stock_price_perplexity(ticker):
+    """Fallback to Perplexity (slow but unlimited)"""
+    if not PERPLEXITY_KEY:
+        return None
+    
+    try:
+        url = 'https://api.perplexity.ai/chat/completions'
+        headers = {
+            'Authorization': f'Bearer {PERPLEXITY_KEY}',
+            'Content-Type': 'application/json'
+        }
+        payload = {
+            'model': 'sonar',
+            'messages': [{
+                'role': 'user',
+                'content': f'What is the current stock price of {ticker}? Reply with just the number.'
+            }]
         }
         
-        stocks.append(stock)
-    
-    return jsonify(stocks)
-
-@app.route('/api/macro-data')
-def get_macro_data():
-    macro_data = []
-    
-    if FRED_KEY:
-        try:
-            indicators = {
-                'GDP': 'A191RLQ193S',
-                'CPI': 'CPIAUCSL',
-                'FED_RATE': 'FEDFUNDS',
-                'UNEMPLOYMENT': 'UNRATE'
-            }
-            
-            for name, series_id in indicators.items():
-                url = f'https://api.stlouisfed.org/fred/series/observations?series_id={series_id}&api_key={FRED_KEY}&limit=1'
-                try:
-                    r = requests.get(url, timeout=5)
-                    data = r.json()
-                    if data.get('observations'):
-                        latest = data['observations'][0]
-                        macro_data.append({
-                            'label': name,
-                            'value': latest.get('value', 'N/A'),
-                            'source': 'FRED'
-                        })
-                except:
-                    pass
-            
-            if macro_data:
-                return jsonify(macro_data)
-        except Exception as e:
-            print(f"FRED API error: {str(e)}")
-    
-    if PERPLEXITY_KEY:
-        try:
-            response = requests.post(
-                'https://api.perplexity.ai/chat/completions',
-                headers={
-                    'Authorization': f'Bearer {PERPLEXITY_KEY}',
-                    'Content-Type': 'application/json'
-                },
-                json={
-                    'model': 'sonar',
-                    'messages': [
-                        {
-                            'role': 'user',
-                            'content': 'Give me latest macro economic data: GDP growth, CPI, Fed funds rate, unemployment rate.'
-                        }
-                    ]
-                },
-                timeout=30
-            )
-            
-            if response.status_code == 200:
-                macro_data = [
-                    {'label': 'GDP Growth', 'value': 'Check Sonar', 'source': 'Perplexity Sonar'},
-                    {'label': 'CPI', 'value': 'Check Sonar', 'source': 'Perplexity Sonar'},
-                    {'label': 'Fed Funds Rate', 'value': 'Check Sonar', 'source': 'Perplexity Sonar'},
-                    {'label': 'Unemployment Rate', 'value': 'Check Sonar', 'source': 'Perplexity Sonar'}
-                ]
-                return jsonify(macro_data)
-        except Exception as e:
-            print(f"Perplexity error: {str(e)}")
-    
-    return jsonify([
-        {'label': 'GDP Growth', 'value': '2.8%', 'source': 'Fallback'},
-        {'label': 'CPI', 'value': '3.2%', 'source': 'Fallback'},
-        {'label': 'Fed Funds Rate', 'value': '5.33%', 'source': 'Fallback'},
-        {'label': 'Unemployment Rate', 'value': '3.9%', 'source': 'Fallback'}
-    ])
-
-@app.route('/api/market-overview')
-def get_market_overview():
-    indices = ['GSPC', 'INDU', 'CCMP', 'VIX']
-    market_data = []
-    
-    if FINNHUB_KEY:
-        for idx in indices:
-            try:
-                url = f'https://finnhub.io/api/v1/quote?symbol={idx}&token={FINNHUB_KEY}'
-                r = requests.get(url, timeout=5)
-                data = r.json()
-                
-                if data.get('c'):
-                    names = {'GSPC': 'S&P 500', 'INDU': 'Dow Jones', 'CCMP': 'NASDAQ', 'VIX': 'VIX'}
-                    change_pct = data.get('dp', 0)
-                    market_data.append({
-                        'name': names.get(idx, idx),
-                        'value': f'{data.get("c", 0):.2f}',
-                        'change': f'{data.get("d", 0):.2f}',
-                        'change_percent': f'{change_pct:.2f}',
-                        'positive': change_pct >= 0,
-                        'source': 'Finnhub'
-                    })
-            except Exception as e:
-                print(f"Error fetching {idx}: {str(e)}")
-    
-    if not market_data:
-        market_data = [
-            {'name': 'S&P 500', 'value': '4785.38', 'change': '42.15', 'change_percent': '0.89', 'positive': True, 'source': 'Fallback'},
-            {'name': 'Dow Jones', 'value': '42358.50', 'change': '156.23', 'change_percent': '0.37', 'positive': True, 'source': 'Fallback'},
-            {'name': 'NASDAQ', 'value': '15340.18', 'change': '275.42', 'change_percent': '1.83', 'positive': True, 'source': 'Fallback'},
-            {'name': 'VIX', 'value': '18.45', 'change': '-0.82', 'change_percent': '-4.25', 'positive': False, 'source': 'Fallback'}
-        ]
-    
-    return jsonify(market_data)
-
-@app.route('/api/ai-analyze', methods=['POST'])
-def ai_analyze():
-    try:
-        if not PERPLEXITY_KEY:
-            return jsonify({'error': 'PERPLEXITY_API_KEY not set'}), 400
+        response = requests.post(url, headers=headers, json=payload, timeout=20)
         
-        data = request.json
-        
-        response = requests.post(
-            'https://api.perplexity.ai/chat/completions',
-            headers={
-                'Authorization': f'Bearer {PERPLEXITY_KEY}',
-                'Content-Type': 'application/json'
-            },
-            json={
-                'model': data.get('model', 'sonar'),
-                'messages': data.get('messages', [{'role': 'user', 'content': 'What is the current market sentiment?'}])
-            },
-            timeout=90
-        )
-        
-        if response.status_code != 200:
-            return jsonify({'error': response.text}), response.status_code
-        
-        return jsonify(response.json())
-        
+        if response.status_code == 200:
+            data = response.json()
+            price_text = data['choices'][0]['message']['content']
+            # Extract number from response
+            import re
+            price_match = re.search(r'\d+\.?\d*', price_text)
+            if price_match:
+                return {
+                    'price': float(price_match.group()),
+                    'source': 'Perplexity (AI-parsed)',
+                    'change': 0
+                }
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"[PERPLEXITY] Error for {ticker}: {e}")
+    
+    return None
 
-@app.route('/api/sonar-research', methods=['POST'])
-def sonar_research():
-    try:
-        if not PERPLEXITY_KEY:
-            return jsonify({'error': 'PERPLEXITY_API_KEY not set'}), 400
+def get_stock_price_waterfall(ticker):
+    """Try APIs in priority order: Massive → Finnhub → AlphaVantage → Perplexity"""
+    
+    # Priority 1: Massive (best data, 100/day limit)
+    result = get_stock_price_massive(ticker)
+    if result:
+        return result
+    
+    # Priority 2: Finnhub (good data, 60/min unlimited daily)
+    result = get_stock_price_finnhub(ticker)
+    if result:
+        return result
+    
+    # Priority 3: Alpha Vantage (backup, 25/day limit)
+    result = get_stock_price_alphavantage(ticker)
+    if result:
+        return result
+    
+    # Priority 4: Perplexity (last resort, slow)
+    result = get_stock_price_perplexity(ticker)
+    if result:
+        return result
+    
+    # Complete fallback
+    return {
+        'price': 100.0,
+        'source': 'Fallback (No API available)',
+        'change': 0
+    }
+
+@app.route('/api/recommendations', methods=['GET'])
+def get_recommendations():
+    """Get stock recommendations with real-time prices"""
+    recommendations = []
+    
+    for ticker in TICKERS:
+        price_data = get_stock_price_waterfall(ticker)
         
-        data = request.json
-        query = data.get('query', 'What stocks are trending today?')
-        
-        response = requests.post(
-            'https://api.perplexity.ai/chat/completions',
-            headers={
-                'Authorization': f'Bearer {PERPLEXITY_KEY}',
-                'Content-Type': 'application/json'
-            },
-            json={
-                'model': 'sonar',
-                'messages': [{'role': 'user', 'content': query}]
-            },
-            timeout=90
-        )
-        
-        if response.status_code != 200:
-            return jsonify({'error': response.text}), response.status_code
-        
-        result = response.json()
-        return jsonify({
-            'query': query,
-            'response': result['choices'][0]['message']['content'],
-            'source': 'Perplexity Sonar',
-            'timestamp': datetime.now().isoformat()
+        recommendations.append({
+            'Symbol': ticker,
+            'Last': price_data['price'],
+            'Change': price_data.get('change', 0),
+            'Source': price_data['source'],
+            'RSI': 50,  # Placeholder - integrate your ThinkScript logic
+            'Signal': 'HOLD',  # Placeholder
+            'Strategy': 'Momentum'  # Placeholder
         })
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.errorhandler(404)
-def not_found(error):
-    return jsonify({'error': 'Endpoint not found'}), 404
-
-@app.errorhandler(500)
-def server_error(error):
-    return jsonify({'error': 'Server error'}), 500
-
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port, debug=False)
-# Add this new endpoint to server.py:
+    
+    return jsonify(recommendations)
 
 @app.route('/api/stock-news/<ticker>', methods=['GET'])
 def get_stock_news(ticker):
-    """Get latest news for a specific stock"""
+    """Get latest news for a specific stock using Finnhub"""
     if not FINNHUB_KEY:
         return jsonify({'error': 'Finnhub not configured'}), 500
     
@@ -426,13 +202,87 @@ def get_stock_news(ticker):
         
         if response.status_code == 200:
             news = response.json()
+            
+            # Format news articles
+            formatted_news = []
+            for article in news[:10]:  # Top 10 most recent
+                formatted_news.append({
+                    'headline': article.get('headline', ''),
+                    'summary': article.get('summary', ''),
+                    'source': article.get('source', ''),
+                    'url': article.get('url', ''),
+                    'datetime': article.get('datetime', 0),
+                    'image': article.get('image', '')
+                })
+            
             return jsonify({
                 'ticker': ticker,
-                'news_count': len(news),
-                'articles': news[:5]  # Return top 5 most recent
+                'news_count': len(formatted_news),
+                'articles': formatted_news
             })
         else:
-            return jsonify({'error': 'Failed to fetch news'}), 500
+            return jsonify({'error': f'Finnhub returned {response.status_code}'}), 500
             
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/market-news', methods=['GET'])
+def get_market_news():
+    """Get general market news using Finnhub"""
+    if not FINNHUB_KEY:
+        return jsonify({'error': 'Finnhub not configured'}), 500
+    
+    try:
+        url = f'https://finnhub.io/api/v1/news?category=general&token={FINNHUB_KEY}'
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code == 200:
+            news = response.json()
+            
+            formatted_news = []
+            for article in news[:20]:  # Top 20
+                formatted_news.append({
+                    'headline': article.get('headline', ''),
+                    'summary': article.get('summary', ''),
+                    'source': article.get('source', ''),
+                    'url': article.get('url', ''),
+                    'datetime': article.get('datetime', 0),
+                    'image': article.get('image', '')
+                })
+            
+            return jsonify({
+                'news_count': len(formatted_news),
+                'articles': formatted_news
+            })
+        else:
+            return jsonify({'error': f'Finnhub returned {response.status_code}'}), 500
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/config', methods=['GET'])
+def get_config():
+    """Check which APIs are configured"""
+    return jsonify({
+        'finnhub_enabled': bool(FINNHUB_KEY),
+        'perplexity_enabled': bool(PERPLEXITY_KEY),
+        'fred_enabled': bool(FRED_KEY),
+        'alphavantage_enabled': bool(ALPHAVANTAGE_KEY),
+        'massive_enabled': bool(MASSIVE_KEY),
+        'timestamp': datetime.now().isoformat()
+    })
+
+@app.route('/', methods=['GET'])
+def home():
+    return jsonify({
+        'status': 'online',
+        'endpoints': [
+            '/api/recommendations',
+            '/api/stock-news/<ticker>',
+            '/api/market-news',
+            '/api/config'
+        ]
+    })
+
+if __name__ == '__main__':
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 10000)))
