@@ -146,7 +146,7 @@ def get_recommendations():
                         'Content-Type': 'application/json'
                     },
                     json={
-                        'model': 'llama-3.1-sonar-small-128k-online',
+                        'model': 'sonar',
                         'messages': [
                             {
                                 'role': 'user',
@@ -267,7 +267,7 @@ def get_macro_data():
                     'Content-Type': 'application/json'
                 },
                 json={
-                    'model': 'llama-3.1-sonar-small-128k-online',
+                    'model': 'sonar',
                     'messages': [
                         {
                             'role': 'user',
@@ -347,7 +347,7 @@ def ai_analyze():
                 'Content-Type': 'application/json'
             },
             json={
-                'model': data.get('model', 'llama-3.1-sonar-small-128k-online'),
+                'model': data.get('model', 'sonar'),
                 'messages': data.get('messages', [{'role': 'user', 'content': 'What is the current market sentiment?'}])
             },
             timeout=90
@@ -377,7 +377,7 @@ def sonar_research():
                 'Content-Type': 'application/json'
             },
             json={
-                'model': 'llama-3.1-sonar-small-128k-online',
+                'model': 'sonar',
                 'messages': [{'role': 'user', 'content': query}]
             },
             timeout=90
