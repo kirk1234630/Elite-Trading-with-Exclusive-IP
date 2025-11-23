@@ -78,32 +78,25 @@ def get_recommendations():
         change_pct = None
         source = 'Unknown'
         
-        # PRIMARY: Finnhub with Extended Hours
         if FINNHUB_KEY:
             try:
-                # Use quote endpoint which includes after-hours data
                 url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
                 r = requests.get(url, timeout=10)
                 quote = r.json()
                 
-                # Finnhub includes after-hours in the quote response
-                # 'c' = current price (includes after-hours)
-                # 'pc' = previous close
                 if quote.get('c') and quote.get('c') > 0:
                     price = float(quote.get('c'))
                     change = float(quote.get('d', 0))
                     change_pct = float(quote.get('dp', 0))
-                    source = f'Finnhub (After-Hours)'
-                    print(f"[OK] {ticker}: ${price} from Finnhub (includes after-hours)")
+                    source = 'Finnhub (After-Hours)'
+                    print(f"[OK] {ticker}: ${price} from Finnhub")
                 else:
-                    print(f"[WARN] {ticker}: Invalid price from Finnhub: {quote.get('c')}")
+                    print(f"[WARN] {ticker}: Invalid price from Finnhub")
             except Exception as e:
                 print(f"[ERROR] Finnhub for {ticker}: {str(e)}")
         
-        # FALLBACK 1: Alpha Vantage Extended Hours
         if price is None and ALPHAVANTAGE_KEY:
             try:
-                # Use TIME_SERIES_INTRADAY for after-hours
                 url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={ALPHAVANTAGE_KEY}'
                 r = requests.get(url, timeout=10)
                 data = r.json()
@@ -113,12 +106,11 @@ def get_recommendations():
                     change = float(data['Global Quote'].get('09. change', 0))
                     change_pct_str = data['Global Quote'].get('10. change percent', '0').replace('%', '')
                     change_pct = float(change_pct_str) if change_pct_str else 0
-                    source = 'AlphaVantage (Extended)'
-                    print(f"[OK] {ticker}: ${price} from AlphaVantage (includes extended hours)")
+                    source = 'AlphaVantage'
+                    print(f"[OK] {ticker}: ${price} from AlphaVantage")
             except Exception as e:
                 print(f"[WARN] AlphaVantage for {ticker}: {str(e)}")
         
-        # FALLBACK 2: Perplexity Sonar for real-time after-hours
         if price is None and PERPLEXITY_KEY:
             try:
                 response = requests.post(
@@ -132,7 +124,7 @@ def get_recommendations():
                         'messages': [
                             {
                                 'role': 'user',
-                                'content': f'What is the current after-hours stock price of {ticker}? If after-hours is closed, give the latest available price. Return ONLY the price as a number with no other text.'
+                                'content': f'What is the current stock price of {ticker}? Return ONLY the number.'
                             }
                         ]
                     },
@@ -142,29 +134,26 @@ def get_recommendations():
                 if response.status_code == 200:
                     content = response.json()['choices'][0]['message']['content'].strip()
                     try:
-                        # Extract just the number
                         price_str = ''.join(c for c in content if c.isdigit() or c == '.')
                         if price_str:
                             price = float(price_str)
                             change = 0
                             change_pct = 0
-                            source = 'Perplexity Sonar (Real-Time)'
-                            print(f"[OK] {ticker}: ${price} from Perplexity Sonar (after-hours)")
+                            source = 'Perplexity Sonar'
+                            print(f"[OK] {ticker}: ${price} from Perplexity")
                     except:
-                        print(f"[WARN] Could not parse Perplexity response for {ticker}: {content}")
+                        print(f"[WARN] Could not parse Perplexity for {ticker}")
             except Exception as e:
                 print(f"[WARN] Perplexity for {ticker}: {str(e)}")
         
-        # LAST RESORT: Only use fallback if ALL APIs failed
         if price is None:
             base_price = 150
             price = base_price + (hash(ticker) % 100) - 50
             change = 0
             change_pct = 0
             source = 'Fallback'
-            print(f"[FALLBACK] {ticker}: ${price} (no live data available)")
+            print(f"[FALLBACK] {ticker}: ${price}")
         
-        # Generate 110-signal analysis
         rsi = (hash(ticker) % 100)
         regime = (hash(ticker) % 100)
         inst = (hash(ticker) % 100)
@@ -180,8 +169,7 @@ def get_recommendations():
         else:
             signal = 'HOLD'
         
-        stories = ['The Setup', 'The Fade', 'The Creep', 'Quality Hold', 
-                  'Steady Growth', 'Consolidation', 'Cloud Strength', 'Breakout Play']
+        stories = ['The Setup', 'The Fade', 'The Creep', 'Quality Hold', 'Steady Growth', 'Consolidation', 'Cloud Strength', 'Breakout Play']
         story = stories[hash(ticker) % len(stories)]
         
         stock = {
@@ -202,12 +190,10 @@ def get_recommendations():
     
     return jsonify(stocks)
 
-
-
-
 @app.route('/api/macro-data')
 def get_macro_data():
     macro_data = []
+    
     if FRED_KEY:
         try:
             indicators = {
@@ -216,6 +202,7 @@ def get_macro_data():
                 'FED_RATE': 'FEDFUNDS',
                 'UNEMPLOYMENT': 'UNRATE'
             }
+            
             for name, series_id in indicators.items():
                 url = f'https://api.stlouisfed.org/fred/series/observations?series_id={series_id}&api_key={FRED_KEY}&limit=1'
                 try:
@@ -230,6 +217,7 @@ def get_macro_data():
                         })
                 except:
                     pass
+            
             if macro_data:
                 return jsonify(macro_data)
         except Exception as e:
@@ -246,10 +234,16 @@ def get_macro_data():
                 },
                 json={
                     'model': 'llama-3.1-sonar-small-128k-online',
-                    'messages': [{'role': 'user', 'content': 'Give me latest macro economic data: GDP growth, CPI, Fed funds rate, unemployment rate. Return as JSON with keys: gdp, cpi, fed_rate, unemployment with values and dates.'}]
+                    'messages': [
+                        {
+                            'role': 'user',
+                            'content': 'Give me latest macro economic data: GDP growth, CPI, Fed funds rate, unemployment rate. Return as JSON.'
+                        }
+                    ]
                 },
                 timeout=30
             )
+            
             if response.status_code == 200:
                 macro_data = [
                     {'label': 'GDP Growth', 'value': 'Check Sonar', 'source': 'Perplexity Sonar'},
@@ -272,12 +266,14 @@ def get_macro_data():
 def get_market_overview():
     indices = ['GSPC', 'INDU', 'CCMP', 'VIX']
     market_data = []
+    
     if FINNHUB_KEY:
         for idx in indices:
             try:
                 url = f'https://finnhub.io/api/v1/quote?symbol={idx}&token={FINNHUB_KEY}'
                 r = requests.get(url, timeout=5)
                 data = r.json()
+                
                 if data.get('c'):
                     names = {'GSPC': 'S&P 500', 'INDU': 'Dow Jones', 'CCMP': 'NASDAQ', 'VIX': 'VIX'}
                     change_pct = data.get('dp', 0)
@@ -299,6 +295,7 @@ def get_market_overview():
             {'name': 'NASDAQ', 'value': '15340.18', 'change': '275.42', 'change_percent': '1.83', 'positive': True, 'source': 'Fallback'},
             {'name': 'VIX', 'value': '18.45', 'change': '-0.82', 'change_percent': '-4.25', 'positive': False, 'source': 'Fallback'}
         ]
+    
     return jsonify(market_data)
 
 @app.route('/api/ai-analyze', methods=['POST'])
@@ -306,7 +303,9 @@ def ai_analyze():
     try:
         if not PERPLEXITY_KEY:
             return jsonify({'error': 'PERPLEXITY_API_KEY not set'}), 400
+        
         data = request.json
+        
         response = requests.post(
             'https://api.perplexity.ai/chat/completions',
             headers={
@@ -319,9 +318,12 @@ def ai_analyze():
             },
             timeout=90
         )
+        
         if response.status_code != 200:
             return jsonify({'error': response.text}), response.status_code
+        
         return jsonify(response.json())
+        
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -330,8 +332,10 @@ def sonar_research():
     try:
         if not PERPLEXITY_KEY:
             return jsonify({'error': 'PERPLEXITY_API_KEY not set'}), 400
+        
         data = request.json
         query = data.get('query', 'What stocks are trending today?')
+        
         response = requests.post(
             'https://api.perplexity.ai/chat/completions',
             headers={
@@ -344,8 +348,10 @@ def sonar_research():
             },
             timeout=90
         )
+        
         if response.status_code != 200:
             return jsonify({'error': response.text}), response.status_code
+        
         result = response.json()
         return jsonify({
             'query': query,
@@ -353,6 +359,7 @@ def sonar_research():
             'source': 'Perplexity Sonar',
             'timestamp': datetime.now().isoformat()
         })
+        
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
