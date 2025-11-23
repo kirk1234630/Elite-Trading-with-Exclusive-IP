@@ -47,9 +47,9 @@ def get_stock_price_waterfall(ticker):
             response = requests.get(url, timeout=5)
             if response.status_code == 200:
                 data = response.json()
-                if data.get('results'):
-                    result['price'] = data['results']['c']
-                    result['change'] = ((data['results']['c'] - data['results']['o']) / data['results']['o']) * 100
+                if data.get('results') and len(data['results']) > 0:
+                    result['price'] = data['results'][0]['c']
+                    result['change'] = ((data['results'][0]['c'] - data['results'][0]['o']) / data['results'][0]['o']) * 100
                     result['source'] = 'Polygon'
                     price_cache[cache_key] = result
                     return result
@@ -138,7 +138,7 @@ def get_stock_news(ticker):
             articles = response.json()
             return jsonify({
                 'ticker': ticker,
-                'articles': articles[:10],  # Return top 10
+                'articles': articles[:10],
                 'count': len(articles)
             })
     except Exception as e:
@@ -166,7 +166,7 @@ def get_market_news_newsletter():
             'articles': articles[:10],
             'last_updated': news_cache['last_updated'].isoformat() if news_cache['last_updated'] else None
         })
-    except Exception as e):
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 def fetch_market_news():
@@ -193,13 +193,17 @@ def fetch_market_news():
     
     return []
 
-# ======== PHASE 1 ADDITIONS ========
+# ======== ENHANCED ENDPOINTS ========
 
 @app.route('/api/earnings-calendar', methods=['GET'])
 def get_earnings_calendar():
     """Get next 7 days of earnings (Finnhub)"""
     if not FINNHUB_KEY:
-        return jsonify({'error': 'Finnhub not configured'}), 500
+        return jsonify({
+            'earnings': [],
+            'count': 0,
+            'error': 'Finnhub API key not configured'
+        }), 200
     
     try:
         from_date = datetime.now().strftime('%Y-%m-%d')
@@ -222,13 +226,26 @@ def get_earnings_calendar():
                 'to_date': to_date
             })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Earnings error: {e}")
+        return jsonify({
+            'earnings': [],
+            'count': 0,
+            'error': str(e)
+        }), 200
 
 @app.route('/api/insider-transactions/<ticker>', methods=['GET'])
 def get_insider_transactions(ticker):
     """Get last 30 days of insider activity (Finnhub)"""
     if not FINNHUB_KEY:
-        return jsonify({'error': 'Finnhub not configured'}), 500
+        return jsonify({
+            'ticker': ticker,
+            'transactions': [],
+            'insider_sentiment': 'NEUTRAL',
+            'buy_count': 0,
+            'sell_count': 0,
+            'total_transactions': 0,
+            'error': 'Finnhub API key not configured'
+        }), 200
     
     try:
         from_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
@@ -249,20 +266,36 @@ def get_insider_transactions(ticker):
             
             return jsonify({
                 'ticker': ticker,
-                'transactions': transactions[:10],  # Last 10
+                'transactions': transactions[:10],
                 'insider_sentiment': sentiment,
                 'buy_count': buys,
                 'sell_count': sells,
                 'total_transactions': len(transactions)
             })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Insider error for {ticker}: {e}")
+        return jsonify({
+            'ticker': ticker,
+            'transactions': [],
+            'insider_sentiment': 'NEUTRAL',
+            'buy_count': 0,
+            'sell_count': 0,
+            'total_transactions': 0,
+            'error': str(e)
+        }), 200
 
 @app.route('/api/social-sentiment/<ticker>', methods=['GET'])
 def get_social_sentiment(ticker):
     """Get Reddit/Twitter sentiment (Finnhub)"""
     if not FINNHUB_KEY:
-        return jsonify({'error': 'Finnhub not configured'}), 500
+        return jsonify({
+            'ticker': ticker,
+            'reddit': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+            'twitter': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+            'overall_sentiment': 'NEUTRAL',
+            'overall_score': 0,
+            'error': 'Finnhub API key not configured'
+        }), 200
     
     try:
         url = f'https://finnhub.io/api/v1/stock/social-sentiment?symbol={ticker}&token={FINNHUB_KEY}'
@@ -295,13 +328,24 @@ def get_social_sentiment(ticker):
                 'overall_score': round(avg_score, 2)
             })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"Sentiment error for {ticker}: {e}")
+        return jsonify({
+            'ticker': ticker,
+            'reddit': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+            'twitter': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+            'overall_sentiment': 'NEUTRAL',
+            'overall_score': 0,
+            'error': str(e)
+        }), 200
 
 @app.route('/api/fred-data', methods=['GET'])
 def get_fred_data():
     """Get macro economic data from FRED API"""
     if not FRED_KEY:
-        return jsonify({'error': 'FRED API key not configured'}), 500
+        return jsonify({
+            'data': {},
+            'error': 'FRED API key not configured'
+        }), 200
     
     try:
         series_ids = {
@@ -321,10 +365,10 @@ def get_fred_data():
             if response.status_code == 200:
                 data = response.json()
                 observations = data.get('observations', [])
-                if observations:
+                if observations and len(observations) > 0:
                     results[name] = {
-                        'value': observations.get('value'),
-                        'date': observations.get('date')
+                        'value': observations[0].get('value'),
+                        'date': observations[0].get('date')
                     }
         
         return jsonify({
@@ -332,16 +376,24 @@ def get_fred_data():
             'last_updated': datetime.now().isoformat()
         })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"FRED error: {e}")
+        return jsonify({
+            'data': {},
+            'error': str(e)
+        }), 200
 
 @app.route('/api/balance-of-power/<ticker>', methods=['GET'])
 def get_balance_of_power(ticker):
     """Calculate Balance of Power indicator"""
+    if not ALPHAVANTAGE_KEY:
+        return jsonify({
+            'ticker': ticker,
+            'balance_of_power': 0,
+            'interpretation': 'NEUTRAL',
+            'error': 'Alpha Vantage API key not configured'
+        }), 200
+    
     try:
-        # Fetch OHLC data from Alpha Vantage
-        if not ALPHAVANTAGE_KEY:
-            return jsonify({'error': 'Alpha Vantage not configured'}), 500
-        
         url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey={ALPHAVANTAGE_KEY}'
         response = requests.get(url, timeout=10)
         
@@ -350,10 +402,15 @@ def get_balance_of_power(ticker):
             time_series = data.get('Time Series (Daily)', {})
             
             if not time_series:
-                return jsonify({'error': 'No data available'}), 404
+                return jsonify({
+                    'ticker': ticker,
+                    'balance_of_power': 0,
+                    'interpretation': 'NEUTRAL',
+                    'error': 'No data available'
+                }), 200
             
             # Get last day's data
-            latest_date = list(time_series.keys())
+            latest_date = list(time_series.keys())[0]
             latest = time_series[latest_date]
             
             open_price = float(latest['1. open'])
@@ -374,130 +431,14 @@ def get_balance_of_power(ticker):
                 'date': latest_date
             })
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print(f"BOP error for {ticker}: {e}")
+        return jsonify({
+            'ticker': ticker,
+            'balance_of_power': 0,
+            'interpretation': 'NEUTRAL',
+            'error': str(e)
+        }), 200
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port, debug=False)
-# Add these endpoints to your server.py
-
-@app.route('/api/earnings-calendar', methods=['GET'])
-def get_earnings_calendar():
-    """Get next 7 days of earnings"""
-    if not FINNHUB_KEY:
-        return jsonify({'error': 'Finnhub not configured', 'earnings': [], 'count': 0}), 200
-    
-    try:
-        from_date = datetime.now().strftime('%Y-%m-%d')
-        to_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
-        
-        url = f'https://finnhub.io/api/v1/calendar/earnings?from={from_date}&to={to_date}&token={FINNHUB_KEY}'
-        response = requests.get(url, timeout=10)
-        
-        if response.status_code == 200:
-            data = response.json()
-            return jsonify({
-                'earnings': data.get('earningsCalendar', []),
-                'count': len(data.get('earningsCalendar', []))
-            })
-    except Exception as e:
-        print(f"Earnings error: {e}")
-    
-    return jsonify({'earnings': [], 'count': 0})
-
-
-@app.route('/api/insider-transactions/<ticker>', methods=['GET'])
-def get_insider_transactions(ticker):
-    """Get insider activity"""
-    if not FINNHUB_KEY:
-        return jsonify({
-            'ticker': ticker,
-            'transactions': [],
-            'insider_sentiment': 'NEUTRAL',
-            'buy_count': 0,
-            'sell_count': 0,
-            'total_transactions': 0
-        }), 200
-    
-    try:
-        from_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
-        url = f'https://finnhub.io/api/v1/stock/insider-transactions?symbol={ticker}&from={from_date}&token={FINNHUB_KEY}'
-        response = requests.get(url, timeout=10)
-        
-        if response.status_code == 200:
-            data = response.json()
-            transactions = data.get('data', [])
-            buys = sum(1 for t in transactions if t.get('transactionCode') in ['P', 'A'])
-            sells = sum(1 for t in transactions if t.get('transactionCode') == 'S')
-            
-            return jsonify({
-                'ticker': ticker,
-                'transactions': transactions[:10],
-                'insider_sentiment': 'BULLISH' if buys > sells else 'BEARISH' if sells > buys else 'NEUTRAL',
-                'buy_count': buys,
-                'sell_count': sells,
-                'total_transactions': len(transactions)
-            })
-    except Exception as e:
-        print(f"Insider error: {e}")
-    
-    return jsonify({
-        'ticker': ticker,
-        'transactions': [],
-        'insider_sentiment': 'NEUTRAL',
-        'buy_count': 0,
-        'sell_count': 0,
-        'total_transactions': 0
-    })
-
-
-@app.route('/api/social-sentiment/<ticker>', methods=['GET'])
-def get_social_sentiment(ticker):
-    """Get social sentiment"""
-    if not FINNHUB_KEY:
-        return jsonify({
-            'ticker': ticker,
-            'reddit': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
-            'twitter': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
-            'overall_sentiment': 'NEUTRAL',
-            'overall_score': 0
-        }), 200
-    
-    try:
-        url = f'https://finnhub.io/api/v1/stock/social-sentiment?symbol={ticker}&token={FINNHUB_KEY}'
-        response = requests.get(url, timeout=10)
-        
-        if response.status_code == 200:
-            data = response.json()
-            reddit_data = data.get('reddit', {})
-            twitter_data = data.get('twitter', {})
-            
-            reddit_score = reddit_data.get('score', 0) if reddit_data else 0
-            twitter_score = twitter_data.get('score', 0) if twitter_data else 0
-            avg_score = (reddit_score + twitter_score) / 2
-            
-            return jsonify({
-                'ticker': ticker,
-                'reddit': {
-                    'score': reddit_score,
-                    'mentions': reddit_data.get('mention', 0) if reddit_data else 0,
-                    'sentiment': 'BULLISH' if reddit_score > 0.5 else 'BEARISH' if reddit_score < -0.5 else 'NEUTRAL'
-                },
-                'twitter': {
-                    'score': twitter_score,
-                    'mentions': twitter_data.get('mention', 0) if twitter_data else 0,
-                    'sentiment': 'BULLISH' if twitter_score > 0.5 else 'BEARISH' if twitter_score < -0.5 else 'NEUTRAL'
-                },
-                'overall_sentiment': 'BULLISH' if avg_score > 0.3 else 'BEARISH' if avg_score < -0.3 else 'NEUTRAL',
-                'overall_score': round(avg_score, 2)
-            })
-    except Exception as e:
-        print(f"Sentiment error: {e}")
-    
-    return jsonify({
-        'ticker': ticker,
-        'reddit': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
-        'twitter': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
-        'overall_sentiment': 'NEUTRAL',
-        'overall_score': 0
-    })
