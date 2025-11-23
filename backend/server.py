@@ -3,353 +3,129 @@ from flask_cors import CORS
 import requests
 import os
 from datetime import datetime, timedelta
-import json
-import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
-from functools import lru_cache
-import concurrent.futures
 
 app = Flask(__name__)
 CORS(app)
 
-# API Keys
-PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
+# API KEYS
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
-FRED_KEY = os.environ.get('FRED_API_KEY', '')
+PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
 ALPHAVANTAGE_KEY = os.environ.get('ALPHAVANTAGE_API_KEY', '')
 MASSIVE_KEY = os.environ.get('MASSIVE_API_KEY', '')
+FRED_KEY = os.environ.get('FRED_API_KEY', '')
 
-print(f"[STARTUP] Finnhub Key: {'✓' if FINNHUB_KEY else '✗'}")
-print(f"[STARTUP] Perplexity Key: {'✓' if PERPLEXITY_KEY else '✗'}")
-print(f"[STARTUP] FRED Key: {'✓' if FRED_KEY else '✗'}")
-print(f"[STARTUP] AlphaVantage Key: {'✓' if ALPHAVANTAGE_KEY else '✗'}")
-print(f"[STARTUP] Massive Key: {'✓' if MASSIVE_KEY else '✗'}")
-
-# Cached data storage
-news_cache = {
-    'market_news': [],
-    'last_updated': None,
-    'timestamp': None
-}
-
-# Price cache to reduce API calls
+# Price cache
 price_cache = {}
-PRICE_CACHE_TTL = 60  # 60 seconds
+news_cache = {'market_news': [], 'last_updated': None}
 
+# Stock list (57 tickers)
 TICKERS = [
     'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'AMD', 'CRM', 'ADBE',
     'NFLX', 'PYPL', 'SHOP', 'RBLX', 'DASH', 'ZOOM', 'SNOW', 'CRWD', 'NET', 'ABNB',
     'UPST', 'COIN', 'RIOT', 'MARA', 'CLSK', 'MSTR', 'SQ', 'PLTR', 'ASML', 'INTU',
-    'SNPS', 'MU', 'QCOM', 'AVGO', 'LRCX', 'TSM', 'INTC', 'VMW', 'CRWD', 'SEMR',
+    'SNPS', 'MU', 'QCOM', 'AVGO', 'LRCX', 'TSM', 'INTC', 'VMW', 'SEMR',
     'SGRY', 'PSTG', 'DDOG', 'OKTA', 'ZS', 'CHKP', 'PANW', 'SMAR', 'NOW', 'VEEV',
     'TWLO', 'GTLB', 'ORCL', 'IBM', 'HPE', 'DELL', 'CSCO'
 ]
 
-# ==================== CACHING & SCHEDULING ====================
-
-def should_update_news():
-    """Check if we should update news based on schedule"""
-    now = datetime.now()
-    
-    # PST times for updates
-    pre_market = 6.5  # 6:30 AM
-    midday = 12.5     # 12:30 PM
-    close = 16.0      # 4:00 PM
-    evening = 19.0    # 7:00 PM
-    
-    current_hour = now.hour + (now.minute / 60)
-    
-    # Check if we're within 5 minutes of any scheduled time
-    scheduled_times = [pre_market, midday, close, evening]
-    
-    for scheduled_time in scheduled_times:
-        if abs(current_hour - scheduled_time) < (5/60):  # 5 minutes window
-            if news_cache['last_updated'] is None or \
-               (datetime.now() - news_cache['last_updated']).total_seconds() > 600:  # 10 min cooldown
-                return True
-    
-    # Also update if cache is older than 1 hour
-    if news_cache['last_updated'] is None:
-        return True
-    
-    cache_age = (datetime.now() - news_cache['last_updated']).total_seconds()
-    return cache_age > 3600  # 1 hour
-    
-def update_market_news_cache():
-    """Fetch and cache market news"""
-    if not FINNHUB_KEY:
-        print("[CACHE] Skipping news update - no Finnhub key")
-        return
-    
-    try:
-        url = f'https://finnhub.io/api/v1/news?category=general&token={FINNHUB_KEY}'
-        response = requests.get(url, timeout=10)
-        
-        if response.status_code == 200:
-            raw_news = response.json()
-            
-            # Format with sentiment analysis
-            formatted_articles = []
-            for article in raw_news[:30]:
-                sentiment = analyze_sentiment_from_headline(article.get('headline', ''))
-                
-                formatted_articles.append({
-                    'headline': article.get('headline', ''),
-                    'summary': article.get('summary', ''),
-                    'source': article.get('source', ''),
-                    'url': article.get('url', ''),
-                    'datetime': article.get('datetime', 0),
-                    'image': article.get('image', ''),
-                    'sentiment': sentiment
-                })
-            
-            news_cache['market_news'] = formatted_articles
-            news_cache['last_updated'] = datetime.now()
-            news_cache['timestamp'] = datetime.now().isoformat()
-            
-            print(f"[CACHE] Market news updated at {news_cache['timestamp']} - {len(formatted_articles)} articles")
-            
-    except Exception as e:
-        print(f"[CACHE_ERROR] Failed to update news cache: {e}")
-
-def analyze_sentiment_from_headline(headline):
-    """Simple sentiment analysis from headline keywords"""
-    headline_lower = headline.lower()
-    
-    positive_keywords = ['surge', 'jump', 'rally', 'beat', 'record', 'gain', 'soar', 'bull', 'profit', 'growth']
-    negative_keywords = ['crash', 'plunge', 'drop', 'miss', 'loss', 'decline', 'bear', 'risk', 'warning', 'fell']
-    
-    positive_count = sum(1 for word in positive_keywords if word in headline_lower)
-    negative_count = sum(1 for word in negative_keywords if word in headline_lower)
-    
-    if positive_count > negative_count:
-        return 'bullish'
-    elif negative_count > positive_count:
-        return 'bearish'
-    else:
-        return 'neutral'
-
-def summarize_news_ai(headline, summary, detail_level='concise'):
-    """Use Perplexity to summarize news at different detail levels"""
-    if not PERPLEXITY_KEY:
-        return summary[:150] if detail_level == 'concise' else summary
-    
-    try:
-        if detail_level == 'concise':
-            prompt = f"Summarize this news in ONE sentence (max 50 chars): {headline}"
-        else:  # detailed
-            prompt = f"Provide a 2-3 sentence detailed analysis of this news for a trading newsletter:\n\nHeadline: {headline}\nSummary: {summary}"
-        
-        response = requests.post(
-            'https://api.perplexity.ai/chat/completions',
-            headers={
-                'Authorization': f'Bearer {PERPLEXITY_KEY}',
-                'Content-Type': 'application/json'
-            },
-            json={
-                'model': 'sonar',
-                'messages': [{
-                    'role': 'user',
-                    'content': prompt
-                }]
-            },
-            timeout=10
-        )
-        
-        if response.status_code == 200:
-            return response.json()['choices'][0]['message']['content']
-    except Exception as e:
-        print(f"[AI_SUMMARY_ERROR] {e}")
-    
-    return summary
-
-# ==================== STOCK PRICE FETCHING ====================
-
-def get_cached_price(ticker):
-    """Check if we have a recent cached price"""
-    if ticker in price_cache:
-        cached_data, cached_time = price_cache[ticker]
-        if (time.time() - cached_time) < PRICE_CACHE_TTL:
-            return cached_data
-    return None
-
-def cache_price(ticker, price_data):
-    """Cache price data"""
-    price_cache[ticker] = (price_data, time.time())
-
-def get_stock_price_massive(ticker):
-    """Try Massive.com API first"""
-    if not MASSIVE_KEY:
-        return None
-    
-    try:
-        url = f'https://api.polygon.io/v2/last/trade/{ticker}?apiKey={MASSIVE_KEY}'
-        response = requests.get(url, timeout=5)
-        
-        if response.status_code == 200:
-            data = response.json()
-            if data.get('status') == 'OK' and 'results' in data:
-                result = data['results']
-                return {
-                    'price': result.get('p', 0),
-                    'source': 'Polygon',
-                    'change': 0
-                }
-    except Exception as e:
-        print(f"[MASSIVE] {ticker}: {str(e)[:50]}")
-    
-    return None
-
-def get_stock_price_finnhub(ticker):
-    """Try Finnhub API"""
-    if not FINNHUB_KEY:
-        return None
-    
-    try:
-        url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
-        response = requests.get(url, timeout=5)
-        
-        if response.status_code == 200:
-            data = response.json()
-            if data.get('c') and data.get('c') > 0:
-                return {
-                    'price': float(data.get('c')),
-                    'source': 'Finnhub',
-                    'change': float(data.get('dp', 0))
-                }
-    except Exception as e:
-        print(f"[FINNHUB] {ticker}: {str(e)[:50]}")
-    
-    return None
-
-def get_stock_price_alphavantage(ticker):
-    """Try Alpha Vantage API"""
-    if not ALPHAVANTAGE_KEY:
-        return None
-    
-    try:
-        url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={ALPHAVANTAGE_KEY}'
-        response = requests.get(url, timeout=5)
-        
-        if response.status_code == 200:
-            data = response.json()
-            if 'Global Quote' in data:
-                quote = data['Global Quote']
-                if quote.get('05. price'):
-                    return {
-                        'price': float(quote['05. price']),
-                        'source': 'Alpha Vantage',
-                        'change': float(quote.get('10. change percent', '0').replace('%', ''))
-                    }
-    except Exception as e:
-        print(f"[ALPHAVANTAGE] {ticker}: {str(e)[:50]}")
-    
-    return None
-
 def get_stock_price_waterfall(ticker):
-    """Try APIs in priority order with caching"""
-    # Check cache first
-    cached = get_cached_price(ticker)
-    if cached:
-        return cached
+    """Fetch price with fallback: Polygon → Finnhub → Alpha Vantage"""
     
-    # Try APIs in order
-    result = get_stock_price_massive(ticker)
-    if result:
-        cache_price(ticker, result)
-        return result
+    # Check cache first (60-second TTL)
+    cache_key = f"{ticker}_{int(time.time() / 60)}"
+    if cache_key in price_cache:
+        return price_cache[cache_key]
     
-    result = get_stock_price_finnhub(ticker)
-    if result:
-        cache_price(ticker, result)
-        return result
+    result = {'price': 0, 'change': 0, 'source': 'fallback'}
     
-    result = get_stock_price_alphavantage(ticker)
-    if result:
-        cache_price(ticker, result)
-        return result
+    try:
+        # Try Polygon (Massive API) first
+        if MASSIVE_KEY:
+            url = f'https://api.polygon.io/v2/aggs/ticker/{ticker}/prev?apiKey={MASSIVE_KEY}'
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('results'):
+                    result['price'] = data['results']['c']
+                    result['change'] = ((data['results']['c'] - data['results']['o']) / data['results']['o']) * 100
+                    result['source'] = 'Polygon'
+                    price_cache[cache_key] = result
+                    return result
+    except:
+        pass
     
-    # Fallback
-    fallback = {
-        'price': 0.0,
-        'source': 'Unavailable',
-        'change': 0
-    }
-    cache_price(ticker, fallback)
-    return fallback
+    try:
+        # Try Finnhub
+        if FINNHUB_KEY:
+            url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                data = response.json()
+                if data.get('c', 0) > 0:
+                    result['price'] = data['c']
+                    result['change'] = data.get('dp', 0)
+                    result['source'] = 'Finnhub'
+                    price_cache[cache_key] = result
+                    return result
+    except:
+        pass
+    
+    try:
+        # Try Alpha Vantage
+        if ALPHAVANTAGE_KEY:
+            url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={ALPHAVANTAGE_KEY}'
+            response = requests.get(url, timeout=5)
+            if response.status_code == 200:
+                data = response.json()
+                quote = data.get('Global Quote', {})
+                if quote:
+                    result['price'] = float(quote.get('05. price', 0))
+                    result['change'] = float(quote.get('10. change percent', '0').replace('%', ''))
+                    result['source'] = 'AlphaVantage'
+                    price_cache[cache_key] = result
+                    return result
+    except:
+        pass
+    
+    return result
 
 def fetch_prices_concurrent(tickers):
     """Fetch multiple stock prices concurrently"""
     results = []
-    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+    with ThreadPoolExecutor(max_workers=10) as executor:
         future_to_ticker = {executor.submit(get_stock_price_waterfall, ticker): ticker for ticker in tickers}
-        for future in concurrent.futures.as_completed(future_to_ticker):
+        for future in as_completed(future_to_ticker):
             ticker = future_to_ticker[future]
             try:
-                price_data = future.result(timeout=10)
-                if price_data['price'] > 0:
-                    results.append({
-                        'Symbol': ticker,
-                        'Last': round(price_data['price'], 2),
-                        'Change': round(price_data['change'], 2),
-                        'Source': price_data['source'],
-                        'RSI': 50,
-                        'Signal': 'HOLD',
-                        'Strategy': 'Momentum'
-                    })
+                price_data = future.result()
+                results.append({
+                    'Symbol': ticker,
+                    'Last': price_data['price'],
+                    'Change': price_data['change'],
+                    'RSI': 50 + (price_data['change'] * 2),  # Mock RSI
+                    'Signal': 'BUY' if price_data['change'] > 2 else 'SELL' if price_data['change'] < -2 else 'HOLD',
+                    'Strategy': 'Momentum' if price_data['change'] > 0 else 'Mean Reversion'
+                })
             except Exception as e:
-                print(f"[CONCURRENT] Error fetching {ticker}: {e}")
-    
+                print(f"Error fetching {ticker}: {e}")
     return results
-
-# ==================== API ENDPOINTS ====================
-
-@app.route('/', methods=['GET'])
-def home():
-    return jsonify({
-        'status': 'online',
-        'version': '2.1',
-        'endpoints': [
-            '/api/recommendations',
-            '/api/stock-news/<ticker>',
-            '/api/market-news',
-            '/api/market-news/dashboard',
-            '/api/market-news/newsletter',
-            '/api/config'
-        ]
-    })
-
-@app.route('/api/config', methods=['GET'])
-def get_config():
-    return jsonify({
-        'finnhub_enabled': bool(FINNHUB_KEY),
-        'perplexity_enabled': bool(PERPLEXITY_KEY),
-        'massive_enabled': bool(MASSIVE_KEY),
-        'alphavantage_enabled': bool(ALPHAVANTAGE_KEY),
-        'cache_status': {
-            'last_updated': news_cache['last_updated'].isoformat() if news_cache['last_updated'] else None,
-            'articles_cached': len(news_cache['market_news'])
-        }
-    })
 
 @app.route('/api/recommendations', methods=['GET'])
 def get_recommendations():
-    """Get stock recommendations with REAL prices (no hardcoded!)"""
+    """Get stock recommendations with real prices"""
     try:
-        recommendations = fetch_prices_concurrent(TICKERS[:20])
-        return jsonify(recommendations)
+        stocks = fetch_prices_concurrent(TICKERS)
+        return jsonify(stocks)
     except Exception as e:
-        print(f"[ERROR] /api/recommendations: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/stock-news/<ticker>', methods=['GET'])
 def get_stock_news(ticker):
-    """Get latest news for a specific stock"""
-    if not ticker or len(ticker) > 10:
-        return jsonify({'error': 'Invalid ticker'}), 400
-        
+    """Get stock-specific news from Finnhub"""
     if not FINNHUB_KEY:
-        return jsonify({'error': 'Finnhub not configured'}), 500
+        return jsonify({'error': 'Finnhub API key not configured'}), 500
     
     try:
         from_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
@@ -359,139 +135,247 @@ def get_stock_news(ticker):
         response = requests.get(url, timeout=10)
         
         if response.status_code == 200:
-            news = response.json()
-            
-            formatted_news = []
-            for article in news[:10]:
-                sentiment = analyze_sentiment_from_headline(article.get('headline', ''))
-                formatted_news.append({
-                    'headline': article.get('headline', ''),
-                    'summary': article.get('summary', ''),
-                    'source': article.get('source', ''),
-                    'url': article.get('url', ''),
-                    'datetime': article.get('datetime', 0),
-                    'sentiment': sentiment
-                })
-            
+            articles = response.json()
             return jsonify({
                 'ticker': ticker,
-                'news_count': len(formatted_news),
-                'articles': formatted_news
+                'articles': articles[:10],  # Return top 10
+                'count': len(articles)
             })
-        else:
-            return jsonify({'error': f'API returned status {response.status_code}'}), 500
-            
     except Exception as e:
-        print(f"[ERROR] /api/stock-news/{ticker}: {e}")
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/market-news', methods=['GET'])
-def get_market_news():
-    """Get cached market news (auto-refreshes)"""
-    try:
-        # Check if we should update cache
-        if should_update_news():
-            print("[AUTO-UPDATE] Triggering news cache update...")
-            update_market_news_cache()
-        
-        return jsonify({
-            'articles': news_cache['market_news'][:30],
-            'news_count': len(news_cache['market_news']),
-            'last_updated': news_cache['timestamp'],
-            'cache_age_seconds': (datetime.now() - news_cache['last_updated']).total_seconds() if news_cache['last_updated'] else None
-        })
-    except Exception as e:
-        print(f"[ERROR] /api/market-news: {e}")
+        print(f"Error fetching news for {ticker}: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/market-news/dashboard', methods=['GET'])
 def get_market_news_dashboard():
-    """Concise news for dashboard (5 articles max)"""
+    """Get market news (5 articles for dashboard)"""
     try:
-        if should_update_news():
-            update_market_news_cache()
-        
-        concise_articles = []
-        for article in news_cache['market_news'][:5]:
-            concise_summary = article['summary'][:100] if article.get('summary') else article.get('headline', '')[:100]
-            
-            concise_articles.append({
-                'headline': article['headline'],
-                'summary': concise_summary,
-                'sentiment': article.get('sentiment', 'neutral'),
-                'source': article['source'],
-                'url': article['url']
-            })
-        
+        articles = fetch_market_news()
         return jsonify({
-            'articles': concise_articles,
-            'news_count': len(concise_articles),
-            'last_updated': news_cache['timestamp']
+            'articles': articles[:5],
+            'last_updated': news_cache['last_updated'].isoformat() if news_cache['last_updated'] else None
         })
     except Exception as e:
-        print(f"[ERROR] /api/market-news/dashboard: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/market-news/newsletter', methods=['GET'])
 def get_market_news_newsletter():
-    """Detailed news for newsletter (10 articles)"""
+    """Get detailed market news (10 articles for newsletter)"""
     try:
-        if should_update_news():
-            update_market_news_cache()
-        
-        detailed_articles = []
-        for article in news_cache['market_news'][:10]:
-            detailed_articles.append({
-                'headline': article['headline'],
-                'summary': article['summary'],
-                'sentiment': article.get('sentiment', 'neutral'),
-                'source': article['source'],
-                'url': article['url'],
-                'datetime': article['datetime']
-            })
-        
+        articles = fetch_market_news()
         return jsonify({
-            'articles': detailed_articles,
-            'news_count': len(detailed_articles),
-            'last_updated': news_cache['timestamp'],
-            'timestamp': datetime.now().isoformat()
+            'articles': articles[:10],
+            'last_updated': news_cache['last_updated'].isoformat() if news_cache['last_updated'] else None
         })
-    except Exception as e:
-        print(f"[ERROR] /api/market-news/newsletter: {e}")
+    except Exception as e):
         return jsonify({'error': str(e)}), 500
 
-# ==================== STARTUP & THREADING ====================
-
-def scheduled_news_updater():
-    """Background thread that updates news on schedule"""
-    while True:
-        try:
-            if should_update_news():
-                print("[SCHEDULER] Updating news cache...")
-                update_market_news_cache()
-            
-            # Check every 2 minutes
-            time.sleep(120)
-        except Exception as e:
-            print(f"[SCHEDULER_ERROR] {e}")
-            time.sleep(120)
-
-# Initialize app data on startup (Flask 3.0 compatible)
-def init_app_data():
-    """Initialize cache and start scheduler"""
-    print("[INIT] Fetching initial news cache...")
-    update_market_news_cache()
+def fetch_market_news():
+    """Fetch general market news"""
+    if news_cache['market_news'] and news_cache['last_updated']:
+        cache_age = (datetime.now() - news_cache['last_updated']).total_seconds()
+        if cache_age < 1800:  # 30 minutes
+            return news_cache['market_news']
     
-    # Start background thread
-    scheduler_thread = threading.Thread(target=scheduled_news_updater, daemon=True)
-    scheduler_thread.start()
-    print("[INIT] News scheduler started")
+    if not FINNHUB_KEY:
+        return []
+    
+    try:
+        url = f'https://finnhub.io/api/v1/news?category=general&token={FINNHUB_KEY}'
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code == 200:
+            articles = response.json()
+            news_cache['market_news'] = articles
+            news_cache['last_updated'] = datetime.now()
+            return articles
+    except:
+        pass
+    
+    return []
 
-# Call initialization before first request using application context
-with app.app_context():
-    init_app_data()
+# ======== PHASE 1 ADDITIONS ========
+
+@app.route('/api/earnings-calendar', methods=['GET'])
+def get_earnings_calendar():
+    """Get next 7 days of earnings (Finnhub)"""
+    if not FINNHUB_KEY:
+        return jsonify({'error': 'Finnhub not configured'}), 500
+    
+    try:
+        from_date = datetime.now().strftime('%Y-%m-%d')
+        to_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
+        
+        url = f'https://finnhub.io/api/v1/calendar/earnings?from={from_date}&to={to_date}&token={FINNHUB_KEY}'
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            earnings = data.get('earningsCalendar', [])
+            
+            # Filter to our tickers only
+            filtered = [e for e in earnings if e.get('symbol') in TICKERS]
+            
+            return jsonify({
+                'earnings': filtered,
+                'count': len(filtered),
+                'from_date': from_date,
+                'to_date': to_date
+            })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/insider-transactions/<ticker>', methods=['GET'])
+def get_insider_transactions(ticker):
+    """Get last 30 days of insider activity (Finnhub)"""
+    if not FINNHUB_KEY:
+        return jsonify({'error': 'Finnhub not configured'}), 500
+    
+    try:
+        from_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+        to_date = datetime.now().strftime('%Y-%m-%d')
+        
+        url = f'https://finnhub.io/api/v1/stock/insider-transactions?symbol={ticker}&from={from_date}&to={to_date}&token={FINNHUB_KEY}'
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            transactions = data.get('data', [])
+            
+            # Calculate insider sentiment
+            buys = sum(1 for t in transactions if t.get('transactionCode') in ['P', 'A'])
+            sells = sum(1 for t in transactions if t.get('transactionCode') == 'S')
+            
+            sentiment = 'BULLISH' if buys > sells else 'BEARISH' if sells > buys else 'NEUTRAL'
+            
+            return jsonify({
+                'ticker': ticker,
+                'transactions': transactions[:10],  # Last 10
+                'insider_sentiment': sentiment,
+                'buy_count': buys,
+                'sell_count': sells,
+                'total_transactions': len(transactions)
+            })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/social-sentiment/<ticker>', methods=['GET'])
+def get_social_sentiment(ticker):
+    """Get Reddit/Twitter sentiment (Finnhub)"""
+    if not FINNHUB_KEY:
+        return jsonify({'error': 'Finnhub not configured'}), 500
+    
+    try:
+        url = f'https://finnhub.io/api/v1/stock/social-sentiment?symbol={ticker}&token={FINNHUB_KEY}'
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            reddit_data = data.get('reddit', {})
+            twitter_data = data.get('twitter', {})
+            
+            reddit_score = reddit_data.get('score', 0) if reddit_data else 0
+            twitter_score = twitter_data.get('score', 0) if twitter_data else 0
+            
+            avg_score = (reddit_score + twitter_score) / 2 if (reddit_score or twitter_score) else 0
+            
+            return jsonify({
+                'ticker': ticker,
+                'reddit': {
+                    'score': reddit_score,
+                    'mentions': reddit_data.get('mention', 0) if reddit_data else 0,
+                    'sentiment': 'BULLISH' if reddit_score > 0.5 else 'BEARISH' if reddit_score < -0.5 else 'NEUTRAL'
+                },
+                'twitter': {
+                    'score': twitter_score,
+                    'mentions': twitter_data.get('mention', 0) if twitter_data else 0,
+                    'sentiment': 'BULLISH' if twitter_score > 0.5 else 'BEARISH' if twitter_score < -0.5 else 'NEUTRAL'
+                },
+                'overall_sentiment': 'BULLISH' if avg_score > 0.3 else 'BEARISH' if avg_score < -0.3 else 'NEUTRAL',
+                'overall_score': round(avg_score, 2)
+            })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/fred-data', methods=['GET'])
+def get_fred_data():
+    """Get macro economic data from FRED API"""
+    if not FRED_KEY:
+        return jsonify({'error': 'FRED API key not configured'}), 500
+    
+    try:
+        series_ids = {
+            'GDP': 'GDP',
+            'UNRATE': 'UNRATE',
+            'CPIAUCSL': 'CPIAUCSL',
+            'DFF': 'DFF',
+            'DGS10': 'DGS10'
+        }
+        
+        results = {}
+        
+        for name, series_id in series_ids.items():
+            url = f'https://api.stlouisfed.org/fred/series/observations?series_id={series_id}&api_key={FRED_KEY}&file_type=json&limit=1&sort_order=desc'
+            response = requests.get(url, timeout=5)
+            
+            if response.status_code == 200:
+                data = response.json()
+                observations = data.get('observations', [])
+                if observations:
+                    results[name] = {
+                        'value': observations.get('value'),
+                        'date': observations.get('date')
+                    }
+        
+        return jsonify({
+            'data': results,
+            'last_updated': datetime.now().isoformat()
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/balance-of-power/<ticker>', methods=['GET'])
+def get_balance_of_power(ticker):
+    """Calculate Balance of Power indicator"""
+    try:
+        # Fetch OHLC data from Alpha Vantage
+        if not ALPHAVANTAGE_KEY:
+            return jsonify({'error': 'Alpha Vantage not configured'}), 500
+        
+        url = f'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={ticker}&apikey={ALPHAVANTAGE_KEY}'
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            time_series = data.get('Time Series (Daily)', {})
+            
+            if not time_series:
+                return jsonify({'error': 'No data available'}), 404
+            
+            # Get last day's data
+            latest_date = list(time_series.keys())
+            latest = time_series[latest_date]
+            
+            open_price = float(latest['1. open'])
+            high_price = float(latest['2. high'])
+            low_price = float(latest['3. low'])
+            close_price = float(latest['4. close'])
+            
+            # Balance of Power = (Close - Open) / (High - Low)
+            if high_price != low_price:
+                bop = (close_price - open_price) / (high_price - low_price)
+            else:
+                bop = 0
+            
+            return jsonify({
+                'ticker': ticker,
+                'balance_of_power': round(bop, 4),
+                'interpretation': 'BULLISH' if bop > 0.5 else 'BEARISH' if bop < -0.5 else 'NEUTRAL',
+                'date': latest_date
+            })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
-    app.run(debug=False, host='0.0.0.0', port=port)
-
+    app.run(host='0.0.0.0', port=port, debug=False)
