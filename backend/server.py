@@ -379,3 +379,125 @@ def get_balance_of_power(ticker):
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port, debug=False)
+# Add these endpoints to your server.py
+
+@app.route('/api/earnings-calendar', methods=['GET'])
+def get_earnings_calendar():
+    """Get next 7 days of earnings"""
+    if not FINNHUB_KEY:
+        return jsonify({'error': 'Finnhub not configured', 'earnings': [], 'count': 0}), 200
+    
+    try:
+        from_date = datetime.now().strftime('%Y-%m-%d')
+        to_date = (datetime.now() + timedelta(days=7)).strftime('%Y-%m-%d')
+        
+        url = f'https://finnhub.io/api/v1/calendar/earnings?from={from_date}&to={to_date}&token={FINNHUB_KEY}'
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            return jsonify({
+                'earnings': data.get('earningsCalendar', []),
+                'count': len(data.get('earningsCalendar', []))
+            })
+    except Exception as e:
+        print(f"Earnings error: {e}")
+    
+    return jsonify({'earnings': [], 'count': 0})
+
+
+@app.route('/api/insider-transactions/<ticker>', methods=['GET'])
+def get_insider_transactions(ticker):
+    """Get insider activity"""
+    if not FINNHUB_KEY:
+        return jsonify({
+            'ticker': ticker,
+            'transactions': [],
+            'insider_sentiment': 'NEUTRAL',
+            'buy_count': 0,
+            'sell_count': 0,
+            'total_transactions': 0
+        }), 200
+    
+    try:
+        from_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
+        url = f'https://finnhub.io/api/v1/stock/insider-transactions?symbol={ticker}&from={from_date}&token={FINNHUB_KEY}'
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            transactions = data.get('data', [])
+            buys = sum(1 for t in transactions if t.get('transactionCode') in ['P', 'A'])
+            sells = sum(1 for t in transactions if t.get('transactionCode') == 'S')
+            
+            return jsonify({
+                'ticker': ticker,
+                'transactions': transactions[:10],
+                'insider_sentiment': 'BULLISH' if buys > sells else 'BEARISH' if sells > buys else 'NEUTRAL',
+                'buy_count': buys,
+                'sell_count': sells,
+                'total_transactions': len(transactions)
+            })
+    except Exception as e:
+        print(f"Insider error: {e}")
+    
+    return jsonify({
+        'ticker': ticker,
+        'transactions': [],
+        'insider_sentiment': 'NEUTRAL',
+        'buy_count': 0,
+        'sell_count': 0,
+        'total_transactions': 0
+    })
+
+
+@app.route('/api/social-sentiment/<ticker>', methods=['GET'])
+def get_social_sentiment(ticker):
+    """Get social sentiment"""
+    if not FINNHUB_KEY:
+        return jsonify({
+            'ticker': ticker,
+            'reddit': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+            'twitter': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+            'overall_sentiment': 'NEUTRAL',
+            'overall_score': 0
+        }), 200
+    
+    try:
+        url = f'https://finnhub.io/api/v1/stock/social-sentiment?symbol={ticker}&token={FINNHUB_KEY}'
+        response = requests.get(url, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            reddit_data = data.get('reddit', {})
+            twitter_data = data.get('twitter', {})
+            
+            reddit_score = reddit_data.get('score', 0) if reddit_data else 0
+            twitter_score = twitter_data.get('score', 0) if twitter_data else 0
+            avg_score = (reddit_score + twitter_score) / 2
+            
+            return jsonify({
+                'ticker': ticker,
+                'reddit': {
+                    'score': reddit_score,
+                    'mentions': reddit_data.get('mention', 0) if reddit_data else 0,
+                    'sentiment': 'BULLISH' if reddit_score > 0.5 else 'BEARISH' if reddit_score < -0.5 else 'NEUTRAL'
+                },
+                'twitter': {
+                    'score': twitter_score,
+                    'mentions': twitter_data.get('mention', 0) if twitter_data else 0,
+                    'sentiment': 'BULLISH' if twitter_score > 0.5 else 'BEARISH' if twitter_score < -0.5 else 'NEUTRAL'
+                },
+                'overall_sentiment': 'BULLISH' if avg_score > 0.3 else 'BEARISH' if avg_score < -0.3 else 'NEUTRAL',
+                'overall_score': round(avg_score, 2)
+            })
+    except Exception as e:
+        print(f"Sentiment error: {e}")
+    
+    return jsonify({
+        'ticker': ticker,
+        'reddit': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+        'twitter': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+        'overall_sentiment': 'NEUTRAL',
+        'overall_score': 0
+    })
