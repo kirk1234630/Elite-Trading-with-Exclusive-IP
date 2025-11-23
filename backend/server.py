@@ -1,7 +1,3 @@
-from flask import Flask, jsonify, request
-from flask_cors import CORS
-import requests
-import os
 from datetime import datetime
 import json
 
@@ -12,6 +8,11 @@ PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
 FRED_KEY = os.environ.get('FRED_API_KEY', '')
 ALPHAVANTAGE_KEY = os.environ.get('ALPHAVANTAGE_API_KEY', '')
+
+print(f"[STARTUP] Finnhub Key: {'✓' if FINNHUB_KEY else '✗'}")
+print(f"[STARTUP] Perplexity Key: {'✓' if PERPLEXITY_KEY else '✗'}")
+print(f"[STARTUP] FRED Key: {'✓' if FRED_KEY else '✗'}")
+print(f"[STARTUP] AlphaVantage Key: {'✓' if ALPHAVANTAGE_KEY else '✗'}")
 
 STOCK_LIST = [
     'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'AMD',
@@ -78,28 +79,43 @@ def get_recommendations():
         change_pct = None
         source = 'Unknown'
         
+        # Try Finnhub
         if FINNHUB_KEY:
             try:
+                print(f"[FINNHUB] Trying {ticker}...")
                 url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
                 r = requests.get(url, timeout=10)
+                print(f"[FINNHUB] Status {r.status_code} for {ticker}")
+                
+                if r.status_code != 200:
+                    print(f"[FINNHUB] ERROR {r.status_code}: {r.text[:200]}")
+                    
                 quote = r.json()
+                print(f"[FINNHUB] Response: {quote}")
                 
                 if quote.get('c') and quote.get('c') > 0:
                     price = float(quote.get('c'))
                     change = float(quote.get('d', 0))
                     change_pct = float(quote.get('dp', 0))
-                    source = 'Finnhub (After-Hours)'
+                    source = 'Finnhub'
                     print(f"[OK] {ticker}: ${price} from Finnhub")
                 else:
-                    print(f"[WARN] {ticker}: Invalid price from Finnhub")
+                    print(f"[FINNHUB] No price in response: {quote}")
             except Exception as e:
-                print(f"[ERROR] Finnhub for {ticker}: {str(e)}")
+                print(f"[FINNHUB_ERROR] {ticker}: {str(e)}")
+        else:
+            print(f"[FINNHUB] No API key configured")
         
+        # Try AlphaVantage
         if price is None and ALPHAVANTAGE_KEY:
             try:
+                print(f"[ALPHAVANTAGE] Trying {ticker}...")
                 url = f'https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol={ticker}&apikey={ALPHAVANTAGE_KEY}'
                 r = requests.get(url, timeout=10)
+                print(f"[ALPHAVANTAGE] Status {r.status_code} for {ticker}")
+                
                 data = r.json()
+                print(f"[ALPHAVANTAGE] Response: {data}")
                 
                 if data.get('Global Quote', {}).get('05. price'):
                     price = float(data['Global Quote']['05. price'])
@@ -109,10 +125,15 @@ def get_recommendations():
                     source = 'AlphaVantage'
                     print(f"[OK] {ticker}: ${price} from AlphaVantage")
             except Exception as e:
-                print(f"[WARN] AlphaVantage for {ticker}: {str(e)}")
+                print(f"[ALPHAVANTAGE_ERROR] {ticker}: {str(e)}")
+        else:
+            if price is None:
+                print(f"[ALPHAVANTAGE] No API key configured")
         
+        # Try Perplexity
         if price is None and PERPLEXITY_KEY:
             try:
+                print(f"[PERPLEXITY] Trying {ticker}...")
                 response = requests.post(
                     'https://api.perplexity.ai/chat/completions',
                     headers={
@@ -131,21 +152,30 @@ def get_recommendations():
                     timeout=15
                 )
                 
+                print(f"[PERPLEXITY] Status {response.status_code} for {ticker}")
+                
                 if response.status_code == 200:
                     content = response.json()['choices'][0]['message']['content'].strip()
+                    print(f"[PERPLEXITY] Response: {content}")
                     try:
                         price_str = ''.join(c for c in content if c.isdigit() or c == '.')
                         if price_str:
                             price = float(price_str)
                             change = 0
                             change_pct = 0
-                            source = 'Perplexity Sonar'
+                            source = 'Perplexity'
                             print(f"[OK] {ticker}: ${price} from Perplexity")
-                    except:
-                        print(f"[WARN] Could not parse Perplexity for {ticker}")
+                    except Exception as parse_e:
+                        print(f"[PERPLEXITY_PARSE_ERROR] {ticker}: {str(parse_e)}")
+                else:
+                    print(f"[PERPLEXITY] ERROR {response.status_code}: {response.text[:200]}")
             except Exception as e:
-                print(f"[WARN] Perplexity for {ticker}: {str(e)}")
+                print(f"[PERPLEXITY_ERROR] {ticker}: {str(e)}")
+        else:
+            if price is None:
+                print(f"[PERPLEXITY] No API key configured")
         
+        # Fallback
         if price is None:
             base_price = 150
             price = base_price + (hash(ticker) % 100) - 50
@@ -225,7 +255,6 @@ def get_macro_data():
     
     if PERPLEXITY_KEY:
         try:
-            print("Using Perplexity Sonar for macro data...")
             response = requests.post(
                 'https://api.perplexity.ai/chat/completions',
                 headers={
@@ -237,7 +266,7 @@ def get_macro_data():
                     'messages': [
                         {
                             'role': 'user',
-                            'content': 'Give me latest macro economic data: GDP growth, CPI, Fed funds rate, unemployment rate. Return as JSON.'
+                            'content': 'Give me latest macro economic data: GDP growth, CPI, Fed funds rate, unemployment rate.'
                         }
                     ]
                 },
