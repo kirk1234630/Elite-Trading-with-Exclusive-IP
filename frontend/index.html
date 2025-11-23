@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +8,7 @@
     <script src="https://s3.tradingview.com/tv.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: linear-gradient(135deg, #1a1a3e 0%, #16213e 50%, #0f3460 100%); color: #fff; font-family: -apple-systdocem, sans-serif; min-height: 100vh; }
+        body { background: linear-gradient(135deg, #1a1a3e 0%, #16213e 50%, #0f3460 100%); color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; min-height: 100vh; }
 
         .header { background: rgba(20, 20, 50, 0.95); backdrop-filter: blur(10px); border-bottom: 2px solid #00d4ff; padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
         .logo { font-size: 1.8em; font-weight: 900; background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
@@ -65,50 +64,6 @@
         .stock-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; }
         .stock-card:hover { border-color: #00d4ff; transform: translateY(-5px); }
 
-        .story-section { margin-bottom: 3rem; padding: 2rem; background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff; border-radius: 15px; }
-        .newsletter-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
-        .newsletter-table th { background: rgba(124, 58, 237, 0.3); color: #00d4ff; padding: 1rem; text-align: left; font-weight: 700; border: 1px solid #444; }
-        .newsletter-table td { padding: 0.8rem 1rem; border: 1px solid #444; color: #b0b8c1; cursor: pointer; }
-        .newsletter-table tr:hover { background: rgba(0, 212, 255, 0.1); }
-
-        .research-layout { display: grid; grid-template-columns: 280px 1fr; gap: 1.5rem; }
-        .left-sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
-        .sidebar-card { background: rgba(26, 26, 64, 0.95); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
-        .sidebar-card h3 { color: #00d4ff; margin-bottom: 1rem; font-size: 1.1em; }
-        .sidebar-content { color: #b0b8c1; line-height: 1.8; font-size: 0.9em; }
-        .price-banner { background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
-        .price-ticker { font-size: 1.8em; font-weight: 900; color: white; }
-        .price-value { font-size: 2em; color: #00d4ff; font-weight: 900; margin: 0.5rem 0; }
-        .price-story { font-style: italic; color: rgba(255, 255, 255, 0.9); font-size: 0.9em; }
-        .metric-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.8rem; margin-top: 1rem; }
-        .metric-box { background: rgba(0, 212, 255, 0.1); border: 1px solid #444; padding: 0.8rem; border-radius: 8px; text-align: center; }
-        .metric-label { font-size: 0.75em; color: #b0b8c1; }
-        .metric-value { font-size: 1.2em; color: #00d4ff; font-weight: 700; margin-top: 0.3rem; }
-        .greeks-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
-        .greeks-table th { background: rgba(124, 58, 237, 0.2); color: #00d4ff; padding: 0.6rem; font-size: 0.8em; border: 1px solid #444; }
-        .greeks-table td { padding: 0.6rem; font-size: 0.85em; text-align: center; border: 1px solid #444; color: #b0b8c1; }
-
-        .main-content { display: flex; flex-direction: column; gap: 1.5rem; }
-        .chart-card { background: rgba(26, 26, 64, 0.9); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
-        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-        .chart-header h3 { color: #00d4ff; font-size: 1.2em; }
-        .timeframe-buttons { display: flex; gap: 0.5rem; }
-        .timeframe-btn { background: rgba(0, 212, 255, 0.1); border: 1px solid #444; color: #b0b8c1; padding: 0.5rem 1rem; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.3s; }
-        .timeframe-btn:hover { border-color: #00d4ff; color: #00d4ff; }
-        .timeframe-btn.active { background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-color: #00d4ff; color: white; }
-        .chart-box { height: 500px; width: 100%; }
-
-        .info-boxes { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-        .info-box { background: rgba(26, 26, 64, 0.9); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
-        .info-box h3 { color: #00d4ff; margin-bottom: 1rem; font-size: 1.2em; }
-        .info-content { color: #b0b8c1; line-height: 1.8; }
-        .ai-deep-section { background: rgba(26, 26, 64, 0.9); border: 2px solid #00d4ff; border-radius: 15px; padding: 2rem; }
-        .ai-deep-section h2 { color: #00d4ff; font-size: 1.8em; margin-bottom: 1rem; }
-        .ai-deep-content { color: #d1fae5; line-height: 1.8; font-size: 1em; }
-
-        .ticker-cell { font-weight: 700; color: white; font-size: 1.1em; }
-
-        /* Loading Spinner - Step 3 */
         .loading-spinner {
             border: 4px solid #1e293b;
             border-top: 4px solid #3b82f6;
@@ -125,10 +80,7 @@
         }
 
         @media (max-width: 1200px) {
-            .research-layout { grid-template-columns: 1fr; }
-            .info-boxes { grid-template-columns: 1fr; }
             .ai-chat-widget { width: calc(100% - 20px); right: 10px; left: 10px; }
-            .timeframe-buttons { flex-wrap: wrap; }
             .top-plays-grid { grid-template-columns: 1fr; }
         }
     </style>
@@ -158,7 +110,6 @@
         </div>
     </div>
 
-    <!-- HOME PAGE -->
     <div id="homePage" class="page active">
         <div class="container">
             <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
@@ -177,33 +128,49 @@
                 <div class="top-plays-grid" id="topPlays">Loading...</div>
             </div>
 
-            <!-- Loading State -->
             <div id="loadingState" style="display: none; text-align: center; padding: 80px 20px;">
                 <div class="loading-spinner"></div>
                 <h3 style="color: #e2e8f0; margin-top: 24px; font-size: 20px;">Loading Market Analysis...</h3>
                 <p style="color: #94a3b8; margin-top: 8px;">Fetching latest 110-signal recommendations</p>
             </div>
 
-            <!-- Error State -->
             <div id="errorState" style="display: none; text-align: center; padding: 80px 20px;">
                 <div style="font-size: 64px; margin-bottom: 20px;">⚠️</div>
                 <h3 style="color: #ef4444; margin-bottom: 12px; font-size: 20px;">Unable to Load Data</h3>
                 <p style="color: #94a3b8; margin-bottom: 24px; font-size: 14px;" id="errorMessage">Connection error</p>
-                <button onclick="retryLoad()" style="background: #3b82f6; color: white; border: none; padding: 12px 28px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600; transition: all 0.2s;">
+                <button onclick="retryLoad()" style="background: #3b82f6; color: white; border: none; padding: 12px 28px; border-radius: 8px; cursor: pointer; font-size: 15px; font-weight: 600;">
                     🔄 Retry
                 </button>
             </div>
 
-            <!-- Stock Grid (existing) -->
-            <div id="stockGrid" class="stock-grid">
-                <!-- Stocks will load here -->
-            </div>
-
+            <div id="stockGrid" class="stock-grid"></div>
         </div>
     </div>
 
-    <!-- (All other pages remain the same - Brief, Newsletter, Research) -->
-    
+    <div id="briefPage" class="page">
+        <div class="container">
+            <h1 style="color: #00d4ff; font-size: 2.5em; margin-bottom: 2rem;">📰 Market Brief</h1>
+            <p style="color: #b0b8c1; font-size: 1.2em;">Quick market overview placeholder...</p>
+            <button class="btn-large btn-back" onclick="goHome()">← BACK TO DASHBOARD</button>
+        </div>
+    </div>
+
+    <div id="newsletterPage" class="page">
+        <div class="container">
+            <h1 style="color: #00d4ff; font-size: 2.5em; margin-bottom: 2rem;">📋 Newsletter Screener</h1>
+            <p style="color: #b0b8c1; font-size: 1.2em;">Newsletter screener placeholder...</p>
+            <button class="btn-large btn-back" onclick="goHome()">← BACK TO DASHBOARD</button>
+        </div>
+    </div>
+
+    <div id="researchPage" class="page">
+        <div class="container">
+            <h1 style="color: #00d4ff; font-size: 2.5em; margin-bottom: 2rem;">🔍 Stock Research</h1>
+            <div id="researchContent"></div>
+            <button class="btn-large btn-back" onclick="goHome()">← BACK TO DASHBOARD</button>
+        </div>
+    </div>
+
     <script>
     // ============================================
     // API CONFIGURATION - Step 1
@@ -223,9 +190,6 @@
         console.log('🔗 Recommendations endpoint:', API_CONFIG.baseUrl + API_CONFIG.endpoints.recommendations);
         return API_CONFIG;
     }
-    // ============================================
-    // END API CONFIGURATION
-    // ============================================
 
     // ============================================
     // API SERVICE FUNCTIONS - Step 2
@@ -294,9 +258,6 @@
         console.log('🧪 Testing API Service...');
         return TradingAPI.testConnection();
     }
-    // ============================================
-    // END API SERVICE FUNCTIONS
-    // ============================================
 
     // ============================================
     // UI STATE MANAGEMENT - Step 3
@@ -319,14 +280,6 @@
         document.getElementById('errorMessage').textContent = message || 'Failed to load data';
     }
 
-    function retryLoad() {
-        console.log('🔄 Retrying data load...');
-        showLoadingState();
-        setTimeout(() => {
-            hideLoadingState();
-        }, 1000);
-    }
-
     function testLoadingState() {
         console.log('Testing loading state...');
         showLoadingState();
@@ -344,10 +297,10 @@
             hideLoadingState();
         }, 3000);
     }
-    // ============================================
-    // END UI STATE MANAGEMENT
-    // ============================================
 
+    // ============================================
+    // DATA - Fallback Stock Data
+    // ============================================
     let allStocks = [
         {Symbol:'NVDA',Last:'178.88',Change:'-0.97',RSIWilder:'70',RegimeDetection:'82',Inst33:'85',Signal:'STRONG BUY',Story:'The Setup'},
         {Symbol:'TSLA',Last:'342.80',Change:'-2.3',RSIWilder:'42',RegimeDetection:'50',Inst33:'60',Signal:'HOLD',Story:'The Fade'},
@@ -359,14 +312,177 @@
         {Symbol:'AMD',Last:'142.35',Change:'4.2',RSIWilder:'68',RegimeDetection:'78',Inst33:'65',Signal:'STRONG BUY',Story:'Breakout Play'}
     ];
 
-    // (Rest of your JavaScript functions remain the same)
-    function loadAllStocks() {
-        // ... your existing loadAllStocks function ...
+    // ============================================
+    // STEP 4: API-DRIVEN DATA LOADING
+    // ============================================
+    let lastUpdateTime = null;
+
+    async function loadAllStocks() {
+        console.log('🔄 Loading stocks from API...');
+        showLoadingState();
+        
+        try {
+            const result = await TradingAPI.getRecommendations();
+            
+            if (result.success || result.usingFallback) {
+                allStocks = result.data;
+                lastUpdateTime = new Date();
+                renderStocks();
+                hideLoadingState();
+                
+                if (result.success) {
+                    console.log('✅ Loaded from API:', allStocks.length, 'stocks');
+                } else {
+                    console.log('⚠️ Using fallback data:', allStocks.length, 'stocks');
+                }
+            } else {
+                showErrorState(result.error || 'Failed to load stock data');
+            }
+        } catch (error) {
+            console.error('💥 Unexpected error:', error);
+            showErrorState('Unexpected error loading data');
+        }
     }
-    
-    // ... all other existing functions ...
-    
-    window.addEventListener('load', loadAllStocks);
+
+    function renderStocks() {
+        const topPlaysHTML = allStocks.slice(0, 3).map((s, i) => {
+            const price = parseFloat(s.Last);
+            const change = parseFloat(s.Change);
+            const buttons = ['STRONG BUY', 'SELL PREMIUM', 'ACCUMULATE'];
+            const colors = ['#10b981', '#f59e0b', '#00d4ff'];
+            const borderColors = ['#7c3aed', '#7c3aed', '#7c3aed'];
+            const bullets = [
+                ['🟣 Positive momentum. Technically strong setup. Institutional inflows.',
+                 '🟡 Buy on support. Sell calls for income. Hold core position.',
+                 '⚠️ Watch for exhaustion. Profit taking potential. Monitor key resistance.'],
+                ['🟣 Pullback detected -2.3%. IV likely depressed. Mean reversion candidate.',
+                 '🟡 Buy dips on support. Scale into position. Monitor for reversal confirmation.',
+                 '⚠️ Could test deeper lows. Watch key support levels. Use stops.'],
+                ['🟣 Positive momentum. Technically strong setup. Institutional inflows.',
+                 '🟡 Buy on support. Sell calls for income. Hold core position.',
+                 '⚠️ Watch for exhaustion. Profit taking potential. Monitor key resistance.']
+            ];
+            const targets = ['Entry: $146 | T1: $520 | T2: $540<br>Stop: $405', 'Entry: $343 | T1: $360 | T2: $375<br>Stop: $325', 'Entry: $512 | T1: $550 | T2: $580<br>Stop: $490'];
+
+            return `
+                <div class="play-card" onclick="researchStock('${s.Symbol}')">
+                    <div class="play-title">${s.Story}</div>
+                    <div class="play-subtitle">${s.Symbol} @ $${price.toFixed(2)} (${change >= 0 ? '+' : ''}${change}%)</div>
+                    <div class="play-change" style="color: ${change >= 0 ? '#10b981' : '#ef4444'};">${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)}%</div>
+                    <button class="play-button" style="background: ${colors[i]};">${buttons[i]}</button>
+                    <div class="play-metrics-grid">
+                        <div class="metric-box-sm"><div class="metric-label-sm">RSI</div><div class="metric-value-sm">${s.RSIWilder}</div></div>
+                        <div class="metric-box-sm"><div class="metric-label-sm">Regime</div><div class="metric-value-sm">${s.RegimeDetection}%</div></div>
+                        <div class="metric-box-sm"><div class="metric-label-sm">Inst</div><div class="metric-value-sm">${s.Inst33}</div></div>
+                    </div>
+                    <div class="play-analysis" style="border-color: ${borderColors[i]};"><ul>${bullets[i].map(b => `<li>${b}</li>`).join('')}</ul></div>
+                    <div class="play-targets"><div class="play-targets-title">🎯 Targets</div><div class="play-targets-content">${targets[i]}</div></div>
+                </div>
+            `;
+        }).join('');
+        document.getElementById('topPlays').innerHTML = topPlaysHTML;
+
+        const grid = allStocks.map(s => {
+            const price = parseFloat(s.Last);
+            const change = parseFloat(s.Change);
+            return `
+                <div class="stock-card" onclick="researchStock('${s.Symbol}')">
+                    <div style="font-size: 2.2em; font-weight: 900; color: white;">${s.Symbol}</div>
+                    <div style="font-size: 1.8em; color: #00d4ff; font-weight: 900;">$${price.toFixed(2)}</div>
+                    <div style="font-style: italic; color: #b0b8c1; margin: 0.3rem 0;">"${s.Story}"</div>
+                    <div style="color: ${change >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.1em; font-weight: 700; margin: 0.5rem 0;">${change >= 0 ? '▲' : '▼'} ${Math.abs(change).toFixed(2)}%</div>
+                    <span style="display: inline-block; padding: 0.6rem 1.2rem; background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 8px; font-weight: 700; color: white;">${s.Signal}</span>
+                    <div style="margin-top: 1rem; font-size: 0.85em; color: #b0b8c1;">RSI: ${s.RSIWilder} | Regime: ${s.RegimeDetection}% | Inst: ${s.Inst33}</div>
+                </div>
+            `;
+        }).join('');
+        document.getElementById('stockGrid').innerHTML = grid;
+    }
+
+    function retryLoad() {
+        console.log('🔄 Retry triggered by user');
+        loadAllStocks();
+    }
+
+    // Auto-refresh every 5 minutes
+    setInterval(() => {
+        console.log('🔄 Auto-refresh: Reloading from API...');
+        loadAllStocks();
+    }, API_CONFIG.refreshInterval);
+
+    // Initialize on page load
+    window.addEventListener('load', () => {
+        console.log('🚀 Dashboard initializing...');
+        loadAllStocks();
+    });
+
+    // ============================================
+    // NAVIGATION & UI FUNCTIONS
+    // ============================================
+    function goHome() {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('homePage').classList.add('active');
+        document.getElementById('aiChatToggle').classList.remove('hidden');
+    }
+
+    function showBrief() {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('briefPage').classList.add('active');
+        document.getElementById('aiChatToggle').classList.add('hidden');
+    }
+
+    function showNewsletter() {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('newsletterPage').classList.add('active');
+        document.getElementById('aiChatToggle').classList.add('hidden');
+    }
+
+    function researchStock(symbol) {
+        const stock = allStocks.find(s => s.Symbol === symbol);
+        if (!stock) return;
+        
+        document.getElementById('researchContent').innerHTML = `
+            <div style="padding: 2rem; background: rgba(0, 212, 255, 0.05); border: 2px solid #00d4ff; border-radius: 15px;">
+                <h2 style="color: #00d4ff; font-size: 2em; margin-bottom: 1rem;">${symbol}</h2>
+                <p style="color: #b0b8c1; font-size: 1.2em;">Price: $${parseFloat(stock.Last).toFixed(2)}</p>
+                <p style="color: #b0b8c1; font-size: 1.2em;">Change: ${stock.Change}%</p>
+                <p style="color: #b0b8c1; font-size: 1.2em;">Signal: ${stock.Signal}</p>
+            </div>
+        `;
+        
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById('researchPage').classList.add('active');
+        document.getElementById('aiChatToggle').classList.add('hidden');
+    }
+
+    function searchStock() {
+        const symbol = document.getElementById('searchInput').value.toUpperCase().trim();
+        if (symbol) {
+            researchStock(symbol);
+        }
+    }
+
+    // ============================================
+    // AI CHAT FUNCTIONS
+    // ============================================
+    function toggleAIChat() {
+        document.getElementById('aiChatWidget').classList.toggle('active');
+    }
+
+    function sendAIMessage() {
+        const input = document.getElementById('aiInput');
+        const message = input.value.trim();
+        if (!message) return;
+        
+        const messagesDiv = document.getElementById('aiMessages');
+        messagesDiv.innerHTML += `<div class="message user">${message}</div>`;
+        input.value = '';
+        
+        setTimeout(() => {
+            messagesDiv.innerHTML += `<div class="message ai">I'm analyzing "${message}"... This is a placeholder AI response.</div>`;
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }, 500);
+    }
     </script>
 </body>
 </html>
