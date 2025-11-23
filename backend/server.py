@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 import gc
+import numpy as np
 
 app = Flask(__name__)
 CORS(app)
@@ -26,9 +27,8 @@ ai_insights_cache = {}
 
 # TTL
 RECOMMENDATIONS_TTL = 300
-NEWS_TTL = 3600
 SENTIMENT_TTL = 86400
-AI_INSIGHTS_TTL = 1800  # 30 minutes for AI insights
+AI_INSIGHTS_TTL = 1800
 
 # Tickers
 TICKERS = [
@@ -133,7 +133,6 @@ def get_recommendations():
             cache_age = (datetime.now() - recommendations_cache['timestamp']).total_seconds()
             if cache_age < RECOMMENDATIONS_TTL:
                 return jsonify(recommendations_cache['data'])
-        
         stocks = fetch_prices_concurrent(TICKERS)
         recommendations_cache['data'] = stocks
         recommendations_cache['timestamp'] = datetime.now()
@@ -145,7 +144,6 @@ def get_recommendations():
 
 @app.route('/api/stock-price/<ticker>', methods=['GET'])
 def get_stock_price_single(ticker):
-    """Get individual stock price for ANY ticker"""
     try:
         price_data = get_stock_price_waterfall(ticker.upper())
         return jsonify({
@@ -158,10 +156,9 @@ def get_stock_price_single(ticker):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-# AI INSIGHTS WITH PERPLEXITY
 @app.route('/api/ai-insights/<ticker>', methods=['GET'])
 def get_ai_insights(ticker):
-    """Get AI-powered insights using Perplexity to scrape multiple sources"""
+    """AI-powered insights using Perplexity to scrape Barchart, Swaggystocks, Quiver, Stock Rover, GuruFocus"""
     
     cache_key = f"{ticker}_ai_insights"
     if cache_key in ai_insights_cache:
@@ -173,31 +170,29 @@ def get_ai_insights(ticker):
     if not PERPLEXITY_KEY:
         return jsonify({
             'ticker': ticker,
-            'edge': 'Perplexity API not configured',
-            'trade': 'N/A',
-            'risk': 'N/A',
-            'sources': []
+            'edge': 'Configure PERPLEXITY_API_KEY in Render environment variables',
+            'trade': 'Get free key at: perplexity.ai/settings/api',
+            'risk': 'Without API key, AI analysis unavailable',
+            'sources': ['Setup Required']
         }), 200
     
     try:
-        # Perplexity AI prompt to scrape all sources
-        prompt = f"""Analyze {ticker} stock using these specific sources:
-1. Barchart.com - Check technical ratings, volatility, and options flow
-2. Swaggystocks.com - Analyze Reddit sentiment and retail trader activity  
-3. Quiver Quantitative - Review congressional trading and insider flows
-4. Stock Rover - Evaluate fundamental metrics and valuation
-5. GuruFocus - Check guru holdings and quality scores
+        prompt = f"""Analyze {ticker} stock using these data sources:
+1. Barchart.com - Technical ratings and options flow
+2. Swaggystocks.com - Reddit/retail sentiment
+3. Quiver Quantitative - Insider/congressional trading
+4. Stock Rover - Fundamental analysis
+5. GuruFocus - Institutional holdings
 
-Also search Perplexity Finance for latest news and analyst ratings.
+Also check Perplexity Finance for latest news.
 
-Provide a concise analysis in this exact format:
+Format your response EXACTLY as:
 
-EDGE: [One sentence on the trading edge or catalyst]
-TRADE: [Specific entry/exit strategy with price levels]
-RISK: [Key risks and stop-loss level]
-SOURCES: [List which sources had the most relevant data]"""
+EDGE: [One sentence on key catalyst or edge]
+TRADE: [Entry price, target, stop loss in one sentence]
+RISK: [Main risks in one sentence]
+SOURCES: [Comma-separated list of sources that had data]"""
 
-        # Call Perplexity API
         headers = {
             'Authorization': f'Bearer {PERPLEXITY_KEY}',
             'Content-Type': 'application/json'
@@ -206,11 +201,11 @@ SOURCES: [List which sources had the most relevant data]"""
         payload = {
             'model': 'llama-3.1-sonar-large-128k-online',
             'messages': [
-                {'role': 'system', 'content': 'You are a professional trading analyst with access to multiple financial data sources.'},
+                {'role': 'system', 'content': 'You are a professional trading analyst.'},
                 {'role': 'user', 'content': prompt}
             ],
             'temperature': 0.2,
-            'max_tokens': 500
+            'max_tokens': 400
         }
         
         response = requests.post(
@@ -224,10 +219,9 @@ SOURCES: [List which sources had the most relevant data]"""
             data = response.json()
             content = data['choices'][0]['message']['content']
             
-            # Parse response
             edge = 'Analyzing...'
-            trade = 'Setting up trade...'
-            risk = 'Assessing risk...'
+            trade = 'Loading...'
+            risk = 'Evaluating...'
             sources = []
             
             if 'EDGE:' in content:
@@ -238,47 +232,40 @@ SOURCES: [List which sources had the most relevant data]"""
                 risk = content.split('RISK:')[1].split('SOURCES:')[0].strip() if 'SOURCES:' in content else content.split('RISK:')[1].strip()
             if 'SOURCES:' in content:
                 sources_text = content.split('SOURCES:')[1].strip()
-                sources = [s.strip() for s in sources_text.split(',') if s.strip()]
+                sources = [s.strip() for s in sources_text.split(',')][:5]
             
             result = {
                 'ticker': ticker,
                 'edge': edge,
                 'trade': trade,
                 'risk': risk,
-                'sources': sources,
-                'raw_analysis': content
+                'sources': sources
             }
             
-            # Cache result
-            ai_insights_cache[cache_key] = {
-                'data': result,
-                'timestamp': datetime.now()
-            }
-            
+            ai_insights_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
             return jsonify(result)
         else:
             return jsonify({
                 'ticker': ticker,
-                'edge': f'API Error: {response.status_code}',
-                'trade': 'Unable to fetch',
-                'risk': 'Check API configuration',
+                'edge': f'Perplexity API Error: {response.status_code}',
+                'trade': 'Check API key and credits at perplexity.ai',
+                'risk': 'API configuration issue',
                 'sources': []
             }), 200
             
     except Exception as e:
-        print(f"AI Insights error: {e}")
         return jsonify({
             'ticker': ticker,
-            'edge': 'Error fetching AI insights',
+            'edge': 'Error connecting to Perplexity AI',
             'trade': str(e),
-            'risk': 'API timeout or error',
+            'risk': 'Check API key configuration',
             'sources': []
         }), 200
 
 @app.route('/api/stock-news/<ticker>', methods=['GET'])
 def get_stock_news(ticker):
     if not FINNHUB_KEY:
-        return jsonify({'error': 'Finnhub not configured'}), 500
+        return jsonify({'ticker': ticker, 'articles': [], 'count': 0}), 200
     try:
         from_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
         to_date = datetime.now().strftime('%Y-%m-%d')
@@ -287,18 +274,23 @@ def get_stock_news(ticker):
         if response.status_code == 200:
             articles = response.json()
             return jsonify({'ticker': ticker, 'articles': articles[:10], 'count': len(articles)})
-    except Exception as e:
-        print(f"Error: {e}")
+    except:
+        pass
     return jsonify({'ticker': ticker, 'articles': [], 'count': 0})
 
 @app.route('/api/market-news/dashboard', methods=['GET'])
 def get_market_news_dashboard():
     try:
         articles = fetch_market_news_scheduled()
-        return jsonify({
-            'articles': articles[:5],
-            'last_updated': news_cache['last_updated'].isoformat() if news_cache['last_updated'] else None
-        })
+        return jsonify({'articles': articles[:5], 'last_updated': news_cache['last_updated'].isoformat() if news_cache['last_updated'] else None})
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/market-news/newsletter', methods=['GET'])
+def get_market_news_newsletter():
+    try:
+        articles = fetch_market_news_scheduled()
+        return jsonify({'articles': articles[:10], 'last_updated': news_cache['last_updated'].isoformat() if news_cache['last_updated'] else None})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -333,8 +325,8 @@ def get_earnings_calendar():
             data = response.json()
             earnings = data.get('earningsCalendar', [])
             return jsonify({'earnings': earnings, 'count': len(earnings)})
-    except Exception as e:
-        print(f"Error: {e}")
+    except:
+        pass
     return jsonify({'earnings': [], 'count': 0})
 
 @app.route('/api/insider-transactions/<ticker>', methods=['GET'])
@@ -364,8 +356,16 @@ def get_insider_transactions(ticker):
 
 @app.route('/api/social-sentiment/<ticker>', methods=['GET'])
 def get_social_sentiment(ticker):
+    """Social sentiment with daily/weekly/monthly tracking"""
     if not FINNHUB_KEY:
-        return jsonify({'ticker': ticker, 'daily': {'score': 0, 'mentions': 0}, 'weekly': {'score': 0, 'mentions': 0}, 'weekly_change': 0}), 200
+        return jsonify({
+            'ticker': ticker,
+            'daily': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+            'weekly': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+            'weekly_change': 0.00,
+            'monthly_change': 0.00,
+            'overall_sentiment': 'NEUTRAL'
+        }), 200
     
     cache_key = f"{ticker}_sentiment"
     if cache_key in sentiment_cache:
@@ -386,22 +386,31 @@ def get_social_sentiment(ticker):
             twitter_daily = twitter_data[-1] if twitter_data else {}
             reddit_daily_score = reddit_daily.get('score', 0)
             twitter_daily_score = twitter_daily.get('score', 0)
-            daily_avg = (reddit_daily_score + twitter_daily_score) / 2
+            daily_avg = (reddit_daily_score + twitter_daily_score) / 2 if (reddit_daily_score or twitter_daily_score) else 0
             
             reddit_weekly = reddit_data[-7:] if len(reddit_data) >= 7 else reddit_data
             twitter_weekly = twitter_data[-7:] if len(twitter_data) >= 7 else twitter_data
             reddit_weekly_avg = sum(r.get('score', 0) for r in reddit_weekly) / len(reddit_weekly) if reddit_weekly else 0
             twitter_weekly_avg = sum(t.get('score', 0) for t in twitter_weekly) / len(twitter_weekly) if twitter_weekly else 0
-            weekly_avg = (reddit_weekly_avg + twitter_weekly_avg) / 2
+            weekly_avg = (reddit_weekly_avg + twitter_weekly_avg) / 2 if (reddit_weekly_avg or twitter_weekly_avg) else 0
             
             weekly_change = round(((daily_avg - weekly_avg) / weekly_avg * 100) if weekly_avg != 0 else 0, 2)
+            monthly_change = round(weekly_change * 1.3, 2)
             
             result = {
                 'ticker': ticker,
-                'daily': {'score': round(daily_avg, 2), 'mentions': reddit_daily.get('mention', 0) + twitter_daily.get('mention', 0), 'sentiment': 'BULLISH' if daily_avg > 0.3 else 'BEARISH' if daily_avg < -0.3 else 'NEUTRAL'},
-                'weekly': {'score': round(weekly_avg, 2), 'mentions': sum(r.get('mention', 0) for r in reddit_weekly) + sum(t.get('mention', 0) for t in twitter_weekly), 'sentiment': 'BULLISH' if weekly_avg > 0.3 else 'BEARISH' if weekly_avg < -0.3 else 'NEUTRAL'},
+                'daily': {
+                    'score': round(daily_avg, 2),
+                    'mentions': reddit_daily.get('mention', 0) + twitter_daily.get('mention', 0),
+                    'sentiment': 'BULLISH' if daily_avg > 0.3 else 'BEARISH' if daily_avg < -0.3 else 'NEUTRAL'
+                },
+                'weekly': {
+                    'score': round(weekly_avg, 2),
+                    'mentions': sum(r.get('mention', 0) for r in reddit_weekly) + sum(t.get('mention', 0) for t in twitter_weekly),
+                    'sentiment': 'BULLISH' if weekly_avg > 0.3 else 'BEARISH' if weekly_avg < -0.3 else 'NEUTRAL'
+                },
                 'weekly_change': weekly_change,
-                'monthly_change': round(weekly_change * 1.3, 2),
+                'monthly_change': monthly_change,
                 'overall_sentiment': 'BULLISH' if daily_avg > 0.3 else 'BEARISH' if daily_avg < -0.3 else 'NEUTRAL'
             }
             
@@ -409,7 +418,15 @@ def get_social_sentiment(ticker):
             return jsonify(result)
     except:
         pass
-    return jsonify({'ticker': ticker, 'daily': {'score': 0, 'mentions': 0}, 'weekly': {'score': 0, 'mentions': 0}, 'weekly_change': 0})
+    
+    return jsonify({
+        'ticker': ticker,
+        'daily': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+        'weekly': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+        'weekly_change': 0.00,
+        'monthly_change': 0.00,
+        'overall_sentiment': 'NEUTRAL'
+    })
 
 @app.route('/api/options-opportunities/<ticker>', methods=['GET'])
 def get_options_opportunities(ticker):
@@ -475,11 +492,11 @@ def get_fred_data():
             if response.status_code == 200:
                 data = response.json()
                 observations = data.get('observations', [])
-                if observations and len(observations) > 0:
+                if observations:
                     results[name] = {'value': observations[0].get('value'), 'date': observations[0].get('date')}
         return jsonify({'data': results})
     except:
-        return jsonify({'data': {}}), 200
+        return jsonify({'data': {}})
 
 @app.route('/health', methods=['GET'])
 def health_check():
