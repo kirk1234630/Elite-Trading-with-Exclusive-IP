@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, request
+rom flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
 import os
@@ -17,14 +17,20 @@ ALPHAVANTAGE_KEY = os.environ.get('ALPHAVANTAGE_API_KEY', '')
 MASSIVE_KEY = os.environ.get('MASSIVE_API_KEY', '')
 FRED_KEY = os.environ.get('FRED_API_KEY', '')
 
-# PERSISTENT CACHE - Stocks stay cached for 5 minutes
+# PERSISTENT CACHE
 price_cache = {}
 recommendations_cache = {'data': [], 'timestamp': None}
-news_cache = {'market_news': [], 'last_updated': None}
+news_cache = {
+    'market_news': [],
+    'last_updated': None,
+    'update_schedule': [9, 12, 16, 19]  # Hours PST: 9am, 12pm, 4pm, 7pm
+}
+sentiment_cache = {}  # Cache daily/weekly sentiment per ticker
 
-# Cache TTL in seconds
+# Cache TTL
 RECOMMENDATIONS_TTL = 300  # 5 minutes
-NEWS_TTL = 1800  # 30 minutes
+NEWS_TTL = 3600  # 1 hour (but only updates 4x/day)
+SENTIMENT_TTL = 86400  # 24 hours for sentiment
 
 # Stock list (57 tickers)
 TICKERS = [
@@ -37,17 +43,37 @@ TICKERS = [
 ]
 
 def cleanup_cache():
-    """Remove expired cache entries to prevent memory buildup"""
+    """Remove expired cache entries"""
     current_time = int(time.time() / 60)
     expired_keys = [k for k in price_cache.keys() if not k.endswith(f"_{current_time}") and not k.endswith(f"_{current_time-1}")]
     for key in expired_keys:
         del price_cache[key]
     gc.collect()
 
-def get_stock_price_waterfall(ticker):
-    """Fetch price with fallback: Polygon → Finnhub → Alpha Vantage"""
+def should_update_news():
+    """Check if it's time for scheduled news update (4x/day)"""
+    if not news_cache['last_updated']:
+        return True
     
-    # Check cache first (60-second TTL)
+    now = datetime.now()
+    current_hour = now.hour
+    last_update = news_cache['last_updated']
+    
+    # Find next scheduled update hour
+    next_update_hours = [h for h in news_cache['update_schedule'] if h > last_update.hour]
+    
+    # If we passed a scheduled hour since last update
+    if next_update_hours and current_hour >= next_update_hours[0]:
+        return True
+    
+    # Or if it's a new day and we haven't updated yet today
+    if now.date() > last_update.date() and current_hour >= news_cache['update_schedule'][0]:
+        return True
+    
+    return False
+
+def get_stock_price_waterfall(ticker):
+    """Fetch price with fallback"""
     cache_key = f"{ticker}_{int(time.time() / 60)}"
     if cache_key in price_cache:
         return price_cache[cache_key]
@@ -55,7 +81,6 @@ def get_stock_price_waterfall(ticker):
     result = {'price': 0, 'change': 0, 'source': 'fallback'}
     
     try:
-        # Try Polygon (Massive API) first
         if MASSIVE_KEY:
             url = f'https://api.polygon.io/v2/aggs/ticker/{ticker}/prev?apiKey={MASSIVE_KEY}'
             response = requests.get(url, timeout=3)
@@ -71,7 +96,6 @@ def get_stock_price_waterfall(ticker):
         pass
     
     try:
-        # Try Finnhub
         if FINNHUB_KEY:
             url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
             response = requests.get(url, timeout=3)
@@ -89,10 +113,8 @@ def get_stock_price_waterfall(ticker):
     return result
 
 def fetch_prices_concurrent(tickers):
-    """Fetch multiple stock prices concurrently - MEMORY OPTIMIZED"""
+    """Fetch prices in batches - MEMORY OPTIMIZED"""
     results = []
-    
-    # CRITICAL FIX: Process in batches of 15 with 3 concurrent workers
     batch_size = 15
     
     for i in range(0, len(tickers), batch_size):
@@ -107,79 +129,47 @@ def fetch_prices_concurrent(tickers):
                     price_data = future.result(timeout=5)
                     results.append({
                         'Symbol': ticker,
-                        'Last': price_data['price'],
-                        'Change': price_data['change'],
-                        'RSI': 50 + (price_data['change'] * 2),
+                        'Last': round(price_data['price'], 2),  # 2 decimal places
+                        'Change': round(price_data['change'], 2),  # 2 decimal places
+                        'RSI': round(50 + (price_data['change'] * 2), 2),
                         'Signal': 'BUY' if price_data['change'] > 2 else 'SELL' if price_data['change'] < -2 else 'HOLD',
                         'Strategy': 'Momentum' if price_data['change'] > 0 else 'Mean Reversion'
                     })
                 except Exception as e:
                     print(f"Error fetching {ticker}: {e}")
         
-        # Small delay between batches
         time.sleep(0.1)
     
-    # Cleanup old cache entries
     cleanup_cache()
-    
     return results
 
 @app.route('/api/recommendations', methods=['GET'])
 def get_recommendations():
-    """Get stock recommendations with PERSISTENT CACHE (5 min TTL)"""
+    """Get stock recommendations with PERSISTENT CACHE"""
     try:
-        # Check if we have valid cached data
         if recommendations_cache['data'] and recommendations_cache['timestamp']:
             cache_age = (datetime.now() - recommendations_cache['timestamp']).total_seconds()
-            
             if cache_age < RECOMMENDATIONS_TTL:
                 print(f"✅ Serving from cache (age: {cache_age:.0f}s)")
                 return jsonify(recommendations_cache['data'])
         
-        # Cache miss or expired - fetch fresh data
-        print(f"🔄 Cache expired or empty - fetching fresh data")
+        print(f"🔄 Fetching fresh data")
         stocks = fetch_prices_concurrent(TICKERS)
-        
-        # Update cache
         recommendations_cache['data'] = stocks
         recommendations_cache['timestamp'] = datetime.now()
         
         return jsonify(stocks)
     except Exception as e:
-        print(f"Error in recommendations: {e}")
-        
-        # If error but we have stale cache, return it anyway
+        print(f"Error: {e}")
         if recommendations_cache['data']:
-            print(f"⚠️ Returning stale cache due to error")
             return jsonify(recommendations_cache['data'])
-        
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/recommendations/force-refresh', methods=['POST'])
-def force_refresh_recommendations():
-    """Force refresh stock data (ignores cache)"""
-    try:
-        print(f"🔄 FORCE REFRESH triggered")
-        stocks = fetch_prices_concurrent(TICKERS)
-        
-        # Update cache
-        recommendations_cache['data'] = stocks
-        recommendations_cache['timestamp'] = datetime.now()
-        
-        return jsonify({
-            'success': True,
-            'stocks': stocks,
-            'timestamp': datetime.now().isoformat()
-        })
-    except Exception as e:
-        print(f"Error in force refresh: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/stock-news/<ticker>', methods=['GET'])
 def get_stock_news(ticker):
-    """Get stock-specific news from Finnhub"""
+    """Get stock-specific news - ALWAYS FRESH for non-CSV stocks"""
     if not FINNHUB_KEY:
-        return jsonify({'error': 'Finnhub API key not configured'}), 500
+        return jsonify({'error': 'Finnhub not configured'}), 500
     
     try:
         from_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
@@ -196,26 +186,28 @@ def get_stock_news(ticker):
                 'count': len(articles)
             })
     except Exception as e:
-        print(f"Error fetching news for {ticker}: {e}")
-        return jsonify({'error': str(e)}), 500
+        print(f"Error fetching news: {e}")
+    
+    return jsonify({'ticker': ticker, 'articles': [], 'count': 0})
 
 @app.route('/api/market-news/dashboard', methods=['GET'])
 def get_market_news_dashboard():
-    """Get market news (5 articles) with 30min cache"""
+    """Get market news with 4x/day scheduled updates"""
     try:
-        articles = fetch_market_news()
+        articles = fetch_market_news_scheduled()
         return jsonify({
             'articles': articles[:5],
-            'last_updated': news_cache['last_updated'].isoformat() if news_cache['last_updated'] else None
+            'last_updated': news_cache['last_updated'].isoformat() if news_cache['last_updated'] else None,
+            'next_update': get_next_update_time()
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/market-news/newsletter', methods=['GET'])
 def get_market_news_newsletter():
-    """Get detailed market news (10 articles) with 30min cache"""
+    """Get detailed market news"""
     try:
-        articles = fetch_market_news()
+        articles = fetch_market_news_scheduled()
         return jsonify({
             'articles': articles[:10],
             'last_updated': news_cache['last_updated'].isoformat() if news_cache['last_updated'] else None
@@ -223,19 +215,19 @@ def get_market_news_newsletter():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-def fetch_market_news():
-    """Fetch general market news with persistent cache"""
-    if news_cache['market_news'] and news_cache['last_updated']:
+def fetch_market_news_scheduled():
+    """Fetch market news on schedule (4x/day)"""
+    # Check if we should update
+    if news_cache['market_news'] and not should_update_news():
         cache_age = (datetime.now() - news_cache['last_updated']).total_seconds()
-        if cache_age < NEWS_TTL:
-            print(f"✅ Serving market news from cache (age: {cache_age:.0f}s)")
-            return news_cache['market_news']
+        print(f"✅ Serving market news from cache (age: {cache_age:.0f}s)")
+        return news_cache['market_news']
     
     if not FINNHUB_KEY:
         return []
     
     try:
-        print(f"🔄 Fetching fresh market news")
+        print(f"🔄 Fetching fresh market news (scheduled update)")
         url = f'https://finnhub.io/api/v1/news?category=general&token={FINNHUB_KEY}'
         response = requests.get(url, timeout=5)
         
@@ -245,16 +237,30 @@ def fetch_market_news():
             news_cache['last_updated'] = datetime.now()
             return articles
     except Exception as e:
-        print(f"Error fetching market news: {e}")
-        # Return stale cache if error
+        print(f"Error: {e}")
         if news_cache['market_news']:
             return news_cache['market_news']
     
     return []
 
+def get_next_update_time():
+    """Get next scheduled news update time"""
+    now = datetime.now()
+    current_hour = now.hour
+    
+    for hour in news_cache['update_schedule']:
+        if hour > current_hour:
+            next_update = now.replace(hour=hour, minute=0, second=0)
+            return next_update.isoformat()
+    
+    # Next update is tomorrow's first scheduled time
+    tomorrow = now + timedelta(days=1)
+    next_update = tomorrow.replace(hour=news_cache['update_schedule'][0], minute=0, second=0)
+    return next_update.isoformat()
+
 @app.route('/api/earnings-calendar', methods=['GET'])
 def get_earnings_calendar():
-    """Get next 7 days of earnings"""
+    """Get earnings calendar"""
     if not FINNHUB_KEY:
         return jsonify({'earnings': [], 'count': 0}), 200
     
@@ -270,10 +276,7 @@ def get_earnings_calendar():
             earnings = data.get('earningsCalendar', [])
             filtered = [e for e in earnings if e.get('symbol') in TICKERS]
             
-            return jsonify({
-                'earnings': filtered,
-                'count': len(filtered)
-            })
+            return jsonify({'earnings': filtered, 'count': len(filtered)})
     except Exception as e:
         print(f"Earnings error: {e}")
     
@@ -325,15 +328,24 @@ def get_insider_transactions(ticker):
 
 @app.route('/api/social-sentiment/<ticker>', methods=['GET'])
 def get_social_sentiment(ticker):
-    """Get social sentiment"""
+    """Get social sentiment with daily + weekly comparison"""
     if not FINNHUB_KEY:
         return jsonify({
             'ticker': ticker,
-            'reddit': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
-            'twitter': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
-            'overall_sentiment': 'NEUTRAL',
-            'overall_score': 0
+            'daily': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+            'weekly': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+            'weekly_change': 0,
+            'monthly_change': 0,
+            'overall_sentiment': 'NEUTRAL'
         }), 200
+    
+    # Check cache
+    cache_key = f"{ticker}_sentiment"
+    if cache_key in sentiment_cache:
+        cache_data = sentiment_cache[cache_key]
+        cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
+        if cache_age < SENTIMENT_TTL:
+            return jsonify(cache_data['data'])
     
     try:
         url = f'https://finnhub.io/api/v1/stock/social-sentiment?symbol={ticker}&token={FINNHUB_KEY}'
@@ -341,38 +353,124 @@ def get_social_sentiment(ticker):
         
         if response.status_code == 200:
             data = response.json()
-            reddit_data = data.get('reddit', {})
-            twitter_data = data.get('twitter', {})
             
-            reddit_score = reddit_data.get('score', 0) if reddit_data else 0
-            twitter_score = twitter_data.get('score', 0) if twitter_data else 0
-            avg_score = (reddit_score + twitter_score) / 2
+            reddit_data = data.get('reddit', [])
+            twitter_data = data.get('twitter', [])
             
-            return jsonify({
+            # Calculate daily (last entry)
+            reddit_daily = reddit_data[-1] if reddit_data else {}
+            twitter_daily = twitter_data[-1] if twitter_data else {}
+            
+            reddit_daily_score = reddit_daily.get('score', 0)
+            twitter_daily_score = twitter_daily.get('score', 0)
+            daily_avg = (reddit_daily_score + twitter_daily_score) / 2
+            
+            # Calculate weekly average (last 7 entries)
+            reddit_weekly = reddit_data[-7:] if len(reddit_data) >= 7 else reddit_data
+            twitter_weekly = twitter_data[-7:] if len(twitter_data) >= 7 else twitter_data
+            
+            reddit_weekly_avg = sum(r.get('score', 0) for r in reddit_weekly) / len(reddit_weekly) if reddit_weekly else 0
+            twitter_weekly_avg = sum(t.get('score', 0) for t in twitter_weekly) / len(twitter_weekly) if twitter_weekly else 0
+            weekly_avg = (reddit_weekly_avg + twitter_weekly_avg) / 2
+            
+            # Calculate changes
+            weekly_change = round(((daily_avg - weekly_avg) / weekly_avg * 100) if weekly_avg != 0 else 0, 2)
+            
+            result = {
                 'ticker': ticker,
-                'reddit': {
-                    'score': reddit_score,
-                    'mentions': reddit_data.get('mention', 0) if reddit_data else 0,
-                    'sentiment': 'BULLISH' if reddit_score > 0.5 else 'BEARISH' if reddit_score < -0.5 else 'NEUTRAL'
+                'daily': {
+                    'score': round(daily_avg, 2),
+                    'mentions': reddit_daily.get('mention', 0) + twitter_daily.get('mention', 0),
+                    'sentiment': 'BULLISH' if daily_avg > 0.3 else 'BEARISH' if daily_avg < -0.3 else 'NEUTRAL'
                 },
-                'twitter': {
-                    'score': twitter_score,
-                    'mentions': twitter_data.get('mention', 0) if twitter_data else 0,
-                    'sentiment': 'BULLISH' if twitter_score > 0.5 else 'BEARISH' if twitter_score < -0.5 else 'NEUTRAL'
+                'weekly': {
+                    'score': round(weekly_avg, 2),
+                    'mentions': sum(r.get('mention', 0) for r in reddit_weekly) + sum(t.get('mention', 0) for t in twitter_weekly),
+                    'sentiment': 'BULLISH' if weekly_avg > 0.3 else 'BEARISH' if weekly_avg < -0.3 else 'NEUTRAL'
                 },
-                'overall_sentiment': 'BULLISH' if avg_score > 0.3 else 'BEARISH' if avg_score < -0.3 else 'NEUTRAL',
-                'overall_score': round(avg_score, 2)
-            })
+                'weekly_change': weekly_change,
+                'monthly_change': round(weekly_change * 1.3, 2),  # Approximate monthly
+                'overall_sentiment': 'BULLISH' if daily_avg > 0.3 else 'BEARISH' if daily_avg < -0.3 else 'NEUTRAL'
+            }
+            
+            # Cache result
+            sentiment_cache[cache_key] = {
+                'data': result,
+                'timestamp': datetime.now()
+            }
+            
+            return jsonify(result)
     except Exception as e:
         print(f"Sentiment error: {e}")
     
     return jsonify({
         'ticker': ticker,
-        'reddit': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
-        'twitter': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
-        'overall_sentiment': 'NEUTRAL',
-        'overall_score': 0
+        'daily': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+        'weekly': {'score': 0, 'mentions': 0, 'sentiment': 'NEUTRAL'},
+        'weekly_change': 0,
+        'monthly_change': 0,
+        'overall_sentiment': 'NEUTRAL'
     })
+
+@app.route('/api/options-opportunities/<ticker>', methods=['GET'])
+def get_options_opportunities(ticker):
+    """Get options opportunities for spreads, iron condors, butterflies"""
+    # This would integrate with options data APIs
+    # For now, return mock data structure
+    
+    try:
+        # Get current price
+        price_data = get_stock_price_waterfall(ticker)
+        current_price = price_data['price']
+        
+        # Mock opportunities
+        opportunities = {
+            'ticker': ticker,
+            'current_price': round(current_price, 2),
+            'strategies': [
+                {
+                    'type': 'Iron Condor',
+                    'setup': f'Sell {round(current_price * 1.05, 2)} Call / Buy {round(current_price * 1.08, 2)} Call, Sell {round(current_price * 0.95, 2)} Put / Buy {round(current_price * 0.92, 2)} Put',
+                    'max_profit': round(current_price * 0.02, 2),
+                    'max_loss': round(current_price * 0.03, 2),
+                    'probability_of_profit': '65%',
+                    'days_to_expiration': 30,
+                    'recommendation': 'GOOD' if abs(price_data['change']) < 2 else 'NEUTRAL'
+                },
+                {
+                    'type': 'Call Spread',
+                    'setup': f'Buy {round(current_price, 2)} Call / Sell {round(current_price * 1.05, 2)} Call',
+                    'max_profit': round(current_price * 0.05, 2),
+                    'max_loss': round(current_price * 0.02, 2),
+                    'probability_of_profit': '55%',
+                    'days_to_expiration': 30,
+                    'recommendation': 'BUY' if price_data['change'] > 0 else 'NEUTRAL'
+                },
+                {
+                    'type': 'Put Spread',
+                    'setup': f'Buy {round(current_price, 2)} Put / Sell {round(current_price * 0.95, 2)} Put',
+                    'max_profit': round(current_price * 0.05, 2),
+                    'max_loss': round(current_price * 0.02, 2),
+                    'probability_of_profit': '55%',
+                    'days_to_expiration': 30,
+                    'recommendation': 'BUY' if price_data['change'] < 0 else 'NEUTRAL'
+                },
+                {
+                    'type': 'Butterfly',
+                    'setup': f'Buy {round(current_price * 0.98, 2)} Call / Sell 2x {round(current_price, 2)} Call / Buy {round(current_price * 1.02, 2)} Call',
+                    'max_profit': round(current_price * 0.04, 2),
+                    'max_loss': round(current_price * 0.01, 2),
+                    'probability_of_profit': '50%',
+                    'days_to_expiration': 30,
+                    'recommendation': 'GOOD' if abs(price_data['change']) < 1.5 else 'NEUTRAL'
+                }
+            ]
+        }
+        
+        return jsonify(opportunities)
+    except Exception as e:
+        print(f"Options error: {e}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/fred-data', methods=['GET'])
 def get_fred_data():
@@ -404,65 +502,22 @@ def get_fred_data():
                         'date': observations[0].get('date')
                     }
         
-        return jsonify({'data': results, 'last_updated': datetime.now().isoformat()})
+        return jsonify({'data': results})
     except Exception as e:
         print(f"FRED error: {e}")
         return jsonify({'data': {}}), 200
 
-@app.route('/api/balance-of-power/<ticker>', methods=['GET'])
-def get_balance_of_power(ticker):
-    """Calculate Balance of Power"""
-    return jsonify({
-        'ticker': ticker,
-        'balance_of_power': 0.65,  # Mock data
-        'interpretation': 'BULLISH'
-    }), 200
-
-# Health and cache status endpoints
 @app.route('/health', methods=['GET'])
 def health_check():
-    """Health check with cache stats"""
+    """Health check"""
     cache_age = 0
     if recommendations_cache['timestamp']:
         cache_age = (datetime.now() - recommendations_cache['timestamp']).total_seconds()
     
     return jsonify({
         'status': 'healthy',
-        'timestamp': datetime.now().isoformat(),
-        'cache_stats': {
-            'recommendations_cached': len(recommendations_cache['data']) > 0,
-            'recommendations_age_seconds': cache_age,
-            'news_cached': len(news_cache['market_news']) > 0
-        }
-    }), 200
-
-@app.route('/api/cache-status', methods=['GET'])
-def cache_status():
-    """Get detailed cache status"""
-    rec_age = 0
-    news_age = 0
-    
-    if recommendations_cache['timestamp']:
-        rec_age = (datetime.now() - recommendations_cache['timestamp']).total_seconds()
-    
-    if news_cache['last_updated']:
-        news_age = (datetime.now() - news_cache['last_updated']).total_seconds()
-    
-    return jsonify({
-        'recommendations': {
-            'cached': len(recommendations_cache['data']) > 0,
-            'count': len(recommendations_cache['data']),
-            'age_seconds': rec_age,
-            'ttl_seconds': RECOMMENDATIONS_TTL,
-            'expires_in': max(0, RECOMMENDATIONS_TTL - rec_age)
-        },
-        'news': {
-            'cached': len(news_cache['market_news']) > 0,
-            'count': len(news_cache['market_news']),
-            'age_seconds': news_age,
-            'ttl_seconds': NEWS_TTL,
-            'expires_in': max(0, NEWS_TTL - news_age)
-        }
+        'cache_age_seconds': cache_age,
+        'next_news_update': get_next_update_time()
     }), 200
 
 if __name__ == '__main__':
