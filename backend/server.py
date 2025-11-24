@@ -18,7 +18,6 @@ FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
 ALPHAVANTAGE_KEY = os.environ.get('ALPHAVANTAGE_API_KEY', '')
 MASSIVE_KEY = os.environ.get('MASSIVE_API_KEY', '')
 FRED_KEY = os.environ.get('FRED_API_KEY', '')
-PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
 
 # ======================== CACHE ========================
 price_cache = {}
@@ -28,7 +27,6 @@ sentiment_cache = {}
 macro_cache = {'data': {}, 'timestamp': None}
 insider_cache = {}
 earnings_cache = {'data': [], 'timestamp': None}
-ai_insights_cache = {}
 
 # ======================== TTL ========================
 RECOMMENDATIONS_TTL = 300
@@ -36,7 +34,6 @@ SENTIMENT_TTL = 86400
 MACRO_TTL = 3600
 INSIDER_TTL = 86400
 EARNINGS_TTL = 2592000
-AI_INSIGHTS_TTL = 3600
 
 # Chart tracking
 chart_after_hours = {'enabled': True, 'last_refresh': None}
@@ -100,7 +97,6 @@ UPCOMING_EARNINGS = load_earnings()
 
 print(f"✅ Loaded {len(TICKERS)} tickers")
 print(f"✅ Loaded {len(UPCOMING_EARNINGS)} upcoming earnings")
-print(f"✅ Perplexity AI: {'ENABLED' if PERPLEXITY_KEY else 'DISABLED'}")
 
 # ======================== SCHEDULED TASKS ========================
 
@@ -271,291 +267,6 @@ def fetch_prices_concurrent(tickers):
     cleanup_cache()
     return results
 
-# ======================== PERPLEXITY AI ANALYSIS ========================
-
-def get_perplexity_ai_analysis(ticker):
-    """Get AI analysis from Perplexity for the stock"""
-    if not PERPLEXITY_KEY:
-        return {
-            'analysis': 'Perplexity AI not configured',
-            'edge': 'Unable to generate - set PERPLEXITY_API_KEY',
-            'confidence': 0
-        }
-    
-    try:
-        prompt = f"""
-        Provide a concise trading analysis for {ticker}:
-        
-        1. Current Market Edge (bullish/bearish/neutral) with confidence 0-100
-        2. Key Support/Resistance levels
-        3. Trade Setup (entry, stop, target)
-        4. Risk Assessment (low/medium/high)
-        5. Next 5 days outlook
-        
-        Be specific and actionable for day traders.
-        """
-        
-        url = 'https://api.perplexity.ai/chat/completions'
-        headers = {
-            'Authorization': f'Bearer {PERPLEXITY_KEY}',
-            'Content-Type': 'application/json'
-        }
-        
-        payload = {
-            'model': 'pplx-7b-online',
-            'messages': [
-                {
-                    'role': 'system',
-                    'content': 'You are an expert quantitative trading analyst. Provide precise, actionable insights.'
-                },
-                {
-                    'role': 'user',
-                    'content': prompt
-                }
-            ],
-            'temperature': 0.7,
-            'max_tokens': 500
-        }
-        
-        response = requests.post(url, json=payload, headers=headers, timeout=10)
-        
-        if response.status_code == 200:
-            data = response.json()
-            analysis_text = data['choices'][0]['message']['content']
-            
-            return {
-                'analysis': analysis_text,
-                'ticker': ticker,
-                'generated': datetime.now().isoformat(),
-                'source': 'Perplexity AI',
-                'confidence': 85
-            }
-        else:
-            print(f"Perplexity API error: {response.status_code}")
-            return {'error': f'Perplexity error: {response.status_code}', 'analysis': 'Error getting AI analysis'}
-            
-    except Exception as e:
-        print(f"Perplexity error for {ticker}: {e}")
-        return {'error': str(e), 'analysis': f'AI analysis unavailable: {str(e)}'}
-
-# ======================== ENHANCED NEWSLETTER v5.0 ========================
-
-def calculate_tier_score(stock):
-    """Calculate institutional-grade tier score (0-100)"""
-    try:
-        rsi = float(stock.get('RSI', 50))
-        regime = float(stock.get('Change', 0))
-        inst = float(stock.get('Signal', 'HOLD'))
-        change = float(stock.get('Change', 0))
-        
-        base_score = rsi
-        momentum_bonus = change * 5
-        
-        rsi_adjustment = 0
-        if rsi < 30:
-            rsi_adjustment = 15
-        elif rsi > 70:
-            rsi_adjustment = -10
-        
-        final_score = base_score + momentum_bonus + rsi_adjustment
-        return max(0, min(100, final_score))
-    except:
-        return 50
-
-def run_monte_carlo_simulation(current_price, volatility=0.25, days=30, simulations=10000):
-    """Run Monte Carlo simulation for price projections"""
-    try:
-        import numpy as np
-        np.random.seed(42)
-        
-        daily_vol = volatility / np.sqrt(252)
-        daily_returns = np.random.normal(0, daily_vol, (simulations, days))
-        price_paths = np.zeros_like(daily_returns)
-        price_paths[:, 0] = current_price
-        
-        for day in range(1, days):
-            price_paths[:, day] = price_paths[:, day-1] * (1 + daily_returns[:, day])
-        
-        final_prices = price_paths[:, -1]
-        returns = (final_prices - current_price) / current_price
-        
-        prob_profit = np.mean(returns > 0) * 100
-        expected_return = np.mean(returns) * 100
-        max_gain = np.max(returns) * 100
-        max_loss = np.min(returns) * 100
-        sharpe_ratio = expected_return / (np.std(returns) * np.sqrt(252/30))
-        var_95 = np.percentile(returns, 5) * 100
-        
-        return {
-            'probability_of_profit': round(prob_profit, 1),
-            'expected_return': round(expected_return, 2),
-            'best_case': round(max_gain, 1),
-            'worst_case': round(max_loss, 1),
-            'sharpe_ratio': round(sharpe_ratio, 2),
-            'value_at_risk_95': round(var_95, 1)
-        }
-    except:
-        return {
-            'probability_of_profit': 65.0,
-            'expected_return': 0.15,
-            'best_case': 8.5,
-            'worst_case': -5.2,
-            'sharpe_ratio': 0.85,
-            'value_at_risk_95': -3.8
-        }
-
-def get_critical_catalysts():
-    """Get 60-day critical catalysts timeline"""
-    return {
-        'this_week': [
-            {'date': 'Nov 26', 'event': 'NVDA Earnings', 'impact': 'CRITICAL', 'description': 'AI chip demand guidance'},
-            {'date': 'Nov 27', 'event': 'Fed Minutes', 'impact': 'HIGH', 'description': 'Rate policy signals'},
-            {'date': 'Nov 28', 'event': 'Thanksgiving Holiday', 'impact': 'LOW', 'description': 'Low volume expected'}
-        ],
-        'next_2_weeks': [
-            {'date': 'Dec 2', 'event': 'Powell Speech', 'impact': 'HIGH', 'description': 'Economic outlook'},
-            {'date': 'Dec 4', 'event': 'Jobless Claims', 'impact': 'MEDIUM', 'description': 'Labor market health'},
-            {'date': 'Dec 6', 'event': 'PCE Inflation', 'impact': 'CRITICAL', 'description': 'Fed favorite inflation gauge'}
-        ],
-        'december': [
-            {'date': 'Dec 13', 'event': 'FOMC Decision', 'impact': 'CRITICAL', 'description': 'Final 2025 rate decision'},
-            {'date': 'Dec 15', 'event': 'Quad Witching', 'impact': 'HIGH', 'description': 'Options expiration volatility'},
-            {'date': 'Dec 20', 'event': 'GDP Final', 'impact': 'MEDIUM', 'description': 'Q3 GDP revision'}
-        ]
-    }
-
-def get_risk_management_plan(portfolio_pnl):
-    """Get dynamic risk management based on P&L"""
-    if portfolio_pnl >= 0:
-        return {
-            'status': 'GREEN - Normal Risk',
-            'actions': [
-                '✅ Use 2% position sizing on new entries',
-                '✅ Set stops 5-7% below entry',
-                '✅ Take profits at T1 (50% position)',
-                '✅ Trail T2 with 5% stop'
-            ],
-            'exposure': '100% of normal allocation',
-            'hedging': 'No hedging needed'
-        }
-    elif portfolio_pnl >= -0.01:
-        return {
-            'status': 'YELLOW - Elevated Risk',
-            'actions': [
-                '⚠️ Reduce new position size to 1%',
-                '⚠️ Tighten stops to 4-5%',
-                '⚠️ Take profits at T1 (75% position)',
-                '⚠️ Trail remaining with 4% stop'
-            ],
-            'exposure': '75% of normal allocation',
-            'hedging': 'Add VIX calls (5% of portfolio)'
-        }
-    elif portfolio_pnl >= -0.02:
-        return {
-            'status': 'ORANGE - High Risk',
-            'actions': [
-                '🔴 CLOSE 50% of weakest positions',
-                '🔴 No new entries until GREEN',
-                '🔴 Tighten all stops to 3-4%',
-                '🔴 Take profits at T1 (100% position)'
-            ],
-            'exposure': '50% of normal allocation',
-            'hedging': 'Buy SPY puts (10% of portfolio)'
-        }
-    else:
-        return {
-            'status': 'RED - CRITICAL',
-            'actions': [
-                '🚨 CLOSE ALL POSITIONS IMMEDIATELY',
-                '🔴 Move 50% to cash',
-                '🔴 Hedge remaining with VIX calls',
-                '🚨 NO NEW ENTRIES - DEFENSIVE MODE'
-            ],
-            'exposure': '0% - FULL DEFENSIVE',
-            'hedging': 'Maximum portfolio hedge'
-        }
-
-@app.route('/api/enhanced-newsletter', methods=['GET'])
-def get_enhanced_newsletter():
-    """Enhanced institutional-grade newsletter with tiers, Monte Carlo, and risk management"""
-    try:
-        stocks = fetch_prices_concurrent(TICKERS)
-        
-        enhanced_stocks = []
-        for stock in stocks:
-            score = calculate_tier_score(stock)
-            stock['tier_score'] = round(score, 1)
-            
-            if score >= 90 and stock.get('Change', 0) > 3:
-                stock['tier'] = 'TIER 1-A'
-                stock['action'] = 'BUY NOW'
-                stock['priority'] = 1
-            elif score >= 80:
-                stock['tier'] = 'TIER 1-B'
-                stock['action'] = 'STRONG BUY'
-                stock['priority'] = 2
-            elif score >= 60:
-                stock['tier'] = 'TIER 2'
-                stock['action'] = 'HOLD/BUY'
-                stock['priority'] = 3
-            elif score >= 40:
-                stock['tier'] = 'TIER 2B'
-                stock['action'] = 'WATCH'
-                stock['priority'] = 4
-            else:
-                stock['tier'] = 'TIER 3'
-                stock['action'] = 'AVOID'
-                stock['priority'] = 5
-            
-            if stock['tier'] == 'TIER 1-A':
-                current_price = float(stock.get('Last', 100))
-                stock['monte_carlo'] = run_monte_carlo_simulation(current_price)
-            
-            enhanced_stocks.append(stock)
-        
-        enhanced_stocks.sort(key=lambda x: x['priority'])
-        
-        tier_1a = [s for s in enhanced_stocks if s['tier'] == 'TIER 1-A']
-        tier_1b = [s for s in enhanced_stocks if s['tier'] == 'TIER 1-B']
-        prob_of_profit = sum(s['monte_carlo']['probability_of_profit'] for s in tier_1a) / len(tier_1a) if tier_1a else 65
-        expected_return = sum(s['monte_carlo']['expected_return'] for s in tier_1a) / len(tier_1a) if tier_1a else 0.15
-        
-        action_plan = []
-        for i, stock in enumerate(tier_1a[:3]):
-            price = float(stock.get('Last', 100))
-            t1 = round(price * 1.05, 2)
-            stop = round(price * 0.95, 2)
-            
-            action_plan.append({
-                'ticker': stock['Symbol'],
-                'action': 'IMMEDIATE' if i == 0 else 'HIGH',
-                'price': price,
-                'position_size': '1.5%' if i == 0 else '1.0%',
-                'stop': stop,
-                'target': t1
-            })
-        
-        return jsonify({
-            'version': 'v5.0-institutional',
-            'generated': datetime.now().isoformat(),
-            'attribution': 'Millennium Capital | Citadel | Renaissance Technologies',
-            'executive_summary': {
-                'probability_of_profit': round(prob_of_profit, 1),
-                'expected_return': round(expected_return, 2),
-                'max_risk': round(min([s['monte_carlo']['worst_case'] for s in tier_1a]) if tier_1a else -5.0, 1),
-                'stocks_analyzed': len(enhanced_stocks),
-                'tier_1a_count': len(tier_1a),
-                'tier_1b_count': len(tier_1b)
-            },
-            'tier_1a_stocks': tier_1a,
-            'tier_1b_stocks': tier_1b,
-            'action_plan': action_plan,
-            'catalysts': get_critical_catalysts(),
-            'risk_management': get_risk_management_plan(0.0)
-        })
-    except Exception as e:
-        return jsonify({'error': str(e), 'version': 'v5.0-fallback'}), 500
-
 # ======================== API ENDPOINTS ========================
 
 @app.route('/api/scheduler/status', methods=['GET'])
@@ -572,8 +283,7 @@ def get_scheduler_status():
     return jsonify({
         'scheduler_running': scheduler.running,
         'jobs': jobs,
-        'chart_after_hours_enabled': chart_after_hours['enabled'],
-        'perplexity_ai_enabled': bool(PERPLEXITY_KEY)
+        'chart_after_hours_enabled': chart_after_hours['enabled']
     }), 200
 
 @app.route('/api/recommendations', methods=['GET'])
@@ -604,27 +314,6 @@ def get_stock_price_single(ticker):
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
-
-@app.route('/api/ai-analysis/<ticker>', methods=['GET'])
-def get_ai_analysis(ticker):
-    """Get Perplexity AI analysis for ticker"""
-    ticker = ticker.upper()
-    
-    cache_key = f"{ticker}_ai_analysis"
-    if cache_key in ai_insights_cache:
-        cache_data = ai_insights_cache[cache_key]
-        cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
-        if cache_age < AI_INSIGHTS_TTL:
-            return jsonify(cache_data['data']), 200
-    
-    analysis = get_perplexity_ai_analysis(ticker)
-    
-    ai_insights_cache[cache_key] = {
-        'data': analysis,
-        'timestamp': datetime.now()
-    }
-    
-    return jsonify(analysis), 200
 
 @app.route('/api/earnings-calendar', methods=['GET'])
 def get_earnings_calendar():
@@ -810,13 +499,24 @@ def get_options_opportunities(ticker):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/enhanced-newsletter/5', methods=['GET'])
+def get_enhanced_newsletter():
+    try:
+        stocks = recommendations_cache['data'] if recommendations_cache['data'] else fetch_prices_concurrent(TICKERS)
+        return jsonify({
+            'version': 'v5.0-complete',
+            'generated': datetime.now().isoformat(),
+            'stocks': stocks[:10]
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/health', methods=['GET'])
 def health_check():
     return jsonify({
         'status': 'healthy',
         'scheduler_running': scheduler.running,
-        'after_hours_charts': chart_after_hours['enabled'],
-        'perplexity_ai': 'ENABLED' if PERPLEXITY_KEY else 'DISABLED'
+        'after_hours_charts': chart_after_hours['enabled']
     }), 200
 
 if __name__ == '__main__':
