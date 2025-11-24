@@ -9,6 +9,8 @@ import time
 import gc
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
+from bs4 import BeautifulSoup
+import re
 
 app = Flask(__name__)
 CORS(app)
@@ -29,16 +31,21 @@ macro_cache = {'data': {}, 'timestamp': None}
 insider_cache = {}
 earnings_cache = {'data': [], 'timestamp': None}
 ai_insights_cache = {}
+barchart_cache = {}
+gurufocus_cache = {}
+reddit_cache = {}
 
 # ======================== TTL ========================
 RECOMMENDATIONS_TTL = 300
 SENTIMENT_TTL = 86400
-MACRO_TTL = 604800  # 7 days for FRED
+MACRO_TTL = 604800
 INSIDER_TTL = 86400
 EARNINGS_TTL = 2592000
 AI_INSIGHTS_TTL = 3600
+BARCHART_TTL = 3600
+GURUFOCUS_TTL = 86400
+REDDIT_TTL = 3600
 
-# Chart tracking
 chart_after_hours = {'enabled': True, 'last_refresh': None}
 
 # ======================== TOP 50 STOCKS DATA ========================
@@ -121,8 +128,246 @@ TICKERS = load_tickers()
 UPCOMING_EARNINGS = load_earnings()
 
 print(f"✅ Loaded {len(TICKERS)} tickers from TOP_50_STOCKS")
+print(f"✅ Scraping: BeautifulSoup4 + lxml enabled")
+print(f"✅ Hybrid mode: Real scraping + Perplexity Sonar")
 print(f"✅ Perplexity: {'ENABLED' if PERPLEXITY_KEY else 'DISABLED'}")
 print(f"✅ FRED: {'ENABLED' if FRED_KEY else 'DISABLED'}")
+
+# ======================== 1. BARCHART SCRAPING ========================
+def scrape_barchart_signals(ticker):
+    """Scrape Barchart technical signals"""
+    cache_key = f"{ticker}_barchart"
+    
+    if cache_key in barchart_cache:
+        cached = barchart_cache[cache_key]
+        if (datetime.now() - cached['ts']).total_seconds() < BARCHART_TTL:
+            return cached['data']
+    
+    result = {
+        'ticker': ticker,
+        'technical_rating': 'N/A',
+        'short_term': 'N/A',
+        'intermediate': 'N/A',
+        'long_term': 'N/A',
+        'source': 'Barchart'
+    }
+    
+    try:
+        url = f'https://www.barchart.com/stocks/quotes/{ticker}/technical-analysis'
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get(url, headers=headers, timeout=5)
+        
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.content, 'lxml')
+            
+            rating_elem = soup.find('span', {'class': lambda x: x and 'rating' in x.lower()})
+            if rating_elem:
+                result['technical_rating'] = rating_elem.text.strip()
+            
+            rows = soup.find_all('tr')
+            for row in rows:
+                cells = row.find_all('td')
+                if len(cells) >= 2:
+                    label = cells[0].text.strip().lower()
+                    signal = cells[1].text.strip()
+                    
+                    if 'short' in label:
+                        result['short_term'] = signal
+                    elif 'intermediate' in label:
+                        result['intermediate'] = signal
+                    elif 'long' in label:
+                        result['long_term'] = signal
+            
+            print(f"✅ Barchart {ticker}: {result['technical_rating']}")
+    except Exception as e:
+        print(f"⚠️ Barchart scrape error {ticker}: {e}")
+    
+    barchart_cache[cache_key] = {'data': result, 'ts': datetime.now()}
+    return result
+
+# ======================== 2. GURUFOCUS SCRAPING ========================
+def scrape_gurufocus_ratings(ticker):
+    """Scrape GuruFocus fundamental ratings"""
+    cache_key = f"{ticker}_gurufocus"
+    
+    if cache_key in gurufocus_cache:
+        cached = gurufocus_cache[cache_key]
+        if (datetime.now() - cached['ts']).total_seconds() < GURUFOCUS_TTL:
+            return cached['data']
+    
+    result = {
+        'ticker': ticker,
+        'guru_rating': 'N/A',
+        'value_score': 'N/A',
+        'quality_score': 'N/A',
+        'financial_strength': 'N/A',
+        'source': 'GuruFocus'
+    }
+    
+    try:
+        url = f'https://www.gurufocus.com/stock/{ticker.lower()}'
+        headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
+        response = requests.get(url, headers=headers, timeout=5)
+        
+        if response.status_code == 200:
+            soup = BeautifulSoup(response.content, 'lxml')
+            
+            rating_text = soup.find('div', {'class': lambda x: x and 'rating' in x.lower()})
+            if rating_text:
+                result['guru_rating'] = rating_text.text.strip()
+            
+            tables = soup.find_all('table')
+            for table in tables:
+                rows = table.find_all('tr')
+                for row in rows:
+                    cells = row.find_all('td')
+                    if len(cells) >= 2:
+                        label = cells[0].text.strip().lower()
+                        value = cells[1].text.strip()
+                        
+                        if 'value' in label:
+                            result['value_score'] = value
+                        elif 'quality' in label:
+                            result['quality_score'] = value
+                        elif 'financial strength' in label:
+                            result['financial_strength'] = value
+            
+            print(f"✅ GuruFocus {ticker}: Rating {result['guru_rating']}")
+    except Exception as e:
+        print(f"⚠️ GuruFocus scrape error {ticker}: {e}")
+    
+    gurufocus_cache[cache_key] = {'data': result, 'ts': datetime.now()}
+    return result
+
+# ======================== 3. REDDIT SENTIMENT SCRAPING ========================
+def scrape_reddit_sentiment(ticker):
+    """Scrape Reddit sentiment"""
+    cache_key = f"{ticker}_reddit"
+    
+    if cache_key in reddit_cache:
+        cached = reddit_cache[cache_key]
+        if (datetime.now() - cached['ts']).total_seconds() < REDDIT_TTL:
+            return cached['data']
+    
+    result = {
+        'ticker': ticker,
+        'reddit_mentions': 0,
+        'sentiment': 'NEUTRAL',
+        'subreddits': ['r/stocks', 'r/investing', 'r/wallstreetbets'],
+        'source': 'Reddit API',
+        'note': 'Based on recent mentions and upvote ratios'
+    }
+    
+    try:
+        for subreddit in ['stocks', 'investing', 'wallstreetbets']:
+            try:
+                url = f'https://www.reddit.com/r/{subreddit}/search.json'
+                params = {'q': ticker, 'restrict_sr': 'true', 'limit': 10}
+                headers = {'User-Agent': 'Mozilla/5.0'}
+                response = requests.get(url, params=params, headers=headers, timeout=5)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    posts = data.get('data', {}).get('children', [])
+                    result['reddit_mentions'] += len(posts)
+                    
+                    upvote_ratios = [p['data'].get('upvote_ratio', 0.5) for p in posts]
+                    avg_ratio = sum(upvote_ratios) / len(upvote_ratios) if upvote_ratios else 0.5
+                    
+                    if avg_ratio > 0.65:
+                        result['sentiment'] = 'BULLISH'
+                    elif avg_ratio < 0.35:
+                        result['sentiment'] = 'BEARISH'
+                    else:
+                        result['sentiment'] = 'NEUTRAL'
+                
+                time.sleep(1)
+            except:
+                pass
+        
+        if result['reddit_mentions'] > 0:
+            print(f"✅ Reddit {ticker}: {result['reddit_mentions']} mentions - {result['sentiment']}")
+    except Exception as e:
+        print(f"⚠️ Reddit scrape error {ticker}: {e}")
+    
+    reddit_cache[cache_key] = {'data': result, 'ts': datetime.now()}
+    return result
+
+# ======================== 4. HYBRID AI ANALYSIS ========================
+def get_hybrid_analysis(ticker, barchart_data=None, gurufocus_data=None, reddit_data=None):
+    """Combine scraped data + Perplexity Sonar"""
+    
+    if not PERPLEXITY_KEY:
+        return {
+            'ticker': ticker,
+            'barchart': barchart_data or {},
+            'gurufocus': gurufocus_data or {},
+            'reddit': reddit_data or {},
+            'sonar_analysis': 'Perplexity key not configured'
+        }
+    
+    try:
+        barchart_context = f"Barchart technical: {barchart_data.get('technical_rating', 'N/A')}" if barchart_data else ""
+        gurufocus_context = f"GuruFocus rating: {gurufocus_data.get('guru_rating', 'N/A')}" if gurufocus_data else ""
+        reddit_context = f"Reddit sentiment: {reddit_data.get('sentiment', 'N/A')} ({reddit_data.get('reddit_mentions', 0)} mentions)" if reddit_data else ""
+        
+        prompt = f"""Analyze {ticker} for day trading using this real market data:
+{barchart_context}
+{gurufocus_context}
+{reddit_context}
+
+Provide 3 bullets:
+1. Edge: Bullish/Bearish % + catalyst
+2. Trade Setup: Entry/Stop/Target 
+3. Risk: Low/Medium/High
+
+Use ONLY the scraped data above."""
+        
+        url = 'https://api.perplexity.ai/chat/completions'
+        headers = {'Authorization': f'Bearer {PERPLEXITY_KEY}', 'Content-Type': 'application/json'}
+        
+        payload = {
+            'model': 'sonar',
+            'messages': [
+                {'role': 'system', 'content': 'Expert trader. Use ONLY provided data.'},
+                {'role': 'user', 'content': prompt}
+            ],
+            'temperature': 0.6,
+            'max_tokens': 300
+        }
+        
+        response = requests.post(url, json=payload, headers=headers, timeout=15)
+        
+        if response.status_code == 200:
+            content = response.json()['choices'][0]['message']['content']
+            lines = content.split('\n')
+            
+            edge = next((l.strip() for l in lines if any(x in l.lower() for x in ['bullish', 'bearish', 'edge'])), 'Neutral')
+            trade = next((l.strip() for l in lines if any(x in l.lower() for x in ['entry', 'stop', 'target'])), 'Monitor')
+            risk = next((l.strip() for l in lines if 'risk' in l.lower()), 'Standard')
+            
+            print(f"✅ Sonar hybrid analysis for {ticker}")
+            return {
+                'ticker': ticker,
+                'barchart': barchart_data or {},
+                'gurufocus': gurufocus_data or {},
+                'reddit': reddit_data or {},
+                'sonar_analysis': {
+                    'edge': edge,
+                    'trade': trade,
+                    'risk': risk,
+                    'sources': ['Barchart', 'GuruFocus', 'Reddit', 'Perplexity Sonar']
+                }
+            }
+    except Exception as e:
+        print(f"❌ Hybrid analysis error {ticker}: {e}")
+        return {
+            'ticker': ticker,
+            'barchart': barchart_data or {},
+            'gurufocus': gurufocus_data or {},
+            'reddit': reddit_data or {},
+            'sonar_analysis': {'error': str(e)}
+        }
 
 # ======================== FRED MACRO DATA ========================
 def fetch_fred_macro_data():
@@ -328,7 +573,7 @@ def get_perplexity_sonar_analysis(ticker, stock_data=None):
         context = f"\nScore: {csv_stock['inst33']}, Signal: {csv_stock['signal']}" if csv_stock else ""
         price_info = f"\nPrice: ${stock_data.get('Last', 'N/A')}, Change: {stock_data.get('Change', 'N/A')}%" if stock_data else ""
         
-        prompt = f"""Analyze {ticker} for day trading. Scrape Barchart, GuruFocus, Reddit.{price_info}{context}
+        prompt = f"""Analyze {ticker} for day trading using real-time market data.{price_info}{context}
 
 Provide 3 bullets:
 1. Edge: Bullish/Bearish % + catalyst
@@ -431,6 +676,20 @@ def get_ai_insights(ticker):
     
     analysis = get_perplexity_sonar_analysis(ticker, stock_data)
     ai_insights_cache[cache_key] = {'data': analysis, 'timestamp': datetime.now()}
+    return jsonify(analysis), 200
+
+@app.route('/api/hybrid-analysis/<ticker>', methods=['GET'])
+def get_hybrid_analysis_endpoint(ticker):
+    """NEW: Hybrid scraping + Perplexity analysis"""
+    ticker = ticker.upper()
+    print(f"🔍 Hybrid analysis for {ticker}")
+    
+    barchart_data = scrape_barchart_signals(ticker)
+    gurufocus_data = scrape_gurufocus_ratings(ticker)
+    reddit_data = scrape_reddit_sentiment(ticker)
+    
+    analysis = get_hybrid_analysis(ticker, barchart_data, gurufocus_data, reddit_data)
+    
     return jsonify(analysis), 200
 
 @app.route('/api/macro-indicators', methods=['GET'])
@@ -606,6 +865,7 @@ def get_stock_news(ticker):
 
 @app.route('/api/options-opportunities/<ticker>', methods=['GET'])
 def get_options_opportunities(ticker):
+    """6 OPTIONS STRATEGIES with Greeks"""
     try:
         price_data = get_stock_price_waterfall(ticker)
         current_price = price_data['price']
@@ -624,6 +884,7 @@ def get_options_opportunities(ticker):
                     'max_profit': round(current_price * 0.02, 2),
                     'max_loss': round(current_price * 0.03, 2),
                     'probability_of_profit': '65%',
+                    'rating': 'Good',
                     'greeks': {'delta': '~0', 'gamma': 'Low', 'theta': '+High', 'vega': '-High'}
                 },
                 {
@@ -634,6 +895,7 @@ def get_options_opportunities(ticker):
                     'max_profit': round(current_price * 0.05, 2),
                     'max_loss': round(current_price * 0.02, 2),
                     'probability_of_profit': '55%',
+                    'rating': 'Neutral',
                     'greeks': {'delta': '+0.60', 'gamma': 'Positive', 'theta': 'Neutral', 'vega': 'Low'}
                 },
                 {
@@ -644,6 +906,7 @@ def get_options_opportunities(ticker):
                     'max_profit': round(current_price * 0.05, 2),
                     'max_loss': round(current_price * 0.02, 2),
                     'probability_of_profit': '55%',
+                    'rating': 'Neutral',
                     'greeks': {'delta': '-0.60', 'gamma': 'Positive', 'theta': 'Neutral', 'vega': 'Low'}
                 },
                 {
@@ -654,6 +917,7 @@ def get_options_opportunities(ticker):
                     'max_profit': round(current_price * 0.02, 2),
                     'max_loss': round(current_price * 0.03, 2),
                     'probability_of_profit': '70%',
+                    'rating': 'Good',
                     'greeks': {'delta': '+0.50', 'gamma': 'Negative', 'theta': '+High', 'vega': '-High'}
                 },
                 {
@@ -664,6 +928,7 @@ def get_options_opportunities(ticker):
                     'max_profit': round(current_price * 0.02, 2),
                     'max_loss': round(current_price * 0.03, 2),
                     'probability_of_profit': '70%',
+                    'rating': 'Good',
                     'greeks': {'delta': '-0.50', 'gamma': 'Negative', 'theta': '+High', 'vega': '-High'}
                 },
                 {
@@ -674,6 +939,7 @@ def get_options_opportunities(ticker):
                     'max_profit': round(current_price * 0.04, 2),
                     'max_loss': round(current_price * 0.01, 2),
                     'probability_of_profit': '50%',
+                    'rating': 'Neutral',
                     'greeks': {'delta': '~0', 'gamma': 'Peaky', 'theta': '+Moderate', 'vega': 'Low'}
                 }
             ]
@@ -687,10 +953,23 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'scheduler_running': scheduler.running,
+        'scraping_enabled': True,
         'perplexity_key': 'enabled' if PERPLEXITY_KEY else 'disabled',
         'fred_key': 'enabled' if FRED_KEY else 'disabled',
         'finnhub_key': 'enabled' if FINNHUB_KEY else 'disabled',
-        'top_50_loaded': len(TOP_50_STOCKS)
+        'top_50_loaded': len(TOP_50_STOCKS),
+        'endpoints': [
+            '/api/recommendations',
+            '/api/stock-price/<ticker>',
+            '/api/ai-insights/<ticker>',
+            '/api/hybrid-analysis/<ticker>',
+            '/api/macro-indicators',
+            '/api/earnings-calendar',
+            '/api/social-sentiment/<ticker>',
+            '/api/insider-transactions/<ticker>',
+            '/api/stock-news/<ticker>',
+            '/api/options-opportunities/<ticker>'
+        ]
     }), 200
 
 if __name__ == '__main__':
