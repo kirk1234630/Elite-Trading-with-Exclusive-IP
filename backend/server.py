@@ -18,6 +18,7 @@ FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
 ALPHAVANTAGE_KEY = os.environ.get('ALPHAVANTAGE_API_KEY', '')
 MASSIVE_KEY = os.environ.get('MASSIVE_API_KEY', '')
 FRED_KEY = os.environ.get('FRED_API_KEY', '')
+PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
 
 # ======================== CACHE ========================
 price_cache = {}
@@ -27,6 +28,7 @@ sentiment_cache = {}
 macro_cache = {'data': {}, 'timestamp': None}
 insider_cache = {}
 earnings_cache = {'data': [], 'timestamp': None}
+ai_insights_cache = {}
 
 # ======================== TTL ========================
 RECOMMENDATIONS_TTL = 300
@@ -34,6 +36,7 @@ SENTIMENT_TTL = 86400
 MACRO_TTL = 3600
 INSIDER_TTL = 86400
 EARNINGS_TTL = 2592000
+AI_INSIGHTS_TTL = 3600
 
 # Chart tracking
 chart_after_hours = {'enabled': True, 'last_refresh': None}
@@ -97,6 +100,7 @@ UPCOMING_EARNINGS = load_earnings()
 
 print(f"✅ Loaded {len(TICKERS)} tickers")
 print(f"✅ Loaded {len(UPCOMING_EARNINGS)} upcoming earnings")
+print(f"✅ Perplexity AI: {'ENABLED' if PERPLEXITY_KEY else 'DISABLED'}")
 
 # ======================== SCHEDULED TASKS ========================
 
@@ -267,6 +271,73 @@ def fetch_prices_concurrent(tickers):
     cleanup_cache()
     return results
 
+# ======================== PERPLEXITY AI ANALYSIS ========================
+
+def get_perplexity_ai_analysis(ticker):
+    """Get AI analysis from Perplexity for the stock"""
+    if not PERPLEXITY_KEY:
+        return {
+            'analysis': 'Perplexity AI not configured',
+            'edge': 'Unable to generate - set PERPLEXITY_API_KEY',
+            'confidence': 0
+        }
+    
+    try:
+        prompt = f"""
+        Provide a concise trading analysis for {ticker}:
+        
+        1. Current Market Edge (bullish/bearish/neutral) with confidence 0-100
+        2. Key Support/Resistance levels
+        3. Trade Setup (entry, stop, target)
+        4. Risk Assessment (low/medium/high)
+        5. Next 5 days outlook
+        
+        Be specific and actionable for day traders.
+        """
+        
+        url = 'https://api.perplexity.ai/chat/completions'
+        headers = {
+            'Authorization': f'Bearer {PERPLEXITY_KEY}',
+            'Content-Type': 'application/json'
+        }
+        
+        payload = {
+            'model': 'pplx-7b-online',
+            'messages': [
+                {
+                    'role': 'system',
+                    'content': 'You are an expert quantitative trading analyst. Provide precise, actionable insights.'
+                },
+                {
+                    'role': 'user',
+                    'content': prompt
+                }
+            ],
+            'temperature': 0.7,
+            'max_tokens': 500
+        }
+        
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            analysis_text = data['choices'][0]['message']['content']
+            
+            return {
+                'analysis': analysis_text,
+                'ticker': ticker,
+                'generated': datetime.now().isoformat(),
+                'source': 'Perplexity AI',
+                'confidence': 85
+            }
+        else:
+            print(f"Perplexity API error: {response.status_code}")
+            return {'error': f'Perplexity error: {response.status_code}', 'analysis': 'Error getting AI analysis'}
+            
+    except Exception as e:
+        print(f"Perplexity error for {ticker}: {e}")
+        return {'error': str(e), 'analysis': f'AI analysis unavailable: {str(e)}'}
+
 # ======================== ENHANCED NEWSLETTER v5.0 ========================
 
 def calculate_tier_score(stock):
@@ -277,13 +348,9 @@ def calculate_tier_score(stock):
         inst = float(stock.get('Signal', 'HOLD'))
         change = float(stock.get('Change', 0))
         
-        # Base score from technicals
         base_score = rsi
-        
-        # Momentum bonus/penalty
         momentum_bonus = change * 5
         
-        # RSI optimization (30-70 sweet spot)
         rsi_adjustment = 0
         if rsi < 30:
             rsi_adjustment = 15
@@ -505,7 +572,8 @@ def get_scheduler_status():
     return jsonify({
         'scheduler_running': scheduler.running,
         'jobs': jobs,
-        'chart_after_hours_enabled': chart_after_hours['enabled']
+        'chart_after_hours_enabled': chart_after_hours['enabled'],
+        'perplexity_ai_enabled': bool(PERPLEXITY_KEY)
     }), 200
 
 @app.route('/api/recommendations', methods=['GET'])
@@ -536,6 +604,27 @@ def get_stock_price_single(ticker):
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ai-analysis/<ticker>', methods=['GET'])
+def get_ai_analysis(ticker):
+    """Get Perplexity AI analysis for ticker"""
+    ticker = ticker.upper()
+    
+    cache_key = f"{ticker}_ai_analysis"
+    if cache_key in ai_insights_cache:
+        cache_data = ai_insights_cache[cache_key]
+        cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
+        if cache_age < AI_INSIGHTS_TTL:
+            return jsonify(cache_data['data']), 200
+    
+    analysis = get_perplexity_ai_analysis(ticker)
+    
+    ai_insights_cache[cache_key] = {
+        'data': analysis,
+        'timestamp': datetime.now()
+    }
+    
+    return jsonify(analysis), 200
 
 @app.route('/api/earnings-calendar', methods=['GET'])
 def get_earnings_calendar():
@@ -726,7 +815,8 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'scheduler_running': scheduler.running,
-        'after_hours_charts': chart_after_hours['enabled']
+        'after_hours_charts': chart_after_hours['enabled'],
+        'perplexity_ai': 'ENABLED' if PERPLEXITY_KEY else 'DISABLED'
     }), 200
 
 if __name__ == '__main__':
