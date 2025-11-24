@@ -486,7 +486,7 @@
                 const response = await fetch(`${API_BASE}/api/options-opportunities/${ticker}`);
                 const data = await response.json();
                 container.innerHTML = data.strategies.map(strategy => {
-                    const recClass = strategy.recommendation === 'BUY' ? 'rec-buy' : strategy.recommendation === 'BEST' ? 'rec-best' : strategy.recommendation === 'GOOD' ? 'rec-good' : 'rec-neutral';
+                    const recClass = strategy.rating  === 'BUY' ? 'rec-buy' : strategy.rating === 'BEST' ? 'rec-best' : strategy.rating === 'GOOD' ? 'rec-good' : 'rec-neutral';
                     return `
                         <div class="strategy-card">
                             <div class="strategy-header">
