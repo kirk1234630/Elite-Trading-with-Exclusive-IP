@@ -376,6 +376,18 @@ Concise, cite sources."""
 
 # ======================== API ENDPOINTS ========================
 
+@app.route('/')
+def serve_frontend():
+    """Serve frontend HTML from absolute path"""
+    import os
+    frontend_path = os.path.join(os.path.dirname(__file__), '..', 'frontend', 'index.html')
+    try:
+        with open(frontend_path, 'r') as f:
+            return f.read()
+    except FileNotFoundError as e:
+        return jsonify({'error': f'File not found at {frontend_path}'}), 500
+
+
 @app.route('/api/recommendations', methods=['GET'])
 def get_recommendations():
     try:
