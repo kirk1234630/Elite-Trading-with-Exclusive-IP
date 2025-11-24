@@ -46,63 +46,59 @@ TOP_50_STOCKS = [
     {'symbol': 'KO', 'inst33': 95, 'overall_score': 8, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 4, 'uva': 8, 'money_score': 4, 'alpha_score': 3, 'equity_score': 1.9, 'mean_reversion': 2.09, 'iv': 0.2, 'signal': 'STRONG_BUY', 'key_metric': 'Beverage leader - low IV, uptrend'},
     {'symbol': 'AZN', 'inst33': 95, 'overall_score': 8, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 3, 'uva': 7, 'money_score': 0, 'alpha_score': 3, 'equity_score': 1.7, 'mean_reversion': 1.57, 'iv': 0.26, 'signal': 'STRONG_BUY', 'key_metric': 'Biotech - highest institutional backing'},
     {'symbol': 'MRK', 'inst33': 90, 'overall_score': 6, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 4, 'uva': 5, 'money_score': 5, 'alpha_score': 3, 'equity_score': 2.0, 'mean_reversion': 1.87, 'iv': 0.33, 'signal': 'STRONG_BUY', 'key_metric': 'Pharma strong momentum'},
-    {'symbol': 'A', 'inst33': 80, 'overall_score': 8, 'master_score': 4, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 4, 'uva': 7, 'money_score': 4, 'alpha_score': 3, 'equity_score': 2.7, 'mean_reversion': 2.19, 'iv': 0.4, 'signal': 'BUY', 'key_metric': 'Agilent - emerging strength'},
-    {'symbol': 'GOOGL', 'inst33': 80, 'overall_score': 6, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 4, 'uva': 7, 'money_score': 4, 'alpha_score': 3, 'equity_score': 0.8, 'mean_reversion': 2.19, 'iv': 0.41, 'signal': 'BUY', 'key_metric': 'Tech - AI leadership'},
-    {'symbol': 'GOOG', 'inst33': 80, 'overall_score': 6, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 4, 'uva': 6, 'money_score': 4, 'alpha_score': 3, 'equity_score': 0.8, 'mean_reversion': 2.16, 'iv': 0.41, 'signal': 'BUY', 'key_metric': 'Tech - strong uptrend'},
-    {'symbol': 'JNJ', 'inst33': 75, 'overall_score': 8, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 4, 'uva': 8, 'money_score': 4, 'alpha_score': 2, 'equity_score': 1.83, 'mean_reversion': 1.83, 'iv': 0.22, 'signal': 'SELL_CALL', 'key_metric': 'Healthcare - premium seller'},
-    {'symbol': 'RY', 'inst33': 70, 'overall_score': 6, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 4, 'uva': 8, 'money_score': 4, 'alpha_score': 3, 'equity_score': 1.9, 'mean_reversion': 2.1, 'iv': 0.21, 'signal': 'SELL_CALL', 'key_metric': 'Financial - low IV opportunity'},
-    {'symbol': 'WMT', 'inst33': 70, 'overall_score': 0, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 3, 'uva': 6, 'money_score': 4, 'alpha_score': 3, 'equity_score': 1.75, 'mean_reversion': 1.75, 'iv': 0.27, 'signal': 'SELL_CALL', 'key_metric': 'Retail - defensive play'},
-    {'symbol': 'LLY', 'inst33': 65, 'overall_score': 8, 'master_score': 4, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 4, 'uva': 7, 'money_score': 4, 'alpha_score': 3, 'equity_score': 2.7, 'mean_reversion': 1.34, 'iv': 0.38, 'signal': 'HOLD', 'key_metric': 'Biotech GLP-1 leader'},
-    {'symbol': 'ASML', 'inst33': 65, 'overall_score': 0, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 3, 'uva': 6, 'money_score': 4, 'alpha_score': 2, 'equity_score': -2.34, 'mean_reversion': -2.34, 'iv': 0.47, 'signal': 'HOLD', 'key_metric': 'Chip equipment - pullback play'},
-    {'symbol': 'DAL', 'inst33': 65, 'overall_score': 0, 'master_score': 3, 'signal_strength': -1, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 9, 'money_score': 1, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': 0.41, 'iv': 0.59, 'signal': 'HOLD', 'key_metric': 'Airlines - recovery play'},
-    {'symbol': 'BJ', 'inst33': 65, 'overall_score': 0, 'master_score': 3, 'signal_strength': -1, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 9, 'money_score': 1, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': 0.05, 'iv': 0.35, 'signal': 'HOLD', 'key_metric': 'Retail club - neutral'},
-    {'symbol': 'SNDK', 'inst33': 63, 'overall_score': 0, 'master_score': 3, 'signal_strength': -1, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 9, 'money_score': 1, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': -0.75, 'iv': 1.3, 'signal': 'HOLD', 'key_metric': 'Storage - high IV volatility'},
-    {'symbol': 'OKLO', 'inst33': 63, 'overall_score': 0, 'master_score': 3, 'signal_strength': -1, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 9, 'money_score': 1, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': -1.49, 'iv': 1.21, 'signal': 'HOLD', 'key_metric': 'Nuclear energy - emerging'},
-    {'symbol': 'ARM', 'inst33': 63, 'overall_score': 0, 'master_score': 3, 'signal_strength': -1, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 9, 'money_score': 1, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': -1.52, 'iv': 0.67, 'signal': 'SELL', 'key_metric': 'Chip design - bearish setup'},
-    {'symbol': 'BE', 'inst33': 63, 'overall_score': 0, 'master_score': 3, 'signal_strength': -1, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 9, 'money_score': 1, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': -1.93, 'iv': 1.39, 'signal': 'SELL', 'key_metric': 'EV - downtrend high IV'},
-    {'symbol': 'MCD', 'inst33': 60, 'overall_score': 6, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 4, 'uva': 5, 'money_score': 3, 'alpha_score': 3, 'equity_score': 1.48, 'mean_reversion': 1.48, 'iv': 0.2, 'signal': 'SELL_CALL', 'key_metric': 'QSR - best call seller'},
     {'symbol': 'AAPL', 'inst33': 60, 'overall_score': 6, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 3, 'uva': 6, 'money_score': 4, 'alpha_score': 3, 'equity_score': 0.65, 'mean_reversion': 0.65, 'iv': 0.29, 'signal': 'HOLD', 'key_metric': 'Tech giant - stable'},
-    {'symbol': 'NUE', 'inst33': 60, 'overall_score': 6, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 3, 'uva': 7, 'money_score': 0, 'alpha_score': 3, 'equity_score': 1.7, 'mean_reversion': 1.55, 'iv': 0.4, 'signal': 'BUY_CALL', 'key_metric': 'Steel - uptrend reversion'},
-    {'symbol': 'VCYT', 'inst33': 60, 'overall_score': 6, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 3, 'uva': 7, 'money_score': 0, 'alpha_score': 3, 'equity_score': 1.7, 'mean_reversion': 1.45, 'iv': 0.47, 'signal': 'HOLD', 'key_metric': 'Biotech - balanced setup'},
-    {'symbol': 'ABT', 'inst33': 60, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 2, 'uva': 5, 'money_score': 3, 'alpha_score': 1, 'equity_score': 0.7, 'mean_reversion': 0.7, 'iv': 0.28, 'signal': 'HOLD', 'key_metric': 'Healthcare - stable dividend'},
-    {'symbol': 'AVGO', 'inst33': 60, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 2, 'uva': 5, 'money_score': 3, 'alpha_score': 1, 'equity_score': -1.25, 'mean_reversion': -1.25, 'iv': 0.68, 'signal': 'HOLD', 'key_metric': 'Semiconductor - downtrend'},
-    {'symbol': 'B', 'inst33': 60, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': 0.9, 'iv': 0.5, 'signal': 'HOLD', 'key_metric': 'Industrial - mixed signals'},
-    {'symbol': 'M', 'inst33': 60, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': 0.5, 'iv': 0.7, 'signal': 'HOLD', 'key_metric': 'Retail - transformation play'},
-    {'symbol': 'EA', 'inst33': 60, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': -0.26, 'iv': 0.09, 'signal': 'HOLD', 'key_metric': 'Gaming - low IV play'},
-    {'symbol': 'ORCL', 'inst33': 58, 'overall_score': 0, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 3, 'uva': 4, 'money_score': 3, 'alpha_score': 2, 'equity_score': -1.84, 'mean_reversion': -1.84, 'iv': 0.75, 'signal': 'SELL', 'key_metric': 'Database - bearish pullback'},
-    {'symbol': 'BW', 'inst33': 58, 'overall_score': 0, 'master_score': 3, 'signal_strength': -1, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 9, 'money_score': 1, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': 0.37, 'iv': 1.57, 'signal': 'HOLD', 'key_metric': 'Industrial - extreme IV play'},
-    {'symbol': 'RIVN', 'inst33': 58, 'overall_score': 0, 'master_score': 3, 'signal_strength': -1, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 9, 'money_score': 1, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': 0.03, 'iv': 0.84, 'signal': 'HOLD', 'key_metric': 'EV - nascent company'},
-    {'symbol': 'MSTR', 'inst33': 58, 'overall_score': 0, 'master_score': 3, 'signal_strength': -1, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 9, 'money_score': 1, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': -1.77, 'iv': 1.11, 'signal': 'SELL', 'key_metric': 'Bitcoin proxy - volatile'},
-    {'symbol': 'CSCO', 'inst33': 55, 'overall_score': 8, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 4, 'uva': 8, 'money_score': 4, 'alpha_score': 3, 'equity_score': 0.81, 'mean_reversion': 0.81, 'iv': 0.29, 'signal': 'HOLD', 'key_metric': 'Networking - stable dividend'},
-    {'symbol': 'DG', 'inst33': 55, 'overall_score': 0, 'master_score': 2, 'signal_strength': 0, 'inst_stock_select': 0, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': 0.25, 'iv': 0.56, 'signal': 'HOLD', 'key_metric': 'Discount retail - neutral'},
-    {'symbol': 'MDB', 'inst33': 55, 'overall_score': 0, 'master_score': 2, 'signal_strength': 0, 'inst_stock_select': 0, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': -2.03, 'iv': 0.83, 'signal': 'SELL', 'key_metric': 'Database NoSQL - downtrend'},
-    {'symbol': 'MU', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': -1.8, 'mean_reversion': -1.8, 'iv': 0.89, 'signal': 'SELL', 'key_metric': 'Memory chips - cycle downturn'},
-    {'symbol': 'AMD', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': -2.36, 'mean_reversion': -2.36, 'iv': 0.68, 'signal': 'SELL', 'key_metric': 'Chip maker - sharp pullback'},
-    {'symbol': 'MLYS', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': 0.05, 'mean_reversion': 0.05, 'iv': 0.83, 'signal': 'HOLD', 'key_metric': 'Medical devices - emerging'},
-    {'symbol': 'HL', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.18, 'mean_reversion': -0.18, 'iv': 0.92, 'signal': 'HOLD', 'key_metric': 'Precious metals - high vol'},
-    {'symbol': 'CRWV', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 0, 'inst_stock_select': 0, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': -1.23, 'iv': 1.09, 'signal': 'HOLD', 'key_metric': 'Specialty pharma - volatile'},
-    {'symbol': 'DELL', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 0, 'inst_stock_select': 0, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': -1.31, 'iv': 0.65, 'signal': 'HOLD', 'key_metric': 'PC/Server - mature market'},
-    {'symbol': 'IREN', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 0, 'inst_stock_select': 0, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': -1.61, 'iv': 1.46, 'signal': 'SELL', 'key_metric': 'Energy infrastructure - weak'},
-    {'symbol': 'AU', 'inst33': 50, 'overall_score': 7, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 3, 'uva': 7, 'money_score': 0, 'alpha_score': 3, 'equity_score': 1.7, 'mean_reversion': 0.95, 'iv': 0.68, 'signal': 'HOLD', 'key_metric': 'Gold miner - balanced'},
-    {'symbol': 'PG', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': 1.54, 'mean_reversion': 1.54, 'iv': 0.24, 'signal': 'SELL_CALL', 'key_metric': 'Consumer staples - call seller'},
-    {'symbol': 'XOM', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': 0.25, 'mean_reversion': 0.25, 'iv': 0.27, 'signal': 'HOLD', 'key_metric': 'Energy dividend - stable'},
-    {'symbol': 'PEP', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': 0.21, 'mean_reversion': 0.21, 'iv': 0.26, 'signal': 'HOLD', 'key_metric': 'Beverage - steady dividend'},
-    {'symbol': 'HD', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': -1.41, 'mean_reversion': -1.41, 'iv': 0.29, 'signal': 'HOLD', 'key_metric': 'Home improvement - pullback'},
-    {'symbol': 'JPM', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': -1.59, 'mean_reversion': -1.59, 'iv': 0.3, 'signal': 'HOLD', 'key_metric': 'Financial system - weak'},
-    {'symbol': 'TSM', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': -1.69, 'mean_reversion': -1.69, 'iv': 0.49, 'signal': 'HOLD', 'key_metric': 'Chip foundry - downtrend'},
-    {'symbol': 'MS', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': -1.95, 'mean_reversion': -1.95, 'iv': 0.35, 'signal': 'HOLD', 'key_metric': 'Investment banking - weak'},
-    {'symbol': 'MT', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': 0.7, 'iv': 0.39, 'signal': 'HOLD', 'key_metric': 'European steel - neutral'},
-    {'symbol': 'GTLB', 'inst33': 48, 'overall_score': 0, 'master_score': 2, 'signal_strength': 0, 'inst_stock_select': 0, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': -1.85, 'iv': 0.83, 'signal': 'SELL', 'key_metric': 'API security - emerging'},
+    {'symbol': 'MSFT', 'inst33': 60, 'overall_score': 6, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 3, 'uva': 6, 'money_score': 4, 'alpha_score': 3, 'equity_score': 0.65, 'mean_reversion': 0.65, 'iv': 0.29, 'signal': 'BUY', 'key_metric': 'Cloud dominant - uptrend'},
     {'symbol': 'NVDA', 'inst33': 45, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 2, 'money_score': 1, 'alpha_score': 1, 'equity_score': -1.69, 'mean_reversion': -1.69, 'iv': 0.59, 'signal': 'SELL', 'key_metric': 'Chip leader - weakness'},
     {'symbol': 'AMZN', 'inst33': 45, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 2, 'money_score': 1, 'alpha_score': 1, 'equity_score': -1.37, 'mean_reversion': -1.37, 'iv': 0.4, 'signal': 'SELL', 'key_metric': 'E-commerce leader - pullback'},
+    {'symbol': 'BABA', 'inst33': 48, 'overall_score': 3, 'signal': 'NEUTRAL', 'key_metric': 'China exposure'},
+    {'symbol': 'TSLA', 'inst33': 50, 'overall_score': 2, 'signal': 'HOLD', 'key_metric': 'EV volatility'},
+    {'symbol': 'META', 'inst33': 55, 'overall_score': 4, 'signal': 'BUY', 'key_metric': 'AI upside'},
+    {'symbol': 'NFLX', 'inst33': 58, 'overall_score': 5, 'signal': 'HOLD', 'key_metric': 'Streaming stable'},
+    {'symbol': 'GOOGL', 'inst33': 80, 'overall_score': 6, 'signal': 'BUY', 'key_metric': 'Tech AI leader'},
+    {'symbol': 'GOOG', 'inst33': 80, 'overall_score': 6, 'signal': 'BUY', 'key_metric': 'Tech uptrend'},
+    {'symbol': 'JNJ', 'inst33': 75, 'overall_score': 8, 'signal': 'SELL_CALL', 'key_metric': 'Healthcare premium'},
+    {'symbol': 'RY', 'inst33': 70, 'overall_score': 6, 'signal': 'SELL_CALL', 'key_metric': 'Financial low IV'},
+    {'symbol': 'WMT', 'inst33': 70, 'overall_score': 0, 'signal': 'SELL_CALL', 'key_metric': 'Retail defensive'},
+    {'symbol': 'V', 'inst33': 70, 'overall_score': 7, 'signal': 'BUY', 'key_metric': 'Payments strong'},
+    {'symbol': 'MA', 'inst33': 70, 'overall_score': 7, 'signal': 'BUY', 'key_metric': 'Mastercard momentum'},
+    {'symbol': 'LLY', 'inst33': 65, 'overall_score': 8, 'signal': 'HOLD', 'key_metric': 'Biotech GLP-1'},
+    {'symbol': 'A', 'inst33': 80, 'overall_score': 8, 'signal': 'BUY', 'key_metric': 'Agilent emerging'},
+    {'symbol': 'ASML', 'inst33': 65, 'overall_score': 0, 'signal': 'HOLD', 'key_metric': 'Chip equipment'},
+    {'symbol': 'DAL', 'inst33': 65, 'overall_score': 0, 'signal': 'HOLD', 'key_metric': 'Airlines recovery'},
+    {'symbol': 'CSCO', 'inst33': 55, 'overall_score': 8, 'signal': 'HOLD', 'key_metric': 'Networking dividend'},
+    {'symbol': 'INTC', 'inst33': 52, 'overall_score': 4, 'signal': 'HOLD', 'key_metric': 'Chip turnaround'},
+    {'symbol': 'AMD', 'inst33': 53, 'overall_score': 0, 'signal': 'SELL', 'key_metric': 'Chip competitor'},
+    {'symbol': 'CRM', 'inst33': 58, 'overall_score': 5, 'signal': 'BUY', 'key_metric': 'Cloud CRM'},
+    {'symbol': 'ADBE', 'inst33': 60, 'overall_score': 6, 'signal': 'HOLD', 'key_metric': 'Creative stable'},
+    {'symbol': 'DDOG', 'inst33': 62, 'overall_score': 6, 'signal': 'BUY', 'key_metric': 'Cloud monitoring'},
+    {'symbol': 'SNOW', 'inst33': 60, 'overall_score': 5, 'signal': 'BUY', 'key_metric': 'Data warehouse'},
+    {'symbol': 'DBX', 'inst33': 54, 'overall_score': 5, 'signal': 'HOLD', 'key_metric': 'Cloud storage'},
+    {'symbol': 'OKTA', 'inst33': 56, 'overall_score': 5, 'signal': 'HOLD', 'key_metric': 'Identity secure'},
+    {'symbol': 'SPLK', 'inst33': 55, 'overall_score': 4, 'signal': 'HOLD', 'key_metric': 'Analytics platform'},
+    {'symbol': 'COIN', 'inst33': 45, 'overall_score': 2, 'signal': 'SELL', 'key_metric': 'Crypto exposure'},
+    {'symbol': 'MSTR', 'inst33': 58, 'overall_score': 0, 'signal': 'SELL', 'key_metric': 'Bitcoin proxy'},
+    {'symbol': 'RIOT', 'inst33': 50, 'overall_score': 1, 'signal': 'SELL', 'key_metric': 'Mining weak'},
+    {'symbol': 'HUT', 'inst33': 48, 'overall_score': 1, 'signal': 'SELL', 'key_metric': 'Miner volatile'},
+    {'symbol': 'CLSK', 'inst33': 52, 'overall_score': 2, 'signal': 'HOLD', 'key_metric': 'Mining consolidate'},
+    {'symbol': 'DELL', 'inst33': 48, 'overall_score': 3, 'signal': 'HOLD', 'key_metric': 'PC mature'},
+    {'symbol': 'HPQ', 'inst33': 45, 'overall_score': 2, 'signal': 'HOLD', 'key_metric': 'Hardware'},
+    {'symbol': 'IBM', 'inst33': 52, 'overall_score': 3, 'signal': 'HOLD', 'key_metric': 'IT services'},
+    {'symbol': 'TSM', 'inst33': 50, 'overall_score': 4, 'signal': 'HOLD', 'key_metric': 'Foundry Taiwan'},
+    {'symbol': 'QCOM', 'inst33': 52, 'overall_score': 3, 'signal': 'HOLD', 'key_metric': 'Chip design'},
+    {'symbol': 'AVGO', 'inst33': 53, 'overall_score': 4, 'signal': 'HOLD', 'key_metric': 'Broadcom'},
+    {'symbol': 'MU', 'inst33': 48, 'overall_score': 2, 'signal': 'HOLD', 'key_metric': 'Memory chips'},
+    {'symbol': 'BOX', 'inst33': 48, 'overall_score': 3, 'signal': 'HOLD', 'key_metric': 'Content mgmt'},
+    {'symbol': 'PYPL', 'inst33': 48, 'overall_score': 3, 'signal': 'NEUTRAL', 'key_metric': 'Fintech'},
+    {'symbol': 'SQ', 'inst33': 52, 'overall_score': 4, 'signal': 'HOLD', 'key_metric': 'Square recovery'},
+    {'symbol': 'PG', 'inst33': 50, 'overall_score': 0, 'signal': 'SELL_CALL', 'key_metric': 'Consumer staples'},
+    {'symbol': 'XOM', 'inst33': 50, 'overall_score': 0, 'signal': 'HOLD', 'key_metric': 'Energy dividend'},
+    {'symbol': 'JPM', 'inst33': 50, 'overall_score': 0, 'signal': 'HOLD', 'key_metric': 'Financial weak'},
 ]
 
 def load_tickers():
-    """Load tickers from TOP_50_STOCKS"""
     return [stock['symbol'] for stock in TOP_50_STOCKS]
 
 def load_earnings():
-    """Load earnings from cache or file"""
     if earnings_cache['data'] and earnings_cache['timestamp']:
         cache_age = (datetime.now() - earnings_cache['timestamp']).total_seconds()
         if cache_age < EARNINGS_TTL:
@@ -116,9 +112,9 @@ def load_earnings():
             pass
     
     return [
-        {'symbol': 'NVDA', 'date': '2025-11-24', 'epsEstimate': 0.73, 'company': 'NVIDIA'},
-        {'symbol': 'MSFT', 'date': '2025-11-25', 'epsEstimate': 2.80, 'company': 'Microsoft'},
-        {'symbol': 'AAPL', 'date': '2025-11-25', 'epsEstimate': 2.15, 'company': 'Apple'},
+        {'symbol': 'NVDA', 'date': '2025-11-24', 'epsEstimate': 0.73},
+        {'symbol': 'MSFT', 'date': '2025-11-25', 'epsEstimate': 2.80},
+        {'symbol': 'AAPL', 'date': '2025-11-25', 'epsEstimate': 2.15},
     ]
 
 TICKERS = load_tickers()
@@ -128,10 +124,8 @@ print(f"✅ Loaded {len(TICKERS)} tickers from TOP_50_STOCKS")
 print(f"✅ Perplexity: {'ENABLED' if PERPLEXITY_KEY else 'DISABLED'}")
 print(f"✅ FRED: {'ENABLED' if FRED_KEY else 'DISABLED'}")
 
-# ======================== FRED MACRO DATA (2 DECIMAL FORMATTING) ========================
-
+# ======================== FRED MACRO DATA ========================
 def fetch_fred_macro_data():
-    """Fetch FRED data with 2 decimal formatting"""
     if not FRED_KEY:
         return get_fallback_macro_data()
     
@@ -142,13 +136,9 @@ def fetch_fred_macro_data():
     }
     
     fred_series = {
-        'WEI': {'name': 'Weekly Economic Index', 'description': 'Real economic activity', 'unit': '%', 'decimals': 0},
-        'ICSA': {'name': 'Initial Claims', 'description': 'Weekly jobless claims', 'unit': 'K', 'decimals': 0},
-        'M1SL': {'name': 'M1 Money Supply', 'description': 'Liquid money supply', 'unit': 'B', 'decimals': 0},
-        'M2SL': {'name': 'M2 Money Supply', 'description': 'Broad money supply', 'unit': 'B', 'decimals': 0},
-        'DCOILWTICO': {'name': 'WTI Oil Price', 'description': 'Crude oil prices', 'unit': '$/B', 'decimals': 0},
-        'DFF': {'name': 'Fed Funds Rate', 'description': 'Fed interest rate', 'unit': '%', 'decimals': 0},
-        'T10Y2Y': {'name': '10Y-2Y Spread', 'description': 'Yield curve', 'unit': '%', 'decimals': 0}
+        'DFF': {'name': 'Fed Funds Rate', 'unit': '%'},
+        'T10Y2Y': {'name': '10Y-2Y Spread', 'unit': '%'},
+        'DCOILWTICO': {'name': 'WTI Oil', 'unit': '$/B'},
     }
     
     try:
@@ -166,15 +156,12 @@ def fetch_fred_macro_data():
                 
                 if response.status_code == 200:
                     data = response.json()
-                    observations = data.get('observations', [])
-                    if observations:
-                        latest = observations[0]
+                    obs = data.get('observations', [])
+                    if obs:
+                        latest = obs[0]
                         raw_value = latest.get('value')
-                        
-                        # Format to specified decimals
                         if raw_value:
-                            decimals = metadata.get('decimals', 2)
-                            formatted_value = round(float(raw_value), decimals)
+                            formatted_value = round(float(raw_value), 2)
                         else:
                             formatted_value = None
                         
@@ -182,65 +169,28 @@ def fetch_fred_macro_data():
                             'name': metadata['name'],
                             'value': formatted_value,
                             'date': latest.get('date'),
-                            'unit': metadata.get('unit', ''),
-                            'description': metadata['description']
+                            'unit': metadata.get('unit', '')
                         }
-                        print(f"✅ FRED: {series_id} = {formatted_value} {metadata['unit']}")
-            except Exception as e:
-                print(f"❌ Error fetching {series_id}: {e}")
+            except:
+                pass
             time.sleep(0.2)
         
         return macro_data
-    except Exception as e:
-        print(f"❌ FRED fetch failed: {e}")
+    except:
         return get_fallback_macro_data()
 
 def get_fallback_macro_data():
-    """Fallback data with 2 decimals"""
     return {
         'timestamp': datetime.now().isoformat(),
         'source': 'Fallback Data',
         'indicators': {
-            'WEI': {
-                'name': 'Weekly Economic Index',
-                'value': 2.29,  # 2 decimals
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'unit': 'percent',
-                'description': 'Real economic activity'
-            },
-            'ICSA': {
-                'name': 'Initial Claims',
-                'value': 220000,
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'unit': 'thousands',
-                'description': 'Weekly jobless claims'
-            },
-            'DFF': {
-                'name': 'Fed Funds Rate',
-                'value': 4.33,  # 2 decimals
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'unit': 'percent',
-                'description': 'Fed interest rate'
-            },
-            'DCOILWTICO': {
-                'name': 'WTI Oil Price',
-                'value': 60.66,  # 2 decimals
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'unit': '$/barrel',
-                'description': 'Crude oil prices'
-            },
-            'T10Y2Y': {
-                'name': '10Y-2Y Spread',
-                'value': 0.55,  # 2 decimals
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'unit': 'percent',
-                'description': 'Yield curve'
-            }
+            'DFF': {'name': 'Fed Funds Rate', 'value': 4.33, 'unit': '%'},
+            'T10Y2Y': {'name': '10Y-2Y Spread', 'value': 0.55, 'unit': '%'},
+            'DCOILWTICO': {'name': 'WTI Oil', 'value': 60.66, 'unit': '$/B'},
         }
     }
 
 # ======================== SCHEDULED TASKS ========================
-
 def refresh_earnings_monthly():
     global UPCOMING_EARNINGS
     print("\n🔄 [SCHEDULED] Refreshing earnings (MONTHLY)...")
@@ -256,7 +206,6 @@ def refresh_earnings_monthly():
                 earnings_cache['data'] = UPCOMING_EARNINGS
                 earnings_cache['timestamp'] = datetime.now()
                 print(f"✅ Updated {len(UPCOMING_EARNINGS)} earnings")
-                return
     except Exception as e:
         print(f"❌ Earnings refresh error: {e}")
 
@@ -282,19 +231,15 @@ def refresh_macro_data_weekly():
 
 # ======================== SCHEDULER ========================
 scheduler = BackgroundScheduler()
-
 scheduler.add_job(func=refresh_earnings_monthly, trigger="cron", day=1, hour=9, minute=0, id='refresh_earnings_monthly')
 scheduler.add_job(func=refresh_social_sentiment_daily, trigger="cron", hour=8, minute=59, id='refresh_sentiment_daily')
 scheduler.add_job(func=refresh_insider_activity_daily, trigger="cron", hour=8, minute=58, id='refresh_insider_daily')
 scheduler.add_job(func=refresh_macro_data_weekly, trigger="cron", day_of_week="0", hour=9, minute=0, id='refresh_macro_weekly')
-
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
-
 print(f"✅ Scheduler started")
 
 # ======================== UTILITY FUNCTIONS ========================
-
 def cleanup_cache():
     current_time = int(time.time() / 60)
     expired_keys = [k for k in price_cache.keys() if not k.endswith(f"_{current_time}") and not k.endswith(f"_{current_time-1}")]
@@ -354,7 +299,7 @@ def fetch_prices_concurrent(tickers):
                 try:
                     price_data = future.result(timeout=5)
                     csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker), None)
-                  
+                    
                     results.append({
                         'Symbol': ticker,
                         'Last': round(price_data['price'], 2),
@@ -362,12 +307,11 @@ def fetch_prices_concurrent(tickers):
                         'RSI': round(50 + (price_data['change'] * 2), 2),
                         'Signal': csv_stock['signal'] if csv_stock else 'HOLD',
                         'Strategy': 'Momentum' if price_data['change'] > 0 else 'Mean Reversion',
-                        
                         'Score': csv_stock['inst33'] if csv_stock else 50.0,
                         'KeyMetric': csv_stock['key_metric'] if csv_stock else ''
                     })
-                except Exception as e:
-                    print(f"Error fetching {ticker}: {e}")
+                except:
+                    pass
         time.sleep(0.1)
     
     results.sort(key=lambda x: x.get('Score', 0), reverse=True)
@@ -375,9 +319,7 @@ def fetch_prices_concurrent(tickers):
     return results
 
 # ======================== PERPLEXITY SONAR AI ========================
-
 def get_perplexity_sonar_analysis(ticker, stock_data=None):
-    """AI analysis with web scraping"""
     if not PERPLEXITY_KEY:
         return {'edge': 'API not configured', 'trade': 'Set key', 'risk': 'N/A', 'sources': [], 'ticker': ticker}
     
@@ -386,13 +328,12 @@ def get_perplexity_sonar_analysis(ticker, stock_data=None):
         context = f"\nScore: {csv_stock['inst33']}, Signal: {csv_stock['signal']}" if csv_stock else ""
         price_info = f"\nPrice: ${stock_data.get('Last', 'N/A')}, Change: {stock_data.get('Change', 'N/A')}%" if stock_data else ""
         
-        prompt = f"""Analyze {ticker} for day trading. Scrape Barchart, Quiver, GuruFocus, Reddit WSB.{price_info}{context}
-        
+        prompt = f"""Analyze {ticker} for day trading. Scrape Barchart, GuruFocus, Reddit.{price_info}{context}
+
 Provide 3 bullets:
 1. Edge: Bullish/Bearish % + catalyst
 2. Trade: Entry/Stop/Target
 3. Risk: Low/Med/High
-
 Concise, cite sources."""
         
         url = 'https://api.perplexity.ai/chat/completions'
@@ -401,13 +342,11 @@ Concise, cite sources."""
         payload = {
             'model': 'sonar',
             'messages': [
-                {'role': 'system', 'content': 'Expert day trader. Scrape Barchart, Quiver, GuruFocus. 3 bullets max.'},
+                {'role': 'system', 'content': 'Expert day trader. 3 bullets max.'},
                 {'role': 'user', 'content': prompt}
             ],
             'temperature': 0.6,
-            'max_tokens': 400,
-            'search_recency_filter': 'day',
-            'return_citations': True
+            'max_tokens': 400
         }
         
         response = requests.post(url, json=payload, headers=headers, timeout=15)
@@ -426,7 +365,7 @@ Concise, cite sources."""
                 'edge': edge,
                 'trade': trade,
                 'risk': risk,
-                'sources': ['Perplexity Sonar', 'Barchart', 'Quiver', 'GuruFocus', 'Reddit WSB'],
+                'sources': ['Perplexity Sonar'],
                 'ticker': ticker
             }
         else:
@@ -496,7 +435,6 @@ def get_ai_insights(ticker):
 
 @app.route('/api/macro-indicators', methods=['GET'])
 def get_macro_indicators():
-    """FRED data with 2 decimal formatting"""
     try:
         if macro_cache['data'] and macro_cache['timestamp']:
             cache_age = (datetime.now() - macro_cache['timestamp']).total_seconds()
@@ -519,21 +457,8 @@ def get_earnings_calendar():
         'next_earnings': UPCOMING_EARNINGS[0] if UPCOMING_EARNINGS else None
     }), 200
 
-# ======================== SOCIAL SENTIMENT (FIXED CALCULATION) ========================
-# IMPORTANT: Sentiment based on ACTUAL MENTION COUNTS (not hardcoded)
-# - Daily: counts from last 24 hours
-# - Weekly: counts from last 7 days
-# - Calculation: (reddit_mentions + twitter_mentions) / avg_daily_mentions = sentiment score
-
 @app.route('/api/social-sentiment/<ticker>', methods=['GET'])
 def get_social_sentiment(ticker):
-    """
-    FIXED SENTIMENT CALCULATION:
-    - Based on actual mention counts from Finnhub API
-    - Daily: Reddit mentions + Twitter mentions (last 24h)
-    - Weekly: Aggregated over 7 days
-    - Change: WoW (week-over-week), MoM (month-over-month)
-    """
     ticker = ticker.upper()
     cache_key = f"{ticker}_sentiment"
     
@@ -551,61 +476,45 @@ def get_social_sentiment(ticker):
             if response.status_code == 200:
                 data = response.json()
                 
-                # Get last reddit and twitter data points
                 reddit_data = data.get('reddit', [])
                 twitter_data = data.get('twitter', [])
                 
                 reddit_daily = reddit_data[-1] if reddit_data else {}
                 twitter_daily = twitter_data[-1] if twitter_data else {}
                 
-                # Extract actual mention counts (NOT scores)
-                reddit_mentions = reddit_daily.get('mention', 0)  # Actual count of mentions
-                twitter_mentions = twitter_daily.get('mention', 0)  # Actual count of mentions
-                
-                # Calculate sentiment based on mention ratio
+                reddit_mentions = reddit_daily.get('mention', 0)
+                twitter_mentions = twitter_daily.get('mention', 0)
                 total_daily_mentions = reddit_mentions + twitter_mentions
                 
-                # Daily sentiment score (based on mention counts)
                 reddit_score = reddit_daily.get('score', 0)
                 twitter_score = twitter_daily.get('score', 0)
                 daily_score = (reddit_score + twitter_score) / 2 if (reddit_score or twitter_score) else 0
                 
                 daily_sentiment = 'BULLISH' if daily_score > 0.3 else 'BEARISH' if daily_score < -0.3 else 'NEUTRAL'
                 
-                # Weekly calculation (sum of all mentions in past 7 days)
-                weekly_mentions = sum(item.get('mention', 0) for item in reddit_data[-7:]) + \
-                                 sum(item.get('mention', 0) for item in twitter_data[-7:])
-                
-                weekly_score = (sum(item.get('score', 0) for item in reddit_data[-7:]) + \
-                               sum(item.get('score', 0) for item in twitter_data[-7:])) / max(len(reddit_data[-7:]) + len(twitter_data[-7:]), 1)
-                
+                weekly_mentions = sum(item.get('mention', 0) for item in reddit_data[-7:]) + sum(item.get('mention', 0) for item in twitter_data[-7:])
+                weekly_score = (sum(item.get('score', 0) for item in reddit_data[-7:]) + sum(item.get('score', 0) for item in twitter_data[-7:])) / max(len(reddit_data[-7:]) + len(twitter_data[-7:]), 1)
                 weekly_sentiment = 'BULLISH' if weekly_score > 0.3 else 'BEARISH' if weekly_score < -0.3 else 'NEUTRAL'
                 
-                # Calculate changes
-                week_prev_mentions = sum(item.get('mention', 0) for item in reddit_data[-14:-7]) + \
-                                    sum(item.get('mention', 0) for item in twitter_data[-14:-7])
-                month_prev_mentions = sum(item.get('mention', 0) for item in reddit_data[-30:]) * 0.5  # Rough estimate for month
-                
+                week_prev_mentions = sum(item.get('mention', 0) for item in reddit_data[-14:-7]) + sum(item.get('mention', 0) for item in twitter_data[-14:-7])
                 wow_change = ((weekly_mentions - week_prev_mentions) / max(week_prev_mentions, 1)) * 100 if week_prev_mentions > 0 else 0
-                mom_change = ((weekly_mentions - month_prev_mentions) / max(month_prev_mentions, 1)) * 100 if month_prev_mentions > 0 else 0
                 
                 result = {
                     'ticker': ticker,
                     'source': 'Finnhub Social Sentiment API',
                     'daily': {
                         'score': round(daily_score, 2),
-                        'mentions': int(total_daily_mentions),  # ACTUAL mention count
+                        'mentions': int(total_daily_mentions),
                         'sentiment': daily_sentiment,
                         'reddit_mentions': int(reddit_mentions),
                         'twitter_mentions': int(twitter_mentions)
                     },
                     'weekly': {
                         'score': round(weekly_score, 2),
-                        'mentions': int(weekly_mentions),  # ACTUAL 7-day mention count
+                        'mentions': int(weekly_mentions),
                         'sentiment': weekly_sentiment
                     },
-                    'weekly_change': round(wow_change, 2),  # Week-over-week % change
-                    'monthly_change': round(mom_change, 2)  # Month-over-month % change
+                    'weekly_change': round(wow_change, 2)
                 }
                 
                 sentiment_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
@@ -614,25 +523,23 @@ def get_social_sentiment(ticker):
         except Exception as e:
             print(f"❌ Finnhub sentiment error: {e}")
     
-    # Fallback with realistic values
     ticker_hash = sum(ord(c) for c in ticker) % 100
     result = {
         'ticker': ticker,
         'source': 'Fallback Data',
         'daily': {
             'score': round((ticker_hash - 50) / 150, 2),
-            'mentions': 100 + ticker_hash * 2,  # Realistic mention count
+            'mentions': 100 + ticker_hash * 2,
             'sentiment': 'NEUTRAL',
             'reddit_mentions': 60 + ticker_hash,
             'twitter_mentions': 40 + ticker_hash
         },
         'weekly': {
             'score': 0.0,
-            'mentions': 700 + ticker_hash * 14,  # 7x daily avg
+            'mentions': 700 + ticker_hash * 14,
             'sentiment': 'NEUTRAL'
         },
-        'weekly_change': 0.0,
-        'monthly_change': 0.0
+        'weekly_change': 0.0
     }
     sentiment_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
     return jsonify(result), 200
@@ -686,7 +593,7 @@ def get_stock_news(ticker):
     if not FINNHUB_KEY:
         return jsonify({'ticker': ticker, 'articles': [], 'count': 0}), 200
     try:
-        from_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+        from_date = (datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d')
         to_date = datetime.now().strftime('%Y-%m-%d')
         url = f'https://finnhub.io/api/v1/company-news?symbol={ticker}&from={from_date}&to={to_date}&token={FINNHUB_KEY}'
         response = requests.get(url, timeout=5)
@@ -697,11 +604,8 @@ def get_stock_news(ticker):
         pass
     return jsonify({'ticker': ticker, 'articles': [], 'count': 0})
 
-# ======================== OPTIONS OPPORTUNITIES (ALL 4 STRATEGIES) ========================
-
 @app.route('/api/options-opportunities/<ticker>', methods=['GET'])
 def get_options_opportunities(ticker):
-    """All 4 options strategies: Iron Condor, Call Spread, Put Spread, Butterfly"""
     try:
         price_data = get_stock_price_waterfall(ticker)
         current_price = price_data['price']
@@ -714,43 +618,35 @@ def get_options_opportunities(ticker):
             'strategies': [
                 {
                     'type': 'Iron Condor',
-                    'description': 'Sell OTM call/put spreads - best for range-bound',
+                    'description': 'Sell OTM call/put spreads',
                     'setup': f'Sell ${round(current_price * 1.05, 2)} Call / Buy ${round(current_price * 1.08, 2)} Call, Sell ${round(current_price * 0.95, 2)} Put / Buy ${round(current_price * 0.92, 2)} Put',
                     'max_profit': round(current_price * 0.02, 2),
                     'max_loss': round(current_price * 0.03, 2),
-                    'probability_of_profit': '65%',
-                    'days_to_expiration': 30,
-                    'recommendation': 'BEST' if abs(change) < 2 else 'GOOD'
+                    'probability_of_profit': '65%'
                 },
                 {
                     'type': 'Call Spread (Bullish)',
-                    'description': 'Buy lower call, sell higher call - bullish directional',
+                    'description': 'Buy lower call, sell higher call',
                     'setup': f'Buy ${round(current_price, 2)} Call / Sell ${round(current_price * 1.05, 2)} Call',
                     'max_profit': round(current_price * 0.05, 2),
                     'max_loss': round(current_price * 0.02, 2),
-                    'probability_of_profit': '55%',
-                    'days_to_expiration': 30,
-                    'recommendation': 'BUY' if change > 2 else 'NEUTRAL'
+                    'probability_of_profit': '55%'
                 },
                 {
                     'type': 'Put Spread (Bearish)',
-                    'description': 'Buy higher put, sell lower put - bearish directional',
+                    'description': 'Buy higher put, sell lower put',
                     'setup': f'Buy ${round(current_price, 2)} Put / Sell ${round(current_price * 0.95, 2)} Put',
                     'max_profit': round(current_price * 0.05, 2),
                     'max_loss': round(current_price * 0.02, 2),
-                    'probability_of_profit': '55%',
-                    'days_to_expiration': 30,
-                    'recommendation': 'BUY' if change < -2 else 'NEUTRAL'
+                    'probability_of_profit': '55%'
                 },
                 {
                     'type': 'Butterfly Spread',
-                    'description': 'Buy 1 call, sell 2 calls, buy 1 call - low cost, defined risk',
+                    'description': 'Buy 1 call, sell 2 calls, buy 1 call',
                     'setup': f'Buy ${round(current_price * 0.98, 2)} Call / Sell 2x ${round(current_price, 2)} Call / Buy ${round(current_price * 1.02, 2)} Call',
                     'max_profit': round(current_price * 0.04, 2),
                     'max_loss': round(current_price * 0.01, 2),
-                    'probability_of_profit': '50%',
-                    'days_to_expiration': 30,
-                    'recommendation': 'GOOD' if abs(change) < 1.5 else 'NEUTRAL'
+                    'probability_of_profit': '50%'
                 }
             ]
         }
@@ -770,5 +666,5 @@ def health_check():
     }), 200
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port, debug=Fal
+    port = int(os.environ.get('PORT', 10000))
+    app.run(host='0.0.0.0', port=port, debug=False)
