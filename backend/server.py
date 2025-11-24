@@ -12,17 +12,17 @@ import atexit
 from bs4 import BeautifulSoup
 import re
 
-app = Flask(__name__)
+app = Flask(name)
 CORS(app)
 
-# ======================== API KEYS ========================
+======================== API KEYS ========================
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
 ALPHAVANTAGE_KEY = os.environ.get('ALPHAVANTAGE_API_KEY', '')
 MASSIVE_KEY = os.environ.get('MASSIVE_API_KEY', '')
 FRED_KEY = os.environ.get('FRED_API_KEY', '')
 PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
 
-# ======================== CACHE ========================
+======================== CACHE ========================
 price_cache = {}
 recommendations_cache = {'data': [], 'timestamp': None}
 news_cache = {'market_news': [], 'last_updated': None}
@@ -35,7 +35,7 @@ barchart_cache = {}
 gurufocus_cache = {}
 reddit_cache = {}
 
-# ======================== TTL ========================
+======================== TTL ========================
 RECOMMENDATIONS_TTL = 300
 SENTIMENT_TTL = 86400
 MACRO_TTL = 604800
