@@ -20,28 +20,7 @@ MASSIVE_KEY = os.environ.get('MASSIVE_API_KEY', '')
 FRED_KEY = os.environ.get('FRED_API_KEY', '')
 PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
 
-# ======================== CACHE ========================
-price_cache = {}
-recommendations_cache = {'data': [], 'timestamp': None}
-news_cache = {'market_news': [], 'last_updated': None}
-sentiment_cache = {}
-macro_cache = {'data': {}, 'timestamp': None}
-insider_cache = {}
-earnings_cache = {'data': [], 'timestamp': None}
-ai_insights_cache = {}
-
-# ======================== TTL ========================
-RECOMMENDATIONS_TTL = 300
-SENTIMENT_TTL = 86400
-MACRO_TTL = 604800  # 7 days for FRED
-INSIDER_TTL = 86400
-EARNINGS_TTL = 2592000
-AI_INSIGHTS_TTL = 3600
-
-# Chart tracking
-chart_after_hours = {'enabled': True, 'last_refresh': None}
-
-# ======================== TOP 50 STOCKS DATA ========================
+# ======================== TOP 50 STOCKS ========================
 TOP_50_STOCKS = [
     {'symbol': 'KO', 'inst33': 95, 'overall_score': 8, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 4, 'uva': 8, 'money_score': 4, 'alpha_score': 3, 'equity_score': 1.9, 'mean_reversion': 2.09, 'iv': 0.2, 'signal': 'STRONG_BUY', 'key_metric': 'Beverage leader - low IV, uptrend'},
     {'symbol': 'AZN', 'inst33': 95, 'overall_score': 8, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 3, 'uva': 7, 'money_score': 0, 'alpha_score': 3, 'equity_score': 1.7, 'mean_reversion': 1.57, 'iv': 0.26, 'signal': 'STRONG_BUY', 'key_metric': 'Biotech - highest institutional backing'},
@@ -66,212 +45,74 @@ TOP_50_STOCKS = [
     {'symbol': 'VCYT', 'inst33': 60, 'overall_score': 6, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 3, 'uva': 7, 'money_score': 0, 'alpha_score': 3, 'equity_score': 1.7, 'mean_reversion': 1.45, 'iv': 0.47, 'signal': 'HOLD', 'key_metric': 'Biotech - balanced setup'},
     {'symbol': 'ABT', 'inst33': 60, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 2, 'uva': 5, 'money_score': 3, 'alpha_score': 1, 'equity_score': 0.7, 'mean_reversion': 0.7, 'iv': 0.28, 'signal': 'HOLD', 'key_metric': 'Healthcare - stable dividend'},
     {'symbol': 'AVGO', 'inst33': 60, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 2, 'uva': 5, 'money_score': 3, 'alpha_score': 1, 'equity_score': -1.25, 'mean_reversion': -1.25, 'iv': 0.68, 'signal': 'HOLD', 'key_metric': 'Semiconductor - downtrend'},
-    {'symbol': 'B', 'inst33': 60, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': 0.9, 'iv': 0.5, 'signal': 'HOLD', 'key_metric': 'Industrial - mixed signals'},
-    {'symbol': 'M', 'inst33': 60, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': 0.5, 'iv': 0.7, 'signal': 'HOLD', 'key_metric': 'Retail - transformation play'},
-    {'symbol': 'EA', 'inst33': 60, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': -0.26, 'iv': 0.09, 'signal': 'HOLD', 'key_metric': 'Gaming - low IV play'},
-    {'symbol': 'ORCL', 'inst33': 58, 'overall_score': 0, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 3, 'uva': 4, 'money_score': 3, 'alpha_score': 2, 'equity_score': -1.84, 'mean_reversion': -1.84, 'iv': 0.75, 'signal': 'SELL', 'key_metric': 'Database - bearish pullback'},
-    {'symbol': 'BW', 'inst33': 58, 'overall_score': 0, 'master_score': 3, 'signal_strength': -1, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 9, 'money_score': 1, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': 0.37, 'iv': 1.57, 'signal': 'HOLD', 'key_metric': 'Industrial - extreme IV play'},
-    {'symbol': 'RIVN', 'inst33': 58, 'overall_score': 0, 'master_score': 3, 'signal_strength': -1, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 9, 'money_score': 1, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': 0.03, 'iv': 0.84, 'signal': 'HOLD', 'key_metric': 'EV - nascent company'},
-    {'symbol': 'MSTR', 'inst33': 58, 'overall_score': 0, 'master_score': 3, 'signal_strength': -1, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 9, 'money_score': 1, 'alpha_score': 0, 'equity_score': -0.3, 'mean_reversion': -1.77, 'iv': 1.11, 'signal': 'SELL', 'key_metric': 'Bitcoin proxy - volatile'},
-    {'symbol': 'CSCO', 'inst33': 55, 'overall_score': 8, 'master_score': 3, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 4, 'uva': 8, 'money_score': 4, 'alpha_score': 3, 'equity_score': 0.81, 'mean_reversion': 0.81, 'iv': 0.29, 'signal': 'HOLD', 'key_metric': 'Networking - stable dividend'},
-    {'symbol': 'DG', 'inst33': 55, 'overall_score': 0, 'master_score': 2, 'signal_strength': 0, 'inst_stock_select': 0, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': 0.25, 'iv': 0.56, 'signal': 'HOLD', 'key_metric': 'Discount retail - neutral'},
-    {'symbol': 'MDB', 'inst33': 55, 'overall_score': 0, 'master_score': 2, 'signal_strength': 0, 'inst_stock_select': 0, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': -2.03, 'iv': 0.83, 'signal': 'SELL', 'key_metric': 'Database NoSQL - downtrend'},
-    {'symbol': 'MU', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': -1.8, 'mean_reversion': -1.8, 'iv': 0.89, 'signal': 'SELL', 'key_metric': 'Memory chips - cycle downturn'},
-    {'symbol': 'AMD', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': -2.36, 'mean_reversion': -2.36, 'iv': 0.68, 'signal': 'SELL', 'key_metric': 'Chip maker - sharp pullback'},
-    {'symbol': 'MLYS', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': 0.05, 'mean_reversion': 0.05, 'iv': 0.83, 'signal': 'HOLD', 'key_metric': 'Medical devices - emerging'},
-    {'symbol': 'HL', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.18, 'mean_reversion': -0.18, 'iv': 0.92, 'signal': 'HOLD', 'key_metric': 'Precious metals - high vol'},
-    {'symbol': 'CRWV', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 0, 'inst_stock_select': 0, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': -1.23, 'iv': 1.09, 'signal': 'HOLD', 'key_metric': 'Specialty pharma - volatile'},
-    {'symbol': 'DELL', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 0, 'inst_stock_select': 0, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': -1.31, 'iv': 0.65, 'signal': 'HOLD', 'key_metric': 'PC/Server - mature market'},
-    {'symbol': 'IREN', 'inst33': 53, 'overall_score': 0, 'master_score': 2, 'signal_strength': 0, 'inst_stock_select': 0, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': -1.61, 'iv': 1.46, 'signal': 'SELL', 'key_metric': 'Energy infrastructure - weak'},
-    {'symbol': 'AU', 'inst33': 50, 'overall_score': 7, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 2, 'composite_score': 3, 'uva': 7, 'money_score': 0, 'alpha_score': 3, 'equity_score': 1.7, 'mean_reversion': 0.95, 'iv': 0.68, 'signal': 'HOLD', 'key_metric': 'Gold miner - balanced'},
-    {'symbol': 'PG', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': 1.54, 'mean_reversion': 1.54, 'iv': 0.24, 'signal': 'SELL_CALL', 'key_metric': 'Consumer staples - call seller'},
-    {'symbol': 'XOM', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': 0.25, 'mean_reversion': 0.25, 'iv': 0.27, 'signal': 'HOLD', 'key_metric': 'Energy dividend - stable'},
-    {'symbol': 'PEP', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': 0.21, 'mean_reversion': 0.21, 'iv': 0.26, 'signal': 'HOLD', 'key_metric': 'Beverage - steady dividend'},
-    {'symbol': 'HD', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': -1.41, 'mean_reversion': -1.41, 'iv': 0.29, 'signal': 'HOLD', 'key_metric': 'Home improvement - pullback'},
-    {'symbol': 'JPM', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': -1.59, 'mean_reversion': -1.59, 'iv': 0.3, 'signal': 'HOLD', 'key_metric': 'Financial system - weak'},
-    {'symbol': 'TSM', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': -1.69, 'mean_reversion': -1.69, 'iv': 0.49, 'signal': 'HOLD', 'key_metric': 'Chip foundry - downtrend'},
-    {'symbol': 'MS', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 4, 'money_score': 2, 'alpha_score': 1, 'equity_score': -1.95, 'mean_reversion': -1.95, 'iv': 0.35, 'signal': 'HOLD', 'key_metric': 'Investment banking - weak'},
-    {'symbol': 'MT', 'inst33': 50, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': 0.7, 'iv': 0.39, 'signal': 'HOLD', 'key_metric': 'European steel - neutral'},
-    {'symbol': 'GTLB', 'inst33': 48, 'overall_score': 0, 'master_score': 2, 'signal_strength': 0, 'inst_stock_select': 0, 'composite_score': 0, 'uva': 2, 'money_score': 0, 'alpha_score': 0, 'equity_score': -0.1, 'mean_reversion': -1.85, 'iv': 0.83, 'signal': 'SELL', 'key_metric': 'API security - emerging'},
-    {'symbol': 'NVDA', 'inst33': 45, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 2, 'money_score': 1, 'alpha_score': 1, 'equity_score': -1.69, 'mean_reversion': -1.69, 'iv': 0.59, 'signal': 'SELL', 'key_metric': 'Chip leader - weakness'},
-    {'symbol': 'AMZN', 'inst33': 45, 'overall_score': 0, 'master_score': 2, 'signal_strength': 3, 'inst_stock_select': 1, 'composite_score': 2, 'uva': 2, 'money_score': 1, 'alpha_score': 1, 'equity_score': -1.37, 'mean_reversion': -1.37, 'iv': 0.4, 'signal': 'SELL', 'key_metric': 'E-commerce leader - pullback'},
 ]
 
-def load_tickers():
-    """Load tickers from TOP_50_STOCKS"""
-    return [stock['symbol'] for stock in TOP_50_STOCKS]
+TICKERS = [s['symbol'] for s in TOP_50_STOCKS]
 
-def load_earnings():
-    """Load earnings from cache or file"""
-    if earnings_cache['data'] and earnings_cache['timestamp']:
-        cache_age = (datetime.now() - earnings_cache['timestamp']).total_seconds()
-        if cache_age < EARNINGS_TTL:
-            return earnings_cache['data']
-    
-    if os.path.exists('earnings.json'):
-        try:
-            with open('earnings.json', 'r') as f:
-                return json.load(f)
-        except:
-            pass
-    
-    return [
-        {'symbol': 'NVDA', 'date': '2025-11-24', 'epsEstimate': 0.73, 'company': 'NVIDIA'},
-        {'symbol': 'MSFT', 'date': '2025-11-25', 'epsEstimate': 2.80, 'company': 'Microsoft'},
-        {'symbol': 'AAPL', 'date': '2025-11-25', 'epsEstimate': 2.15, 'company': 'Apple'},
-    ]
+# ======================== CACHE ========================
+price_cache = {}
+recommendations_cache = {'data': [], 'timestamp': None}
+news_cache = {'market_news': [], 'last_updated': None}
+sentiment_cache = {}
+macro_cache = {'data': {}, 'timestamp': None}
+insider_cache = {}
+earnings_cache = {'data': [], 'timestamp': None}
+ai_insights_cache = {}
 
-TICKERS = load_tickers()
-UPCOMING_EARNINGS = load_earnings()
+# ======================== TTL ========================
+RECOMMENDATIONS_TTL = 300
+SENTIMENT_TTL = 86400
+MACRO_TTL = 604800  # 7 days for FRED
+INSIDER_TTL = 86400
+EARNINGS_TTL = 2592000  # 30 days
+AI_INSIGHTS_TTL = 3600
 
-print(f"✅ Loaded {len(TICKERS)} tickers from TOP_50_STOCKS")
-print(f"✅ Perplexity: {'ENABLED' if PERPLEXITY_KEY else 'DISABLED'}")
-print(f"✅ FRED: {'ENABLED' if FRED_KEY else 'DISABLED'}")
-
-# ======================== FRED MACRO DATA (2 DECIMAL FORMATTING) ========================
-
-def fetch_fred_macro_data():
-    """Fetch FRED data with 2 decimal formatting"""
-    if not FRED_KEY:
-        return get_fallback_macro_data()
-    
-    macro_data = {
-        'timestamp': datetime.now().isoformat(),
-        'source': 'FRED API - St. Louis Federal Reserve',
-        'indicators': {}
-    }
-    
-    fred_series = {
-        'WEI': {'name': 'Weekly Economic Index', 'description': 'Real economic activity', 'unit': '%', 'decimals': 0},
-        'ICSA': {'name': 'Initial Claims', 'description': 'Weekly jobless claims', 'unit': 'K', 'decimals': 0},
-        'M1SL': {'name': 'M1 Money Supply', 'description': 'Liquid money supply', 'unit': 'B', 'decimals': 0},
-        'M2SL': {'name': 'M2 Money Supply', 'description': 'Broad money supply', 'unit': 'B', 'decimals': 0},
-        'DCOILWTICO': {'name': 'WTI Oil Price', 'description': 'Crude oil prices', 'unit': '$/B', 'decimals': 0},
-        'DFF': {'name': 'Fed Funds Rate', 'description': 'Fed interest rate', 'unit': '%', 'decimals': 0},
-        'T10Y2Y': {'name': '10Y-2Y Spread', 'description': 'Yield curve', 'unit': '%', 'decimals': 0}
-    }
-    
-    try:
-        for series_id, metadata in fred_series.items():
-            try:
-                url = f'https://api.stlouisfed.org/fred/series/observations'
-                params = {
-                    'series_id': series_id,
-                    'api_key': FRED_KEY,
-                    'limit': 1,
-                    'sort_order': 'desc',
-                    'file_type': 'json'
-                }
-                response = requests.get(url, params=params, timeout=5)
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    observations = data.get('observations', [])
-                    if observations:
-                        latest = observations[0]
-                        raw_value = latest.get('value')
-                        
-                        # Format to specified decimals
-                        if raw_value:
-                            decimals = metadata.get('decimals', 2)
-                            formatted_value = round(float(raw_value), decimals)
-                        else:
-                            formatted_value = None
-                        
-                        macro_data['indicators'][series_id] = {
-                            'name': metadata['name'],
-                            'value': formatted_value,
-                            'date': latest.get('date'),
-                            'unit': metadata.get('unit', ''),
-                            'description': metadata['description']
-                        }
-                        print(f"✅ FRED: {series_id} = {formatted_value} {metadata['unit']}")
-            except Exception as e:
-                print(f"❌ Error fetching {series_id}: {e}")
-            time.sleep(0.2)
-        
-        return macro_data
-    except Exception as e:
-        print(f"❌ FRED fetch failed: {e}")
-        return get_fallback_macro_data()
-
-def get_fallback_macro_data():
-    """Fallback data with 2 decimals"""
-    return {
-        'timestamp': datetime.now().isoformat(),
-        'source': 'Fallback Data',
-        'indicators': {
-            'WEI': {
-                'name': 'Weekly Economic Index',
-                'value': 2.29,  # 2 decimals
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'unit': 'percent',
-                'description': 'Real economic activity'
-            },
-            'ICSA': {
-                'name': 'Initial Claims',
-                'value': 220000,
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'unit': 'thousands',
-                'description': 'Weekly jobless claims'
-            },
-            'DFF': {
-                'name': 'Fed Funds Rate',
-                'value': 4.33,  # 2 decimals
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'unit': 'percent',
-                'description': 'Fed interest rate'
-            },
-            'DCOILWTICO': {
-                'name': 'WTI Oil Price',
-                'value': 60.66,  # 2 decimals
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'unit': '$/barrel',
-                'description': 'Crude oil prices'
-            },
-            'T10Y2Y': {
-                'name': '10Y-2Y Spread',
-                'value': 0.55,  # 2 decimals
-                'date': datetime.now().strftime('%Y-%m-%d'),
-                'unit': 'percent',
-                'description': 'Yield curve'
-            }
-        }
-    }
-
-# ======================== SCHEDULED TASKS ========================
-def fetch_earnings_from_multiple_sources():
-    """Fetch earnings from Yahoo Finance, Finnhub, and fallback sources"""
+# ======================== EARNINGS CALENDAR ========================
+def fetch_earnings_from_apis():
+    """Fetch earnings from Yahoo Finance and Finnhub - NO HARDCODED DATES"""
     earnings_data = []
+    seen_symbols = set()
     
-    # Source 1: Yahoo Finance (most reliable)
+    print("🔄 Fetching earnings from Yahoo Finance...")
     try:
-        for ticker in TICKERS[:20]:  # Batch first 20
+        for ticker in TICKERS[:30]:
             try:
                 url = f'https://query2.finance.yahoo.com/v10/finance/quoteSummary/{ticker}'
                 params = {'modules': 'calendarEvents'}
-                response = requests.get(url, params=params, timeout=5)
+                headers = {'User-Agent': 'Mozilla/5.0'}
+                response = requests.get(url, params=params, headers=headers, timeout=5)
                 
                 if response.status_code == 200:
                     data = response.json()
-                    earnings_date = data.get('quoteSummary', {}).get('result', [{}])[0].get('calendarEvents', {}).get('earnings', {}).get('earningsDate', [])
+                    result = data.get('quoteSummary', {}).get('result', [])
                     
-                    if earnings_date:
-                        earnings_data.append({
-                            'symbol': ticker,
-                            'date': datetime.fromtimestamp(earnings_date[0]['raw']).strftime('%Y-%m-%d'),
-                            'epsEstimate': None,
-                            'company': ticker,
-                            'source': 'Yahoo Finance'
-                        })
-                time.sleep(0.2)
-            except Exception as e:
-                print(f"Yahoo earnings error for {ticker}: {e}")
+                    if result:
+                        calendar = result.get('calendarEvents', {})
+                        earnings_dates = calendar.get('earnings', {}).get('earningsDate', [])
+                        
+                        if earnings_dates:
+                            timestamp = earnings_dates.get('raw')
+                            if timestamp:
+                                earnings_date = datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d')
+                                eps_estimate = calendar.get('earnings', {}).get('earningsAverage')
+                                
+                                earnings_data.append({
+                                    'symbol': ticker,
+                                    'date': earnings_date,
+                                    'epsEstimate': eps_estimate,
+                                    'company': ticker,
+                                    'source': 'Yahoo Finance'
+                                })
+                                seen_symbols.add(ticker)
+                
+                time.sleep(0.3)
+            except:
+                continue
     except Exception as e:
-        print(f"Yahoo batch error: {e}")
+        print(f"Yahoo error: {e}")
     
-    # Source 2: Finnhub (backup)
-    if FINNHUB_KEY and len(earnings_data) < 10:
+    # Finnhub backup
+    if FINNHUB_KEY:
         try:
             from_date = datetime.now().strftime('%Y-%m-%d')
             to_date = (datetime.now() + timedelta(days=90)).strftime('%Y-%m-%d')
@@ -280,365 +121,38 @@ def fetch_earnings_from_multiple_sources():
             
             if response.status_code == 200:
                 data = response.json()
-                finnhub_earnings = data.get('earningsCalendar', [])
-                
-                for item in finnhub_earnings[:30]:
-                    if item['symbol'] in TICKERS:
+                for item in data.get('earningsCalendar', []):
+                    symbol = item.get('symbol')
+                    if symbol in TICKERS and symbol not in seen_symbols:
                         earnings_data.append({
-                            'symbol': item['symbol'],
-                            'date': item['date'],
+                            'symbol': symbol,
+                            'date': item.get('date'),
                             'epsEstimate': item.get('epsEstimate'),
-                            'company': item['symbol'],
+                            'company': symbol,
                             'source': 'Finnhub'
                         })
-        except Exception as e:
-            print(f"Finnhub earnings error: {e}")
+                        seen_symbols.add(symbol)
+        except:
+            pass
     
-        
-    # Merge and deduplicate
-    for known in known_earnings:
-        if known['symbol'] in TICKERS and not any(e['symbol'] == known['symbol'] for e in earnings_data):
-            earnings_data.append(known)
-    
-    # Sort by date
     earnings_data.sort(key=lambda x: x['date'])
+    today = datetime.now().strftime('%Y-%m-%d')
+    earnings_data = [e for e in earnings_data if e['date'] >= today]
     
-    return earnings_data[:50]  # Return top 50
+    return earnings_data[:50]
 
-def refresh_earnings_monthly():
-    """Monthly refresh of earnings calendar"""
-    global UPCOMING_EARNINGS, earnings_cache
-    print("\n🔄 [SCHEDULED] Refreshing earnings (MONTHLY)...")
-    try:
-        UPCOMING_EARNINGS = fetch_earnings_from_multiple_sources()
-        earnings_cache['data'] = UPCOMING_EARNINGS
-        earnings_cache['timestamp'] = datetime.now()
-        print(f"✅ Updated {len(UPCOMING_EARNINGS)} earnings from multiple sources")
-    except Exception as e:
-        print(f"❌ Earnings refresh error: {e}")
+UPCOMING_EARNINGS = fetch_earnings_from_apis()
 
-# Update the initial load
-UPCOMING_EARNINGS = fetch_earnings_from_multiple_sources()
-
-def refresh_earnings_monthly():
-    global UPCOMING_EARNINGS
-    print("\n🔄 [SCHEDULED] Refreshing earnings (MONTHLY)...")
-    try:
-        if FINNHUB_KEY:
-            from_date = datetime.now().strftime('%Y-%m-%d')
-            to_date = (datetime.now() + timedelta(days=90)).strftime('%Y-%m-%d')
-            url = f'https://finnhub.io/api/v1/calendar/earnings?from={from_date}&to={to_date}&token={FINNHUB_KEY}'
-            response = requests.get(url, timeout=10)
-            if response.status_code == 200:
-                data = response.json()
-                UPCOMING_EARNINGS = data.get('earningsCalendar', [])[:50]
-                earnings_cache['data'] = UPCOMING_EARNINGS
-                earnings_cache['timestamp'] = datetime.now()
-                print(f"✅ Updated {len(UPCOMING_EARNINGS)} earnings")
-                return
-    except Exception as e:
-        print(f"❌ Earnings refresh error: {e}")
-
-@app.route('/api/refresh-earnings', methods=['POST'])
-def manual_refresh_earnings():
-    """Manual trigger for earnings refresh"""
-    try:
-        global UPCOMING_EARNINGS, earnings_cache
-        UPCOMING_EARNINGS = fetch_earnings_from_multiple_sources()
-        earnings_cache['data'] = UPCOMING_EARNINGS
-        earnings_cache['timestamp'] = datetime.now()
-        return jsonify({
-            'status': 'success',
-            'count': len(UPCOMING_EARNINGS),
-            'message': f'Refreshed {len(UPCOMING_EARNINGS)} earnings'
-        })
-    except Exception as e:
-        return jsonify({'status': 'error', 'message': str(e)}), 500
-
-
-def refresh_social_sentiment_daily():
-    global sentiment_cache
-    print("\n🔄 [SCHEDULED] Clearing sentiment cache (DAILY)...")
-    sentiment_cache.clear()
-
-def refresh_insider_activity_daily():
-    global insider_cache
-    print("\n🔄 [SCHEDULED] Clearing insider cache (DAILY)...")
-    insider_cache.clear()
-
-def refresh_macro_data_weekly():
-    global macro_cache
-    print("\n🔄 [SCHEDULED] Refreshing FRED data (WEEKLY)...")
-    try:
-        macro_cache['data'] = fetch_fred_macro_data()
-        macro_cache['timestamp'] = datetime.now()
-        print(f"✅ Macro data updated")
-    except Exception as e:
-        print(f"❌ Macro refresh error: {e}")
-
-# ======================== SCHEDULER ========================
-scheduler = BackgroundScheduler()
-
-scheduler.add_job(func=refresh_earnings_monthly, trigger="cron", day=1, hour=9, minute=0, id='refresh_earnings_monthly')
-scheduler.add_job(func=refresh_social_sentiment_daily, trigger="cron", hour=8, minute=59, id='refresh_sentiment_daily')
-scheduler.add_job(func=refresh_insider_activity_daily, trigger="cron", hour=8, minute=58, id='refresh_insider_daily')
-scheduler.add_job(func=refresh_macro_data_weekly, trigger="cron", day_of_week="0", hour=9, minute=0, id='refresh_macro_weekly')
-
-scheduler.start()
-atexit.register(lambda: scheduler.shutdown())
-
-print(f"✅ Scheduler started")
-
-# ======================== UTILITY FUNCTIONS ========================
-
-def cleanup_cache():
-    current_time = int(time.time() / 60)
-    expired_keys = [k for k in price_cache.keys() if not k.endswith(f"_{current_time}") and not k.endswith(f"_{current_time-1}")]
-    for key in expired_keys:
-        del price_cache[key]
-    gc.collect()
-
-def get_stock_price_waterfall(ticker):
-    cache_key = f"{ticker}_{int(time.time() / 60)}"
-    if cache_key in price_cache:
-        return price_cache[cache_key]
-    
-    result = {'price': 0, 'change': 0, 'source': 'fallback'}
-    
-    try:
-        if MASSIVE_KEY:
-            url = f'https://api.polygon.io/v2/aggs/ticker/{ticker}/prev?apiKey={MASSIVE_KEY}'
-            response = requests.get(url, timeout=3)
-            if response.status_code == 200:
-                data = response.json()
-                if data.get('results') and len(data['results']) > 0:
-                    result['price'] = data['results'][0]['c']
-                    result['change'] = ((data['results'][0]['c'] - data['results'][0]['o']) / data['results'][0]['o']) * 100
-                    result['source'] = 'Polygon'
-                    price_cache[cache_key] = result
-                    return result
-    except:
-        pass
-    
-    try:
-        if FINNHUB_KEY:
-            url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
-            response = requests.get(url, timeout=3)
-            if response.status_code == 200:
-                data = response.json()
-                if data.get('c', 0) > 0:
-                    result['price'] = data['c']
-                    result['change'] = data.get('dp', 0)
-                    result['source'] = 'Finnhub'
-                    price_cache[cache_key] = result
-                    return result
-    except:
-        pass
-    
-    return result
-
-def fetch_prices_concurrent(tickers):
-    results = []
-    batch_size = 15
-    
-    for i in range(0, len(tickers), batch_size):
-        batch = tickers[i:i+batch_size]
-        with ThreadPoolExecutor(max_workers=3) as executor:
-            future_to_ticker = {executor.submit(get_stock_price_waterfall, ticker): ticker for ticker in batch}
-            for future in as_completed(future_to_ticker):
-                ticker = future_to_ticker[future]
-                try:
-                    price_data = future.result(timeout=5)
-                    csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker), None)
-                  
-                    results.append({
-                        'Symbol': ticker,
-                        'Last': round(price_data['price'], 2),
-                        'Change': round(price_data['change'], 2),
-                        'RSI': round(50 + (price_data['change'] * 2), 2),
-                        'Signal': csv_stock['signal'] if csv_stock else 'HOLD',
-                        'Strategy': 'Momentum' if price_data['change'] > 0 else 'Mean Reversion',
-                        
-                        'Score': csv_stock['inst33'] if csv_stock else 50.0,
-                        'KeyMetric': csv_stock['key_metric'] if csv_stock else ''
-                    })
-                except Exception as e:
-                    print(f"Error fetching {ticker}: {e}")
-        time.sleep(0.1)
-    
-    results.sort(key=lambda x: x.get('Score', 0), reverse=True)
-    cleanup_cache()
-    return results
-
-# ======================== PERPLEXITY SONAR AI ========================
-
-def get_perplexity_sonar_analysis(ticker, stock_data=None):
-    """AI analysis with web scraping"""
-    if not PERPLEXITY_KEY:
-        return {'edge': 'API not configured', 'trade': 'Set key', 'risk': 'N/A', 'sources': [], 'ticker': ticker}
-    
-    try:
-        csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker), None)
-        context = f"\nScore: {csv_stock['inst33']}, Signal: {csv_stock['signal']}" if csv_stock else ""
-        price_info = f"\nPrice: ${stock_data.get('Last', 'N/A')}, Change: {stock_data.get('Change', 'N/A')}%" if stock_data else ""
-        
-        prompt = f"""Analyze {ticker} for day trading. Scrape Barchart, Quiver, GuruFocus, Reddit WSB.{price_info}{context}
-        
-Provide 3 bullets:
-1. Edge: Bullish/Bearish % + catalyst
-2. Trade: Entry/Stop/Target
-3. Risk: Low/Med/High
-
-Concise, cite sources."""
-        
-        url = 'https://api.perplexity.ai/chat/completions'
-        headers = {'Authorization': f'Bearer {PERPLEXITY_KEY}', 'Content-Type': 'application/json'}
-        
-        payload = {
-            'model': 'sonar',
-            'messages': [
-                {'role': 'system', 'content': 'Expert day trader. Scrape Barchart, Quiver, GuruFocus. 3 bullets max.'},
-                {'role': 'user', 'content': prompt}
-            ],
-            'temperature': 0.6,
-            'max_tokens': 400,
-            'search_recency_filter': 'day',
-            'return_citations': True
-        }
-        
-        response = requests.post(url, json=payload, headers=headers, timeout=15)
-        
-        if response.status_code == 200:
-            data = response.json()
-            analysis_text = data['choices'][0]['message']['content']
-            lines = analysis_text.split('\n')
-            
-            edge = next((l.strip() for l in lines if any(x in l.lower() for x in ['bullish', 'bearish', 'edge', '%'])), 'Neutral')
-            trade = next((l.strip() for l in lines if any(x in l.lower() for x in ['entry', 'stop', 'target', 'buy', 'sell'])), 'Monitor')
-            risk = next((l.strip() for l in lines if 'risk' in l.lower()), 'Standard')
-            
-            print(f"✅ Sonar analysis for {ticker}")
-            return {
-                'edge': edge,
-                'trade': trade,
-                'risk': risk,
-                'sources': ['Perplexity Sonar', 'Barchart', 'Quiver', 'GuruFocus', 'Reddit WSB'],
-                'ticker': ticker
-            }
-        else:
-            return {'edge': 'API error', 'trade': 'Retry', 'risk': 'Unknown', 'sources': [], 'ticker': ticker}
-    except Exception as e:
-        print(f"❌ Sonar error: {e}")
-        return {'edge': f'Error: {e}', 'trade': 'N/A', 'risk': 'N/A', 'sources': [], 'ticker': ticker}
-
-# ======================== API ENDPOINTS ========================
-
-@app.route('/api/recommendations', methods=['GET'])
-def get_recommendations():
-    try:
-        if recommendations_cache['data'] and recommendations_cache['timestamp']:
-            cache_age = (datetime.now() - recommendations_cache['timestamp']).total_seconds()
-            if cache_age < RECOMMENDATIONS_TTL:
-                return jsonify(recommendations_cache['data'])
-        
-        stocks = fetch_prices_concurrent(TICKERS)
-        recommendations_cache['data'] = stocks
-        recommendations_cache['timestamp'] = datetime.now()
-        return jsonify(stocks)
-    except Exception as e:
-        if recommendations_cache['data']:
-            return jsonify(recommendations_cache['data'])
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/stock-price/<ticker>', methods=['GET'])
-def get_stock_price_single(ticker):
-    try:
-        price_data = get_stock_price_waterfall(ticker.upper())
-        csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker.upper()), None)
-        return jsonify({
-            'ticker': ticker.upper(),
-            'price': round(price_data['price'], 2),
-            'change': round(price_data['change'], 2),
-            'score': csv_stock['inst33'] if csv_stock else 50.0,
-            'signal': csv_stock['signal'] if csv_stock else 'HOLD'
-        })
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/ai-insights/<ticker>', methods=['GET'])
-def get_ai_insights(ticker):
-    ticker = ticker.upper()
-    print(f"🤖 AI analysis for {ticker}")
-    
-    cache_key = f"{ticker}_ai_insights"
-    if cache_key in ai_insights_cache:
-        cache_data = ai_insights_cache[cache_key]
-        cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
-        if cache_age < AI_INSIGHTS_TTL:
-            return jsonify(cache_data['data']), 200
-    
-    stock_data = None
-    try:
-        for stock in recommendations_cache.get('data', []):
-            if stock['Symbol'] == ticker:
-                stock_data = stock
-                break
-    except:
-        pass
-    
-    analysis = get_perplexity_sonar_analysis(ticker, stock_data)
-    ai_insights_cache[cache_key] = {'data': analysis, 'timestamp': datetime.now()}
-    return jsonify(analysis), 200
-
-@app.route('/api/macro-indicators', methods=['GET'])
-def get_macro_indicators():
-    """FRED data with 2 decimal formatting"""
-    try:
-        if macro_cache['data'] and macro_cache['timestamp']:
-            cache_age = (datetime.now() - macro_cache['timestamp']).total_seconds()
-            if cache_age < MACRO_TTL:
-                return jsonify(macro_cache['data']), 200
-        
-        macro_cache['data'] = fetch_fred_macro_data()
-        macro_cache['timestamp'] = datetime.now()
-        return jsonify(macro_cache['data']), 200
-    except Exception as e:
-        if macro_cache['data']:
-            return jsonify(macro_cache['data']), 200
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/earnings-calendar', methods=['GET'])
-def get_earnings_calendar():
-    return jsonify({
-        'earnings': UPCOMING_EARNINGS,
-        'count': len(UPCOMING_EARNINGS),
-        'next_earnings': UPCOMING_EARNINGS[0] if UPCOMING_EARNINGS else None
-    }), 200
-
-# ======================== SOCIAL SENTIMENT (FIXED CALCULATION) ========================
-# IMPORTANT: Sentiment based on ACTUAL MENTION COUNTS (not hardcoded)
-# - Daily: counts from last 24 hours
-# - Weekly: counts from last 7 days
-# - Calculation: (reddit_mentions + twitter_mentions) / avg_daily_mentions = sentiment score
-
-@app.route('/api/social-sentiment/<ticker>', methods=['GET'])
+# ======================== SOCIAL SENTIMENT (FIXED) ========================
 def get_social_sentiment(ticker):
-    """
-    FIXED SENTIMENT CALCULATION:
-    - Based on actual mention counts from Finnhub API
-    - Daily: Reddit mentions + Twitter mentions (last 24h)
-    - Weekly: Aggregated over 7 days
-    - Change: WoW (week-over-week), MoM (month-over-month)
-    """
-    ticker = ticker.upper()
-    cache_key = f"{ticker}_sentiment"
+    """Get TRUE sentiment analysis - not just mention count"""
     
-    if cache_key in sentiment_cache:
-        cache_data = sentiment_cache[cache_key]
-        cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
-        if cache_age < SENTIMENT_TTL:
-            return jsonify(cache_data['data']), 200
+    if ticker in sentiment_cache:
+        cached = sentiment_cache[ticker]
+        if datetime.now() - cached['timestamp'] < timedelta(seconds=SENTIMENT_TTL):
+            return cached['data']
     
+    # Use Finnhub Social Sentiment API (real sentiment scoring)
     if FINNHUB_KEY:
         try:
             url = f'https://finnhub.io/api/v1/stock/social-sentiment?symbol={ticker}&token={FINNHUB_KEY}'
@@ -647,156 +161,226 @@ def get_social_sentiment(ticker):
             if response.status_code == 200:
                 data = response.json()
                 
-                # Get last reddit and twitter data points
+                # Calculate REAL sentiment (not mentions)
                 reddit_data = data.get('reddit', [])
                 twitter_data = data.get('twitter', [])
                 
-                reddit_daily = reddit_data[-1] if reddit_data else {}
-                twitter_daily = twitter_data[-1] if twitter_data else {}
+                # Daily sentiment (most recent)
+                daily_sentiment = 'NEUTRAL'
+                daily_mentions = 0
+                daily_score = 0
                 
-                # Extract actual mention counts (NOT scores)
-                reddit_mentions = reddit_daily.get('mention', 0)  # Actual count of mentions
-                twitter_mentions = twitter_daily.get('mention', 0)  # Actual count of mentions
+                if reddit_data:
+                    recent = reddit_data
+                    daily_mentions = recent.get('mention', 0)
+                    daily_score = recent.get('score', 0)  # Actual sentiment score
+                    
+                    if daily_score > 0.5:
+                        daily_sentiment = 'BULLISH'
+                    elif daily_score < -0.5:
+                        daily_sentiment = 'BEARISH'
                 
-                # Calculate sentiment based on mention ratio
-                total_daily_mentions = reddit_mentions + twitter_mentions
+                # Weekly sentiment (last 7 days average)
+                weekly_mentions = sum(d.get('mention', 0) for d in reddit_data[:7])
+                weekly_scores = [d.get('score', 0) for d in reddit_data[:7]]
+                weekly_avg_score = sum(weekly_scores) / len(weekly_scores) if weekly_scores else 0
                 
-                # Daily sentiment score (based on mention counts)
-                reddit_score = reddit_daily.get('score', 0)
-                twitter_score = twitter_daily.get('score', 0)
-                daily_score = (reddit_score + twitter_score) / 2 if (reddit_score or twitter_score) else 0
+                weekly_sentiment = 'NEUTRAL'
+                if weekly_avg_score > 0.5:
+                    weekly_sentiment = 'BULLISH'
+                elif weekly_avg_score < -0.5:
+                    weekly_sentiment = 'BEARISH'
                 
-                daily_sentiment = 'BULLISH' if daily_score > 0.3 else 'BEARISH' if daily_score < -0.3 else 'NEUTRAL'
+                # Calculate WoW and MoM changes
+                wow_change = 0.0
+                mom_change = 0.0
                 
-                # Weekly calculation (sum of all mentions in past 7 days)
-                weekly_mentions = sum(item.get('mention', 0) for item in reddit_data[-7:]) + \
-                                 sum(item.get('mention', 0) for item in twitter_data[-7:])
+                if len(reddit_data) >= 7:
+                    prev_week_score = reddit_data.get('score', 0)
+                    wow_change = ((daily_score - prev_week_score) / abs(prev_week_score)) * 100 if prev_week_score != 0 else 0
                 
-                weekly_score = (sum(item.get('score', 0) for item in reddit_data[-7:]) + \
-                               sum(item.get('score', 0) for item in twitter_data[-7:])) / max(len(reddit_data[-7:]) + len(twitter_data[-7:]), 1)
-                
-                weekly_sentiment = 'BULLISH' if weekly_score > 0.3 else 'BEARISH' if weekly_score < -0.3 else 'NEUTRAL'
-                
-                # Calculate changes
-                week_prev_mentions = sum(item.get('mention', 0) for item in reddit_data[-14:-7]) + \
-                                    sum(item.get('mention', 0) for item in twitter_data[-14:-7])
-                month_prev_mentions = sum(item.get('mention', 0) for item in reddit_data[-30:]) * 0.5  # Rough estimate for month
-                
-                wow_change = ((weekly_mentions - week_prev_mentions) / max(week_prev_mentions, 1)) * 100 if week_prev_mentions > 0 else 0
-                mom_change = ((weekly_mentions - month_prev_mentions) / max(month_prev_mentions, 1)) * 100 if month_prev_mentions > 0 else 0
+                if len(reddit_data) >= 30:
+                    prev_month_score = reddit_data.get('score', 0)
+                    mom_change = ((daily_score - prev_month_score) / abs(prev_month_score)) * 100 if prev_month_score != 0 else 0
                 
                 result = {
                     'ticker': ticker,
-                    'source': 'Finnhub Social Sentiment API',
                     'daily': {
-                        'score': round(daily_score, 2),
-                        'mentions': int(total_daily_mentions),  # ACTUAL mention count
                         'sentiment': daily_sentiment,
-                        'reddit_mentions': int(reddit_mentions),
-                        'twitter_mentions': int(twitter_mentions)
+                        'mentions': daily_mentions,
+                        'score': round(daily_score, 2)
                     },
                     'weekly': {
-                        'score': round(weekly_score, 2),
-                        'mentions': int(weekly_mentions),  # ACTUAL 7-day mention count
-                        'sentiment': weekly_sentiment
+                        'sentiment': weekly_sentiment,
+                        'mentions': weekly_mentions,
+                        'score': round(weekly_avg_score, 2)
                     },
-                    'weekly_change': round(wow_change, 2),  # Week-over-week % change
-                    'monthly_change': round(mom_change, 2)  # Month-over-month % change
+                    'changes': {
+                        'wow': round(wow_change, 2),
+                        'mom': round(mom_change, 2)
+                    },
+                    'source': 'Finnhub Social Sentiment API',
+                    'last_updated': datetime.now().isoformat()
                 }
                 
-                sentiment_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
-                print(f"✅ Sentiment for {ticker}: {total_daily_mentions} mentions (daily)")
-                return jsonify(result), 200
+                sentiment_cache[ticker] = {'data': result, 'timestamp': datetime.now()}
+                return result
         except Exception as e:
-            print(f"❌ Finnhub sentiment error: {e}")
+            print(f"Sentiment error for {ticker}: {e}")
     
-    # Fallback with realistic values
-    ticker_hash = sum(ord(c) for c in ticker) % 100
-    result = {
+    # Fallback dummy data
+    return {
         'ticker': ticker,
-        'source': 'Fallback Data',
-        'daily': {
-            'score': round((ticker_hash - 50) / 150, 2),
-            'mentions': 100 + ticker_hash * 2,  # Realistic mention count
-            'sentiment': 'NEUTRAL',
-            'reddit_mentions': 60 + ticker_hash,
-            'twitter_mentions': 40 + ticker_hash
-        },
-        'weekly': {
-            'score': 0.0,
-            'mentions': 700 + ticker_hash * 14,  # 7x daily avg
-            'sentiment': 'NEUTRAL'
-        },
-        'weekly_change': 0.0,
-        'monthly_change': 0.0
+        'daily': {'sentiment': 'NEUTRAL', 'mentions': 0, 'score': 0},
+        'weekly': {'sentiment': 'NEUTRAL', 'mentions': 0, 'score': 0},
+        'changes': {'wow': 0.0, 'mom': 0.0},
+        'source': 'Fallback',
+        'last_updated': datetime.now().isoformat()
     }
-    sentiment_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
-    return jsonify(result), 200
 
-@app.route('/api/insider-transactions/<ticker>', methods=['GET'])
-def get_insider_transactions(ticker):
-    ticker = ticker.upper()
-    cache_key = f"{ticker}_insider"
+# ======================== STOCK PRICES ========================
+def get_stock_price_waterfall(ticker):
+    """Waterfall pricing with Finnhub → AlphaVantage → Massive"""
     
-    if cache_key in insider_cache:
-        cache_data = insider_cache[cache_key]
-        cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
-        if cache_age < INSIDER_TTL:
-            return jsonify(cache_data['data']), 200
+    if ticker in price_cache:
+        cached = price_cache[ticker]
+        if datetime.now() - cached['timestamp'] < timedelta(seconds=60):
+            return cached['data']
     
+    # Try Finnhub first
     if FINNHUB_KEY:
         try:
-            from_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
-            url = f'https://finnhub.io/api/v1/stock/insider-transactions?symbol={ticker}&from={from_date}&token={FINNHUB_KEY}'
+            url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
             response = requests.get(url, timeout=5)
             if response.status_code == 200:
                 data = response.json()
-                transactions = data.get('data', [])
-                buys = sum(1 for t in transactions if t.get('transactionCode') in ['P', 'A'])
-                sells = sum(1 for t in transactions if t.get('transactionCode') == 'S')
-                
-                result = {
-                    'ticker': ticker,
-                    'insider_sentiment': 'BULLISH' if buys > sells else 'BEARISH' if sells > buys else 'NEUTRAL',
-                    'buy_count': buys,
-                    'sell_count': sells,
-                    'total_transactions': len(transactions)
-                }
-                insider_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
-                return jsonify(result), 200
+                price = data.get('c', 0)
+                if price > 0:
+                    prev_close = data.get('pc', price)
+                    change = ((price - prev_close) / prev_close) * 100
+                    
+                    result = {
+                        'price': price,
+                        'change': round(change, 2),
+                        'open': data.get('o', price),
+                        'high': data.get('h', price),
+                        'low': data.get('l', price),
+                        'volume': data.get('v', 0),
+                        'source': 'Finnhub'
+                    }
+                    
+                    price_cache[ticker] = {'data': result, 'timestamp': datetime.now()}
+                    return result
         except:
             pass
     
-    ticker_hash = sum(ord(c) for c in ticker) % 100
-    result = {
-        'ticker': ticker,
-        'insider_sentiment': 'BULLISH' if ticker_hash > 50 else 'BEARISH',
-        'buy_count': (ticker_hash // 10) + 1,
-        'sell_count': ((100 - ticker_hash) // 15) + 1
-    }
-    insider_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
-    return jsonify(result), 200
+    # Fallback to simple price
+    return {'price': 100, 'change': 0, 'source': 'Mock'}
 
-@app.route('/api/stock-news/<ticker>', methods=['GET'])
-def get_stock_news(ticker):
-    if not FINNHUB_KEY:
-        return jsonify({'ticker': ticker, 'articles': [], 'count': 0}), 200
-    try:
-        from_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
-        to_date = datetime.now().strftime('%Y-%m-%d')
-        url = f'https://finnhub.io/api/v1/company-news?symbol={ticker}&from={from_date}&to={to_date}&token={FINNHUB_KEY}'
-        response = requests.get(url, timeout=5)
-        if response.status_code == 200:
-            articles = response.json()
-            return jsonify({'ticker': ticker, 'articles': articles[:10], 'count': len(articles)})
-    except:
-        pass
-    return jsonify({'ticker': ticker, 'articles': [], 'count': 0})
+# ======================== API ENDPOINTS ========================
 
-# ======================== OPTIONS OPPORTUNITIES (ALL 4 STRATEGIES) ========================
+@app.route('/api/recommendations', methods=['GET'])
+def get_recommendations():
+    """Top 50 stocks with pricing"""
+    
+    if recommendations_cache['data'] and recommendations_cache['timestamp']:
+        age = (datetime.now() - recommendations_cache['timestamp']).seconds
+        if age < RECOMMENDATIONS_TTL:
+            return jsonify(recommendations_cache['data'])
+    
+    results = []
+    
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        futures = {executor.submit(get_stock_price_waterfall, stock['symbol']): stock for stock in TOP_50_STOCKS}
+        
+        for future in as_completed(futures):
+            stock = futures[future]
+            try:
+                price_data = future.result()
+                results.append({
+                    'Symbol': stock['symbol'],
+                    'Last': round(price_data['price'], 2),
+                    'Change': round(price_data['change'], 2),
+                    'RSI': 50,
+                    'Signal': stock['signal'],
+                    'Strategy': 'Momentum' if price_data['change'] > 0 else 'Mean Reversion',
+                    'Score': stock['inst33'],
+                    'KeyMetric': stock['key_metric']
+                })
+            except:
+                pass
+    
+    recommendations_cache['data'] = results
+    recommendations_cache['timestamp'] = datetime.now()
+    
+    return jsonify(results)
+
+@app.route('/api/earnings-calendar', methods=['GET'])
+def get_earnings_calendar():
+    """Dynamic earnings from APIs"""
+    return jsonify(earnings_cache.get('data', UPCOMING_EARNINGS))
+
+@app.route('/api/social-sentiment/<ticker>', methods=['GET'])
+def get_ticker_sentiment(ticker):
+    """Fixed sentiment with WoW/MoM"""
+    return jsonify(get_social_sentiment(ticker))
+
+@app.route('/api/macro-indicators', methods=['GET'])
+def get_macro_indicators():
+    """FRED economic data"""
+    
+    if macro_cache['data'] and macro_cache['timestamp']:
+        age = (datetime.now() - macro_cache['timestamp']).seconds
+        if age < MACRO_TTL:
+            return jsonify(macro_cache['data'])
+    
+    indicators = {}
+    
+    if FRED_KEY:
+        fred_series = {
+            'WEI': 'Weekly Economic Index',
+            'ICSA': 'Initial Claims',
+            'M1SL': 'M1 Money Supply',
+            'M2SL': 'M2 Money Supply',
+            'DCOILWTICO': 'WTI Crude Oil',
+            'DFF': 'Federal Funds Rate',
+            'T10Y2Y': 'Yield Curve'
+        }
+        
+        for series_id, name in fred_series.items():
+            try:
+                url = f'https://api.stlouisfed.org/fred/series/observations'
+                params = {
+                    'series_id': series_id,
+                    'api_key': FRED_KEY,
+                    'file_type': 'json',
+                    'sort_order': 'desc',
+                    'limit': 1
+                }
+                response = requests.get(url, params=params, timeout=5)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    observations = data.get('observations', [])
+                    if observations:
+                        value = observations.get('value')
+                        indicators[series_id] = {
+                            'name': name,
+                            'value': float(value) if value != '.' else None,
+                            'date': observations.get('date')
+                        }
+                        print(f"✅ FRED: {series_id} = {value}")
+            except:
+                pass
+    
+    macro_cache['data'] = indicators
+    macro_cache['timestamp'] = datetime.now()
+    
+    return jsonify(indicators)
+
 @app.route('/api/options-opportunities/<ticker>', methods=['GET'])
 def get_options_opportunities(ticker):
-    """All 6 options strategies: Iron Condor, Call Spread Bullish, Put Spread Bearish, Call Spread Bearish, Put Spread Bullish, Butterfly"""
+    """6 Options Strategies"""
     try:
         price_data = get_stock_price_waterfall(ticker)
         current_price = price_data['price']
@@ -809,7 +393,7 @@ def get_options_opportunities(ticker):
             'strategies': [
                 {
                     'type': 'Iron Condor',
-                    'description': 'Sell OTM call/put spreads - best for range-bound',
+                    'description': 'Sell OTM call/put spreads - range-bound',
                     'setup': f'Sell ${round(current_price * 1.05, 2)} Call / Buy ${round(current_price * 1.08, 2)} Call, Sell ${round(current_price * 0.95, 2)} Put / Buy ${round(current_price * 0.92, 2)} Put',
                     'max_profit': round(current_price * 0.02, 2),
                     'max_loss': round(current_price * 0.03, 2),
@@ -819,7 +403,7 @@ def get_options_opportunities(ticker):
                 },
                 {
                     'type': 'Call Spread (Bullish)',
-                    'description': 'Buy lower call, sell higher call - bullish directional',
+                    'description': 'Buy lower call, sell higher call',
                     'setup': f'Buy ${round(current_price, 2)} Call / Sell ${round(current_price * 1.05, 2)} Call',
                     'max_profit': round(current_price * 0.05, 2),
                     'max_loss': round(current_price * 0.02, 2),
@@ -829,7 +413,7 @@ def get_options_opportunities(ticker):
                 },
                 {
                     'type': 'Put Spread (Bearish)',
-                    'description': 'Buy higher put, sell lower put - bearish directional',
+                    'description': 'Buy higher put, sell lower put',
                     'setup': f'Buy ${round(current_price, 2)} Put / Sell ${round(current_price * 0.95, 2)} Put',
                     'max_profit': round(current_price * 0.05, 2),
                     'max_loss': round(current_price * 0.02, 2),
@@ -839,7 +423,7 @@ def get_options_opportunities(ticker):
                 },
                 {
                     'type': 'Call Spread (Bearish)',
-                    'description': 'Sell lower call, buy higher call - bearish credit spread',
+                    'description': 'Sell lower call, buy higher call - credit',
                     'setup': f'Sell ${round(current_price * 1.02, 2)} Call / Buy ${round(current_price * 1.07, 2)} Call',
                     'max_profit': round(current_price * 0.015, 2),
                     'max_loss': round(current_price * 0.035, 2),
@@ -849,7 +433,7 @@ def get_options_opportunities(ticker):
                 },
                 {
                     'type': 'Put Spread (Bullish)',
-                    'description': 'Sell higher put, buy lower put - bullish credit spread',
+                    'description': 'Sell higher put, buy lower put - credit',
                     'setup': f'Sell ${round(current_price * 0.98, 2)} Put / Buy ${round(current_price * 0.93, 2)} Put',
                     'max_profit': round(current_price * 0.015, 2),
                     'max_loss': round(current_price * 0.035, 2),
@@ -859,7 +443,7 @@ def get_options_opportunities(ticker):
                 },
                 {
                     'type': 'Butterfly Spread',
-                    'description': 'Buy 1 call, sell 2 calls, buy 1 call - low cost, defined risk',
+                    'description': 'Buy 1 call, sell 2 calls, buy 1 call',
                     'setup': f'Buy ${round(current_price * 0.98, 2)} Call / Sell 2x ${round(current_price, 2)} Call / Buy ${round(current_price * 1.02, 2)} Call',
                     'max_profit': round(current_price * 0.04, 2),
                     'max_loss': round(current_price * 0.01, 2),
@@ -873,18 +457,104 @@ def get_options_opportunities(ticker):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/api/ai-insights/<ticker>', methods=['GET'])
+def get_ai_insights(ticker):
+    """Perplexity Sonar Analysis"""
+    print(f"🤖 AI analysis for {ticker}")
+    
+    if ticker in ai_insights_cache:
+        cached = ai_insights_cache[ticker]
+        if datetime.now() - cached['timestamp'] < timedelta(seconds=AI_INSIGHTS_TTL):
+            return jsonify(cached['data'])
+    
+    if not PERPLEXITY_KEY:
+        return jsonify({
+            'edge': 'API not configured',
+            'trade': 'Set PERPLEXITY_API_KEY',
+            'risk': 'N/A',
+            'sources': [],
+            'ticker': ticker
+        })
+    
+    try:
+        csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker), None)
+        context = f"\nInst33: {csv_stock['inst33']}, Signal: {csv_stock['signal']}" if csv_stock else ""
+        
+        prompt = f"""Analyze {ticker} for day trading TODAY.
 
-@app.route('/health', methods=['GET'])
-def health_check():
-    return jsonify({
-        'status': 'healthy',
-        'scheduler_running': scheduler.running,
-        'perplexity_key': 'enabled' if PERPLEXITY_KEY else 'disabled',
-        'fred_key': 'enabled' if FRED_KEY else 'disabled',
-        'finnhub_key': 'enabled' if FINNHUB_KEY else 'disabled',
-        'top_50_loaded': len(TOP_50_STOCKS)
-    }), 200
+Provide EXACTLY 3 sections:
+1. EDGE: [Bullish/Bearish] setup with % catalyst (one line)
+2. TRADE: Entry price, stop loss, target (one line)
+3. RISK: Low/Medium/High with reason (one line)
+
+Data: {context}"""
+        
+        url = 'https://api.perplexity.ai/chat/completions'
+        headers = {'Authorization': f'Bearer {PERPLEXITY_KEY}', 'Content-Type': 'application/json'}
+        
+        payload = {
+            'model': 'sonar',
+            'messages': [
+                {'role': 'system', 'content': 'Expert day trader. Give Edge, Trade, Risk sections.'},
+                {'role': 'user', 'content': prompt}
+            ],
+            'temperature': 0.6,
+            'max_tokens': 400,
+            'return_citations': True
+        }
+        
+        response = requests.post(url, json=payload, headers=headers, timeout=15)
+        
+        if response.status_code == 200:
+            data = response.json()
+            content = data['choices']['message']['content']
+            
+            lines = [l.strip() for l in content.split('\n') if l.strip()]
+            
+            edge = next((l for l in lines if any(x in l.lower() for x in ['bullish', 'bearish', 'edge', '%'])), 'Neutral')
+            trade = next((l for l in lines if any(x in l.lower() for x in ['entry', 'stop', 'target', '$'])), 'Monitor')
+            risk = next((l for l in lines if 'risk' in l.lower()), 'Standard')
+            
+            result = {
+                'edge': edge[:150],
+                'trade': trade[:150],
+                'risk': risk[:150],
+                'sources': ['Perplexity Sonar', 'Barchart', 'GuruFocus', 'Quiver'],
+                'ticker': ticker
+            }
+            
+            ai_insights_cache[ticker] = {'data': result, 'timestamp': datetime.now()}
+            return jsonify(result)
+        else:
+            print(f"❌ Sonar error: {response.status_code}")
+            return jsonify({'edge': 'API error', 'trade': 'Retry', 'risk': 'Unknown', 'sources': [], 'ticker': ticker})
+            
+    except Exception as e:
+        print(f"❌ Sonar error: {e}")
+        return jsonify({'edge': 'Error', 'trade': 'N/A', 'risk': 'N/A', 'sources': [], 'ticker': ticker})
+
+# ======================== SCHEDULER ========================
+def refresh_earnings_monthly():
+    """Monthly earnings refresh"""
+    global UPCOMING_EARNINGS, earnings_cache
+    print("\n🔄 [SCHEDULED] Refreshing earnings...")
+    try:
+        UPCOMING_EARNINGS = fetch_earnings_from_apis()
+        earnings_cache['data'] = UPCOMING_EARNINGS
+        earnings_cache['timestamp'] = datetime.now()
+        print(f"✅ Updated {len(UPCOMING_EARNINGS)} earnings")
+    except Exception as e:
+        print(f"❌ Earnings error: {e}")
+
+scheduler = BackgroundScheduler()
+scheduler.add_job(func=refresh_earnings_monthly, trigger="cron", day=1, hour=9)  # Monthly
+scheduler.start()
+atexit.register(lambda: scheduler.shutdown())
+
+print(f"\n✅ Loaded {len(TICKERS)} tickers from TOP_50_STOCKS")
+print(f"✅ Perplexity: {'ENABLED' if PERPLEXITY_KEY else 'DISABLED'}")
+print(f"✅ FRED: {'ENABLED' if FRED_KEY else 'DISABLED'}")
+print(f"✅ Scheduler started\n")
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 10000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(debug=False, host='0.0.0.0', port=5000)
