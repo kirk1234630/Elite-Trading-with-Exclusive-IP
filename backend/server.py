@@ -240,6 +240,85 @@ def get_fallback_macro_data():
     }
 
 # ======================== SCHEDULED TASKS ========================
+def fetch_earnings_from_multiple_sources():
+    """Fetch earnings from Yahoo Finance, Finnhub, and fallback sources"""
+    earnings_data = []
+    
+    # Source 1: Yahoo Finance (most reliable)
+    try:
+        for ticker in TICKERS[:20]:  # Batch first 20
+            try:
+                url = f'https://query2.finance.yahoo.com/v10/finance/quoteSummary/{ticker}'
+                params = {'modules': 'calendarEvents'}
+                response = requests.get(url, params=params, timeout=5)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    earnings_date = data.get('quoteSummary', {}).get('result', [{}])[0].get('calendarEvents', {}).get('earnings', {}).get('earningsDate', [])
+                    
+                    if earnings_date:
+                        earnings_data.append({
+                            'symbol': ticker,
+                            'date': datetime.fromtimestamp(earnings_date[0]['raw']).strftime('%Y-%m-%d'),
+                            'epsEstimate': None,
+                            'company': ticker,
+                            'source': 'Yahoo Finance'
+                        })
+                time.sleep(0.2)
+            except Exception as e:
+                print(f"Yahoo earnings error for {ticker}: {e}")
+    except Exception as e:
+        print(f"Yahoo batch error: {e}")
+    
+    # Source 2: Finnhub (backup)
+    if FINNHUB_KEY and len(earnings_data) < 10:
+        try:
+            from_date = datetime.now().strftime('%Y-%m-%d')
+            to_date = (datetime.now() + timedelta(days=90)).strftime('%Y-%m-%d')
+            url = f'https://finnhub.io/api/v1/calendar/earnings?from={from_date}&to={to_date}&token={FINNHUB_KEY}'
+            response = requests.get(url, timeout=10)
+            
+            if response.status_code == 200:
+                data = response.json()
+                finnhub_earnings = data.get('earningsCalendar', [])
+                
+                for item in finnhub_earnings[:30]:
+                    if item['symbol'] in TICKERS:
+                        earnings_data.append({
+                            'symbol': item['symbol'],
+                            'date': item['date'],
+                            'epsEstimate': item.get('epsEstimate'),
+                            'company': item['symbol'],
+                            'source': 'Finnhub'
+                        })
+        except Exception as e:
+            print(f"Finnhub earnings error: {e}")
+    
+        
+    # Merge and deduplicate
+    for known in known_earnings:
+        if known['symbol'] in TICKERS and not any(e['symbol'] == known['symbol'] for e in earnings_data):
+            earnings_data.append(known)
+    
+    # Sort by date
+    earnings_data.sort(key=lambda x: x['date'])
+    
+    return earnings_data[:50]  # Return top 50
+
+def refresh_earnings_monthly():
+    """Monthly refresh of earnings calendar"""
+    global UPCOMING_EARNINGS, earnings_cache
+    print("\n🔄 [SCHEDULED] Refreshing earnings (MONTHLY)...")
+    try:
+        UPCOMING_EARNINGS = fetch_earnings_from_multiple_sources()
+        earnings_cache['data'] = UPCOMING_EARNINGS
+        earnings_cache['timestamp'] = datetime.now()
+        print(f"✅ Updated {len(UPCOMING_EARNINGS)} earnings from multiple sources")
+    except Exception as e:
+        print(f"❌ Earnings refresh error: {e}")
+
+# Update the initial load
+UPCOMING_EARNINGS = fetch_earnings_from_multiple_sources()
 
 def refresh_earnings_monthly():
     global UPCOMING_EARNINGS
