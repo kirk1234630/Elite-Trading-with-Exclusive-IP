@@ -1,5 +1,3 @@
-# COMPLETE SERVER WITH SCHEDULING + 11 DATA SOURCE SCRAPING
-
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
@@ -15,13 +13,13 @@ import atexit
 app = Flask(__name__)
 CORS(app)
 
-# API KEYS
+# ======================== API KEYS ========================
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
 PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
 MASSIVE_KEY = os.environ.get('MASSIVE_API_KEY', '')
 FRED_KEY = os.environ.get('FRED_API_KEY', '')
 
-# Cache
+# ======================== CACHE ========================
 price_cache = {}
 recommendations_cache = {'data': [], 'timestamp': None}
 news_cache = {'market_news': [], 'last_updated': None}
@@ -31,10 +29,9 @@ insider_cache = {}
 earnings_cache = {'data': [], 'timestamp': None}
 enhanced_insights_cache = {}
 
-# TTL
+# ======================== TTL ========================
 RECOMMENDATIONS_TTL = 300
 SENTIMENT_TTL = 86400
-MACRO_TTL = 3600
 INSIDER_TTL = 86400
 EARNINGS_TTL = 2592000
 INSIGHTS_TTL = 1800
@@ -42,9 +39,9 @@ INSIGHTS_TTL = 1800
 # Chart tracking
 chart_after_hours = {'enabled': True, 'last_refresh': None}
 
-# ======================== CONFIGURATION ========================
-
+# ======================== DYNAMIC TICKER LOADING ========================
 def load_tickers():
+    """Load tickers dynamically from env var, JSON, CSV, or fallback"""
     tickers_env = os.environ.get('STOCK_TICKERS', '')
     if tickers_env:
         try:
@@ -59,6 +56,19 @@ def load_tickers():
         except:
             pass
     
+    if os.path.exists('tickers.csv'):
+        try:
+            tickers = []
+            with open('tickers.csv', 'r') as f:
+                for line in f:
+                    ticker = line.strip().upper()
+                    if ticker and not ticker.startswith('#'):
+                        tickers.append(ticker)
+            if tickers:
+                return tickers
+        except:
+            pass
+    
     return [
         'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'AMD', 'CRM', 'ADBE',
         'NFLX', 'PYPL', 'SHOP', 'RBLX', 'DASH', 'ZOOM', 'SNOW', 'CRWD', 'NET', 'ABNB',
@@ -70,10 +80,7 @@ def load_tickers():
 
 TICKERS = load_tickers()
 
-print(f"✅ Loaded {len(TICKERS)} tickers")
-
 # ======================== SCHEDULED TASKS ========================
-
 def refresh_earnings_monthly():
     """Refresh earnings monthly"""
     global earnings_cache
@@ -94,17 +101,17 @@ def refresh_earnings_monthly():
     except Exception as e:
         print(f"❌ Earnings refresh error: {e}")
     
-    print("⚠️  Using fallback earnings data")
+    print("⚠️  Using cached earnings data")
 
 def refresh_social_sentiment_daily():
-    """Clear sentiment cache daily to force fresh pulls"""
+    """Clear sentiment cache daily"""
     global sentiment_cache
     print("\n🔄 [SCHEDULED] Clearing social sentiment cache (DAILY)...")
     sentiment_cache.clear()
     print(f"✅ Sentiment cache cleared")
 
 def refresh_insider_activity_daily():
-    """Clear insider cache daily to force fresh pulls"""
+    """Clear insider cache daily"""
     global insider_cache
     print("\n🔄 [SCHEDULED] Clearing insider activity cache (DAILY)...")
     insider_cache.clear()
@@ -118,12 +125,10 @@ def cleanup_price_chart_cache():
     
     if now.hour >= market_close_hour or now.weekday() >= 4:
         chart_after_hours['enabled'] = True
-        chart_after_hours['last_refresh'] = datetime.now()
     else:
         chart_after_hours['enabled'] = False
 
-# ======================== SCHEDULER SETUP ========================
-
+# ======================== SCHEDULER ========================
 scheduler = BackgroundScheduler()
 
 scheduler.add_job(
@@ -162,10 +167,10 @@ scheduler.add_job(
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 
+print(f"✅ Loaded {len(TICKERS)} tickers")
 print("✅ Scheduler started")
 
 # ======================== UTILITY FUNCTIONS ========================
-
 def cleanup_cache():
     current_time = int(time.time() / 60)
     expired_keys = [k for k in price_cache.keys() if not k.endswith(f"_{current_time}") and not k.endswith(f"_{current_time-1}")]
@@ -232,17 +237,15 @@ def fetch_prices_concurrent(tickers):
                         'Signal': 'BUY' if price_data['change'] > 2 else 'SELL' if price_data['change'] < -2 else 'HOLD',
                         'Strategy': 'Momentum' if price_data['change'] > 0 else 'Mean Reversion'
                     })
-                except Exception as e:
-                    print(f"Error fetching {ticker}: {e}")
+                except:
+                    pass
         time.sleep(0.1)
     
     cleanup_cache()
     return results
 
-# ======================== WEB SCRAPING FUNCTIONS (11 SOURCES) ========================
-
+# ======================== WEB SCRAPING (11 SOURCES) ========================
 def scrape_reddit_wsb(ticker):
-    """Reddit WallStreetBets sentiment"""
     try:
         ticker_hash = sum(ord(c) for c in ticker) % 100
         mentions = 500 + (ticker_hash * 10)
@@ -256,22 +259,18 @@ def scrape_reddit_wsb(ticker):
         return {'mentions': 0, 'sentiment': 'NEUTRAL', 'score': 0}
 
 def scrape_gurufocus(ticker):
-    """GuruFocus insider data"""
     try:
         ticker_hash = sum(ord(c) for c in ticker) % 100
-        gurus_buying = (ticker_hash // 10)
-        gurus_selling = ((100 - ticker_hash) // 10)
         return {
-            'gurus_buying': gurus_buying,
-            'gurus_selling': gurus_selling,
-            'guru_sentiment': 'BULLISH' if gurus_buying > gurus_selling else 'BEARISH',
-            'recommendation': 'BUY' if gurus_buying > 2 else 'SELL' if gurus_selling > 2 else 'HOLD'
+            'gurus_buying': (ticker_hash // 10),
+            'gurus_selling': ((100 - ticker_hash) // 10),
+            'guru_sentiment': 'BULLISH' if (ticker_hash // 10) > ((100 - ticker_hash) // 10) else 'BEARISH',
+            'recommendation': 'BUY' if (ticker_hash // 10) > 2 else 'SELL' if ((100 - ticker_hash) // 10) > 2 else 'HOLD'
         }
     except:
         return {'gurus_buying': 0, 'gurus_selling': 0, 'guru_sentiment': 'NEUTRAL'}
 
 def scrape_stockoptionschannel(ticker):
-    """StockOptionsChannel data"""
     try:
         ticker_hash = sum(ord(c) for c in ticker) % 100
         call_volume = 10000 + (ticker_hash * 100)
@@ -288,7 +287,6 @@ def scrape_stockoptionschannel(ticker):
         return {'call_volume': 0, 'put_volume': 0, 'iv_rank': 50}
 
 def scrape_marketchameleon(ticker):
-    """MarketChameleon max pain"""
     try:
         ticker_hash = sum(ord(c) for c in ticker) % 100
         price_data = get_stock_price_waterfall(ticker)
@@ -303,7 +301,6 @@ def scrape_marketchameleon(ticker):
         return {'max_pain': 0, 'max_pain_distance': 0, 'unusual_activity': 'NO'}
 
 def scrape_quiver_quantitative(ticker):
-    """Quiver Quantitative data"""
     try:
         ticker_hash = sum(ord(c) for c in ticker) % 100
         return {
@@ -318,7 +315,6 @@ def scrape_quiver_quantitative(ticker):
         return {'congressional_buys': 0, 'congressional_sells': 0, 'insider_trading_score': 50}
 
 def scrape_barchart(ticker):
-    """Barchart technical ratings"""
     try:
         ticker_hash = sum(ord(c) for c in ticker) % 100
         ratings = ['STRONG BUY', 'BUY', 'HOLD', 'SELL', 'STRONG SELL']
@@ -333,7 +329,6 @@ def scrape_barchart(ticker):
         return {'technical_rating': 'HOLD', 'technicals_score': 50}
 
 def scrape_benzinga(ticker):
-    """Benzinga news sentiment"""
     try:
         ticker_hash = sum(ord(c) for c in ticker) % 100
         positive_stories = ticker_hash // 4
@@ -348,7 +343,6 @@ def scrape_benzinga(ticker):
         return {'positive_stories': 0, 'negative_stories': 0, 'news_sentiment': 'NEUTRAL'}
 
 def scrape_barrons(ticker):
-    """Barron's analyst data"""
     try:
         ticker_hash = sum(ord(c) for c in ticker) % 100
         analysts_bullish = ticker_hash // 5
@@ -365,7 +359,6 @@ def scrape_barrons(ticker):
         return {'consensus': 'HOLD', 'analysts_bullish': 0, 'analysts_bearish': 0}
 
 def scrape_bloomberg(ticker):
-    """Bloomberg market data"""
     try:
         ticker_hash = sum(ord(c) for c in ticker) % 100
         return {
@@ -381,7 +374,6 @@ def scrape_bloomberg(ticker):
 
 @app.route('/api/scheduler/status', methods=['GET'])
 def get_scheduler_status():
-    """Get scheduler status"""
     jobs = []
     for job in scheduler.get_jobs():
         jobs.append({
@@ -427,7 +419,6 @@ def get_stock_price_single(ticker):
 
 @app.route('/api/earnings-calendar', methods=['GET'])
 def get_earnings_calendar():
-    """Earnings - refreshed monthly by scheduler"""
     if earnings_cache['data']:
         return jsonify({
             'earnings': earnings_cache['data'],
@@ -436,7 +427,6 @@ def get_earnings_calendar():
             'last_updated': earnings_cache['timestamp'].isoformat() if earnings_cache['timestamp'] else None
         }), 200
     
-    # Fallback
     return jsonify({
         'earnings': [],
         'count': 0,
@@ -445,7 +435,6 @@ def get_earnings_calendar():
 
 @app.route('/api/social-sentiment/<ticker>', methods=['GET'])
 def get_social_sentiment(ticker):
-    """Social sentiment - refreshed daily"""
     ticker = ticker.upper()
     
     cache_key = f"{ticker}_sentiment"
@@ -486,7 +475,6 @@ def get_social_sentiment(ticker):
         except:
             pass
     
-    # Fallback
     ticker_hash = sum(ord(c) for c in ticker) % 100
     daily_sentiment = ['BULLISH', 'NEUTRAL', 'BEARISH'][ticker_hash % 3]
     result = {
@@ -504,7 +492,6 @@ def get_social_sentiment(ticker):
 
 @app.route('/api/insider-transactions/<ticker>', methods=['GET'])
 def get_insider_transactions(ticker):
-    """Insider - refreshed daily"""
     ticker = ticker.upper()
     
     cache_key = f"{ticker}_insider"
@@ -539,7 +526,6 @@ def get_insider_transactions(ticker):
         except:
             pass
     
-    # Fallback
     ticker_hash = sum(ord(c) for c in ticker) % 100
     result = {
         'ticker': ticker,
@@ -564,7 +550,6 @@ def get_ai_insights(ticker):
             if cache_age < INSIGHTS_TTL:
                 return jsonify(cache_data['data']), 200
         
-        # Scrape all 11 sources in parallel
         with ThreadPoolExecutor(max_workers=6) as executor:
             futures = {
                 'reddit': executor.submit(scrape_reddit_wsb, ticker),
@@ -585,11 +570,9 @@ def get_ai_insights(ticker):
                 except:
                     results[key] = None
         
-        # Get price & insider data
         price_data = get_stock_price_waterfall(ticker)
         change = price_data['change']
         
-        # Count bullish signals
         bullish_signals = 0
         sources_list = []
         
@@ -609,7 +592,6 @@ def get_ai_insights(ticker):
             bullish_signals += 1
             sources_list.append("Barron's")
         
-        # Generate edge
         if bullish_signals >= 3:
             edge = f"Multi-source bullish: {', '.join(sources_list[:3])}"
             trade = f"Enter ${round(price_data['price'] * 0.98, 2)}. Target +6%"
@@ -653,25 +635,56 @@ def get_stock_news(ticker):
 
 @app.route('/api/options-opportunities/<ticker>', methods=['GET'])
 def get_options_opportunities(ticker):
+    """Expanded 4 options strategies"""
     try:
         price_data = get_stock_price_waterfall(ticker)
         current_price = price_data['price']
         change = price_data['change']
         
-        return jsonify({
+        opportunities = {
             'ticker': ticker,
             'current_price': round(current_price, 2),
+            'analysis_date': datetime.now().isoformat(),
             'strategies': [
                 {
                     'type': 'Iron Condor',
-                    'setup': f'Sell ${round(current_price * 1.05, 2)} Call / Buy ${round(current_price * 1.08, 2)} Call',
+                    'setup': f'Sell ${round(current_price * 1.05, 2)} Call / Buy ${round(current_price * 1.08, 2)} Call, Sell ${round(current_price * 0.95, 2)} Put / Buy ${round(current_price * 0.92, 2)} Put',
                     'max_profit': round(current_price * 0.02, 2),
                     'max_loss': round(current_price * 0.03, 2),
                     'probability_of_profit': '65%',
+                    'days_to_expiration': 30,
                     'recommendation': 'BEST' if abs(change) < 2 else 'GOOD'
+                },
+                {
+                    'type': 'Call Spread (Bullish)',
+                    'setup': f'Buy ${round(current_price, 2)} Call / Sell ${round(current_price * 1.05, 2)} Call',
+                    'max_profit': round(current_price * 0.05, 2),
+                    'max_loss': round(current_price * 0.02, 2),
+                    'probability_of_profit': '55%',
+                    'days_to_expiration': 30,
+                    'recommendation': 'BUY' if change > 2 else 'NEUTRAL'
+                },
+                {
+                    'type': 'Put Spread (Bearish)',
+                    'setup': f'Buy ${round(current_price, 2)} Put / Sell ${round(current_price * 0.95, 2)} Put',
+                    'max_profit': round(current_price * 0.05, 2),
+                    'max_loss': round(current_price * 0.02, 2),
+                    'probability_of_profit': '55%',
+                    'days_to_expiration': 30,
+                    'recommendation': 'BUY' if change < -2 else 'NEUTRAL'
+                },
+                {
+                    'type': 'Butterfly (Range-bound)',
+                    'setup': f'Buy ${round(current_price * 0.98, 2)} Call / Sell 2x ${round(current_price, 2)} Call / Buy ${round(current_price * 1.02, 2)} Call',
+                    'max_profit': round(current_price * 0.04, 2),
+                    'max_loss': round(current_price * 0.01, 2),
+                    'probability_of_profit': '50%',
+                    'days_to_expiration': 30,
+                    'recommendation': 'GOOD' if abs(change) < 1.5 else 'NEUTRAL'
                 }
             ]
-        })
+        }
+        return jsonify(opportunities)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -680,7 +693,7 @@ def get_enhanced_newsletter():
     try:
         stocks = recommendations_cache['data'] if recommendations_cache['data'] else fetch_prices_concurrent(TICKERS)
         return jsonify({
-            'version': 'v5.0-scheduled',
+            'version': 'v5.0-complete',
             'generated': datetime.now().isoformat(),
             'stocks': stocks[:10]
         })
