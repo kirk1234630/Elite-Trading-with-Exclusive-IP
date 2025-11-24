@@ -260,6 +260,23 @@ def refresh_earnings_monthly():
     except Exception as e:
         print(f"❌ Earnings refresh error: {e}")
 
+@app.route('/api/refresh-earnings', methods=['POST'])
+def manual_refresh_earnings():
+    """Manual trigger for earnings refresh"""
+    try:
+        global UPCOMING_EARNINGS, earnings_cache
+        UPCOMING_EARNINGS = fetch_earnings_from_multiple_sources()
+        earnings_cache['data'] = UPCOMING_EARNINGS
+        earnings_cache['timestamp'] = datetime.now()
+        return jsonify({
+            'status': 'success',
+            'count': len(UPCOMING_EARNINGS),
+            'message': f'Refreshed {len(UPCOMING_EARNINGS)} earnings'
+        })
+    except Exception as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+
 def refresh_social_sentiment_daily():
     global sentiment_cache
     print("\n🔄 [SCHEDULED] Clearing sentiment cache (DAILY)...")
