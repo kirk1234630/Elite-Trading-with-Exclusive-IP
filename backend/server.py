@@ -18,6 +18,7 @@ FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
 ALPHAVANTAGE_KEY = os.environ.get('ALPHAVANTAGE_API_KEY', '')
 MASSIVE_KEY = os.environ.get('MASSIVE_API_KEY', '')
 FRED_KEY = os.environ.get('FRED_API_KEY', '')
+PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
 
 # ======================== CACHE ========================
 price_cache = {}
@@ -27,6 +28,7 @@ sentiment_cache = {}
 macro_cache = {'data': {}, 'timestamp': None}
 insider_cache = {}
 earnings_cache = {'data': [], 'timestamp': None}
+ai_insights_cache = {}
 
 # ======================== TTL ========================
 RECOMMENDATIONS_TTL = 300
@@ -34,6 +36,7 @@ SENTIMENT_TTL = 86400
 MACRO_TTL = 3600
 INSIDER_TTL = 86400
 EARNINGS_TTL = 2592000
+AI_INSIGHTS_TTL = 3600
 
 # Chart tracking
 chart_after_hours = {'enabled': True, 'last_refresh': None}
@@ -98,6 +101,7 @@ UPCOMING_EARNINGS = load_earnings()
 print(f"✅ Loaded {len(TICKERS)} tickers")
 print(f"✅ Loaded {len(UPCOMING_EARNINGS)} upcoming earnings")
 print(f"✅ FINNHUB_KEY: {'ENABLED' if FINNHUB_KEY else 'DISABLED (using fallback)'}")
+print(f"✅ PERPLEXITY_KEY: {'ENABLED' if PERPLEXITY_KEY else 'DISABLED'}")
 
 # ======================== SCHEDULED TASKS ========================
 
@@ -268,6 +272,79 @@ def fetch_prices_concurrent(tickers):
     cleanup_cache()
     return results
 
+# ======================== PERPLEXITY AI ANALYSIS ========================
+
+def get_perplexity_ai_analysis(ticker, stock_data=None):
+    """Get AI analysis from Perplexity for the stock"""
+    if not PERPLEXITY_KEY:
+        return {
+            'analysis': 'Perplexity AI not configured',
+            'edge': 'Set PERPLEXITY_API_KEY in environment variables',
+            'confidence': 0,
+            'ticker': ticker,
+            'source': 'N/A'
+        }
+    
+    try:
+        price_info = ""
+        if stock_data:
+            price_info = f"\nCurrent Price: ${stock_data.get('Last', 'N/A')}\nChange: {stock_data.get('Change', 'N/A')}%\nRSI: {stock_data.get('RSI', 'N/A')}"
+        
+        prompt = f"""Analyze {ticker} for day traders:{price_info}
+
+Provide:
+1. Market Edge (bullish/bearish/neutral with 0-100 confidence)
+2. Support/Resistance levels
+3. Entry/Stop/Target setup
+4. Risk (low/medium/high)
+5. Next 5 days outlook
+
+Be concise and actionable."""
+        
+        url = 'https://api.perplexity.ai/chat/completions'
+        headers = {
+            'Authorization': f'Bearer {PERPLEXITY_KEY}',
+            'Content-Type': 'application/json'
+        }
+        
+        payload = {
+            'model': 'pplx-7b-online',
+            'messages': [
+                {
+                    'role': 'system',
+                    'content': 'You are an expert quantitative trading analyst. Provide precise, actionable insights for day traders.'
+                },
+                {
+                    'role': 'user',
+                    'content': prompt
+                }
+            ],
+            'temperature': 0.7,
+            'max_tokens': 500
+        }
+        
+        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            analysis_text = data['choices'][0]['message']['content']
+            
+            print(f"✅ Perplexity AI analysis generated for {ticker}")
+            return {
+                'analysis': analysis_text,
+                'ticker': ticker,
+                'generated': datetime.now().isoformat(),
+                'source': 'Perplexity AI',
+                'confidence': 85
+            }
+        else:
+            print(f"❌ Perplexity API error: {response.status_code}")
+            return {'error': f'API error: {response.status_code}', 'analysis': 'Error getting AI analysis', 'ticker': ticker}
+            
+    except Exception as e:
+        print(f"❌ Perplexity error for {ticker}: {e}")
+        return {'error': str(e), 'analysis': f'AI analysis unavailable: {str(e)}', 'ticker': ticker}
+
 # ======================== API ENDPOINTS ========================
 
 @app.route('/api/scheduler/status', methods=['GET'])
@@ -284,7 +361,8 @@ def get_scheduler_status():
     return jsonify({
         'scheduler_running': scheduler.running,
         'jobs': jobs,
-        'chart_after_hours_enabled': chart_after_hours['enabled']
+        'chart_after_hours_enabled': chart_after_hours['enabled'],
+        'perplexity_ai': 'enabled' if PERPLEXITY_KEY else 'disabled'
     }), 200
 
 @app.route('/api/recommendations', methods=['GET'])
@@ -315,6 +393,42 @@ def get_stock_price_single(ticker):
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/ai-analysis/<ticker>', methods=['GET'])
+def get_ai_analysis(ticker):
+    """Get Perplexity AI analysis for ticker"""
+    ticker = ticker.upper()
+    print(f"🤖 AI Analysis request for {ticker}...")
+    
+    cache_key = f"{ticker}_ai_analysis"
+    if cache_key in ai_insights_cache:
+        cache_data = ai_insights_cache[cache_key]
+        cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
+        if cache_age < AI_INSIGHTS_TTL:
+            print(f"✅ Using cached AI analysis for {ticker}")
+            return jsonify(cache_data['data']), 200
+    
+    stock_data = None
+    try:
+        stock_data = {
+            'Last': recommendations_cache['data'],
+            'Change': 0,
+            'RSI': 50
+        }
+        for stock in recommendations_cache['data']:
+            if stock['Symbol'] == ticker:
+                stock_data = stock
+                break
+    except:
+        pass
+    
+    analysis = get_perplexity_ai_analysis(ticker, stock_data)
+    ai_insights_cache[cache_key] = {
+        'data': analysis,
+        'timestamp': datetime.now()
+    }
+    
+    return jsonify(analysis), 200
 
 @app.route('/api/earnings-calendar', methods=['GET'])
 def get_earnings_calendar():
@@ -522,7 +636,8 @@ def health_check():
         'status': 'healthy',
         'scheduler_running': scheduler.running,
         'after_hours_charts': chart_after_hours['enabled'],
-        'finnhub_key': 'enabled' if FINNHUB_KEY else 'disabled'
+        'finnhub_key': 'enabled' if FINNHUB_KEY else 'disabled',
+        'perplexity_key': 'enabled' if PERPLEXITY_KEY else 'disabled'
     }), 200
 
 if __name__ == '__main__':
