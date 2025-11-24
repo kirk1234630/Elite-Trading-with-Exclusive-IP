@@ -1,5 +1,14 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+@app.route('/')
+def serve_frontend():
+    """Serve frontend from backend/server.py"""
+    try:
+        with open('frontend/index.html', 'r') as f:
+            return f.read()
+    except FileNotFoundError:
+        return jsonify({'status': 'API Running'}), 200
+
 import requests
 import os
 import json
