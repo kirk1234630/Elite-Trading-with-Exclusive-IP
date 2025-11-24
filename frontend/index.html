@@ -581,5 +581,257 @@
             loadAllStocks();
         });
     </script>
+    // ======================== ENHANCED AI INSIGHTS JAVASCRIPT ========================
+// Add this to your index.html <script> section
+// Fetches all 11 data sources from /api/ai-insights endpoint
+
+async function loadAIInsights(ticker) {
+    try {
+        const response = await fetch(`/api/ai-insights/${ticker}`);
+        if (!response.ok) {
+            throw new Error('Failed to fetch AI insights');
+        }
+        const data = await response.json();
+        
+        // Update sidebar with insights
+        document.getElementById('aiEdge').textContent = data.edge || 'Loading...';
+        document.getElementById('aiTrade').textContent = data.trade || 'Loading...';
+        document.getElementById('aiRisk').textContent = data.risk || 'Loading...';
+        
+        // Display all scraped data sources
+        if (data.data_sources) {
+            let sourcesHtml = '<ul style="list-style: none; padding: 0; font-size: 0.85em;">';
+            
+            // Reddit WSB
+            if (data.data_sources.reddit) {
+                const reddit = data.data_sources.reddit;
+                sourcesHtml += `<li>🔴 Reddit WSB: <strong>${reddit.sentiment}</strong> (${reddit.mentions} mentions)</li>`;
+            }
+            
+            // GuruFocus
+            if (data.data_sources.gurufocus) {
+                const guru = data.data_sources.gurufocus;
+                sourcesHtml += `<li>🎯 GuruFocus: <strong>${guru.guru_sentiment}</strong> (Buying: ${guru.gurus_buying}, Selling: ${guru.gurus_selling})</li>`;
+            }
+            
+            // Stock Options Channel
+            if (data.data_sources.stockoptionschannel) {
+                const opts = data.data_sources.stockoptionschannel;
+                sourcesHtml += `<li>📊 Options: C/P Ratio ${opts.call_put_ratio} | IV Rank ${opts.iv_rank}%</li>`;
+            }
+            
+            // MarketChameleon
+            if (data.data_sources.marketchameleon) {
+                const mc = data.data_sources.marketchameleon;
+                sourcesHtml += `<li>🦎 Max Pain: $${mc.max_pain} (${mc.max_pain_distance}%)</li>`;
+            }
+            
+            // Quiver Quantitative
+            if (data.data_sources.quiver) {
+                const quiver = data.data_sources.quiver;
+                sourcesHtml += `<li>🕵️ Congress: Buy ${quiver.congressional_buys} / Sell ${quiver.congressional_sells} | Dark Pool: ${quiver.institutional_flow}</li>`;
+            }
+            
+            // Barchart
+            if (data.data_sources.barchart) {
+                const bar = data.data_sources.barchart;
+                sourcesHtml += `<li>📈 Barchart: <strong>${bar.technical_rating}</strong> (Score: ${bar.technicals_score})</li>`;
+            }
+            
+            // Benzinga
+            if (data.data_sources.benzinga) {
+                const bez = data.data_sources.benzinga;
+                sourcesHtml += `<li>📰 Benzinga: ${bez.positive_stories} Positive | ${bez.negative_stories} Negative | ${bez.momentum}</li>`;
+            }
+            
+            // Barron's
+            if (data.data_sources.barrons) {
+                const bar = data.data_sources.barrons;
+                sourcesHtml += `<li>📊 Barron's: <strong>${bar.consensus}</strong> (Bull ${bar.analysts_bullish}, Bear ${bar.analysts_bearish}) | Upside ${bar.rating_upside}%</li>`;
+            }
+            
+            // Bloomberg
+            if (data.data_sources.bloomberg) {
+                const bloom = data.data_sources.bloomberg;
+                sourcesHtml += `<li>💼 Bloomberg: P/E ${bloom.pe_ratio} | MCap ${bloom.market_cap_billions}B | Yield ${bloom.dividend_yield}%</li>`;
+            }
+            
+            sourcesHtml += '</ul>';
+            
+            // Create a detailed AI deep analysis box
+            let detailedAnalysis = `
+                <div style="background: rgba(0,212,255,0.05); padding: 1rem; border-radius: 8px; margin-top: 1rem;">
+                    <strong style="color: 00d4ff;">📊 MULTI-SOURCE ANALYSIS</strong><br>
+                    <div style="margin-top: 0.5rem; font-size: 0.9em; color: b0b8c1; line-height: 1.8;">
+                        ${sourcesHtml}
+                    </div>
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #444;">
+                        <strong style="color: 10b981;">✓ Bullish Signals: ${data.bullish_signals || 0}/5</strong><br>
+                        <div style="font-size: 0.9em; color: b0b8c1; margin-top: 0.5rem;">
+                            Sources: ${data.sources ? data.sources.join(', ') : 'Multiple sources'}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('aiDeepAnalysis').innerHTML = detailedAnalysis;
+        }
+        
+    } catch (error) {
+        console.error('AI Insights Error:', error);
+        document.getElementById('aiDeepAnalysis').innerHTML = `
+            <div style="color: ef4444;">
+                <strong>⚠️ AI Analysis Unavailable</strong><br>
+                <span style="font-size: 0.9em;">Check FINNHUB_API_KEY in environment</span>
+            </div>
+        `;
+    }
+}
+
+// ======================== SOCIAL SENTIMENT LOADER ========================
+async function loadSocialSentiment(ticker) {
+    try {
+        const response = await fetch(`/api/social-sentiment/${ticker}`);
+        if (!response.ok) throw new Error('Sentiment failed');
+        const data = response.json();
+        
+        // Display sentiment
+        console.log(`Social Sentiment for ${ticker}:`, data);
+        return data;
+    } catch (error) {
+        console.error('Social Sentiment Error:', error);
+        return null;
+    }
+}
+
+// ======================== INSIDER ACTIVITY LOADER ========================
+async function loadInsiderActivity(ticker) {
+    try {
+        const response = await fetch(`/api/insider-transactions/${ticker}`);
+        if (!response.ok) throw new Error('Insider failed');
+        const data = response.json();
+        
+        console.log(`Insider Activity for ${ticker}:`, data);
+        return data;
+    } catch (error) {
+        console.error('Insider Activity Error:', error);
+        return null;
+    }
+}
+
+// ======================== OPTIONS STRATEGIES LOADER ========================
+async function loadOptionsStrategies(ticker) {
+    try {
+        const response = await fetch(`/api/options-opportunities/${ticker}`);
+        if (!response.ok) throw new Error('Options failed');
+        const data = response.json();
+        
+        // Display options
+        let optionsHtml = `
+            <div style="background: rgba(0,212,255,0.05); padding: 1rem; border-radius: 8px;">
+                <strong style="color: 00d4ff;">⚙️ OPTIONS STRATEGIES</strong>
+        `;
+        
+        if (data.strategies) {
+            data.strategies.forEach(strategy => {
+                optionsHtml += `
+                    <div style="margin-top: 0.8rem; padding: 0.8rem; background: rgba(26,26,64,0.8); border-left: 3px solid 7c3aed; border-radius: 4px;">
+                        <strong style="color: 7c3aed;">${strategy.type}</strong><br>
+                        <span style="font-size: 0.9em; color: b0b8c1;">
+                            Setup: ${strategy.setup}<br>
+                            Max Profit: $${strategy.max_profit} | Max Loss: $${strategy.max_loss}<br>
+                            Probability: ${strategy.probability_of_profit} | <strong style="color: 10b981;">${strategy.recommendation}</strong>
+                        </span>
+                    </div>
+                `;
+            });
+        }
+        
+        optionsHtml += '</div>';
+        
+        // Update a designated options box
+        const optionsBox = document.getElementById('optionsAnalysis');
+        if (optionsBox) optionsBox.innerHTML = optionsHtml;
+        
+        console.log(`Options for ${ticker}:`, data);
+        return data;
+    } catch (error) {
+        console.error('Options Error:', error);
+    }
+}
+
+// ======================== EARNINGS CALENDAR LOADER ========================
+async function loadEarningsCalendar() {
+    try {
+        const response = await fetch('/api/earnings-calendar');
+        if (!response.ok) throw new Error('Earnings failed');
+        const data = response.json();
+        
+        // Display upcoming earnings
+        let earningsHtml = `
+            <div style="background: rgba(0,212,255,0.05); padding: 1rem; border-radius: 8px;">
+                <strong style="color: 00d4ff;">📅 UPCOMING EARNINGS</strong><br>
+        `;
+        
+        if (data.earnings && data.earnings.length > 0) {
+            data.earnings.slice(0, 5).forEach((earning, idx) => {
+                earningsHtml += `
+                    <div style="margin-top: 0.5rem; padding: 0.6rem; background: rgba(26,26,64,0.8); border-radius: 4px;">
+                        <strong style="color: f59e0b;">${earning.symbol || 'N/A'}</strong> 
+                        <span style="color: 10b981;">${earning.report || 'TBA'}</span><br>
+                        <span style="font-size: 0.85em; color: b0b8c1;">EPS Est: ${earning.epsEstimate || 'N/A'}</span>
+                    </div>
+                `;
+            });
+        } else {
+            earningsHtml += '<div style="padding: 0.5rem; color: b0b8c1; font-size: 0.9em;">Monthly refresh scheduled. Check back soon.</div>';
+        }
+        
+        earningsHtml += '</div>';
+        
+        const earningsBox = document.getElementById('earningsDisplay');
+        if (earningsBox) earningsBox.innerHTML = earningsHtml;
+        
+        console.log('Earnings Calendar:', data);
+        return data;
+    } catch (error) {
+        console.error('Earnings Error:', error);
+    }
+}
+
+// ======================== MAIN INTEGRATION (Call on page load) ========================
+async function integrateAllAPIs(ticker = 'AAPL') {
+    console.log(`Loading complete analysis for ${ticker}...`);
+    
+    // Call all endpoints in parallel
+    Promise.all([
+        loadAIInsights(ticker),
+        loadSocialSentiment(ticker),
+        loadInsiderActivity(ticker),
+        loadOptionsStrategies(ticker),
+        loadEarningsCalendar()
+    ]).then(([aiData, sentimentData, insiderData, optionsData, earningsData]) => {
+        console.log('✅ All data loaded successfully');
+    }).catch(error => {
+        console.error('❌ Error loading data:', error);
+    });
+}
+
+// Call on page load or when ticker changes
+window.addEventListener('load', () => {
+    integrateAllAPIs('AAPL'); // Default ticker
+});
+
+// Modify existing researchStock function to use new API
+function researchStockWithNewAPIs(ticker) {
+    console.log(`Researching ${ticker} with full API integration...`);
+    
+    // Clear previous data
+    document.getElementById('aiDeepAnalysis').innerHTML = 'Loading AI analysis...';
+    document.getElementById('optionsAnalysis').innerHTML = 'Loading options...';
+    
+    // Load all data
+    integrateAllAPIs(ticker);
+}
 </body>
 </html>
