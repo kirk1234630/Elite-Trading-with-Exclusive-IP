@@ -1,3 +1,19 @@
+// Set API base URL based on environment
+const API_BASE = window.location.hostname === 'localhost' 
+  ? 'http://localhost:10000'
+  : 'https://your-render-app.onrender.com';  // Replace with your Render URL
+
+// Now all fetch calls use this
+async function loadAllStocks() {
+    try {
+        const response = await fetch(`${API_BASE}/api/stocks`);
+        const data = await response.json();
+        // ... rest of code
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
