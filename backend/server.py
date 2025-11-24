@@ -948,6 +948,19 @@ def get_options_opportunities(ticker):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+@app.route('/')
+def serve_frontend():
+    """Serve the frontend HTML"""
+    try:
+        with open('index.html', 'r') as f:
+            return f.read()
+    except FileNotFoundError:
+        return jsonify({
+            'status': 'API Running',
+            'message': 'Frontend not found. Place index.html in root directory.',
+            'health_check': '/health'
+        }), 200
+
 @app.route('/health', methods=['GET'])
 def health_check():
     return jsonify({
@@ -959,6 +972,7 @@ def health_check():
         'finnhub_key': 'enabled' if FINNHUB_KEY else 'disabled',
         'top_50_loaded': len(TOP_50_STOCKS),
         'endpoints': [
+            '/',
             '/api/recommendations',
             '/api/stock-price/<ticker>',
             '/api/ai-insights/<ticker>',
