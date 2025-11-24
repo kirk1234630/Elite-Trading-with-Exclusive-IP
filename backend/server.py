@@ -1,4 +1,5 @@
-from flask import Flask, jsonify, request
+
+rom flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
 import os
@@ -9,21 +10,9 @@ import time
 import gc
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
-from bs4 import BeautifulSoup
-import re
 
 app = Flask(__name__)
 CORS(app)
-
-# ======================== ROOT ROUTE - SERVES FRONTEND ========================
-@app.route('/')
-def serve_frontend():
-    """Serve frontend HTML"""
-    try:
-        with open('frontend/index.html', 'r') as f:
-            return f.read()
-    except FileNotFoundError:
-        return jsonify({'status': 'API Running', 'message': 'Frontend index.html not found'}), 200
 
 # ======================== API KEYS ========================
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
@@ -41,20 +30,17 @@ macro_cache = {'data': {}, 'timestamp': None}
 insider_cache = {}
 earnings_cache = {'data': [], 'timestamp': None}
 ai_insights_cache = {}
-barchart_cache = {}
-gurufocus_cache = {}
-reddit_cache = {}
 
 # ======================== TTL ========================
 RECOMMENDATIONS_TTL = 300
 SENTIMENT_TTL = 86400
-MACRO_TTL = 604800
+MACRO_TTL = 604800  # 7 days for FRED
 INSIDER_TTL = 86400
 EARNINGS_TTL = 2592000
 AI_INSIGHTS_TTL = 3600
-BARCHART_TTL = 360
-GURUFOCUS_TTL = 86400
-REDDIT_TTL = 3600
+
+# Chart tracking
+chart_after_hours = {'enabled': True, 'last_refresh': None}
 
 # ======================== TOP 50 STOCKS DATA ========================
 TOP_50_STOCKS = [
@@ -136,8 +122,6 @@ TICKERS = load_tickers()
 UPCOMING_EARNINGS = load_earnings()
 
 print(f"✅ Loaded {len(TICKERS)} tickers from TOP_50_STOCKS")
-print(f"✅ Scraping: BeautifulSoup4 + lxml enabled")
-print(f"✅ Hybrid mode: Real scraping + Perplexity Sonar")
 print(f"✅ Perplexity: {'ENABLED' if PERPLEXITY_KEY else 'DISABLED'}")
 print(f"✅ FRED: {'ENABLED' if FRED_KEY else 'DISABLED'}")
 
@@ -156,8 +140,6 @@ def fetch_fred_macro_data():
         'DFF': {'name': 'Fed Funds Rate', 'unit': '%'},
         'T10Y2Y': {'name': '10Y-2Y Spread', 'unit': '%'},
         'DCOILWTICO': {'name': 'WTI Oil', 'unit': '$/B'},
-        'WEI': {'name': 'Weekly Econ Index', 'unit': '%'},
-        'ICSA': {'name': 'Initial Claims', 'unit': 'K'},
     }
     
     try:
@@ -206,8 +188,6 @@ def get_fallback_macro_data():
             'DFF': {'name': 'Fed Funds Rate', 'value': 4.33, 'unit': '%'},
             'T10Y2Y': {'name': '10Y-2Y Spread', 'value': 0.55, 'unit': '%'},
             'DCOILWTICO': {'name': 'WTI Oil', 'value': 60.66, 'unit': '$/B'},
-            'WEI': {'name': 'Weekly Econ Index', 'value': 2.15, 'unit': '%'},
-            'ICSA': {'name': 'Initial Claims', 'value': 220, 'unit': 'K'},
         }
     }
 
@@ -520,9 +500,6 @@ def get_social_sentiment(ticker):
                 week_prev_mentions = sum(item.get('mention', 0) for item in reddit_data[-14:-7]) + sum(item.get('mention', 0) for item in twitter_data[-14:-7])
                 wow_change = ((weekly_mentions - week_prev_mentions) / max(week_prev_mentions, 1)) * 100 if week_prev_mentions > 0 else 0
                 
-                month_prev_mentions = sum(item.get('mention', 0) for item in reddit_data[-30:-7]) + sum(item.get('mention', 0) for item in twitter_data[-30:-7])
-                mom_change = ((weekly_mentions - month_prev_mentions) / max(month_prev_mentions, 1)) * 100 if month_prev_mentions > 0 else 0
-                
                 result = {
                     'ticker': ticker,
                     'source': 'Finnhub Social Sentiment API',
@@ -538,8 +515,7 @@ def get_social_sentiment(ticker):
                         'mentions': int(weekly_mentions),
                         'sentiment': weekly_sentiment
                     },
-                    'weekly_change': round(wow_change, 2),
-                    'monthly_change': round(mom_change, 2)
+                    'weekly_change': round(wow_change, 2)
                 }
                 
                 sentiment_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
@@ -564,8 +540,7 @@ def get_social_sentiment(ticker):
             'mentions': 700 + ticker_hash * 14,
             'sentiment': 'NEUTRAL'
         },
-        'weekly_change': 0.0,
-        'monthly_change': 0.0
+        'weekly_change': 0.0
     }
     sentiment_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
     return jsonify(result), 200
@@ -609,8 +584,7 @@ def get_insider_transactions(ticker):
         'ticker': ticker,
         'insider_sentiment': 'BULLISH' if ticker_hash > 50 else 'BEARISH',
         'buy_count': (ticker_hash // 10) + 1,
-        'sell_count': ((100 - ticker_hash) // 15) + 1,
-        'total_transactions': 0
+        'sell_count': ((100 - ticker_hash) // 15) + 1
     }
     insider_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
     return jsonify(result), 200
@@ -634,12 +608,12 @@ def get_stock_news(ticker):
 @app.route('/api/options-opportunities/<ticker>', methods=['GET'])
 def get_options_opportunities(ticker):
     try:
-        price_data = get_stock_price_waterfall(ticker.upper())
+        price_data = get_stock_price_waterfall(ticker)
         current_price = price_data['price']
         change = price_data['change']
         
         opportunities = {
-            'ticker': ticker.upper(),
+            'ticker': ticker,
             'current_price': round(current_price, 2),
             'analysis_date': datetime.now().isoformat(),
             'strategies': [
@@ -651,7 +625,6 @@ def get_options_opportunities(ticker):
                     'max_profit': round(current_price * 0.02, 2),
                     'max_loss': round(current_price * 0.03, 2),
                     'probability_of_profit': '65%',
-                    'rating': 'Good',
                     'greeks': {'delta': '~0', 'gamma': 'Low', 'theta': '+High', 'vega': '-High'}
                 },
                 {
@@ -662,7 +635,6 @@ def get_options_opportunities(ticker):
                     'max_profit': round(current_price * 0.05, 2),
                     'max_loss': round(current_price * 0.02, 2),
                     'probability_of_profit': '55%',
-                    'rating': 'Neutral',
                     'greeks': {'delta': '+0.60', 'gamma': 'Positive', 'theta': 'Neutral', 'vega': 'Low'}
                 },
                 {
@@ -673,7 +645,6 @@ def get_options_opportunities(ticker):
                     'max_profit': round(current_price * 0.05, 2),
                     'max_loss': round(current_price * 0.02, 2),
                     'probability_of_profit': '55%',
-                    'rating': 'Neutral',
                     'greeks': {'delta': '-0.60', 'gamma': 'Positive', 'theta': 'Neutral', 'vega': 'Low'}
                 },
                 {
@@ -684,7 +655,6 @@ def get_options_opportunities(ticker):
                     'max_profit': round(current_price * 0.02, 2),
                     'max_loss': round(current_price * 0.03, 2),
                     'probability_of_profit': '70%',
-                    'rating': 'Good',
                     'greeks': {'delta': '+0.50', 'gamma': 'Negative', 'theta': '+High', 'vega': '-High'}
                 },
                 {
@@ -695,7 +665,6 @@ def get_options_opportunities(ticker):
                     'max_profit': round(current_price * 0.02, 2),
                     'max_loss': round(current_price * 0.03, 2),
                     'probability_of_profit': '70%',
-                    'rating': 'Good',
                     'greeks': {'delta': '-0.50', 'gamma': 'Negative', 'theta': '+High', 'vega': '-High'}
                 },
                 {
@@ -706,7 +675,6 @@ def get_options_opportunities(ticker):
                     'max_profit': round(current_price * 0.04, 2),
                     'max_loss': round(current_price * 0.01, 2),
                     'probability_of_profit': '50%',
-                    'rating': 'Neutral',
                     'greeks': {'delta': '~0', 'gamma': 'Peaky', 'theta': '+Moderate', 'vega': 'Low'}
                 }
             ]
