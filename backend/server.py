@@ -168,7 +168,7 @@ def evaluate_options_rating(strategy_type, greeks, price_change, iv):
     theta = greeks.get('theta', '')
     vega = greeks.get('vega', '')
     delta = greeks.get('delta', '')
-    
+    gamma = greeks.get('gamma', '') 
     is_low_iv = iv < 0.30
     is_high_iv = iv > 0.50
     is_uptrend = price_change > 1.0
