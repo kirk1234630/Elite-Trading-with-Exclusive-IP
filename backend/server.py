@@ -618,35 +618,63 @@ def get_options_opportunities(ticker):
             'strategies': [
                 {
                     'type': 'Iron Condor',
-                    'description': 'Sell OTM call/put spreads',
+                    'description': 'Neutral - Sell OTM call/put spreads',
+                    'direction': 'Neutral',
                     'setup': f'Sell ${round(current_price * 1.05, 2)} Call / Buy ${round(current_price * 1.08, 2)} Call, Sell ${round(current_price * 0.95, 2)} Put / Buy ${round(current_price * 0.92, 2)} Put',
                     'max_profit': round(current_price * 0.02, 2),
                     'max_loss': round(current_price * 0.03, 2),
-                    'probability_of_profit': '65%'
+                    'probability_of_profit': '65%',
+                    'greeks': {'delta': '~0', 'gamma': 'Low', 'theta': '+High', 'vega': '-High'}
                 },
                 {
                     'type': 'Call Spread (Bullish)',
-                    'description': 'Buy lower call, sell higher call',
+                    'description': 'Bullish - Buy lower call, sell higher call',
+                    'direction': 'Bullish',
                     'setup': f'Buy ${round(current_price, 2)} Call / Sell ${round(current_price * 1.05, 2)} Call',
                     'max_profit': round(current_price * 0.05, 2),
                     'max_loss': round(current_price * 0.02, 2),
-                    'probability_of_profit': '55%'
+                    'probability_of_profit': '55%',
+                    'greeks': {'delta': '+0.60', 'gamma': 'Positive', 'theta': 'Neutral', 'vega': 'Low'}
                 },
                 {
                     'type': 'Put Spread (Bearish)',
-                    'description': 'Buy higher put, sell lower put',
+                    'description': 'Bearish - Buy higher put, sell lower put',
+                    'direction': 'Bearish',
                     'setup': f'Buy ${round(current_price, 2)} Put / Sell ${round(current_price * 0.95, 2)} Put',
                     'max_profit': round(current_price * 0.05, 2),
                     'max_loss': round(current_price * 0.02, 2),
-                    'probability_of_profit': '55%'
+                    'probability_of_profit': '55%',
+                    'greeks': {'delta': '-0.60', 'gamma': 'Positive', 'theta': 'Neutral', 'vega': 'Low'}
+                },
+                {
+                    'type': 'Bullish Put Spread',
+                    'description': 'Bullish - Sell OTM put, buy further OTM put',
+                    'direction': 'Bullish (Income)',
+                    'setup': f'Sell ${round(current_price * 0.98, 2)} Put / Buy ${round(current_price * 0.93, 2)} Put',
+                    'max_profit': round(current_price * 0.02, 2),
+                    'max_loss': round(current_price * 0.03, 2),
+                    'probability_of_profit': '70%',
+                    'greeks': {'delta': '+0.50', 'gamma': 'Negative', 'theta': '+High', 'vega': '-High'}
+                },
+                {
+                    'type': 'Bearish Call Spread',
+                    'description': 'Bearish - Sell OTM call, buy further OTM call',
+                    'direction': 'Bearish (Income)',
+                    'setup': f'Sell ${round(current_price * 1.02, 2)} Call / Buy ${round(current_price * 1.07, 2)} Call',
+                    'max_profit': round(current_price * 0.02, 2),
+                    'max_loss': round(current_price * 0.03, 2),
+                    'probability_of_profit': '70%',
+                    'greeks': {'delta': '-0.50', 'gamma': 'Negative', 'theta': '+High', 'vega': '-High'}
                 },
                 {
                     'type': 'Butterfly Spread',
-                    'description': 'Buy 1 call, sell 2 calls, buy 1 call',
+                    'description': 'Neutral - Buy 1 call, sell 2 calls, buy 1 call',
+                    'direction': 'Neutral (High Probability)',
                     'setup': f'Buy ${round(current_price * 0.98, 2)} Call / Sell 2x ${round(current_price, 2)} Call / Buy ${round(current_price * 1.02, 2)} Call',
                     'max_profit': round(current_price * 0.04, 2),
                     'max_loss': round(current_price * 0.01, 2),
-                    'probability_of_profit': '50%'
+                    'probability_of_profit': '50%',
+                    'greeks': {'delta': '~0', 'gamma': 'Peaky', 'theta': '+Moderate', 'vega': 'Low'}
                 }
             ]
         }
