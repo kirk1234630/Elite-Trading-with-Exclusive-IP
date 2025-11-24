@@ -15,6 +15,7 @@ CORS(app)
 
 # ======================== API KEYS ========================
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
+ALPHAVANTAGE_KEY = os.environ.get('ALPHAVANTAGE_API_KEY', '')
 PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
 MASSIVE_KEY = os.environ.get('MASSIVE_API_KEY', '')
 FRED_KEY = os.environ.get('FRED_API_KEY', '')
@@ -28,6 +29,7 @@ macro_cache = {'data': {}, 'timestamp': None}
 insider_cache = {}
 earnings_cache = {'data': [], 'timestamp': None}
 enhanced_insights_cache = {}
+technicals_cache = {}
 
 # ======================== TTL ========================
 RECOMMENDATIONS_TTL = 300
@@ -35,6 +37,7 @@ SENTIMENT_TTL = 86400
 INSIDER_TTL = 86400
 EARNINGS_TTL = 2592000
 INSIGHTS_TTL = 1800
+TECHNICALS_TTL = 3600
 
 # Chart tracking
 chart_after_hours = {'enabled': True, 'last_refresh': None}
@@ -370,6 +373,133 @@ def scrape_bloomberg(ticker):
     except:
         return {'market_cap_billions': 0, 'pe_ratio': 0, 'valuation': 'FAIR'}
 
+# ======================== ALPHA VANTAGE TECHNICALS ========================
+def scrape_alpha_vantage_technicals(ticker):
+    """Get technical indicators from Alpha Vantage"""
+    try:
+        if not ALPHAVANTAGE_KEY:
+            return {
+                'rsi': 50,
+                'macd': 'NEUTRAL',
+                'bb_signal': 'NEUTRAL',
+                'adx': 25,
+                'stochastic': 50
+            }
+        
+        # RSI
+        url = f'https://www.alphavantage.co/query?function=RSI&symbol={ticker}&interval=daily&time_period=14&apikey={ALPHAVANTAGE_KEY}'
+        response = requests.get(url, timeout=3)
+        rsi_data = response.json()
+        rsi = 50
+        
+        if 'Technical Analysis: RSI' in rsi_data:
+            latest_date = list(rsi_data['Technical Analysis: RSI'].keys())[0]
+            rsi = float(rsi_data['Technical Analysis: RSI'][latest_date]['RSI'])
+        
+        # MACD
+        url = f'https://www.alphavantage.co/query?function=MACD&symbol={ticker}&interval=daily&apikey={ALPHAVANTAGE_KEY}'
+        response = requests.get(url, timeout=3)
+        macd_data = response.json()
+        macd_signal = 'NEUTRAL'
+        
+        if 'Technical Analysis: MACD' in macd_data:
+            latest_date = list(macd_data['Technical Analysis: MACD'].keys())[0]
+            macd_val = float(macd_data['Technical Analysis: MACD'][latest_date]['MACD'])
+            signal = float(macd_data['Technical Analysis: MACD'][latest_date]['MACD_Signal'])
+            macd_signal = 'BULLISH' if macd_val > signal else 'BEARISH'
+        
+        # Bollinger Bands
+        url = f'https://www.alphavantage.co/query?function=BBANDS&symbol={ticker}&interval=daily&time_period=20&apikey={ALPHAVANTAGE_KEY}'
+        response = requests.get(url, timeout=3)
+        bb_data = response.json()
+        bb_signal = 'NEUTRAL'
+        
+        if 'Technical Analysis: BBANDS' in bb_data:
+            latest_date = list(bb_data['Technical Analysis: BBANDS'].keys())[0]
+            real_middle_band = float(bb_data['Technical Analysis: BBANDS'][latest_date]['Real Middle Band'])
+            real_lower_band = float(bb_data['Technical Analysis: BBANDS'][latest_date]['Real Lower Band'])
+            real_upper_band = float(bb_data['Technical Analysis: BBANDS'][latest_date]['Real Upper Band'])
+            
+            price_data = get_stock_price_waterfall(ticker)
+            current_price = price_data['price']
+            
+            if current_price > real_upper_band:
+                bb_signal = 'OVERBOUGHT'
+            elif current_price < real_lower_band:
+                bb_signal = 'OVERSOLD'
+            else:
+                bb_signal = 'NEUTRAL'
+        
+        return {
+            'rsi': round(rsi, 2),
+            'rsi_signal': 'OVERBOUGHT' if rsi > 70 else 'OVERSOLD' if rsi < 30 else 'NEUTRAL',
+            'macd': macd_signal,
+            'bb_signal': bb_signal,
+            'adx': 25,
+            'stochastic': 50,
+            'source': 'Alpha Vantage'
+        }
+    except Exception as e:
+        print(f"Alpha Vantage technical error for {ticker}: {e}")
+        return {
+            'rsi': 50,
+            'macd': 'NEUTRAL',
+            'bb_signal': 'NEUTRAL',
+            'adx': 25,
+            'stochastic': 50,
+            'error': str(e)
+        }
+
+def scrape_alpha_vantage_sma(ticker):
+    """Get Simple Moving Averages from Alpha Vantage"""
+    try:
+        if not ALPHAVANTAGE_KEY:
+            return {
+                'sma_20': 0,
+                'sma_50': 0,
+                'sma_200': 0,
+                'trend': 'NEUTRAL'
+            }
+        
+        sma_data = {}
+        
+        for period in [20, 50, 200]:
+            url = f'https://www.alphavantage.co/query?function=SMA&symbol={ticker}&interval=daily&time_period={period}&apikey={ALPHAVANTAGE_KEY}'
+            response = requests.get(url, timeout=3)
+            data = response.json()
+            
+            if f'Technical Analysis: SMA' in data:
+                latest_date = list(data['Technical Analysis: SMA'].keys())[0]
+                sma_data[f'sma_{period}'] = float(data['Technical Analysis: SMA'][latest_date]['SMA'])
+        
+        # Determine trend
+        if sma_data.get('sma_20', 0) > sma_data.get('sma_50', 0) > sma_data.get('sma_200', 0):
+            trend = 'STRONG UPTREND'
+        elif sma_data.get('sma_20', 0) > sma_data.get('sma_50', 0):
+            trend = 'UPTREND'
+        elif sma_data.get('sma_20', 0) < sma_data.get('sma_50', 0) < sma_data.get('sma_200', 0):
+            trend = 'STRONG DOWNTREND'
+        elif sma_data.get('sma_20', 0) < sma_data.get('sma_50', 0):
+            trend = 'DOWNTREND'
+        else:
+            trend = 'NEUTRAL'
+        
+        return {
+            'sma_20': round(sma_data.get('sma_20', 0), 2),
+            'sma_50': round(sma_data.get('sma_50', 0), 2),
+            'sma_200': round(sma_data.get('sma_200', 0), 2),
+            'trend': trend,
+            'source': 'Alpha Vantage'
+        }
+    except Exception as e:
+        print(f"Alpha Vantage SMA error for {ticker}: {e}")
+        return {
+            'sma_20': 0,
+            'sma_50': 0,
+            'sma_200': 0,
+            'trend': 'NEUTRAL'
+        }
+
 # ======================== API ENDPOINTS ========================
 
 @app.route('/api/scheduler/status', methods=['GET'])
@@ -537,9 +667,25 @@ def get_insider_transactions(ticker):
     insider_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
     return jsonify(result), 200
 
+@app.route('/api/stock-news/<ticker>', methods=['GET'])
+def get_stock_news(ticker):
+    if not FINNHUB_KEY:
+        return jsonify({'ticker': ticker, 'articles': [], 'count': 0}), 200
+    try:
+        from_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
+        to_date = datetime.now().strftime('%Y-%m-%d')
+        url = f'https://finnhub.io/api/v1/company-news?symbol={ticker}&from={from_date}&to={to_date}&token={FINNHUB_KEY}'
+        response = requests.get(url, timeout=5)
+        if response.status_code == 200:
+            articles = response.json()
+            return jsonify({'ticker': ticker, 'articles': articles[:10], 'count': len(articles)})
+    except:
+        pass
+    return jsonify({'ticker': ticker, 'articles': [], 'count': 0})
+
 @app.route('/api/ai-insights/<ticker>', methods=['GET'])
 def get_ai_insights(ticker):
-    """AI insights with 11 data sources"""
+    """AI insights with 11 data sources + Alpha Vantage"""
     try:
         ticker = ticker.upper()
         cache_key = f"{ticker}_insights"
@@ -561,6 +707,7 @@ def get_ai_insights(ticker):
                 'benzinga': executor.submit(scrape_benzinga, ticker),
                 'barrons': executor.submit(scrape_barrons, ticker),
                 'bloomberg': executor.submit(scrape_bloomberg, ticker),
+                'alpha_technicals': executor.submit(scrape_alpha_vantage_technicals, ticker),
             }
             
             results = {}
@@ -591,6 +738,9 @@ def get_ai_insights(ticker):
         if results['barrons'] and results['barrons'].get('consensus') == 'BUY':
             bullish_signals += 1
             sources_list.append("Barron's")
+        if results['alpha_technicals'] and results['alpha_technicals'].get('rsi_signal') == 'OVERSOLD':
+            bullish_signals += 1
+            sources_list.append('Alpha Vantage')
         
         if bullish_signals >= 3:
             edge = f"Multi-source bullish: {', '.join(sources_list[:3])}"
@@ -617,21 +767,33 @@ def get_ai_insights(ticker):
         print(f"AI error: {e}")
         return jsonify({'error': 'AI analysis unavailable', 'ticker': ticker}), 500
 
-@app.route('/api/stock-news/<ticker>', methods=['GET'])
-def get_stock_news(ticker):
-    if not FINNHUB_KEY:
-        return jsonify({'ticker': ticker, 'articles': [], 'count': 0}), 200
+@app.route('/api/technicals/<ticker>', methods=['GET'])
+def get_technicals(ticker):
+    """Get Alpha Vantage technical indicators"""
     try:
-        from_date = (datetime.now() - timedelta(days=7)).strftime('%Y-%m-%d')
-        to_date = datetime.now().strftime('%Y-%m-%d')
-        url = f'https://finnhub.io/api/v1/company-news?symbol={ticker}&from={from_date}&to={to_date}&token={FINNHUB_KEY}'
-        response = requests.get(url, timeout=5)
-        if response.status_code == 200:
-            articles = response.json()
-            return jsonify({'ticker': ticker, 'articles': articles[:10], 'count': len(articles)})
-    except:
-        pass
-    return jsonify({'ticker': ticker, 'articles': [], 'count': 0})
+        ticker = ticker.upper()
+        cache_key = f"{ticker}_technicals"
+        
+        if cache_key in technicals_cache:
+            cache_data = technicals_cache[cache_key]
+            cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
+            if cache_age < TECHNICALS_TTL:
+                return jsonify(cache_data['data']), 200
+        
+        technicals = scrape_alpha_vantage_technicals(ticker)
+        sma = scrape_alpha_vantage_sma(ticker)
+        
+        result = {
+            'ticker': ticker,
+            'technicals': technicals,
+            'moving_averages': sma,
+            'generated': datetime.now().isoformat()
+        }
+        
+        technicals_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
+        return jsonify(result), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/options-opportunities/<ticker>', methods=['GET'])
 def get_options_opportunities(ticker):
@@ -705,7 +867,12 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'scheduler_running': scheduler.running,
-        'after_hours_charts': chart_after_hours['enabled']
+        'after_hours_charts': chart_after_hours['enabled'],
+        'api_keys': {
+            'finnhub': bool(FINNHUB_KEY),
+            'alphavantage': bool(ALPHAVANTAGE_KEY),
+            'polygon': bool(MASSIVE_KEY)
+        }
     }), 200
 
 if __name__ == '__main__':
