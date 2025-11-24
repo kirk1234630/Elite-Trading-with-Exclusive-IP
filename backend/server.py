@@ -698,10 +698,9 @@ def get_stock_news(ticker):
     return jsonify({'ticker': ticker, 'articles': [], 'count': 0})
 
 # ======================== OPTIONS OPPORTUNITIES (ALL 4 STRATEGIES) ========================
-
 @app.route('/api/options-opportunities/<ticker>', methods=['GET'])
 def get_options_opportunities(ticker):
-    """All 4 options strategies: Iron Condor, Call Spread, Put Spread, Butterfly"""
+    """All 6 options strategies: Iron Condor, Call Spread Bullish, Put Spread Bearish, Call Spread Bearish, Put Spread Bullish, Butterfly"""
     try:
         price_data = get_stock_price_waterfall(ticker)
         current_price = price_data['price']
@@ -743,6 +742,26 @@ def get_options_opportunities(ticker):
                     'recommendation': 'BUY' if change < -2 else 'NEUTRAL'
                 },
                 {
+                    'type': 'Call Spread (Bearish)',
+                    'description': 'Sell lower call, buy higher call - bearish credit spread',
+                    'setup': f'Sell ${round(current_price * 1.02, 2)} Call / Buy ${round(current_price * 1.07, 2)} Call',
+                    'max_profit': round(current_price * 0.015, 2),
+                    'max_loss': round(current_price * 0.035, 2),
+                    'probability_of_profit': '60%',
+                    'days_to_expiration': 30,
+                    'recommendation': 'SELL' if change < -1.5 else 'NEUTRAL'
+                },
+                {
+                    'type': 'Put Spread (Bullish)',
+                    'description': 'Sell higher put, buy lower put - bullish credit spread',
+                    'setup': f'Sell ${round(current_price * 0.98, 2)} Put / Buy ${round(current_price * 0.93, 2)} Put',
+                    'max_profit': round(current_price * 0.015, 2),
+                    'max_loss': round(current_price * 0.035, 2),
+                    'probability_of_profit': '60%',
+                    'days_to_expiration': 30,
+                    'recommendation': 'SELL' if change > 1.5 else 'NEUTRAL'
+                },
+                {
                     'type': 'Butterfly Spread',
                     'description': 'Buy 1 call, sell 2 calls, buy 1 call - low cost, defined risk',
                     'setup': f'Buy ${round(current_price * 0.98, 2)} Call / Sell 2x ${round(current_price, 2)} Call / Buy ${round(current_price * 1.02, 2)} Call',
@@ -757,6 +776,7 @@ def get_options_opportunities(ticker):
         return jsonify(opportunities)
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
 
 @app.route('/health', methods=['GET'])
 def health_check():
