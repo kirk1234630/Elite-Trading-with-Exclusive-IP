@@ -97,6 +97,7 @@ UPCOMING_EARNINGS = load_earnings()
 
 print(f"✅ Loaded {len(TICKERS)} tickers")
 print(f"✅ Loaded {len(UPCOMING_EARNINGS)} upcoming earnings")
+print(f"✅ FINNHUB_KEY: {'ENABLED' if FINNHUB_KEY else 'DISABLED (using fallback)'}")
 
 # ======================== SCHEDULED TASKS ========================
 
@@ -327,16 +328,22 @@ def get_earnings_calendar():
 @app.route('/api/social-sentiment/<ticker>', methods=['GET'])
 def get_social_sentiment(ticker):
     ticker = ticker.upper()
+    print(f"🔍 Fetching social sentiment for {ticker}...")
     
     cache_key = f"{ticker}_sentiment"
+    
+    # CHECK CACHE FIRST
     if cache_key in sentiment_cache:
         cache_data = sentiment_cache[cache_key]
         cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
         if cache_age < SENTIMENT_TTL:
+            print(f"✅ Using cached sentiment for {ticker} (age: {int(cache_age)}s)")
             return jsonify(cache_data['data']), 200
     
+    # PRIORITY 1: Try Finnhub API if key exists
     if FINNHUB_KEY:
         try:
+            print(f"🌐 Calling Finnhub API for {ticker}...")
             url = f'https://finnhub.io/api/v1/stock/social-sentiment?symbol={ticker}&token={FINNHUB_KEY}'
             response = requests.get(url, timeout=5)
             
@@ -353,6 +360,7 @@ def get_social_sentiment(ticker):
                 
                 result = {
                     'ticker': ticker,
+                    'source': 'Finnhub API',
                     'daily': {
                         'score': round(daily_avg, 2),
                         'mentions': max(int(reddit_daily.get('mention', 50) + twitter_daily.get('mention', 40)), 100),
@@ -362,14 +370,22 @@ def get_social_sentiment(ticker):
                 }
                 
                 sentiment_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
+                print(f"✅ Finnhub data cached for {ticker}")
                 return jsonify(result), 200
-        except:
-            pass
+            else:
+                print(f"❌ Finnhub API error: {response.status_code} for {ticker}")
+        except Exception as e:
+            print(f"❌ Finnhub exception for {ticker}: {e}")
+    else:
+        print(f"⚠️  No FINNHUB_KEY set - using fallback for {ticker}")
     
+    # PRIORITY 2: Fallback if no key or API fails
+    print(f"📊 Using synthetic fallback for {ticker}")
     ticker_hash = sum(ord(c) for c in ticker) % 100
     daily_sentiment = ['BULLISH', 'NEUTRAL', 'BEARISH'][ticker_hash % 3]
     result = {
         'ticker': ticker,
+        'source': 'Synthetic (Fallback)',
         'daily': {
             'score': round((ticker_hash - 50) / 150, 2),
             'mentions': max(150 + (ticker_hash * 7), 100),
@@ -379,6 +395,7 @@ def get_social_sentiment(ticker):
     }
     
     sentiment_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
+    print(f"✅ Fallback data cached for {ticker}")
     return jsonify(result), 200
 
 @app.route('/api/insider-transactions/<ticker>', methods=['GET'])
@@ -499,24 +516,13 @@ def get_options_opportunities(ticker):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/enhanced-newsletter/5', methods=['GET'])
-def get_enhanced_newsletter():
-    try:
-        stocks = recommendations_cache['data'] if recommendations_cache['data'] else fetch_prices_concurrent(TICKERS)
-        return jsonify({
-            'version': 'v5.0-complete',
-            'generated': datetime.now().isoformat(),
-            'stocks': stocks[:10]
-        })
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
 @app.route('/health', methods=['GET'])
 def health_check():
     return jsonify({
         'status': 'healthy',
         'scheduler_running': scheduler.running,
-        'after_hours_charts': chart_after_hours['enabled']
+        'after_hours_charts': chart_after_hours['enabled'],
+        'finnhub_key': 'enabled' if FINNHUB_KEY else 'disabled'
     }), 200
 
 if __name__ == '__main__':
