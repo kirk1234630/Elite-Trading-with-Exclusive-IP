@@ -354,7 +354,7 @@ def fetch_prices_concurrent(tickers):
                 try:
                     price_data = future.result(timeout=5)
                     csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker), None)
-                    
+                  
                     results.append({
                         'Symbol': ticker,
                         'Last': round(price_data['price'], 2),
@@ -362,7 +362,8 @@ def fetch_prices_concurrent(tickers):
                         'RSI': round(50 + (price_data['change'] * 2), 2),
                         'Signal': csv_stock['signal'] if csv_stock else 'HOLD',
                         'Strategy': 'Momentum' if price_data['change'] > 0 else 'Mean Reversion',
-                        'Score': csv_stock['score'] if csv_stock else 50.0,
+                        
+                        'Score': csv_stock['inst33'] if csv_stock else 50.0,
                         'KeyMetric': csv_stock['key_metric'] if csv_stock else ''
                     })
                 except Exception as e:
@@ -382,7 +383,7 @@ def get_perplexity_sonar_analysis(ticker, stock_data=None):
     
     try:
         csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker), None)
-        context = f"\nScore: {csv_stock['score']}, Signal: {csv_stock['signal']}" if csv_stock else ""
+        context = f"\nScore: {csv_stock['inst33']}, Signal: {csv_stock['signal']}" if csv_stock else ""
         price_info = f"\nPrice: ${stock_data.get('Last', 'N/A')}, Change: {stock_data.get('Change', 'N/A')}%" if stock_data else ""
         
         prompt = f"""Analyze {ticker} for day trading. Scrape Barchart, Quiver, GuruFocus, Reddit WSB.{price_info}{context}
@@ -462,7 +463,7 @@ def get_stock_price_single(ticker):
             'ticker': ticker.upper(),
             'price': round(price_data['price'], 2),
             'change': round(price_data['change'], 2),
-            'score': csv_stock['score'] if csv_stock else 50.0,
+            'score': csv_stock['inst33'] if csv_stock else 50.0,
             'signal': csv_stock['signal'] if csv_stock else 'HOLD'
         })
     except Exception as e:
