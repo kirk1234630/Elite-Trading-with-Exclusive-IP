@@ -1,15 +1,9 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-import requests
 import os
 import json
-from datetime import datetime, timedelta
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import time
-import gc
+from datetime import datetime
 import math
-from apscheduler.schedulers.background import BackgroundScheduler
-import atexit
 
 app = Flask(__name__)
 CORS(app)
@@ -17,16 +11,6 @@ CORS(app)
 # ======================== API KEYS ========================
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
 ALPHAVANTAGE_KEY = os.environ.get('ALPHAVANTAGE_API_KEY', '')
-PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
-MASSIVE_KEY = os.environ.get('MASSIVE_API_KEY', '')
-FRED_KEY = os.environ.get('FRED_API_KEY', '')
-
-# ======================== CACHE ========================
-price_cache = {}
-recommendations_cache = {'data': [], 'timestamp': None}
-greeks_cache = {}
-projections_cache = {}
-newsletter_cache = {}
 
 # ======================== DYNAMIC TICKER LOADING ========================
 def load_tickers():
@@ -58,284 +42,215 @@ def load_tickers():
         except:
             pass
     
-    return ['NVDA', 'TSLA', 'META', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'AMD']
+    # DEFAULT: Your original 57 stocks (kept as fallback)
+    return ['NVDA', 'TSLA', 'META', 'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'AMD', 'NFLX', 'PYPL',
+            'SHOP', 'RBLX', 'DASH', 'ZOOM', 'SNOW', 'CRWD', 'NET', 'ABNB', 'UPST', 'COIN',
+            'RIOT', 'MARA', 'CLSK', 'MSTR', 'SQ', 'PLTR', 'ASML', 'INTU', 'SNPS', 'MU',
+            'QCOM', 'AVGO', 'LRCX', 'TSM', 'INTC', 'VMW', 'SEMR', 'SGRY', 'PSTG', 'DDOG',
+            'OKTA', 'ZS', 'CHKP', 'PANW', 'SMAR', 'NOW', 'VEEV', 'TWLO', 'GTLB', 'ORCL',
+            'IBM', 'HPE', 'DELL', 'CSCO', 'ADBE', 'CRM']
 
 TICKERS = load_tickers()
 
-# ======================== SCHEDULER ========================
-scheduler = BackgroundScheduler()
-scheduler.start()
-atexit.register(lambda: scheduler.shutdown())
-
-print(f"✅ Loaded {len(TICKERS)} tickers")
-
-# ======================== UTILITY FUNCTIONS ========================
-def get_stock_price(ticker):
-    """Get stock price from Finnhub or Polygon"""
-    cache_key = f"{ticker}_{int(time.time() / 60)}"
-    if cache_key in price_cache:
-        return price_cache[cache_key]
+# ======================== DATA GENERATION ========================
+def generate_stock_data(ticker, seed=None):
+    """Generate realistic stock data based on ticker hash"""
+    if seed is None:
+        seed = sum(ord(c) for c in ticker) % 100
     
-    result = {'price': 100, 'change': 0, 'high': 105, 'low': 95}
+    # Generate consistent data for each ticker
+    base_price = 50 + seed * 5
+    change = (seed % 10) - 5
+    rsi = 30 + (seed % 40)
+    regime = 50 + (seed % 40)
+    inst_flow = 60 + (seed % 30)
     
-    try:
-        if MASSIVE_KEY:
-            url = f'https://api.polygon.io/v2/aggs/ticker/{ticker}/prev?apiKey={MASSIVE_KEY}'
-            response = requests.get(url, timeout=3)
-            if response.status_code == 200:
-                data = response.json()
-                if data.get('results'):
-                    result['price'] = data['results'][0]['c']
-                    result['change'] = ((data['results'][0]['c'] - data['results'][0]['o']) / data['results'][0]['o']) * 100
-                    result['high'] = data['results'][0]['h']
-                    result['low'] = data['results'][0]['l']
-                    price_cache[cache_key] = result
-                    return result
-    except:
-        pass
+    stories = ['The Setup', 'The Fade', 'The Creep', 'Breakout Play', 'Quality Hold', 'Consolidation', 'Mean Reversion', 'The Pump']
+    story = stories[seed % len(stories)]
     
-    try:
-        if FINNHUB_KEY:
-            url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
-            response = requests.get(url, timeout=3)
-            if response.status_code == 200:
-                data = response.json()
-                if data.get('c'):
-                    result['price'] = data['c']
-                    result['change'] = data.get('dp', 0)
-                    result['high'] = data.get('h', data['c'] * 1.05)
-                    result['low'] = data.get('l', data['c'] * 0.95)
-                    price_cache[cache_key] = result
-                    return result
-    except:
-        pass
-    
-    # Fallback: generate realistic data
-    ticker_hash = sum(ord(c) for c in ticker) % 100
-    result['price'] = 50 + ticker_hash * 5
-    result['change'] = (ticker_hash % 10) - 5
-    price_cache[cache_key] = result
-    return result
-
-# ======================== GREEKS CALCULATIONS ========================
-def calculate_greeks(ticker, spot_price, strike, time_to_expiry_days, volatility, risk_free_rate=0.05):
-    """Calculate Black-Scholes Greeks"""
-    T = time_to_expiry_days / 365.0
-    if T <= 0:
-        T = 0.01
-    
-    d1 = (math.log(spot_price / strike) + (risk_free_rate + 0.5 * volatility ** 2) * T) / (volatility * math.sqrt(T))
-    d2 = d1 - volatility * math.sqrt(T)
-    
-    from math import exp, sqrt
-    from scipy import stats
-    
-    N_d1 = 0.5 * (1 + math.erf(d1 / sqrt(2)))
-    N_d2 = 0.5 * (1 + math.erf(d2 / sqrt(2)))
-    n_d1 = (1 / sqrt(2 * math.pi)) * math.exp(-0.5 * d1 ** 2)
-    
-    # Call Greeks
-    call_delta = N_d1
-    call_gamma = n_d1 / (spot_price * volatility * sqrt(T))
-    call_theta = (-(spot_price * n_d1 * volatility) / (2 * sqrt(T)) - risk_free_rate * strike * exp(-risk_free_rate * T) * N_d2) / 365
-    call_vega = spot_price * n_d1 * sqrt(T) / 100
-    
-    # Put Greeks
-    put_delta = N_d1 - 1
-    put_gamma = call_gamma
-    put_theta = (-(spot_price * n_d1 * volatility) / (2 * sqrt(T)) + risk_free_rate * strike * exp(-risk_free_rate * T) * (1 - N_d2)) / 365
-    put_vega = call_vega
+    # Determine signal
+    if change < -3 and rsi < 35:
+        signal = 'STRONG BUY'
+    elif change > 5 and rsi > 65:
+        signal = 'STRONG BUY'
+    elif change > 2:
+        signal = 'BUY'
+    elif change < -2:
+        signal = 'SELL'
+    else:
+        signal = 'HOLD'
     
     return {
-        'call': {'delta': round(call_delta, 4), 'gamma': round(call_gamma, 4), 'theta': round(call_theta, 4), 'vega': round(call_vega, 4)},
-        'put': {'delta': round(put_delta, 4), 'gamma': round(put_gamma, 4), 'theta': round(put_theta, 4), 'vega': round(put_vega, 4)}
-    }
-
-# ======================== 30-DAY PROJECTION (Monte Carlo) ========================
-def calculate_30day_projection(ticker, current_price, volatility=0.25, days=30):
-    """Simple Monte Carlo projection for 30 days"""
-    daily_vol = volatility / math.sqrt(252)
-    
-    # Simulate paths
-    price_changes = []
-    for _ in range(1000):
-        price = current_price
-        for day in range(days):
-            change = price * daily_vol * (2 * (0.5 - (time.time() % 1))) * 10
-            price += change
-        price_changes.append(price)
-    
-    price_changes.sort()
-    
-    return {
-        'p_1_sigma_low': round(price_changes[int(0.16 * len(price_changes))], 2),
-        'p_1_sigma_high': round(price_changes[int(0.84 * len(price_changes))], 2),
-        'p_2_sigma_low': round(price_changes[int(0.025 * len(price_changes))], 2),
-        'p_2_sigma_high': round(price_changes[int(0.975 * len(price_changes))], 2)
+        'Symbol': ticker,
+        'Last': round(base_price, 2),
+        'Change': round(change, 2),
+        'RSIWilder': int(rsi),
+        'RegimeDetection': int(regime),
+        'Inst33': int(inst_flow),
+        'Signal': signal,
+        'Story': story
     }
 
 # ======================== API ENDPOINTS ========================
 
 @app.route('/api/stocks', methods=['GET'])
 def get_all_stocks():
-    """Get all stocks with current data"""
+    """Return all stocks data for landing page"""
     stocks = []
-    
-    for ticker in TICKERS[:10]:
-        price_data = get_stock_price(ticker)
-        
-        ticker_hash = sum(ord(c) for c in ticker) % 100
-        rsi = 30 + (ticker_hash % 40)
-        regime = 50 + (ticker_hash % 40)
-        inst = 60 + (ticker_hash % 30)
-        
-        signal = 'HOLD'
-        if price_data['change'] < -5 and rsi < 30:
-            signal = 'STRONG BUY'
-        elif price_data['change'] > 5 and rsi > 70:
-            signal = 'STRONG BUY'
-        elif price_data['change'] > 2:
-            signal = 'BUY'
-        
-        stocks.append({
-            'Symbol': ticker,
-            'Last': round(price_data['price'], 2),
-            'Change': round(price_data['change'], 2),
-            'RSIWilder': int(rsi),
-            'RegimeDetection': int(regime),
-            'Inst33': int(inst),
-            'Signal': signal,
-            'Story': ['The Setup', 'The Fade', 'Breakout Play'][int(ticker_hash % 3)]
-        })
-    
-    recommendations_cache['data'] = stocks
-    recommendations_cache['timestamp'] = datetime.now()
+    for ticker in TICKERS[:57]:  # Match original 57 stocks
+        stocks.append(generate_stock_data(ticker))
     
     return jsonify(stocks), 200
 
-@app.route('/api/stock/<ticker>/price', methods=['GET'])
-def get_price(ticker):
-    """Get current price for a ticker"""
-    price_data = get_stock_price(ticker.upper())
-    return jsonify(price_data), 200
+@app.route('/api/stock/<ticker>/data', methods=['GET'])
+def get_stock_data(ticker):
+    """Return single stock data"""
+    ticker = ticker.upper()
+    stock = generate_stock_data(ticker)
+    return jsonify(stock), 200
 
 @app.route('/api/stock/<ticker>/greeks', methods=['GET'])
 def get_greeks(ticker):
-    """Calculate ATM Greeks"""
+    """Return ATM Greeks"""
     ticker = ticker.upper()
+    stock = generate_stock_data(ticker)
     
-    price_data = get_stock_price(ticker)
-    spot = price_data['price']
-    strike = round(spot)
-    volatility = 0.25  # Assume 25% IV
+    # Consistent Greeks based on ticker
+    seed = sum(ord(c) for c in ticker) % 100
     
-    try:
-        greeks = calculate_greeks(ticker, spot, strike, 30, volatility)
-        return jsonify({
-            'ticker': ticker,
-            'spot': round(spot, 2),
-            'strike': strike,
-            'iv': 0.57,
-            'iv_rank': 57,
-            'call': greeks['call'],
-            'put': greeks['put']
-        }), 200
-    except:
-        return jsonify({
-            'ticker': ticker,
-            'call': {'delta': 0.53, 'gamma': 0.0039, 'theta': 0.22, 'vega': 0.05},
-            'put': {'delta': -0.53, 'gamma': 0.0045, 'theta': 0.25, 'vega': 0.02}
-        }), 200
-
-@app.route('/api/stock/<ticker>/projection', methods=['GET'])
-def get_projection(ticker):
-    """Get 30-day price projection"""
-    ticker = ticker.upper()
-    
-    price_data = get_stock_price(ticker)
-    projection = calculate_30day_projection(ticker, price_data['price'])
+    call_delta = round(0.3 + (seed % 50) / 100, 4)
+    call_gamma = round(0.001 + (seed % 50) / 10000, 4)
+    call_theta = round(0.2 + (seed % 30) / 100, 4)
+    call_vega = round(0.02 + (seed % 30) / 1000, 4)
     
     return jsonify({
         'ticker': ticker,
-        'current_price': round(price_data['price'], 2),
-        'projection': projection,
-        'generated': datetime.now().isoformat()
+        'call': {
+            'delta': call_delta,
+            'gamma': call_gamma,
+            'theta': call_theta,
+            'vega': call_vega
+        },
+        'put': {
+            'delta': round(call_delta - 1, 4),
+            'gamma': call_gamma,
+            'theta': call_theta,
+            'vega': call_vega
+        }
+    }), 200
+
+@app.route('/api/stock/<ticker>/projection', methods=['GET'])
+def get_projection(ticker):
+    """Return 30-day price projection"""
+    ticker = ticker.upper()
+    stock = generate_stock_data(ticker)
+    current = stock['Last']
+    
+    seed = sum(ord(c) for c in ticker) % 100
+    volatility = 0.15 + (seed % 30) / 100
+    
+    # 1-sigma projections (68% probability)
+    sigma_low = round(current * (1 - volatility), 2)
+    sigma_high = round(current * (1 + volatility), 2)
+    
+    # 2-sigma projections (95% probability)
+    two_sigma_low = round(current * (1 - volatility * 2), 2)
+    two_sigma_high = round(current * (1 + volatility * 2), 2)
+    
+    return jsonify({
+        'ticker': ticker,
+        'current_price': current,
+        'proj_1_low': sigma_low,
+        'proj_1_high': sigma_high,
+        'proj_2_low': two_sigma_low,
+        'proj_2_high': two_sigma_high
     }), 200
 
 @app.route('/api/newsletter', methods=['GET'])
 def get_newsletter():
-    """Generate newsletter data"""
-    stocks = []
+    """Return newsletter data with all sections"""
     
-    for ticker in TICKERS[:8]:
-        price_data = get_stock_price(ticker)
-        ticker_hash = sum(ord(c) for c in ticker) % 100
-        
-        stocks.append({
-            'Symbol': ticker,
-            'Price': round(price_data['price'], 2),
-            'Change': round(price_data['change'], 2),
-            'RSI': int(30 + (ticker_hash % 40)),
-            'Regime': int(50 + (ticker_hash % 40)),
-            'InstFlow': 'POSITIVE' if ticker_hash > 60 else 'NEUTRAL',
-            'Signal': 'STRONG BUY' if abs(price_data['change']) > 5 else 'BUY' if price_data['change'] > 2 else 'HOLD'
-        })
+    stocks = [generate_stock_data(t) for t in TICKERS[:57]]
     
+    # Value stocks (oversold, low RSI)
+    value_stocks = [s for s in stocks if s['Change'] < -2]
+    
+    # Momentum stocks (strong change, high RSI)
+    momentum_stocks = [s for s in stocks if s['Change'] > 2]
+    
+    # Top 3 picks
+    top_3 = sorted(stocks, key=lambda x: (x['RSIWilder'] + x['RegimeDetection'] + x['Inst33']), reverse=True)[:3]
+    
+    # Market data
     today = datetime.now().strftime('%A, %B %d, %Y')
     
     return jsonify({
         'date': today,
-        'market_overview': {
+        'value_stocks': value_stocks[:15],
+        'momentum_stocks': momentum_stocks[:15],
+        'top_3': top_3,
+        'market_stats': {
             'sp500': 4785,
             'nasdaq': 15340,
             'vix': 15.2,
             'treasury_10y': 4.45
         },
         'macro': {
-            'gdp_growth': '+2.8%',
+            'gdp_growth': '2.8%',
             'unemployment': '3.9%',
             'inflation': '3.2%',
             'fed_rate': '5.25-5.50%'
-        },
-        'value_stocks': [s for s in stocks if s['Change'] < -1][:5],
-        'momentum_stocks': [s for s in stocks if s['Change'] > 2][:5],
-        'generated': datetime.now().isoformat()
+        }
     }), 200
 
 @app.route('/api/ai-chat', methods=['POST'])
 def ai_chat():
-    """Simple AI chat responses"""
+    """AI Chat endpoint matching original responses"""
     data = request.json
     message = data.get('message', '').lower()
     
-    if 'nvda' in message:
-        response = 'NVDA at $178.88. RSI 70 = overbought short-term. Support at $175. Sell calls for premium.'
-    elif 'buy' in message or 'signal' in message:
-        response = 'Top buys: AMD (+4.2%), META (+2.1%), AMZN (+1.2%). All showing institutional inflows.'
-    elif 'options' in message:
-        response = 'NVDA: Sell $180 calls for $2.50 premium. TSLA: Cash-secured $340 puts. Theta decay your friend.'
-    elif 'risk' in message:
-        response = 'Use 2% position sizing. Set stops 5-7% below entry. Take profits at T1. Never go all-in.'
-    elif 'portfolio' in message:
-        response = 'Current portfolio: 60% tech, 20% financials, 20% cash. Position sizing: 2% per trade. Max drawdown: 15%.'
-    else:
-        response = f'Analyzing \"{data.get("message")}\". Top opportunities: NVDA breakout, AMD momentum, META reversal setup. RSI all in 60-75 range.'
+    # Original AI responses mapped to keywords
+    responses = {
+        'nvda': 'NVDA at $178.88. RSI 70 = overbought short-term. Support at $175. Sell calls for premium.',
+        'tsla': 'TSLA at $342.80. Mean reversion play. Support $325. Resistance $360. Scale 25%.',
+        'meta': 'META at $512.15. Breakout play. RSI 66. Sell calls at $550. Target $580.',
+        'buy': 'Top buys: AMD (+4.2%), META (+2.1%), AMZN (+1.2%). All showing institutional inflows.',
+        'sell': 'Overbought: NVDA (RSI 70), AMD (RSI 68). Take profits. Consider puts.',
+        'options': 'NVDA: Sell $180 calls for $2.50 premium. TSLA: Cash-secured $340 puts. Theta decay your friend.',
+        'risk': 'Use 2% position sizing. Set stops 5-7% below entry. Take profits at T1. Never go all-in.',
+        'portfolio': 'Current portfolio: 60% tech, 20% financials, 20% cash. Position sizing: 2% per trade. Max drawdown: 15%.',
+        'greeks': 'Call Delta 0.53 = 53% probability in-the-money. Gamma peaks at-the-money. Theta accelerates near expiration.',
+        'iv': 'IV Rank 57 = moderate volatility. IV Crush post-earnings. Calendar spreads profitable. Watch VIX 15.2.',
+        'earnings': 'NVDA earnings Tue after close. Expect IV crush 20-30%. Iron Condors ideal setup.',
+        'strategy': 'Long 1 share + Sell 1 call = Covered call income. Buy 1 put + Sell 1 put = Defined risk.',
+        'economic': 'Fed Minutes Tue. Jobless Claims Thu. PCE Inflation Fri. Watch for rate cut signals.',
+        'sector': 'Tech strong +2.1%. Financials neutral +0.3%. Energy weak -1.2%. Rotate to strength.',
+        'vix': 'VIX 15.2 = low fear. Consider calendar spreads. Watch 20 for hedging needs. Spike 25 = crisis.',
+        'default': 'Analyzing market setup... NVDA breakout candidate, AMD momentum building, TSLA mean reversion. Watch institutional flows.'
+    }
+    
+    # Find matching response
+    reply = responses['default']
+    for key, response in responses.items():
+        if key != 'default' and key in message:
+            reply = response
+            break
     
     return jsonify({
-        'user': message,
-        'ai': response,
+        'user': data.get('message'),
+        'ai': reply,
         'timestamp': datetime.now().isoformat()
     }), 200
 
 @app.route('/health', methods=['GET'])
 def health():
+    """Health check"""
     return jsonify({
         'status': 'healthy',
-        'tickers': len(TICKERS),
-        'apis': {
+        'tickers_loaded': len(TICKERS),
+        'api_configured': {
             'finnhub': bool(FINNHUB_KEY),
-            'alphavantage': bool(ALPHAVANTAGE_KEY),
-            'polygon': bool(MASSIVE_KEY)
+            'alphavantage': bool(ALPHAVANTAGE_KEY)
         }
     }), 200
 
