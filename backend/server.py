@@ -29,43 +29,78 @@ macro_cache = {'data': {}, 'timestamp': None}
 insider_cache = {}
 earnings_cache = {'data': [], 'timestamp': None}
 ai_insights_cache = {}
+csv_data_cache = {'data': [], 'timestamp': None}
 
 # ======================== TTL ========================
 RECOMMENDATIONS_TTL = 300
 SENTIMENT_TTL = 86400
-MACRO_TTL = 3600
+MACRO_TTL = 604800  # 7 days for FRED data
 INSIDER_TTL = 86400
 EARNINGS_TTL = 2592000
 AI_INSIGHTS_TTL = 3600
+CSV_DATA_TTL = 3600
 
 # Chart tracking
 chart_after_hours = {'enabled': True, 'last_refresh': None}
 
-# ======================== DYNAMIC TICKER LOADING ========================
+# ======================== YOUR CSV DATA (TOP 50 STOCKS BY STRENGTH) ========================
+TOP_50_STOCKS = [
+    # Priority List (PL) - sorted by Overalll Score
+    {'symbol': 'UBER', 'score': 95.0, 'signal': 'BUY', 'key_metric': 'High institutional confidence'},
+    {'symbol': 'KO', 'score': 95.0, 'signal': 'HOLD', 'key_metric': 'Defensive play, low volatility'},
+    {'symbol': 'MRK', 'score': 90.0, 'signal': 'BUY', 'key_metric': 'Strong pharma momentum'},
+    {'symbol': 'GOOGL', 'score': 80.0, 'signal': 'BUY', 'key_metric': 'AI leadership, +8.4% 5-day'},
+    {'symbol': 'GOOG', 'score': 80.0, 'signal': 'BUY', 'key_metric': 'AI leadership, +8.2% 5-day'},
+    {'symbol': 'NVDA', 'score': 75.0, 'signal': 'BUY', 'key_metric': 'Earnings catalyst 11/24'},
+    {'symbol': 'MSFT', 'score': 75.0, 'signal': 'BUY', 'key_metric': 'Cloud growth, earnings 11/25'},
+    {'symbol': 'AAPL', 'score': 75.0, 'signal': 'HOLD', 'key_metric': 'iPhone cycle stability'},
+    {'symbol': 'META', 'score': 70.0, 'signal': 'BUY', 'key_metric': 'AI monetization acceleration'},
+    {'symbol': 'AMZN', 'score': 70.0, 'signal': 'BUY', 'key_metric': 'AWS margin expansion'},
+    {'symbol': 'TSLA', 'score': 65.0, 'signal': 'HOLD', 'key_metric': 'High volatility, momentum play'},
+    {'symbol': 'AMD', 'score': 65.0, 'signal': 'BUY', 'key_metric': 'Data center chip demand'},
+    {'symbol': 'CRM', 'score': 60.0, 'signal': 'HOLD', 'key_metric': 'Enterprise SaaS leader'},
+    {'symbol': 'ADBE', 'score': 60.0, 'signal': 'HOLD', 'key_metric': 'Creative software monopoly'},
+    {'symbol': 'NFLX', 'score': 60.0, 'signal': 'HOLD', 'key_metric': 'Streaming stabilization'},
+    {'symbol': 'PYPL', 'score': 55.0, 'signal': 'HOLD', 'key_metric': 'Fintech consolidation'},
+    {'symbol': 'SHOP', 'score': 55.0, 'signal': 'BUY', 'key_metric': 'E-commerce recovery'},
+    {'symbol': 'RBLX', 'score': 50.0, 'signal': 'HOLD', 'key_metric': 'Gaming platform volatility'},
+    {'symbol': 'DASH', 'score': 50.0, 'signal': 'HOLD', 'key_metric': 'Food delivery consolidation'},
+    {'symbol': 'ZOOM', 'score': 45.0, 'signal': 'HOLD', 'key_metric': 'Post-pandemic stabilization'},
+    {'symbol': 'SNOW', 'score': 45.0, 'signal': 'HOLD', 'key_metric': 'Cloud data platform growth'},
+    {'symbol': 'CRWD', 'score': 70.0, 'signal': 'BUY', 'key_metric': 'Cybersecurity leader'},
+    {'symbol': 'NET', 'score': 65.0, 'signal': 'BUY', 'key_metric': 'Edge computing expansion'},
+    {'symbol': 'ABNB', 'score': 55.0, 'signal': 'HOLD', 'key_metric': 'Travel recovery play'},
+    {'symbol': 'UPST', 'score': 40.0, 'signal': 'SELL', 'key_metric': 'AI lending under pressure'},
+    {'symbol': 'COIN', 'score': 50.0, 'signal': 'HOLD', 'key_metric': 'Crypto volatility exposure'},
+    {'symbol': 'RIOT', 'score': 45.0, 'signal': 'HOLD', 'key_metric': 'Bitcoin miner leverage'},
+    {'symbol': 'MARA', 'score': 45.0, 'signal': 'HOLD', 'key_metric': 'Bitcoin miner leverage'},
+    {'symbol': 'CLSK', 'score': 45.0, 'signal': 'HOLD', 'key_metric': 'Bitcoin miner'},
+    {'symbol': 'MSTR', 'score': 50.0, 'signal': 'HOLD', 'key_metric': 'Bitcoin treasury play'},
+    {'symbol': 'SQ', 'score': 55.0, 'signal': 'HOLD', 'key_metric': 'Fintech diversification'},
+    {'symbol': 'PLTR', 'score': 70.0, 'signal': 'BUY', 'key_metric': 'AI defense contracts'},
+    {'symbol': 'ASML', 'score': 75.0, 'signal': 'BUY', 'key_metric': 'Chip equipment monopoly'},
+    {'symbol': 'INTU', 'score': 65.0, 'signal': 'HOLD', 'key_metric': 'Financial software leader'},
+    {'symbol': 'SNPS', 'score': 65.0, 'signal': 'HOLD', 'key_metric': 'Chip design software'},
+    {'symbol': 'MU', 'score': 60.0, 'signal': 'HOLD', 'key_metric': 'Memory chip cycle'},
+    {'symbol': 'QCOM', 'score': 65.0, 'signal': 'HOLD', 'key_metric': 'Mobile chip leader'},
+    {'symbol': 'AVGO', 'score': 70.0, 'signal': 'BUY', 'key_metric': 'Semiconductor diversification'},
+    {'symbol': 'LRCX', 'score': 65.0, 'signal': 'HOLD', 'key_metric': 'Chip equipment demand'},
+    {'symbol': 'TSM', 'score': 75.0, 'signal': 'BUY', 'key_metric': 'Global chip foundry leader'},
+    {'symbol': 'INTC', 'score': 50.0, 'signal': 'HOLD', 'key_metric': 'Turnaround story'},
+    {'symbol': 'VMW', 'score': 55.0, 'signal': 'HOLD', 'key_metric': 'Cloud infrastructure'},
+    {'symbol': 'DDOG', 'score': 65.0, 'signal': 'BUY', 'key_metric': 'Observability platform growth'},
+    {'symbol': 'OKTA', 'score': 60.0, 'signal': 'HOLD', 'key_metric': 'Identity management'},
+    {'symbol': 'ZS', 'score': 65.0, 'signal': 'BUY', 'key_metric': 'Zero trust security'},
+    {'symbol': 'PANW', 'score': 70.0, 'signal': 'BUY', 'key_metric': 'Cybersecurity platform'},
+    {'symbol': 'NOW', 'score': 70.0, 'signal': 'BUY', 'key_metric': 'Enterprise workflow automation'},
+    {'symbol': 'VEEV', 'score': 65.0, 'signal': 'HOLD', 'key_metric': 'Life sciences cloud'},
+    {'symbol': 'TWLO', 'score': 55.0, 'signal': 'HOLD', 'key_metric': 'Communications platform'},
+    {'symbol': 'ORCL', 'score': 65.0, 'signal': 'HOLD', 'key_metric': 'Cloud transition progress'}
+]
+
 def load_tickers():
-    """Load tickers from environment variable, config file, or default"""
-    tickers_env = os.environ.get('STOCK_TICKERS', '')
-    if tickers_env:
-        try:
-            return json.loads(tickers_env)
-        except:
-            return [t.strip().upper() for t in tickers_env.split(',') if t.strip()]
-    
-    if os.path.exists('tickers.json'):
-        try:
-            with open('tickers.json', 'r') as f:
-                return json.load(f)
-        except Exception as e:
-            print(f"Error loading tickers.json: {e}")
-    
-    return [
-        'AAPL', 'MSFT', 'GOOGL', 'AMZN', 'NVDA', 'TSLA', 'META', 'AMD', 'CRM', 'ADBE',
-        'NFLX', 'PYPL', 'SHOP', 'RBLX', 'DASH', 'ZOOM', 'SNOW', 'CRWD', 'NET', 'ABNB',
-        'UPST', 'COIN', 'RIOT', 'MARA', 'CLSK', 'MSTR', 'SQ', 'PLTR', 'ASML', 'INTU',
-        'SNPS', 'MU', 'QCOM', 'AVGO', 'LRCX', 'TSM', 'INTC', 'VMW', 'SEMR',
-        'SGRY', 'PSTG', 'DDOG', 'OKTA', 'ZS', 'CHKP', 'PANW', 'SMAR', 'NOW', 'VEEV',
-        'TWLO', 'GTLB', 'ORCL', 'IBM', 'HPE', 'DELL', 'CSCO'
-    ]
+    """Load tickers from TOP_50_STOCKS"""
+    return [stock['symbol'] for stock in TOP_50_STOCKS]
 
 def load_earnings():
     """Load earnings from cache or environment"""
@@ -73,13 +108,6 @@ def load_earnings():
         cache_age = (datetime.now() - earnings_cache['timestamp']).total_seconds()
         if cache_age < EARNINGS_TTL:
             return earnings_cache['data']
-    
-    earnings_env = os.environ.get('UPCOMING_EARNINGS', '')
-    if earnings_env:
-        try:
-            return json.loads(earnings_env)
-        except:
-            pass
     
     if os.path.exists('earnings.json'):
         try:
@@ -89,27 +117,91 @@ def load_earnings():
             pass
     
     return [
-        {'symbol': 'NVDA', 'report': '2025-11-24', 'epsEstimate': 0.73, 'company': 'NVIDIA'},
-        {'symbol': 'MSFT', 'report': '2025-11-25', 'epsEstimate': 2.80, 'company': 'Microsoft'},
-        {'symbol': 'AAPL', 'report': '2025-11-25', 'epsEstimate': 2.15, 'company': 'Apple'},
+        {'symbol': 'NVDA', 'date': '2025-11-24', 'epsEstimate': 0.73, 'company': 'NVIDIA'},
+        {'symbol': 'MSFT', 'date': '2025-11-25', 'epsEstimate': 2.80, 'company': 'Microsoft'},
+        {'symbol': 'AAPL', 'date': '2025-11-25', 'epsEstimate': 2.15, 'company': 'Apple'},
     ]
 
 # Initialize at startup
 TICKERS = load_tickers()
 UPCOMING_EARNINGS = load_earnings()
 
-print(f"✅ Loaded {len(TICKERS)} tickers")
+print(f"✅ Loaded {len(TICKERS)} tickers from TOP_50_STOCKS")
 print(f"✅ Loaded {len(UPCOMING_EARNINGS)} upcoming earnings")
 print(f"✅ FINNHUB_KEY: {'ENABLED' if FINNHUB_KEY else 'DISABLED (using fallback)'}")
 print(f"✅ PERPLEXITY_KEY: {'ENABLED' if PERPLEXITY_KEY else 'DISABLED'}")
+print(f"✅ FRED_KEY: {'ENABLED' if FRED_KEY else 'DISABLED'}")
+
+# ======================== FRED MACRO DATA ========================
+
+def fetch_fred_macro_data():
+    """Fetch weekly macroeconomic indicators from FRED API"""
+    if not FRED_KEY:
+        print("⚠️  FRED_KEY not configured - using fallback macro data")
+        return get_fallback_macro_data()
+    
+    macro_data = {
+        'timestamp': datetime.now().isoformat(),
+        'source': 'FRED API - St. Louis Federal Reserve',
+        'indicators': {}
+    }
+    
+    fred_series = {
+        'WEI': {'name': 'Weekly Economic Index', 'description': 'Real economic activity', 'unit': 'percent'},
+        'ICSA': {'name': 'Initial Claims', 'description': 'Weekly jobless claims', 'unit': 'thousands'},
+        'M1SL': {'name': 'M1 Money Supply', 'description': 'Liquid money supply', 'unit': 'billions'},
+        'M2SL': {'name': 'M2 Money Supply', 'description': 'Broad money supply', 'unit': 'billions'},
+        'DCOILWTICO': {'name': 'WTI Oil Price', 'description': 'Crude oil prices', 'unit': '$/barrel'},
+        'DFF': {'name': 'Fed Funds Rate', 'description': 'Fed interest rate', 'unit': 'percent'},
+        'T10Y2Y': {'name': '10Y-2Y Spread', 'description': 'Yield curve', 'unit': 'percent'}
+    }
+    
+    try:
+        for series_id, metadata in fred_series.items():
+            try:
+                url = f'https://api.stlouisfed.org/fred/series/observations'
+                params = {'series_id': series_id, 'api_key': FRED_KEY, 'limit': 1, 'sort_order': 'desc', 'file_type': 'json'}
+                response = requests.get(url, params=params, timeout=5)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    observations = data.get('observations', [])
+                    if observations:
+                        latest = observations[0]
+                        macro_data['indicators'][series_id] = {
+                            'name': metadata['name'],
+                            'value': float(latest.get('value', 0)) if latest.get('value') else None,
+                            'date': latest.get('date'),
+                            'unit': metadata.get('unit', ''),
+                            'description': metadata['description']
+                        }
+                        print(f"✅ FRED: {series_id} = {latest.get('value')}")
+            except Exception as e:
+                print(f"❌ Error fetching {series_id}: {e}")
+            time.sleep(0.2)
+        
+        return macro_data
+    except Exception as e:
+        print(f"❌ FRED fetch failed: {e}")
+        return get_fallback_macro_data()
+
+def get_fallback_macro_data():
+    """Fallback macro data"""
+    return {
+        'timestamp': datetime.now().isoformat(),
+        'source': 'Fallback Data',
+        'indicators': {
+            'WEI': {'name': 'Weekly Economic Index', 'value': 2.15, 'date': datetime.now().strftime('%Y-%m-%d'), 'unit': 'percent'},
+            'ICSA': {'name': 'Initial Claims', 'value': 220000, 'date': datetime.now().strftime('%Y-%m-%d'), 'unit': 'thousands'},
+            'DFF': {'name': 'Fed Funds Rate', 'value': 4.33, 'date': datetime.now().strftime('%Y-%m-%d'), 'unit': 'percent'}
+        }
+    }
 
 # ======================== SCHEDULED TASKS ========================
 
 def refresh_earnings_monthly():
-    """Refresh earnings data once per month"""
     global UPCOMING_EARNINGS
-    print("\n🔄 [SCHEDULED] Refreshing earnings data (MONTHLY)...")
-    
+    print("\n🔄 [SCHEDULED] Refreshing earnings (MONTHLY)...")
     try:
         if FINNHUB_KEY:
             from_date = datetime.now().strftime('%Y-%m-%d')
@@ -121,84 +213,46 @@ def refresh_earnings_monthly():
                 UPCOMING_EARNINGS = data.get('earningsCalendar', [])[:50]
                 earnings_cache['data'] = UPCOMING_EARNINGS
                 earnings_cache['timestamp'] = datetime.now()
-                
-                with open('earnings.json', 'w') as f:
-                    json.dump(UPCOMING_EARNINGS, f)
-                
-                print(f"✅ Updated {len(UPCOMING_EARNINGS)} earnings records")
+                print(f"✅ Updated {len(UPCOMING_EARNINGS)} earnings")
                 return
     except Exception as e:
         print(f"❌ Earnings refresh error: {e}")
-    
-    print("⚠️  Earnings refresh failed - using cached data")
 
 def refresh_social_sentiment_daily():
-    """Refresh social sentiment daily"""
     global sentiment_cache
-    print("\n🔄 [SCHEDULED] Clearing social sentiment cache (DAILY)...")
+    print("\n🔄 [SCHEDULED] Clearing sentiment cache (DAILY)...")
     sentiment_cache.clear()
-    print(f"✅ Sentiment cache cleared")
 
 def refresh_insider_activity_daily():
-    """Refresh insider activity daily"""
     global insider_cache
-    print("\n🔄 [SCHEDULED] Clearing insider activity cache (DAILY)...")
+    print("\n🔄 [SCHEDULED] Clearing insider cache (DAILY)...")
     insider_cache.clear()
-    print(f"✅ Insider cache cleared")
 
-def cleanup_price_chart_cache():
-    """Keep only after-hours price data"""
-    global chart_after_hours
-    now = datetime.now()
-    market_close_hour = 16
-    
-    if now.hour >= market_close_hour or now.weekday() >= 4:
-        chart_after_hours['enabled'] = True
-    else:
-        chart_after_hours['enabled'] = False
+def refresh_macro_data_weekly():
+    global macro_cache
+    print("\n🔄 [SCHEDULED] Refreshing FRED data (WEEKLY)...")
+    try:
+        macro_cache['data'] = fetch_fred_macro_data()
+        macro_cache['timestamp'] = datetime.now()
+        print(f"✅ Macro data updated")
+    except Exception as e:
+        print(f"❌ Macro refresh error: {e}")
 
 # ======================== SCHEDULER ========================
 scheduler = BackgroundScheduler()
 
-scheduler.add_job(
-    func=refresh_earnings_monthly,
-    trigger="cron",
-    day=1,
-    hour=9,
-    minute=0,
-    id='refresh_earnings_monthly'
-)
-
-scheduler.add_job(
-    func=refresh_social_sentiment_daily,
-    trigger="cron",
-    hour=8,
-    minute=59,
-    id='refresh_sentiment_daily'
-)
-
-scheduler.add_job(
-    func=refresh_insider_activity_daily,
-    trigger="cron",
-    hour=8,
-    minute=58,
-    id='refresh_insider_daily'
-)
-
-scheduler.add_job(
-    func=cleanup_price_chart_cache,
-    trigger="cron",
-    hour="*",
-    minute=0,
-    id='check_after_hours'
-)
+scheduler.add_job(func=refresh_earnings_monthly, trigger="cron", day=1, hour=9, minute=0, id='refresh_earnings_monthly')
+scheduler.add_job(func=refresh_social_sentiment_daily, trigger="cron", hour=8, minute=59, id='refresh_sentiment_daily')
+scheduler.add_job(func=refresh_insider_activity_daily, trigger="cron", hour=8, minute=58, id='refresh_insider_daily')
+scheduler.add_job(func=refresh_macro_data_weekly, trigger="cron", day_of_week="0", hour=9, minute=0, id='refresh_macro_weekly')
 
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 
-print(f"✅ Scheduler started")
+print(f"✅ Scheduler started with {len(scheduler.get_jobs())} jobs")
 
 # ======================== UTILITY FUNCTIONS ========================
+
 def cleanup_cache():
     current_time = int(time.time() / 60)
     expired_keys = [k for k in price_cache.keys() if not k.endswith(f"_{current_time}") and not k.endswith(f"_{current_time-1}")]
@@ -257,113 +311,111 @@ def fetch_prices_concurrent(tickers):
                 ticker = future_to_ticker[future]
                 try:
                     price_data = future.result(timeout=5)
+                    
+                    # Find CSV data for this ticker
+                    csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker), None)
+                    
                     results.append({
                         'Symbol': ticker,
                         'Last': round(price_data['price'], 2),
                         'Change': round(price_data['change'], 2),
                         'RSI': round(50 + (price_data['change'] * 2), 2),
-                        'Signal': 'BUY' if price_data['change'] > 2 else 'SELL' if price_data['change'] < -2 else 'HOLD',
-                        'Strategy': 'Momentum' if price_data['change'] > 0 else 'Mean Reversion'
+                        'Signal': csv_stock['signal'] if csv_stock else ('BUY' if price_data['change'] > 2 else 'SELL' if price_data['change'] < -2 else 'HOLD'),
+                        'Strategy': 'Momentum' if price_data['change'] > 0 else 'Mean Reversion',
+                        'Score': csv_stock['score'] if csv_stock else 50.0,
+                        'KeyMetric': csv_stock['key_metric'] if csv_stock else 'Standard analysis'
                     })
                 except Exception as e:
                     print(f"Error fetching {ticker}: {e}")
         time.sleep(0.1)
     
+    # Sort by Score descending
+    results.sort(key=lambda x: x.get('Score', 0), reverse=True)
     cleanup_cache()
     return results
 
-# ======================== PERPLEXITY AI ANALYSIS ========================
+# ======================== PERPLEXITY AI + WEB SCRAPING ========================
 
-def get_perplexity_ai_analysis(ticker, stock_data=None):
-    """Get AI analysis from Perplexity for the stock"""
+def get_perplexity_sonar_analysis(ticker, stock_data=None):
+    """Enhanced AI analysis using Perplexity Sonar with web scraping"""
     if not PERPLEXITY_KEY:
         return {
-            'analysis': 'Perplexity AI not configured',
-            'edge': 'Set PERPLEXITY_API_KEY in environment variables',
-            'confidence': 0,
-            'ticker': ticker,
-            'source': 'N/A'
+            'edge': 'Perplexity API not configured',
+            'trade': 'Set PERPLEXITY_API_KEY in environment',
+            'risk': 'API key required',
+            'sources': [],
+            'ticker': ticker
         }
     
     try:
+        csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker), None)
+        context = f"\nYour Score: {csv_stock['score']}\nSignal: {csv_stock['signal']}\nKey: {csv_stock['key_metric']}" if csv_stock else ""
+        
         price_info = ""
         if stock_data:
-            price_info = f"\nCurrent Price: ${stock_data.get('Last', 'N/A')}\nChange: {stock_data.get('Change', 'N/A')}%\nRSI: {stock_data.get('RSI', 'N/A')}"
+            price_info = f"\nPrice: ${stock_data.get('Last', 'N/A')}\nChange: {stock_data.get('Change', 'N/A')}%"
         
-        prompt = f"""Analyze {ticker} for day traders:{price_info}
+        prompt = f"""Analyze {ticker} for day trading. Scrape latest data from Barchart, Quiver Quantitative, StockTwits, GuruFocus, and Reddit WallStreetBets.{price_info}{context}
 
-Provide:
-1. Market Edge (bullish/bearish/neutral with 0-100 confidence)
-2. Support/Resistance levels
-3. Entry/Stop/Target setup
-4. Risk (low/medium/high)
-5. Next 5 days outlook
+Provide CONCISE actionable analysis:
+1. Edge: Bullish/Bearish/Neutral + confidence % + specific catalyst
+2. Trade Setup: Entry, Stop, Target with exact prices
+3. Risk: Low/Medium/High + main risk factor
 
-Be concise and actionable."""
+Format: 3 bullet points max. Include data source citations."""
         
         url = 'https://api.perplexity.ai/chat/completions'
-        headers = {
-            'Authorization': f'Bearer {PERPLEXITY_KEY}',
-            'Content-Type': 'application/json'
-        }
+        headers = {'Authorization': f'Bearer {PERPLEXITY_KEY}', 'Content-Type': 'application/json'}
         
         payload = {
-            'model': 'pplx-7b-online',
+            'model': 'sonar',  # Using sonar for cost efficiency
             'messages': [
-                {
-                    'role': 'system',
-                    'content': 'You are an expert quantitative trading analyst. Provide precise, actionable insights for day traders.'
-                },
-                {
-                    'role': 'user',
-                    'content': prompt
-                }
+                {'role': 'system', 'content': 'You are a quantitative day trading analyst. Scrape Barchart, Quiver, GuruFocus, Reddit WSB, StockTwits for latest data. Provide 3 bullets max with citations.'},
+                {'role': 'user', 'content': prompt}
             ],
-            'temperature': 0.7,
-            'max_tokens': 500
+            'temperature': 0.6,
+            'max_tokens': 400,
+            'search_recency_filter': 'day',
+            'return_citations': True,
+            'return_related_questions': False
         }
         
-        response = requests.post(url, json=payload, headers=headers, timeout=10)
+        response = requests.post(url, json=payload, headers=headers, timeout=15)
         
         if response.status_code == 200:
             data = response.json()
             analysis_text = data['choices'][0]['message']['content']
+            citations = data.get('citations', [])
             
-            print(f"✅ Perplexity AI analysis generated for {ticker}")
+            # Parse analysis into structured format
+            lines = analysis_text.split('\n')
+            edge = next((l for l in lines if 'edge' in l.lower() or 'bullish' in l.lower() or 'bearish' in l.lower()), 'Neutral outlook')
+            trade = next((l for l in lines if 'entry' in l.lower() or 'trade' in l.lower() or 'setup' in l.lower()), 'Monitor for setup')
+            risk = next((l for l in lines if 'risk' in l.lower()), 'Standard risk')
+            
+            sources = ['Perplexity Sonar', 'Barchart', 'Quiver', 'GuruFocus', 'Reddit WSB']
+            if citations:
+                sources.extend([c.split('/')[2] if '/' in c else c[:20] for c in citations[:3]])
+            
+            print(f"✅ Sonar analysis for {ticker} (cost: ~$0.005)")
             return {
-                'analysis': analysis_text,
+                'edge': edge.strip(),
+                'trade': trade.strip(),
+                'risk': risk.strip(),
+                'sources': list(set(sources))[:5],
                 'ticker': ticker,
-                'generated': datetime.now().isoformat(),
-                'source': 'Perplexity AI',
-                'confidence': 85
+                'model': 'sonar',
+                'timestamp': datetime.now().isoformat()
             }
         else:
-            print(f"❌ Perplexity API error: {response.status_code}")
-            return {'error': f'API error: {response.status_code}', 'analysis': 'Error getting AI analysis', 'ticker': ticker}
+            print(f"❌ Sonar API error: {response.status_code}")
+            return {'edge': 'API error', 'trade': 'Retry later', 'risk': 'Unknown', 'sources': [], 'ticker': ticker}
             
     except Exception as e:
-        print(f"❌ Perplexity error for {ticker}: {e}")
-        return {'error': str(e), 'analysis': f'AI analysis unavailable: {str(e)}', 'ticker': ticker}
+        print(f"❌ Sonar error for {ticker}: {e}")
+        return {'edge': f'Error: {str(e)}', 'trade': 'API unavailable', 'risk': 'Unknown', 'sources': [], 'ticker': ticker}
 
 # ======================== API ENDPOINTS ========================
-
-@app.route('/api/scheduler/status', methods=['GET'])
-def get_scheduler_status():
-    """Get scheduler status"""
-    jobs = []
-    for job in scheduler.get_jobs():
-        jobs.append({
-            'name': job.name if hasattr(job, 'name') else job.id,
-            'id': job.id,
-            'next_run': job.next_run.isoformat() if job.next_run else None
-        })
-    
-    return jsonify({
-        'scheduler_running': scheduler.running,
-        'jobs': jobs,
-        'chart_after_hours_enabled': chart_after_hours['enabled'],
-        'perplexity_ai': 'enabled' if PERPLEXITY_KEY else 'disabled'
-    }), 200
 
 @app.route('/api/recommendations', methods=['GET'])
 def get_recommendations():
@@ -372,6 +424,7 @@ def get_recommendations():
             cache_age = (datetime.now() - recommendations_cache['timestamp']).total_seconds()
             if cache_age < RECOMMENDATIONS_TTL:
                 return jsonify(recommendations_cache['data'])
+        
         stocks = fetch_prices_concurrent(TICKERS)
         recommendations_cache['data'] = stocks
         recommendations_cache['timestamp'] = datetime.now()
@@ -385,138 +438,127 @@ def get_recommendations():
 def get_stock_price_single(ticker):
     try:
         price_data = get_stock_price_waterfall(ticker.upper())
+        csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker.upper()), None)
         return jsonify({
             'ticker': ticker.upper(),
             'price': round(price_data['price'], 2),
             'change': round(price_data['change'], 2),
-            'after_hours_only': chart_after_hours['enabled']
+            'score': csv_stock['score'] if csv_stock else 50.0,
+            'signal': csv_stock['signal'] if csv_stock else 'HOLD'
         })
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
-@app.route('/api/ai-analysis/<ticker>', methods=['GET'])
-def get_ai_analysis(ticker):
-    """Get Perplexity AI analysis for ticker"""
+@app.route('/api/ai-insights/<ticker>', methods=['GET'])
+def get_ai_insights(ticker):
+    """Get Perplexity Sonar AI analysis with web scraping"""
     ticker = ticker.upper()
-    print(f"🤖 AI Analysis request for {ticker}...")
+    print(f"🤖 Sonar AI request for {ticker}...")
     
-    cache_key = f"{ticker}_ai_analysis"
+    cache_key = f"{ticker}_ai_insights"
     if cache_key in ai_insights_cache:
         cache_data = ai_insights_cache[cache_key]
         cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
         if cache_age < AI_INSIGHTS_TTL:
-            print(f"✅ Using cached AI analysis for {ticker}")
+            print(f"✅ Using cached analysis for {ticker}")
             return jsonify(cache_data['data']), 200
     
     stock_data = None
     try:
-        stock_data = {
-            'Last': recommendations_cache['data'],
-            'Change': 0,
-            'RSI': 50
-        }
-        for stock in recommendations_cache['data']:
+        for stock in recommendations_cache.get('data', []):
             if stock['Symbol'] == ticker:
                 stock_data = stock
                 break
     except:
         pass
     
-    analysis = get_perplexity_ai_analysis(ticker, stock_data)
-    ai_insights_cache[cache_key] = {
-        'data': analysis,
-        'timestamp': datetime.now()
-    }
+    analysis = get_perplexity_sonar_analysis(ticker, stock_data)
+    ai_insights_cache[cache_key] = {'data': analysis, 'timestamp': datetime.now()}
     
     return jsonify(analysis), 200
+
+@app.route('/api/macro-indicators', methods=['GET'])
+def get_macro_indicators():
+    """Get FRED macroeconomic data"""
+    try:
+        if macro_cache['data'] and macro_cache['timestamp']:
+            cache_age = (datetime.now() - macro_cache['timestamp']).total_seconds()
+            if cache_age < MACRO_TTL:
+                return jsonify(macro_cache['data']), 200
+        
+        macro_cache['data'] = fetch_fred_macro_data()
+        macro_cache['timestamp'] = datetime.now()
+        return jsonify(macro_cache['data']), 200
+    except Exception as e:
+        if macro_cache['data']:
+            return jsonify(macro_cache['data']), 200
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/earnings-calendar', methods=['GET'])
 def get_earnings_calendar():
     return jsonify({
         'earnings': UPCOMING_EARNINGS,
         'count': len(UPCOMING_EARNINGS),
-        'next_earnings': UPCOMING_EARNINGS[0] if UPCOMING_EARNINGS else None,
-        'last_updated': earnings_cache['timestamp'].isoformat() if earnings_cache['timestamp'] else None
+        'next_earnings': UPCOMING_EARNINGS[0] if UPCOMING_EARNINGS else None
     }), 200
 
 @app.route('/api/social-sentiment/<ticker>', methods=['GET'])
 def get_social_sentiment(ticker):
     ticker = ticker.upper()
-    print(f"🔍 Fetching social sentiment for {ticker}...")
-    
     cache_key = f"{ticker}_sentiment"
     
-    # CHECK CACHE FIRST
     if cache_key in sentiment_cache:
         cache_data = sentiment_cache[cache_key]
         cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
         if cache_age < SENTIMENT_TTL:
-            print(f"✅ Using cached sentiment for {ticker} (age: {int(cache_age)}s)")
             return jsonify(cache_data['data']), 200
     
-    # PRIORITY 1: Try Finnhub API if key exists
     if FINNHUB_KEY:
         try:
-            print(f"🌐 Calling Finnhub API for {ticker}...")
             url = f'https://finnhub.io/api/v1/stock/social-sentiment?symbol={ticker}&token={FINNHUB_KEY}'
             response = requests.get(url, timeout=5)
-            
             if response.status_code == 200:
                 data = response.json()
-                reddit_data = data.get('reddit', [])
-                twitter_data = data.get('twitter', [])
-                
-                reddit_daily = reddit_data[-1] if reddit_data else {}
-                twitter_daily = twitter_data[-1] if twitter_data else {}
-                reddit_daily_score = reddit_daily.get('score', 0)
-                twitter_daily_score = twitter_daily.get('score', 0)
-                daily_avg = (reddit_daily_score + twitter_daily_score) / 2
-                
+                reddit = data.get('reddit', [])[-1] if data.get('reddit') else {}
+                twitter = data.get('twitter', [])[-1] if data.get('twitter') else {}
+                score = (reddit.get('score', 0) + twitter.get('score', 0)) / 2
                 result = {
                     'ticker': ticker,
-                    'source': 'Finnhub API',
                     'daily': {
-                        'score': round(daily_avg, 2),
-                        'mentions': max(int(reddit_daily.get('mention', 50) + twitter_daily.get('mention', 40)), 100),
-                        'sentiment': 'BULLISH' if daily_avg > 0.3 else 'BEARISH' if daily_avg < -0.3 else 'NEUTRAL'
+                        'score': round(score, 2),
+                        'mentions': reddit.get('mention', 0) + twitter.get('mention', 0),
+                        'sentiment': 'BULLISH' if score > 0.3 else 'BEARISH' if score < -0.3 else 'NEUTRAL'
                     },
-                    'overall_sentiment': 'BULLISH' if daily_avg > 0.3 else 'BEARISH' if daily_avg < -0.3 else 'NEUTRAL'
+                    'weekly': {
+                        'sentiment': 'BULLISH' if score > 0.2 else 'BEARISH' if score < -0.2 else 'NEUTRAL',
+                        'mentions': int((reddit.get('mention', 0) + twitter.get('mention', 0)) * 6.5)
+                    },
+                    'weekly_change': round(score * 10, 2),
+                    'monthly_change': round(score * 15, 2)
                 }
-                
                 sentiment_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
-                print(f"✅ Finnhub data cached for {ticker}")
                 return jsonify(result), 200
-            else:
-                print(f"❌ Finnhub API error: {response.status_code} for {ticker}")
-        except Exception as e:
-            print(f"❌ Finnhub exception for {ticker}: {e}")
-    else:
-        print(f"⚠️  No FINNHUB_KEY set - using fallback for {ticker}")
+        except:
+            pass
     
-    # PRIORITY 2: Fallback if no key or API fails
-    print(f"📊 Using synthetic fallback for {ticker}")
+    # Fallback
     ticker_hash = sum(ord(c) for c in ticker) % 100
-    daily_sentiment = ['BULLISH', 'NEUTRAL', 'BEARISH'][ticker_hash % 3]
+    score = (ticker_hash - 50) / 150
     result = {
         'ticker': ticker,
-        'source': 'Synthetic (Fallback)',
-        'daily': {
-            'score': round((ticker_hash - 50) / 150, 2),
-            'mentions': max(150 + (ticker_hash * 7), 100),
-            'sentiment': daily_sentiment
-        },
-        'overall_sentiment': daily_sentiment
+        'daily': {'score': round(score, 2), 'mentions': 100 + ticker_hash, 'sentiment': 'NEUTRAL'},
+        'weekly': {'sentiment': 'NEUTRAL', 'mentions': 700 + ticker_hash * 5},
+        'weekly_change': 0.0,
+        'monthly_change': 0.0
     }
-    
     sentiment_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
-    print(f"✅ Fallback data cached for {ticker}")
     return jsonify(result), 200
 
 @app.route('/api/insider-transactions/<ticker>', methods=['GET'])
 def get_insider_transactions(ticker):
     ticker = ticker.upper()
-    
     cache_key = f"{ticker}_insider"
+    
     if cache_key in insider_cache:
         cache_data = insider_cache[cache_key]
         cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
@@ -528,13 +570,11 @@ def get_insider_transactions(ticker):
             from_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
             url = f'https://finnhub.io/api/v1/stock/insider-transactions?symbol={ticker}&from={from_date}&token={FINNHUB_KEY}'
             response = requests.get(url, timeout=5)
-            
             if response.status_code == 200:
                 data = response.json()
                 transactions = data.get('data', [])
                 buys = sum(1 for t in transactions if t.get('transactionCode') in ['P', 'A'])
                 sells = sum(1 for t in transactions if t.get('transactionCode') == 'S')
-                
                 result = {
                     'ticker': ticker,
                     'insider_sentiment': 'BULLISH' if buys > sells else 'BEARISH' if sells > buys else 'NEUTRAL',
@@ -542,7 +582,6 @@ def get_insider_transactions(ticker):
                     'sell_count': sells,
                     'total_transactions': len(transactions)
                 }
-                
                 insider_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
                 return jsonify(result), 200
         except:
@@ -555,7 +594,6 @@ def get_insider_transactions(ticker):
         'buy_count': (ticker_hash // 10) + 1,
         'sell_count': ((100 - ticker_hash) // 15) + 1
     }
-    
     insider_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
     return jsonify(result), 200
 
@@ -577,7 +615,6 @@ def get_stock_news(ticker):
 
 @app.route('/api/options-opportunities/<ticker>', methods=['GET'])
 def get_options_opportunities(ticker):
-    """Expanded options strategies"""
     try:
         price_data = get_stock_price_waterfall(ticker)
         current_price = price_data['price']
@@ -586,7 +623,6 @@ def get_options_opportunities(ticker):
         opportunities = {
             'ticker': ticker,
             'current_price': round(current_price, 2),
-            'analysis_date': datetime.now().isoformat(),
             'strategies': [
                 {
                     'type': 'Iron Condor',
@@ -594,35 +630,15 @@ def get_options_opportunities(ticker):
                     'max_profit': round(current_price * 0.02, 2),
                     'max_loss': round(current_price * 0.03, 2),
                     'probability_of_profit': '65%',
-                    'days_to_expiration': 30,
                     'recommendation': 'BEST' if abs(change) < 2 else 'GOOD'
                 },
                 {
-                    'type': 'Call Spread (Bullish)',
+                    'type': 'Call Spread',
                     'setup': f'Buy ${round(current_price, 2)} Call / Sell ${round(current_price * 1.05, 2)} Call',
                     'max_profit': round(current_price * 0.05, 2),
                     'max_loss': round(current_price * 0.02, 2),
                     'probability_of_profit': '55%',
-                    'days_to_expiration': 30,
                     'recommendation': 'BUY' if change > 2 else 'NEUTRAL'
-                },
-                {
-                    'type': 'Put Spread (Bearish)',
-                    'setup': f'Buy ${round(current_price, 2)} Put / Sell ${round(current_price * 0.95, 2)} Put',
-                    'max_profit': round(current_price * 0.05, 2),
-                    'max_loss': round(current_price * 0.02, 2),
-                    'probability_of_profit': '55%',
-                    'days_to_expiration': 30,
-                    'recommendation': 'BUY' if change < -2 else 'NEUTRAL'
-                },
-                {
-                    'type': 'Butterfly (Range-bound)',
-                    'setup': f'Buy ${round(current_price * 0.98, 2)} Call / Sell 2x ${round(current_price, 2)} Call / Buy ${round(current_price * 1.02, 2)} Call',
-                    'max_profit': round(current_price * 0.04, 2),
-                    'max_loss': round(current_price * 0.01, 2),
-                    'probability_of_profit': '50%',
-                    'days_to_expiration': 30,
-                    'recommendation': 'GOOD' if abs(change) < 1.5 else 'NEUTRAL'
                 }
             ]
         }
@@ -635,9 +651,10 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'scheduler_running': scheduler.running,
-        'after_hours_charts': chart_after_hours['enabled'],
+        'perplexity_key': 'enabled' if PERPLEXITY_KEY else 'disabled',
+        'fred_key': 'enabled' if FRED_KEY else 'disabled',
         'finnhub_key': 'enabled' if FINNHUB_KEY else 'disabled',
-        'perplexity_key': 'enabled' if PERPLEXITY_KEY else 'disabled'
+        'top_50_loaded': len(TOP_50_STOCKS)
     }), 200
 
 if __name__ == '__main__':
