@@ -140,13 +140,13 @@ def fetch_fred_macro_data():
     }
     
     fred_series = {
-        'WEI': {'name': 'Weekly Economic Index', 'description': 'Real economic activity', 'unit': 'percent', 'decimals': 0},
-        'ICSA': {'name': 'Initial Claims', 'description': 'Weekly jobless claims', 'unit': 'thousands', 'decimals': 0},
-        'M1SL': {'name': 'M1 Money Supply', 'description': 'Liquid money supply', 'unit': 'billions', 'decimals': 0},
-        'M2SL': {'name': 'M2 Money Supply', 'description': 'Broad money supply', 'unit': 'billions', 'decimals': 0},
-        'DCOILWTICO': {'name': 'WTI Oil Price', 'description': 'Crude oil prices', 'unit': '$/barrel', 'decimals': 0},
-        'DFF': {'name': 'Fed Funds Rate', 'description': 'Fed interest rate', 'unit': 'percent', 'decimals': 0},
-        'T10Y2Y': {'name': '10Y-2Y Spread', 'description': 'Yield curve', 'unit': 'percent', 'decimals': 0}
+        'WEI': {'name': 'Weekly Economic Index', 'description': 'Real economic activity', 'unit': '%', 'decimals': 0},
+        'ICSA': {'name': 'Initial Claims', 'description': 'Weekly jobless claims', 'unit': 'K', 'decimals': 0},
+        'M1SL': {'name': 'M1 Money Supply', 'description': 'Liquid money supply', 'unit': 'B', 'decimals': 0},
+        'M2SL': {'name': 'M2 Money Supply', 'description': 'Broad money supply', 'unit': 'B', 'decimals': 0},
+        'DCOILWTICO': {'name': 'WTI Oil Price', 'description': 'Crude oil prices', 'unit': '$/B', 'decimals': 0},
+        'DFF': {'name': 'Fed Funds Rate', 'description': 'Fed interest rate', 'unit': '%', 'decimals': 0},
+        'T10Y2Y': {'name': '10Y-2Y Spread', 'description': 'Yield curve', 'unit': '%', 'decimals': 0}
     }
     
     try:
