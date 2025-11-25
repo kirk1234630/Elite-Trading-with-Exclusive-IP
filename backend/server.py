@@ -14,8 +14,8 @@ app = Flask(__name__)
 CORS(app)
 
 # ======================== NEWSLETTER INTEGRATION ========================
-from newsletter_api import newsletter_bp
-app.register_blueprint(newsletter_bp)  # ✅ Register AFTER app is created
+#from newsletter_api import newsletter_bp
+#app.register_blueprint(newsletter_bp)  # ✅ Register AFTER app is created
 
 # ======================== API KEYS ========================
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
