@@ -103,8 +103,8 @@
     <div id="homePage" class="page active">
         <div class="container">
             <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
-                <h1 style="font-size: 2.8em; font-weight: 900;">Top 50 Stocks by Strength</h1>
-                <p style="font-size: 1.1em;">AI Analysis via Perplexity Sonar • Real-Time Data • Web Scraping Insights</p>
+                <h1 style="font-size: 2.8em; font-weight: 900;"> Top 50 Stock and Option Weekly Recommendation</h1>
+                <p style="font-size: 1.1em;">AI Analysis • Real-Time Data • Multi-Factor Propietary Model </p>
             </div>
 
             <div class="action-buttons">
@@ -112,7 +112,7 @@
                     <i class="fas fa-sync"></i> <span id="btnText">REFRESH STOCKS</span>
                 </button>
                 <button class="btn-large btn-newsletter" onclick="showNewsletter()">
-                    <i class="fas fa-newspaper"></i> DETAILED NEWSLETTER
+                    <i class="fas fa-newspaper"></i> RECOMMENDATION BRIEF 
                 </button>
             </div>
 
@@ -124,8 +124,8 @@
     <div id="newsletterPage" class="page">
         <div class="container">
             <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
-                <h1 style="font-size: 2.8em; font-weight: 900;">📈 Elite Trading Newsletter</h1>
-                <p style="font-size: 1.1em;"><span id="newsletterDate"></span></p>
+                <h1 style="font-size: 2.8em; font-weight: 900;">📈 Elite Market Brief</h1>
+                <p style="font-size: 1.1em;"><span id="Date"></span></p>
             </div>
 
             <div class="sidebar-card">
@@ -135,7 +135,7 @@
 
             <div class="sidebar-card">
                 <h3 style="color: #10b981;"><i class="fas fa-gem"></i> TOP 10 BUYS BY SCORE</h3>
-                <table class="newsletter-table">
+                <table class="table">
                     <thead><tr><th>Ticker</th><th>Price</th><th>Change</th><th>Score</th><th>Key Metric</th></tr></thead>
                     <tbody id="valueTable"></tbody>
                 </table>
