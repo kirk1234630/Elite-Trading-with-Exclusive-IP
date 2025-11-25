@@ -1,4 +1,3 @@
-
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
@@ -106,45 +105,35 @@ TOP_50_STOCKS = [
 def load_tickers():
     return [stock['symbol'] for stock in TOP_50_STOCKS]
 
-# ✅ UPDATE 1: LIVE EARNINGS CALENDAR
 def load_earnings():
-    """Fetch live earnings from Finnhub API with file cache fallback"""
     print("📅 Loading earnings calendar...")
-    
     if earnings_cache['data'] and earnings_cache['timestamp']:
         cache_age = (datetime.now() - earnings_cache['timestamp']).total_seconds()
         if cache_age < EARNINGS_TTL:
             print(f"✅ Using cached earnings (age: {int(cache_age/3600)}h)")
             return earnings_cache['data']
-    
     if FINNHUB_KEY:
         try:
             from_date = datetime.now().strftime('%Y-%m-%d')
             to_date = (datetime.now() + timedelta(days=90)).strftime('%Y-%m-%d')
             url = f'https://finnhub.io/api/v1/calendar/earnings?from={from_date}&to={to_date}&token={FINNHUB_KEY}'
-            
             print(f"🔄 Fetching live earnings from Finnhub API...")
             response = requests.get(url, timeout=10)
-            
             if response.status_code == 200:
                 data = response.json()
                 earnings_list = data.get('earningsCalendar', [])
-                
                 if earnings_list:
                     earnings_cache['data'] = earnings_list[:50]
                     earnings_cache['timestamp'] = datetime.now()
-                    
                     try:
                         with open('earnings.json', 'w') as f:
                             json.dump(earnings_cache['data'], f)
                         print(f"✅ Loaded {len(earnings_cache['data'])} live earnings from Finnhub")
                     except:
                         pass
-                    
                     return earnings_cache['data']
         except Exception as e:
             print(f"❌ Finnhub earnings fetch error: {e}")
-    
     if os.path.exists('earnings.json'):
         try:
             with open('earnings.json', 'r') as f:
@@ -155,7 +144,6 @@ def load_earnings():
                 return saved_data
         except Exception as e:
             print(f"⚠️ Error loading earnings.json: {e}")
-    
     print("⚠️ No earnings data available")
     return []
 
@@ -168,89 +156,56 @@ print(f"✅ Hybrid mode: Real scraping + Perplexity Sonar")
 print(f"✅ Perplexity: {'ENABLED' if PERPLEXITY_KEY else 'DISABLED'}")
 print(f"✅ FRED: {'ENABLED' if FRED_KEY else 'DISABLED'}")
 
-# ======================== SCRAPING FUNCTIONS ========================
-
 def scrape_barchart_signals(ticker):
-    """Scrape Barchart technical signals"""
     cache_key = f"{ticker}_barchart"
-    
     if cache_key in barchart_cache:
         cached = barchart_cache[cache_key]
         if (datetime.now() - cached['ts']).total_seconds() < BARCHART_TTL:
             return cached['data']
-    
-    result = {
-        'ticker': ticker,
-        'technical_rating': 'N/A',
-        'short_term': 'N/A',
-        'intermediate': 'N/A',
-        'long_term': 'N/A',
-        'source': 'Barchart'
-    }
-    
+    result = {'ticker': ticker, 'technical_rating': 'N/A', 'short_term': 'N/A', 'intermediate': 'N/A', 'long_term': 'N/A', 'source': 'Barchart'}
     try:
         url = f'https://www.barchart.com/stocks/quotes/{ticker}/technical-analysis'
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
         response = requests.get(url, headers=headers, timeout=5)
-        
         if response.status_code == 200:
             soup = BeautifulSoup(response.content, 'lxml')
-            
             rating_elem = soup.find('span', {'class': lambda x: x and 'rating' in x.lower()})
             if rating_elem:
                 result['technical_rating'] = rating_elem.text.strip()
-            
             rows = soup.find_all('tr')
             for row in rows:
                 cells = row.find_all('td')
                 if len(cells) >= 2:
                     label = cells[0].text.strip().lower()
                     signal = cells[1].text.strip()
-                    
                     if 'short' in label:
                         result['short_term'] = signal
                     elif 'intermediate' in label:
                         result['intermediate'] = signal
                     elif 'long' in label:
                         result['long_term'] = signal
-            
             print(f"✅ Barchart {ticker}: {result['technical_rating']}")
     except Exception as e:
         print(f"⚠️ Barchart scrape error {ticker}: {e}")
-    
     barchart_cache[cache_key] = {'data': result, 'ts': datetime.now()}
     return result
 
 def scrape_gurufocus_ratings(ticker):
-    """Scrape GuruFocus fundamental ratings"""
     cache_key = f"{ticker}_gurufocus"
-    
     if cache_key in gurufocus_cache:
         cached = gurufocus_cache[cache_key]
         if (datetime.now() - cached['ts']).total_seconds() < GURUFOCUS_TTL:
             return cached['data']
-    
-    result = {
-        'ticker': ticker,
-        'guru_rating': 'N/A',
-        'value_score': 'N/A',
-        'quality_score': 'N/A',
-        'financial_strength': 'N/A',
-        'source': 'GuruFocus'
-    }
-    
+    result = {'ticker': ticker, 'guru_rating': 'N/A', 'value_score': 'N/A', 'quality_score': 'N/A', 'financial_strength': 'N/A', 'source': 'GuruFocus'}
     try:
         url = f'https://www.gurufocus.com/stock/{ticker.lower()}'
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'}
         response = requests.get(url, headers=headers, timeout=5)
-        
         if response.status_code == 200:
             soup = BeautifulSoup(response.content, 'lxml')
-            
             rating_text = soup.find('div', {'class': lambda x: x and 'rating' in x.lower()})
             if rating_text:
                 result['guru_rating'] = rating_text.text.strip()
-            
             tables = soup.find_all('table')
             for table in tables:
                 rows = table.find_all('tr')
@@ -259,38 +214,25 @@ def scrape_gurufocus_ratings(ticker):
                     if len(cells) >= 2:
                         label = cells[0].text.strip().lower()
                         value = cells[1].text.strip()
-                        
                         if 'value' in label:
                             result['value_score'] = value
                         elif 'quality' in label:
                             result['quality_score'] = value
                         elif 'financial strength' in label:
                             result['financial_strength'] = value
-            
             print(f"✅ GuruFocus {ticker}: Rating {result['guru_rating']}")
     except Exception as e:
         print(f"⚠️ GuruFocus scrape error {ticker}: {e}")
-    
     gurufocus_cache[cache_key] = {'data': result, 'ts': datetime.now()}
     return result
 
 def scrape_reddit_sentiment(ticker):
-    """Scrape Reddit sentiment from multiple subreddits"""
     cache_key = f"{ticker}_reddit"
-    
     if cache_key in reddit_cache:
         cached = reddit_cache[cache_key]
         if (datetime.now() - cached['ts']).total_seconds() < REDDIT_TTL:
             return cached['data']
-    
-    result = {
-        'ticker': ticker,
-        'reddit_mentions': 0,
-        'sentiment': 'NEUTRAL',
-        'subreddits': ['r/stocks', 'r/investing', 'r/wallstreetbets'],
-        'source': 'Reddit API'
-    }
-    
+    result = {'ticker': ticker, 'reddit_mentions': 0, 'sentiment': 'NEUTRAL', 'subreddits': ['r/stocks', 'r/investing', 'r/wallstreetbets'], 'source': 'Reddit API'}
     try:
         for subreddit in ['stocks', 'investing', 'wallstreetbets']:
             try:
@@ -298,49 +240,33 @@ def scrape_reddit_sentiment(ticker):
                 params = {'q': ticker, 'restrict_sr': 'true', 'limit': 10}
                 headers = {'User-Agent': 'Mozilla/5.0'}
                 response = requests.get(url, params=params, headers=headers, timeout=5)
-                
                 if response.status_code == 200:
                     data = response.json()
                     posts = data.get('data', {}).get('children', [])
                     result['reddit_mentions'] += len(posts)
-                    
                     upvote_ratios = [p['data'].get('upvote_ratio', 0.5) for p in posts]
                     avg_ratio = sum(upvote_ratios) / len(upvote_ratios) if upvote_ratios else 0.5
-                    
                     if avg_ratio > 0.65:
                         result['sentiment'] = 'BULLISH'
                     elif avg_ratio < 0.35:
                         result['sentiment'] = 'BEARISH'
-                
                 time.sleep(1)
             except:
                 pass
-        
         if result['reddit_mentions'] > 0:
             print(f"✅ Reddit {ticker}: {result['reddit_mentions']} mentions - {result['sentiment']}")
     except Exception as e:
         print(f"⚠️ Reddit scrape error {ticker}: {e}")
-    
     reddit_cache[cache_key] = {'data': result, 'ts': datetime.now()}
     return result
 
 def get_hybrid_analysis(ticker, barchart_data=None, gurufocus_data=None, reddit_data=None):
-    """Combine scraped data + Perplexity Sonar"""
-    
     if not PERPLEXITY_KEY:
-        return {
-            'ticker': ticker,
-            'barchart': barchart_data or {},
-            'gurufocus': gurufocus_data or {},
-            'reddit': reddit_data or {},
-            'sonar_analysis': 'Perplexity key not configured'
-        }
-    
+        return {'ticker': ticker, 'barchart': barchart_data or {}, 'gurufocus': gurufocus_data or {}, 'reddit': reddit_data or {}, 'sonar_analysis': 'Perplexity key not configured'}
     try:
         barchart_context = f"Barchart technical: {barchart_data.get('technical_rating', 'N/A')}" if barchart_data else ""
         gurufocus_context = f"GuruFocus rating: {gurufocus_data.get('guru_rating', 'N/A')}" if gurufocus_data else ""
         reddit_context = f"Reddit sentiment: {reddit_data.get('sentiment', 'N/A')} ({reddit_data.get('reddit_mentions', 0)} mentions)" if reddit_data else ""
-        
         prompt = f"""Analyze {ticker} for day trading using this real market data:
 {barchart_context}
 {gurufocus_context}
@@ -352,109 +278,48 @@ Provide 3 bullets:
 3. Risk: Low/Medium/High
 
 Use ONLY the scraped data above."""
-        
         url = 'https://api.perplexity.ai/chat/completions'
         headers = {'Authorization': f'Bearer {PERPLEXITY_KEY}', 'Content-Type': 'application/json'}
-        
-        payload = {
-            'model': 'sonar',
-            'messages': [
-                {'role': 'system', 'content': 'Expert trader. Use ONLY provided data.'},
-                {'role': 'user', 'content': prompt}
-            ],
-            'temperature': 0.6,
-            'max_tokens': 300
-        }
-        
+        payload = {'model': 'sonar', 'messages': [{'role': 'system', 'content': 'Expert trader. Use ONLY provided data.'}, {'role': 'user', 'content': prompt}], 'temperature': 0.6, 'max_tokens': 300}
         response = requests.post(url, json=payload, headers=headers, timeout=15)
-        
         if response.status_code == 200:
             content = response.json()['choices'][0]['message']['content']
             lines = content.split('\n')
-            
             edge = next((l.strip() for l in lines if any(x in l.lower() for x in ['bullish', 'bearish', 'edge'])), 'Neutral')
             trade = next((l.strip() for l in lines if any(x in l.lower() for x in ['entry', 'stop', 'target'])), 'Monitor')
             risk = next((l.strip() for l in lines if 'risk' in l.lower()), 'Standard')
-            
             print(f"✅ Sonar hybrid analysis for {ticker}")
-            return {
-                'ticker': ticker,
-                'barchart': barchart_data or {},
-                'gurufocus': gurufocus_data or {},
-                'reddit': reddit_data or {},
-                'sonar_analysis': {
-                    'edge': edge,
-                    'trade': trade,
-                    'risk': risk
-                }
-            }
+            return {'ticker': ticker, 'barchart': barchart_data or {}, 'gurufocus': gurufocus_data or {}, 'reddit': reddit_data or {}, 'sonar_analysis': {'edge': edge, 'trade': trade, 'risk': risk}}
     except Exception as e:
         print(f"❌ Hybrid analysis error {ticker}: {e}")
-        return {
-            'ticker': ticker,
-            'sonar_analysis': {'error': str(e)}
-        }
-
-# ======================== FRED MACRO DATA ========================
+        return {'ticker': ticker, 'sonar_analysis': {'error': str(e)}}
 
 def fetch_fred_macro_data():
     if not FRED_KEY:
         return get_fallback_macro_data()
-    
-    macro_data = {
-        'timestamp': datetime.now().isoformat(),
-        'source': 'FRED API - St. Louis Federal Reserve',
-        'indicators': {}
-    }
-    
-    fred_series = {
-        'DFF': {'name': 'Fed Funds Rate', 'unit': '%'},
-        'T10Y2Y': {'name': '10Y-2Y Spread', 'unit': '%'},
-        'DCOILWTICO': {'name': 'WTI Oil', 'unit': '$/B'},
-    }
-    
+    macro_data = {'timestamp': datetime.now().isoformat(), 'source': 'FRED API - St. Louis Federal Reserve', 'indicators': {}}
+    fred_series = {'DFF': {'name': 'Fed Funds Rate', 'unit': '%'}, 'T10Y2Y': {'name': '10Y-2Y Spread', 'unit': '%'}, 'DCOILWTICO': {'name': 'WTI Oil', 'unit': '$/B'}}
     try:
         for series_id, metadata in fred_series.items():
             try:
                 url = 'https://api.stlouisfed.org/fred/series/observations'
-                params = {
-                    'series_id': series_id,
-                    'api_key': FRED_KEY,
-                    'limit': 1,
-                    'sort_order': 'desc',
-                    'file_type': 'json'
-                }
+                params = {'series_id': series_id, 'api_key': FRED_KEY, 'limit': 1, 'sort_order': 'desc', 'file_type': 'json'}
                 response = requests.get(url, params=params, timeout=5)
-                
                 if response.status_code == 200:
                     data = response.json()
                     obs = data.get('observations', [])
                     if obs:
                         latest = obs[0]
-                        macro_data['indicators'][series_id] = {
-                            'name': metadata['name'],
-                            'value': round(float(latest.get('value', 0)), 2),
-                            'date': latest.get('date'),
-                            'unit': metadata.get('unit', '')
-                        }
+                        macro_data['indicators'][series_id] = {'name': metadata['name'], 'value': round(float(latest.get('value', 0)), 2), 'date': latest.get('date'), 'unit': metadata.get('unit', '')}
             except:
                 pass
             time.sleep(0.2)
-        
         return macro_data
     except:
         return get_fallback_macro_data()
 
 def get_fallback_macro_data():
-    return {
-        'timestamp': datetime.now().isoformat(),
-        'source': 'Fallback Data',
-        'indicators': {
-            'DFF': {'name': 'Fed Funds Rate', 'value': 4.33, 'unit': '%'},
-        }
-    }
-
-# ======================== SCHEDULED TASKS ========================
+    return {'timestamp': datetime.now().isoformat(), 'source': 'Fallback Data', 'indicators': {'DFF': {'name': 'Fed Funds Rate', 'value': 4.33, 'unit': '%'}}}
 
 def refresh_earnings_monthly():
     global UPCOMING_EARNINGS
@@ -494,8 +359,6 @@ scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 print(f"✅ Scheduler started")
 
-# ======================== UTILITY FUNCTIONS ========================
-
 def cleanup_cache():
     current_time = int(time.time() / 60)
     expired_keys = [k for k in price_cache.keys() if not k.endswith(f"_{current_time}") and not k.endswith(f"_{current_time-1}")]
@@ -507,9 +370,7 @@ def get_stock_price_waterfall(ticker):
     cache_key = f"{ticker}_{int(time.time() / 60)}"
     if cache_key in price_cache:
         return price_cache[cache_key]
-    
     result = {'price': 0, 'change': 0, 'source': 'fallback'}
-    
     try:
         if MASSIVE_KEY:
             url = f'https://api.polygon.io/v2/aggs/ticker/{ticker}/prev?apiKey={MASSIVE_KEY}'
@@ -524,7 +385,6 @@ def get_stock_price_waterfall(ticker):
                     return result
     except:
         pass
-    
     try:
         if FINNHUB_KEY:
             url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
@@ -539,13 +399,11 @@ def get_stock_price_waterfall(ticker):
                     return result
     except:
         pass
-    
     return result
 
 def fetch_prices_concurrent(tickers):
     results = []
     batch_size = 15
-    
     for i in range(0, len(tickers), batch_size):
         batch = tickers[i:i+batch_size]
         with ThreadPoolExecutor(max_workers=3) as executor:
@@ -555,21 +413,10 @@ def fetch_prices_concurrent(tickers):
                 try:
                     price_data = future.result(timeout=5)
                     csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker), None)
-                    
-                    results.append({
-                        'Symbol': ticker,
-                        'Last': round(price_data['price'], 2),
-                        'Change': round(price_data['change'], 2),
-                        'RSI': round(50 + (price_data['change'] * 2), 2),
-                        'Signal': csv_stock['signal'] if csv_stock else 'HOLD',
-                        'Strategy': 'Momentum' if price_data['change'] > 0 else 'Mean Reversion',
-                        'Score': csv_stock['inst33'] if csv_stock else 50.0,
-                        'KeyMetric': csv_stock['key_metric'] if csv_stock else ''
-                    })
+                    results.append({'Symbol': ticker, 'Last': round(price_data['price'], 2), 'Change': round(price_data['change'], 2), 'RSI': round(50 + (price_data['change'] * 2), 2), 'Signal': csv_stock['signal'] if csv_stock else 'HOLD', 'Strategy': 'Momentum' if price_data['change'] > 0 else 'Mean Reversion', 'Score': csv_stock['inst33'] if csv_stock else 50.0, 'KeyMetric': csv_stock['key_metric'] if csv_stock else ''})
                 except:
                     pass
         time.sleep(0.1)
-    
     results.sort(key=lambda x: x.get('Score', 0), reverse=True)
     cleanup_cache()
     return results
@@ -577,50 +424,32 @@ def fetch_prices_concurrent(tickers):
 def get_perplexity_sonar_analysis(ticker, stock_data=None):
     if not PERPLEXITY_KEY:
         return {'edge': 'API not configured', 'trade': 'Set key', 'risk': 'N/A', 'ticker': ticker}
-    
     try:
         csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker), None)
         context = f"\nScore: {csv_stock['inst33']}, Signal: {csv_stock['signal']}" if csv_stock else ""
         price_info = f"\nPrice: ${stock_data.get('Last', 'N/A')}, Change: {stock_data.get('Change', 'N/A')}%" if stock_data else ""
-        
         prompt = f"""Analyze {ticker} for day trading.{price_info}{context}
 
 Provide 3 bullets:
 1. Edge: Bullish/Bearish % + catalyst
 2. Trade: Entry/Stop/Target
 3. Risk: Low/Med/High"""
-        
         url = 'https://api.perplexity.ai/chat/completions'
         headers = {'Authorization': f'Bearer {PERPLEXITY_KEY}', 'Content-Type': 'application/json'}
-        
-        payload = {
-            'model': 'sonar',
-            'messages': [
-                {'role': 'system', 'content': 'Expert day trader.'},
-                {'role': 'user', 'content': prompt}
-            ],
-            'temperature': 0.6,
-            'max_tokens': 400
-        }
-        
+        payload = {'model': 'sonar', 'messages': [{'role': 'system', 'content': 'Expert day trader.'}, {'role': 'user', 'content': prompt}], 'temperature': 0.6, 'max_tokens': 400}
         response = requests.post(url, json=payload, headers=headers, timeout=15)
-        
         if response.status_code == 200:
             data = response.json()
             analysis_text = data['choices'][0]['message']['content']
             lines = analysis_text.split('\n')
-            
             edge = next((l.strip() for l in lines if any(x in l.lower() for x in ['bullish', 'bearish', 'edge'])), 'Neutral')
             trade = next((l.strip() for l in lines if any(x in l.lower() for x in ['entry', 'stop', 'target'])), 'Monitor')
             risk = next((l.strip() for l in lines if 'risk' in l.lower()), 'Standard')
-            
             print(f"✅ Sonar analysis for {ticker}")
             return {'edge': edge, 'trade': trade, 'risk': risk, 'ticker': ticker}
     except Exception as e:
         print(f"❌ Sonar error: {e}")
         return {'edge': f'Error: {e}', 'trade': 'N/A', 'risk': 'N/A', 'ticker': ticker}
-
-# ======================== API ENDPOINTS ========================
 
 @app.route('/api/recommendations', methods=['GET'])
 def get_recommendations():
@@ -629,7 +458,6 @@ def get_recommendations():
             cache_age = (datetime.now() - recommendations_cache['timestamp']).total_seconds()
             if cache_age < RECOMMENDATIONS_TTL:
                 return jsonify(recommendations_cache['data'])
-        
         stocks = fetch_prices_concurrent(TICKERS)
         recommendations_cache['data'] = stocks
         recommendations_cache['timestamp'] = datetime.now()
@@ -644,13 +472,7 @@ def get_stock_price_single(ticker):
     try:
         price_data = get_stock_price_waterfall(ticker.upper())
         csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker.upper()), None)
-        return jsonify({
-            'ticker': ticker.upper(),
-            'price': round(price_data['price'], 2),
-            'change': round(price_data['change'], 2),
-            'score': csv_stock['inst33'] if csv_stock else 50.0,
-            'signal': csv_stock['signal'] if csv_stock else 'HOLD'
-        })
+        return jsonify({'ticker': ticker.upper(), 'price': round(price_data['price'], 2), 'change': round(price_data['change'], 2), 'score': csv_stock['inst33'] if csv_stock else 50.0, 'signal': csv_stock['signal'] if csv_stock else 'HOLD'})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -658,14 +480,12 @@ def get_stock_price_single(ticker):
 def get_ai_insights(ticker):
     ticker = ticker.upper()
     print(f"🤖 AI analysis for {ticker}")
-    
     cache_key = f"{ticker}_ai_insights"
     if cache_key in ai_insights_cache:
         cache_data = ai_insights_cache[cache_key]
         cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
         if cache_age < AI_INSIGHTS_TTL:
             return jsonify(cache_data['data']), 200
-    
     stock_data = None
     try:
         for stock in recommendations_cache.get('data', []):
@@ -674,7 +494,6 @@ def get_ai_insights(ticker):
                 break
     except:
         pass
-    
     analysis = get_perplexity_sonar_analysis(ticker, stock_data)
     ai_insights_cache[cache_key] = {'data': analysis, 'timestamp': datetime.now()}
     return jsonify(analysis), 200
@@ -683,12 +502,10 @@ def get_ai_insights(ticker):
 def get_hybrid_analysis_endpoint(ticker):
     ticker = ticker.upper()
     print(f"🔍 Hybrid analysis for {ticker}")
-    
     barchart_data = scrape_barchart_signals(ticker)
     gurufocus_data = scrape_gurufocus_ratings(ticker)
     reddit_data = scrape_reddit_sentiment(ticker)
     analysis = get_hybrid_analysis(ticker, barchart_data, gurufocus_data, reddit_data)
-    
     return jsonify(analysis), 200
 
 @app.route('/api/macro-indicators', methods=['GET'])
@@ -698,7 +515,6 @@ def get_macro_indicators():
             cache_age = (datetime.now() - macro_cache['timestamp']).total_seconds()
             if cache_age < MACRO_TTL:
                 return jsonify(macro_cache['data']), 200
-        
         macro_cache['data'] = fetch_fred_macro_data()
         macro_cache['timestamp'] = datetime.now()
         return jsonify(macro_cache['data']), 200
@@ -709,57 +525,28 @@ def get_macro_indicators():
 
 @app.route('/api/earnings-calendar', methods=['GET'])
 def get_earnings_calendar():
-    """✅ UPDATE 1: Returns live earnings data"""
-    return jsonify({
-        'earnings': UPCOMING_EARNINGS,
-        'count': len(UPCOMING_EARNINGS),
-        'next_earnings': UPCOMING_EARNINGS[0] if UPCOMING_EARNINGS else None
-    }), 200
+    return jsonify({'earnings': UPCOMING_EARNINGS, 'count': len(UPCOMING_EARNINGS), 'next_earnings': UPCOMING_EARNINGS[0] if UPCOMING_EARNINGS else None}), 200
 
-# ✅ UPDATE 3: SOCIAL SENTIMENT - REDDIT SCRAPING (NO HARDCODED FALLBACK)
 @app.route('/api/social-sentiment/<ticker>', methods=['GET'])
 def get_social_sentiment(ticker):
-    """Uses Reddit scraping for social sentiment (live data, no hardcoded fallback)"""
     ticker = ticker.upper()
     cache_key = f"{ticker}_sentiment"
-    
     if cache_key in sentiment_cache:
         cache_data = sentiment_cache[cache_key]
         cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
         if cache_age < SENTIMENT_TTL:
             return jsonify(cache_data['data']), 200
-    
     print(f"🔍 Scraping Reddit for {ticker} social sentiment...")
     reddit_data = scrape_reddit_sentiment(ticker)
-    
     mentions = reddit_data['reddit_mentions']
     sentiment = reddit_data['sentiment']
-    
     if sentiment == 'BULLISH':
         score = 0.6
     elif sentiment == 'BEARISH':
         score = -0.6
     else:
         score = 0.0
-    
-    result = {
-        'ticker': ticker,
-        'source': 'Reddit Live Scraping (r/stocks, r/investing, r/wallstreetbets)',
-        'daily': {
-            'score': score,
-            'mentions': mentions,
-            'sentiment': sentiment,
-            'reddit_mentions': mentions,
-            'twitter_mentions': 0
-        },
-        'weekly': {
-            'score': score,
-            'mentions': mentions * 7,
-            'sentiment': sentiment
-        },
-        'weekly_change': 0.0
-    }
-    
+    result = {'ticker': ticker, 'source': 'Reddit Live Scraping (r/stocks, r/investing, r/wallstreetbets)', 'daily': {'score': score, 'mentions': mentions, 'sentiment': sentiment, 'reddit_mentions': mentions, 'twitter_mentions': 0}, 'weekly': {'score': score, 'mentions': mentions * 7, 'sentiment': sentiment}, 'weekly_change': 0.0}
     sentiment_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
     print(f"✅ Reddit sentiment for {ticker}: {mentions} mentions - {sentiment}")
     return jsonify(result), 200
@@ -768,13 +555,11 @@ def get_social_sentiment(ticker):
 def get_insider_transactions(ticker):
     ticker = ticker.upper()
     cache_key = f"{ticker}_insider"
-    
     if cache_key in insider_cache:
         cache_data = insider_cache[cache_key]
         cache_age = (datetime.now() - cache_data['timestamp']).total_seconds()
         if cache_age < INSIDER_TTL:
             return jsonify(cache_data['data']), 200
-    
     if FINNHUB_KEY:
         try:
             from_date = (datetime.now() - timedelta(days=30)).strftime('%Y-%m-%d')
@@ -785,26 +570,13 @@ def get_insider_transactions(ticker):
                 transactions = data.get('data', [])
                 buys = sum(1 for t in transactions if t.get('transactionCode') in ['P', 'A'])
                 sells = sum(1 for t in transactions if t.get('transactionCode') == 'S')
-                
-                result = {
-                    'ticker': ticker,
-                    'insider_sentiment': 'BULLISH' if buys > sells else 'BEARISH' if sells > buys else 'NEUTRAL',
-                    'buy_count': buys,
-                    'sell_count': sells,
-                    'total_transactions': len(transactions)
-                }
+                result = {'ticker': ticker, 'insider_sentiment': 'BULLISH' if buys > sells else 'BEARISH' if sells > buys else 'NEUTRAL', 'buy_count': buys, 'sell_count': sells, 'total_transactions': len(transactions)}
                 insider_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
                 return jsonify(result), 200
         except:
             pass
-    
     ticker_hash = sum(ord(c) for c in ticker) % 100
-    result = {
-        'ticker': ticker,
-        'insider_sentiment': 'BULLISH' if ticker_hash > 50 else 'BEARISH',
-        'buy_count': (ticker_hash // 10) + 1,
-        'sell_count': ((100 - ticker_hash) // 15) + 1
-    }
+    result = {'ticker': ticker, 'insider_sentiment': 'BULLISH' if ticker_hash > 50 else 'BEARISH', 'buy_count': (ticker_hash // 10) + 1, 'sell_count': ((100 - ticker_hash) // 15) + 1}
     insider_cache[cache_key] = {'data': result, 'timestamp': datetime.now()}
     return jsonify(result), 200
 
@@ -824,121 +596,34 @@ def get_stock_news(ticker):
         pass
     return jsonify({'ticker': ticker, 'articles': [], 'count': 0})
 
-# ✅ UPDATE 2: OPTIONS WITH FIXED RATINGS (NO UNDEFINED ERRORS)
 @app.route('/api/options-opportunities/<ticker>', methods=['GET'])
 def get_options_opportunities(ticker):
-    """6 options strategies with ALL fields pre-defined (no undefined errors)"""
     try:
         ticker = ticker.upper()
         price_data = get_stock_price_waterfall(ticker)
         current_price = price_data['price']
         change = price_data['change']
-        
         csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker), None)
         iv = csv_stock.get('iv', 0.35) if csv_stock else 0.35
-        
-        def get_rating(strategy_type, price_change, iv):
-            """Returns pre-defined rating - no undefined variables"""
-            is_low_iv = iv < 0.30
-            is_high_iv = iv > 0.50
-            is_uptrend = price_change > 1.0
-            is_downtrend = price_change < -1.0
-            
-            if strategy_type == 'Iron Condor':
-                return 'Good' if is_low_iv else 'Not Recommended' if is_high_iv else 'Neutral'
-            elif strategy_type == 'Call Spread (Bullish)':
-                return 'Good' if is_uptrend else 'Not Recommended' if is_downtrend else 'Neutral'
-            elif strategy_type == 'Put Spread (Bearish)':
-                return 'Good' if is_downtrend else 'Not Recommended' if is_uptrend else 'Neutral'
-            elif strategy_type == 'Bullish Put Spread':
-                return 'Good' if is_low_iv and not is_downtrend else 'Not Recommended' if is_downtrend else 'Neutral'
-            elif strategy_type == 'Bearish Call Spread':
-                return 'Good' if is_low_iv and not is_uptrend else 'Not Recommended' if is_uptrend else 'Neutral'
-            elif strategy_type == 'Butterfly Spread':
-                return 'Neutral' if is_low_iv else 'Not Recommended' if is_high_iv else 'Neutral'
-            return 'Neutral'
-        
+        def get_simple_rating(price_change, iv):
+            if iv < 0.30:
+                return 'Good'
+            elif iv > 0.50:
+                return 'Not Recommended'
+            else:
+                return 'Neutral'
+        base_rating = get_simple_rating(change, iv)
         strategies = [
-            {
-                'type': 'Iron Condor',
-                'description': 'Neutral - Sell OTM call/put spreads',
-                'direction': 'Neutral',
-                'setup': f'Sell ${round(current_price * 1.05, 2)} Call / Buy ${round(current_price * 1.08, 2)} Call, Sell ${round(current_price * 0.95, 2)} Put / Buy ${round(current_price * 0.92, 2)} Put',
-                'max_profit': round(current_price * 0.02, 2),
-                'max_loss': round(current_price * 0.03, 2),
-                'probability_of_profit': '65%',
-                'rating': get_rating('Iron Condor', change, iv),
-                'greeks': {'delta': '~0', 'gamma': 'Low', 'theta': '+High', 'vega': '-High'}
-            },
-            {
-                'type': 'Call Spread (Bullish)',
-                'description': 'Bullish - Buy lower call, sell higher call',
-                'direction': 'Bullish',
-                'setup': f'Buy ${round(current_price, 2)} Call / Sell ${round(current_price * 1.05, 2)} Call',
-                'max_profit': round(current_price * 0.05, 2),
-                'max_loss': round(current_price * 0.02, 2),
-                'probability_of_profit': '55%',
-                'rating': get_rating('Call Spread (Bullish)', change, iv),
-                'greeks': {'delta': '+0.60', 'gamma': 'Positive', 'theta': 'Neutral', 'vega': 'Low'}
-            },
-            {
-                'type': 'Put Spread (Bearish)',
-                'description': 'Bearish - Buy higher put, sell lower put',
-                'direction': 'Bearish',
-                'setup': f'Buy ${round(current_price, 2)} Put / Sell ${round(current_price * 0.95, 2)} Put',
-                'max_profit': round(current_price * 0.05, 2),
-                'max_loss': round(current_price * 0.02, 2),
-                'probability_of_profit': '55%',
-                'rating': get_rating('Put Spread (Bearish)', change, iv),
-                'greeks': {'delta': '-0.60', 'gamma': 'Positive', 'theta': 'Neutral', 'vega': 'Low'}
-            },
-            {
-                'type': 'Bullish Put Spread',
-                'description': 'Bullish - Sell OTM put, buy further OTM put',
-                'direction': 'Bullish (Income)',
-                'setup': f'Sell ${round(current_price * 0.98, 2)} Put / Buy ${round(current_price * 0.93, 2)} Put',
-                'max_profit': round(current_price * 0.02, 2),
-                'max_loss': round(current_price * 0.03, 2),
-                'probability_of_profit': '70%',
-                'rating': get_rating('Bullish Put Spread', change, iv),
-                'greeks': {'delta': '+0.50', 'gamma': 'Negative', 'theta': '+High', 'vega': '-High'}
-            },
-            {
-                'type': 'Bearish Call Spread',
-                'description': 'Bearish - Sell OTM call, buy further OTM call',
-                'direction': 'Bearish (Income)',
-                'setup': f'Sell ${round(current_price * 1.02, 2)} Call / Buy ${round(current_price * 1.07, 2)} Call',
-                'max_profit': round(current_price * 0.02, 2),
-                'max_loss': round(current_price * 0.03, 2),
-                'probability_of_profit': '70%',
-                'rating': get_rating('Bearish Call Spread', change, iv),
-                'greeks': {'delta': '-0.50', 'gamma': 'Negative', 'theta': '+High', 'vega': '-High'}
-            },
-            {
-                'type': 'Butterfly Spread',
-                'description': 'Neutral - Buy 1 call, sell 2 calls, buy 1 call',
-                'direction': 'Neutral (High Probability)',
-                'setup': f'Buy ${round(current_price * 0.98, 2)} Call / Sell 2x ${round(current_price, 2)} Call / Buy ${round(current_price * 1.02, 2)} Call',
-                'max_profit': round(current_price * 0.04, 2),
-                'max_loss': round(current_price * 0.01, 2),
-                'probability_of_profit': '50%',
-                'rating': get_rating('Butterfly Spread', change, iv),
-                'greeks': {'delta': '~0', 'gamma': 'Peaky', 'theta': '+Moderate', 'vega': 'Low'}
-            }
+            {'type': 'Iron Condor', 'description': 'Neutral - Sell OTM call/put spreads', 'direction': 'Neutral', 'setup': f'Sell ${round(current_price * 1.05, 2)} Call / Buy ${round(current_price * 1.08, 2)} Call, Sell ${round(current_price * 0.95, 2)} Put / Buy ${round(current_price * 0.92, 2)} Put', 'max_profit': round(current_price * 0.02, 2), 'max_loss': round(current_price * 0.03, 2), 'probability_of_profit': '65%', 'rating': base_rating, 'greeks': {'delta': '~0', 'gamma': 'Low', 'theta': '+High', 'vega': '-High'}},
+            {'type': 'Call Spread (Bullish)', 'description': 'Bullish - Buy lower call, sell higher call', 'direction': 'Bullish', 'setup': f'Buy ${round(current_price, 2)} Call / Sell ${round(current_price * 1.05, 2)} Call', 'max_profit': round(current_price * 0.05, 2), 'max_loss': round(current_price * 0.02, 2), 'probability_of_profit': '55%', 'rating': 'Good' if change > 1.0 else 'Neutral', 'greeks': {'delta': '+0.60', 'gamma': 'Positive', 'theta': 'Neutral', 'vega': 'Low'}},
+            {'type': 'Put Spread (Bearish)', 'description': 'Bearish - Buy higher put, sell lower put', 'direction': 'Bearish', 'setup': f'Buy ${round(current_price, 2)} Put / Sell ${round(current_price * 0.95, 2)} Put', 'max_profit': round(current_price * 0.05, 2), 'max_loss': round(current_price * 0.02, 2), 'probability_of_profit': '55%', 'rating': 'Good' if change < -1.0 else 'Neutral', 'greeks': {'delta': '-0.60', 'gamma': 'Positive', 'theta': 'Neutral', 'vega': 'Low'}},
+            {'type': 'Bullish Put Spread', 'description': 'Bullish - Sell OTM put, buy further OTM put', 'direction': 'Bullish (Income)', 'setup': f'Sell ${round(current_price * 0.98, 2)} Put / Buy ${round(current_price * 0.93, 2)} Put', 'max_profit': round(current_price * 0.02, 2), 'max_loss': round(current_price * 0.03, 2), 'probability_of_profit': '70%', 'rating': base_rating, 'greeks': {'delta': '+0.50', 'gamma': 'Negative', 'theta': '+High', 'vega': '-High'}},
+            {'type': 'Bearish Call Spread', 'description': 'Bearish - Sell OTM call, buy further OTM call', 'direction': 'Bearish (Income)', 'setup': f'Sell ${round(current_price * 1.02, 2)} Call / Buy ${round(current_price * 1.07, 2)} Call', 'max_profit': round(current_price * 0.02, 2), 'max_loss': round(current_price * 0.03, 2), 'probability_of_profit': '70%', 'rating': base_rating, 'greeks': {'delta': '-0.50', 'gamma': 'Negative', 'theta': '+High', 'vega': '-High'}},
+            {'type': 'Butterfly Spread', 'description': 'Neutral - Buy 1 call, sell 2 calls, buy 1 call', 'direction': 'Neutral (High Probability)', 'setup': f'Buy ${round(current_price * 0.98, 2)} Call / Sell 2x ${round(current_price, 2)} Call / Buy ${round(current_price * 1.02, 2)} Call', 'max_profit': round(current_price * 0.04, 2), 'max_loss': round(current_price * 0.01, 2), 'probability_of_profit': '50%', 'rating': 'Neutral', 'greeks': {'delta': '~0', 'gamma': 'Peaky', 'theta': '+Moderate', 'vega': 'Low'}}
         ]
-        
-        opportunities = {
-            'ticker': ticker,
-            'current_price': round(current_price, 2),
-            'price_change': round(change, 2),
-            'implied_volatility': round(iv, 2),
-            'analysis_date': datetime.now().isoformat(),
-            'strategies': strategies
-        }
-        
-        print(f"✅ Options opportunities for {ticker} (all ratings defined)")
+        opportunities = {'ticker': ticker, 'current_price': round(current_price, 2), 'price_change': round(change, 2), 'implied_volatility': round(iv, 2), 'analysis_date': datetime.now().isoformat(), 'strategies': strategies}
+        print(f"✅ Options opportunities for {ticker} - all ratings: {[s['rating'] for s in strategies]}")
         return jsonify(opportunities), 200
-        
     except Exception as e:
         print(f"❌ Options error: {e}")
         return jsonify({'error': str(e)}), 500
@@ -949,39 +634,11 @@ def serve_frontend():
         with open('index.html', 'r') as f:
             return f.read()
     except FileNotFoundError:
-        return jsonify({
-            'status': 'Elite Stock Tracker API - FINAL VERSION',
-            'updates': ['Live earnings', 'Reddit social sentiment', 'Fixed options ratings'],
-            'health_check': '/health'
-        }), 200
+        return jsonify({'status': 'Elite Stock Tracker API - FINAL VERSION', 'updates': ['Live earnings', 'Reddit social sentiment', 'Fixed options ratings'], 'health_check': '/health'}), 200
 
 @app.route('/health', methods=['GET'])
 def health_check():
-    return jsonify({
-        'status': 'healthy',
-        'version': '2.0 - Final',
-        'updates': {
-            'earnings': 'Live from Finnhub API',
-            'options': 'Fixed ratings (no undefined errors)',
-            'sentiment': 'Reddit scraping (live data)'
-        },
-        'scheduler_running': scheduler.running,
-        'perplexity': 'enabled' if PERPLEXITY_KEY else 'disabled',
-        'fred': 'enabled' if FRED_KEY else 'disabled',
-        'finnhub': 'enabled' if FINNHUB_KEY else 'disabled',
-        'endpoints': [
-            '/api/recommendations',
-            '/api/stock-price/<ticker>',
-            '/api/ai-insights/<ticker>',
-            '/api/hybrid-analysis/<ticker>',
-            '/api/macro-indicators',
-            '/api/earnings-calendar',
-            '/api/social-sentiment/<ticker>',
-            '/api/insider-transactions/<ticker>',
-            '/api/stock-news/<ticker>',
-            '/api/options-opportunities/<ticker>'
-        ]
-    }), 200
+    return jsonify({'status': 'healthy', 'version': '2.0 - Final', 'updates': {'earnings': 'Live from Finnhub API', 'options': 'Fixed ratings (no undefined errors)', 'sentiment': 'Reddit scraping (live data)'}, 'scheduler_running': scheduler.running, 'perplexity': 'enabled' if PERPLEXITY_KEY else 'disabled', 'fred': 'enabled' if FRED_KEY else 'disabled', 'finnhub': 'enabled' if FINNHUB_KEY else 'disabled', 'endpoints': ['/api/recommendations', '/api/stock-price/<ticker>', '/api/ai-insights/<ticker>', '/api/hybrid-analysis/<ticker>', '/api/macro-indicators', '/api/earnings-calendar', '/api/social-sentiment/<ticker>', '/api/insider-transactions/<ticker>', '/api/stock-news/<ticker>', '/api/options-opportunities/<ticker>']}), 200
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
