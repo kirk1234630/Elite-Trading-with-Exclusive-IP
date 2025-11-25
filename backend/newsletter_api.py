@@ -1,8 +1,3 @@
-"""
-Flask Integration for Newsletter Generator
-Add this to your existing server.py on Render
-"""
-
 from flask import Flask, jsonify, send_file, request, Blueprint
 from datetime import datetime
 import os
