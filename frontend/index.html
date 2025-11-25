@@ -91,7 +91,7 @@
 </head>
 <body>
     <div class="header">
-        <div class="logo" onclick="goHome()">⚡ Elite Trading<div class="logo-subtitle">AI-Powered</div></div>
+        <div class="logo" onclick="goHome()">⚡ Elite Trading<div class="logo-subtitle">AI-Powered + Sonar</div></div>
         <div class="search-bar">
             <i class="fas fa-search"></i>
             <input type="text" id="searchInput" placeholder="Search ANY ticker (AAPL, UBER, GOOGL...)..." onkeypress="if(event.key==='Enter') searchStock()">
@@ -104,15 +104,15 @@
         <div class="container">
             <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
                 <h1 style="font-size: 2.8em; font-weight: 900;">Top 50 Stocks by Strength</h1>
-                <p style="font-size: 1.1em;">AI Analysis • Real-Time Data • Multi-Factor Propietary Model Stock and Option Recommendations Scraping </p>
+                <p style="font-size: 1.1em;">AI Analysis via Perplexity Sonar • Real-Time Data • Web Scraping Insights</p>
             </div>
 
             <div class="action-buttons">
                 <button class="btn-large btn-refresh" id="refreshBtn" onclick="loadAllStocks()">
                     <i class="fas fa-sync"></i> <span id="btnText">REFRESH STOCKS</span>
                 </button>
-                <button class="btn-large btn-newsletter" onclick="loadSimpleNewsletter()">
-                    <i class="fas fa-newspaper"></i> TIERED NEWSLETTER
+                <button class="btn-large btn-newsletter" onclick="showNewsletter()">
+                    <i class="fas fa-newspaper"></i> DETAILED NEWSLETTER
                 </button>
             </div>
 
@@ -120,68 +120,7 @@
         </div>
     </div>
 
-    <!-- TIERED NEWSLETTER PAGE (NEW) -->
-    <div id="tieredNewsletterPage" class="page">
-        <div class="container">
-            <!-- Header -->
-            <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
-                <h1 style="font-size: 2.8em; font-weight: 900;">📈 MARKET BRIEF </h1>
-                <p style="font-size: 1.1em;">Week <span id="weekNum"></span> | <span id="newsDate"></span></p>
-                <p style="font-size: 0.9em; opacity: 0.9;">Institutional-Grade Analysis</p>
-            </div>
-
-            <!-- Executive Summary -->
-            <div style="background: rgba(26, 26, 64, 0.95); border: 2px solid #00d4ff; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-                <h2 style="color: #00d4ff; margin-bottom: 1rem;">📊 EXECUTIVE SUMMARY</h2>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
-                    <div style="background: rgba(0, 212, 255, 0.1); padding: 1rem; border-radius: 10px; text-align: center;">
-                        <div style="color: #9ca3af; font-size: 0.9em;">Total Analyzed</div>
-                        <div style="color: #00d4ff; font-size: 2em; font-weight: 900;" id="totalStocks">--</div>
-                    </div>
-                    <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 10px; text-align: center;">
-                        <div style="color: #9ca3af; font-size: 0.9em;">Tier 1-A (BUY NOW)</div>
-                        <div style="color: #10b981; font-size: 2em; font-weight: 900;" id="tier1aCount">--</div>
-                    </div>
-                    <div style="background: rgba(245, 158, 11, 0.1); padding: 1rem; border-radius: 10px; text-align: center;">
-                        <div style="color: #9ca3af; font-size: 0.9em;">Tier 1-B (STRONG BUY)</div>
-                        <div style="color: #f59e0b; font-size: 2em; font-weight: 900;" id="tier1bCount">--</div>
-                    </div>
-                    <div style="background: rgba(124, 58, 237, 0.1); padding: 1rem; border-radius: 10px; text-align: center;">
-                        <div style="color: #9ca3af; font-size: 0.9em;">Average Score</div>
-                        <div style="color: #7c3aed; font-size: 2em; font-weight: 900;" id="avgScore">--</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Top Pick -->
-            <div id="topPickSection"></div>
-
-            <!-- Tier 1-A -->
-            <div style="background: rgba(26, 26, 64, 0.9); border: 2px solid #10b981; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-                <h2 style="color: #10b981; margin-bottom: 1.5rem;">🏆 TIER 1-A: BUY NOW (Score 85-100)</h2>
-                <div id="tier1aContent">Loading...</div>
-            </div>
-
-            <!-- Tier 1-B -->
-            <div style="background: rgba(26, 26, 64, 0.9); border: 2px solid #f59e0b; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-                <h2 style="color: #f59e0b; margin-bottom: 1.5rem;">🎯 TIER 1-B: STRONG BUY (Score 70-84)</h2>
-                <div id="tier1bContent">Loading...</div>
-            </div>
-
-            <!-- Tier 2 -->
-            <div style="background: rgba(26, 26, 64, 0.9); border: 2px solid #00d4ff; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-                <h2 style="color: #00d4ff; margin-bottom: 1.5rem;">📊 TIER 2: HOLD/BUY (Score 50-69)</h2>
-                <div id="tier2Content">Loading...</div>
-            </div>
-
-            <!-- Back Button -->
-            <button class="btn-large btn-refresh" onclick="goHome()" style="width: 100%; margin-top: 2rem;">
-                <i class="fas fa-arrow-left"></i> BACK TO DASHBOARD
-            </button>
-        </div>
-    </div>
-
-    <!-- TRADITIONAL NEWSLETTER PAGE (ORIGINAL) -->
+    <!-- NEWSLETTER PAGE -->
     <div id="newsletterPage" class="page">
         <div class="container">
             <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
@@ -547,12 +486,12 @@
                 const response = await fetch(`${API_BASE}/api/options-opportunities/${ticker}`);
                 const data = await response.json();
                 container.innerHTML = data.strategies.map(strategy => {
-                    const recClass = strategy.rating === 'Good' ? 'rec-buy' : strategy.rating === 'BEST' ? 'rec-best' : strategy.rating === 'Neutral' ? 'rec-good' : 'rec-neutral';
+                    const recClass = strategy.recommendation === 'BUY' ? 'rec-buy' : strategy.recommendation === 'BEST' ? 'rec-best' : strategy.recommendation === 'GOOD' ? 'rec-good' : 'rec-neutral';
                     return `
                         <div class="strategy-card">
                             <div class="strategy-header">
                                 <div class="strategy-type">${strategy.type}</div>
-                                <div class="strategy-rec ${recClass}">${strategy.rating}</div>
+                                <div class="strategy-rec ${recClass}">${strategy.recommendation}</div>
                             </div>
                             <div class="strategy-setup">${strategy.setup}</div>
                             <div class="strategy-stats">
@@ -567,124 +506,6 @@
                 container.innerHTML = '<span style="color: #ef4444;">Failed to load</span>';
             }
         }
-
-        // ==================== NEW NEWSLETTER FUNCTIONS ====================
-        async function loadSimpleNewsletter() {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('tieredNewsletterPage').classList.add('active');
-            
-            try {
-                const response = await fetch(`${API_BASE}/api/newsletter/simple`);
-                const data = await response.json();
-                
-                console.log('Newsletter data:', data);
-                
-                document.getElementById('weekNum').textContent = data.week;
-                document.getElementById('newsDate').textContent = data.date;
-                
-                document.getElementById('totalStocks').textContent = data.summary.total_stocks;
-                document.getElementById('tier1aCount').textContent = data.summary.tier_1a_count;
-                document.getElementById('tier1bCount').textContent = data.summary.tier_1b_count;
-                document.getElementById('avgScore').textContent = data.summary.avg_score;
-                
-                if (data.summary.top_pick) {
-                    displayTopPick(data.summary.top_pick);
-                }
-                
-                displayTierStocks('tier1aContent', data.tiers['TIER 1-A']);
-                displayTierStocks('tier1bContent', data.tiers['TIER 1-B']);
-                displayTierStocks('tier2Content', data.tiers['TIER 2']);
-                
-            } catch (error) {
-                console.error('Newsletter error:', error);
-                alert('Error loading newsletter. Check browser console.');
-            }
-        }
-
-        function displayTopPick(stock) {
-            const html = `
-                <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 15px; padding: 2rem; margin-bottom: 2rem; color: white;">
-                    <h2 style="margin-bottom: 1rem;">🌟 TOP PICK OF THE WEEK</h2>
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-size: 3em; font-weight: 900;">${stock.symbol}</div>
-                            <div style="font-size: 1.5em; margin-top: 0.5rem;">$${stock.price}</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 2.5em; font-weight: 900;">Score: ${stock.score}</div>
-                            <div style="font-size: 1.2em; margin-top: 0.5rem;">${stock.change > 0 ? '↑' : '↓'} ${Math.abs(stock.change)}%</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 2px solid rgba(255,255,255,0.2);">
-                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
-                            <div>
-                                <div style="opacity: 0.8; font-size: 0.9em;">Entry</div>
-                                <div style="font-size: 1.3em; font-weight: 700;">$${stock.entry}</div>
-                            </div>
-                            <div>
-                                <div style="opacity: 0.8; font-size: 0.9em;">Stop Loss</div>
-                                <div style="font-size: 1.3em; font-weight: 700;">$${stock.stop}</div>
-                            </div>
-                            <div>
-                                <div style="opacity: 0.8; font-size: 0.9em;">Target</div>
-                                <div style="font-size: 1.3em; font-weight: 700;">$${stock.target}</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            document.getElementById('topPickSection').innerHTML = html;
-        }
-
-        function displayTierStocks(containerId, stocks) {
-            const container = document.getElementById(containerId);
-            
-            if (!stocks || stocks.length === 0) {
-                container.innerHTML = '<p style="color: #9ca3af; text-align: center; padding: 2rem;">No stocks in this tier</p>';
-                return;
-            }
-            
-            const html = stocks.map((stock, idx) => `
-                <div style="background: rgba(0, 212, 255, 0.05); border: 1px solid #444; border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer;" onclick="researchStock('${stock.symbol}')">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                        <div>
-                            <span style="color: #9ca3af; font-size: 0.9em; margin-right: 0.5rem;">#${idx + 1}</span>
-                            <span style="font-size: 1.5em; font-weight: 900; color: white;">${stock.symbol}</span>
-                            <span style="color: #00d4ff; font-size: 1.3em; margin-left: 1rem;">$${stock.price}</span>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="background: ${stock.color}; padding: 0.4rem 0.8rem; border-radius: 6px; font-weight: 700; font-size: 0.9em; margin-bottom: 0.5rem;">${stock.action}</div>
-                            <div style="color: ${stock.change > 0 ? '#10b981' : '#ef4444'}; font-weight: 700;">${stock.change > 0 ? '↑' : '↓'} ${Math.abs(stock.change)}%</div>
-                        </div>
-                    </div>
-                    <div style="background: rgba(124, 58, 237, 0.2); border-left: 3px solid #7c3aed; padding: 0.8rem; border-radius: 6px; margin-bottom: 1rem;">
-                        <strong style="color: #7c3aed;">Score:</strong> <span style="color: white; font-weight: 700; font-size: 1.1em;">${stock.score}/100</span>
-                        <span style="margin-left: 1rem; color: #9ca3af;">|</span>
-                        <strong style="color: #7c3aed; margin-left: 1rem;">Signal:</strong> <span style="color: white;">${stock.signal}</span>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-bottom: 1rem;">
-                        <div style="background: rgba(16, 185, 129, 0.1); padding: 0.6rem; border-radius: 6px; text-align: center;">
-                            <div style="color: #9ca3af; font-size: 0.75em;">Entry</div>
-                            <div style="color: #10b981; font-weight: 700;">$${stock.entry}</div>
-                        </div>
-                        <div style="background: rgba(239, 68, 68, 0.1); padding: 0.6rem; border-radius: 6px; text-align: center;">
-                            <div style="color: #9ca3af; font-size: 0.75em;">Stop</div>
-                            <div style="color: #ef4444; font-weight: 700;">$${stock.stop}</div>
-                        </div>
-                        <div style="background: rgba(0, 212, 255, 0.1); padding: 0.6rem; border-radius: 6px; text-align: center;">
-                            <div style="color: #9ca3af; font-size: 0.75em;">Target</div>
-                            <div style="color: #00d4ff; font-weight: 700;">$${stock.target}</div>
-                        </div>
-                    </div>
-                    <div style="color: #b0b8c1; font-size: 0.9em; line-height: 1.6;">
-                        <strong style="color: #00d4ff;">Why:</strong> ${stock.key_metric}
-                    </div>
-                </div>
-            `).join('');
-            
-            container.innerHTML = html;
-        }
-        // ==================== END NEW NEWSLETTER FUNCTIONS ====================
 
         async function showNewsletter() {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -747,4 +568,3 @@
     </script>
 </body>
 </html>
-                   
