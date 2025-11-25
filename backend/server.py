@@ -13,6 +13,12 @@ import atexit
 app = Flask(__name__)
 CORS(app)
 
+# ======================== NEWSLETTER INTEGRATION ========================
+from newsletter_api import newsletter_bp
+app.register_blueprint(newsletter_bp)  # ✅ Register AFTER app is created
+
+# ======================== API KEYS ========================
+FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
 # ======================== API KEYS ========================
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
 ALPHAVANTAGE_KEY = os.environ.get('ALPHAVANTAGE_API_KEY', '')
@@ -894,8 +900,5 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
     app.run(host='0.0.0.0', port=port, debug=False)
 
-from newsletter_api import newsletter_bp
 
-# Register the newsletter blueprint
-app.register_blueprint(newsletter_bp)
 
