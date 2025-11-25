@@ -1,4 +1,6 @@
-from flask import Flask, jsonify, request
+
+    
+    from flask import Flask, jsonify, request
 from flask_cors import CORS
 import requests
 import os
@@ -17,8 +19,6 @@ CORS(app)
 from newsletter_api import newsletter_bp
 app.register_blueprint(newsletter_bp)  # ✅ Register AFTER app is created
 
-# ======================== API KEYS ========================
-FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
 # ======================== API KEYS ========================
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
 ALPHAVANTAGE_KEY = os.environ.get('ALPHAVANTAGE_API_KEY', '')
