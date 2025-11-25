@@ -688,9 +688,8 @@ def get_social_sentiment(ticker):
                                     sum(item.get('mention', 0) for item in twitter_data[-14:-7])
                 month_prev_mentions = sum(item.get('mention', 0) for item in reddit_data[-30:]) * 0.5  # Rough estimate for month
                 
-                wow_change = ((weekly_mentions - week_prev_mentions) / max(week_prev_mentions, 1)) * 100 if week_prev_mentions > 0 else 0
-                mom_change = ((weekly_mentions - month_prev_mentions) / max(month_prev_mentions, 1)) * 100 if month_prev_mentions > 0 else 0
                 
+                               
                 result = {
                     'ticker': ticker,
                     'source': 'Finnhub Social Sentiment API',
