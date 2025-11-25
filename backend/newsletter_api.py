@@ -4,10 +4,10 @@ import os
 import io
 
 # Create blueprint for modular integration
-newsletter_bp = Blueprint('newsletter', __name__)
+newsletter_bp = Blueprint('newsletter', __name__, url_prefix='/api/newsletter')
 
 
-@newsletter_bp.route('/api/newsletter/generate', methods=['POST'])
+@newsletter_bp.route('/generate', methods=['POST'])
 def generate_newsletter():
     """
     API endpoint to generate newsletter
@@ -67,7 +67,7 @@ def generate_newsletter():
         }), 500
 
 
-@newsletter_bp.route('/api/newsletter/status', methods=['GET'])
+@newsletter_bp.route('/status', methods=['GET'])
 def newsletter_status():
     """
     Check newsletter system status
@@ -111,7 +111,7 @@ def newsletter_status():
         }), 500
 
 
-@newsletter_bp.route('/api/newsletter/schedule', methods=['POST'])
+@newsletter_bp.route('/schedule', methods=['POST'])
 def schedule_newsletter():
     """
     Schedule automatic newsletter generation
