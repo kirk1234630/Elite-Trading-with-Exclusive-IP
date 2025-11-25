@@ -1103,19 +1103,7 @@ function displayTierSection(containerId, stocks, color) {
 }
 </style>
 
-<script>
-document.getElementById('generateNewsletterBtn').addEventListener('click', async function() {
-    const btn = this;
-    const statusDiv = document.getElementById('newsletterStatus');
-    
-    // Disable button and show loading
-    btn.disabled = true;
-    btn.textContent = 'Generating...';
-    statusDiv.className = 'status-message loading';
-    statusDiv.textContent = '⏳ Generating newsletter with real-time data...';
-    
-    try {
-        const response = await fetch('YOUR_BACKEND_URL/api/newsletter/generate', {
+
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
