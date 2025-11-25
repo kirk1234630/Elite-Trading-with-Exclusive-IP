@@ -426,39 +426,50 @@
         }
 
         async function loadSentimentDataEnhanced(ticker) {
-            const container = document.getElementById('sentimentInfo');
-            container.innerHTML = 'Loading...';
-            try {
-                const response = await fetch(`${API_BASE}/api/social-sentiment/${ticker}`);
-                const data = await response.json();
-                const dailyColor = data.daily.sentiment === 'BULLISH' ? '#10b981' : data.daily.sentiment === 'BEARISH' ? '#ef4444' : '#f59e0b';
-                const weeklyColor = data.weekly.sentiment === 'BULLISH' ? '#10b981' : data.weekly.sentiment === 'BEARISH' ? '#ef4444' : '#f59e0b';
-                const changeClass = data.weekly_change > 0 ? 'change-positive' : 'change-negative';
-                container.innerHTML = `
-                    <div class="sentiment-grid">
-                        <div class="sentiment-period">
-                            <div class="sentiment-period-title">DAILY</div>
-                            <div class="sentiment-score" style="color: ${dailyColor};">${data.daily.sentiment}</div>
-                            <div style="font-size: 0.85em; color: #b0b8c1; margin-top: 0.3rem;">${data.daily.mentions} mentions</div>
-                        </div>
-                        <div class="sentiment-period">
-                            <div class="sentiment-period-title">WEEKLY</div>
-                            <div class="sentiment-score" style="color: ${weeklyColor};">${data.weekly.sentiment}</div>
-                            <div style="font-size: 0.85em; color: #b0b8c1; margin-top: 0.3rem;">${data.weekly.mentions} mentions</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 1rem; padding: 0.8rem; background: rgba(0, 212, 255, 0.05); border-radius: 8px;">
-                        <div style="font-size: 0.85em; color: #7c3aed; font-weight: 700;">CHANGES</div>
-                        <div class="sentiment-change ${changeClass}">WoW: ${data.weekly_change > 0 ? '+' : ''}${formatPercent(data.weekly_change)}</div>
-                        <div class="sentiment-change ${changeClass}">MoM: ${data.monthly_change > 0 ? '+' : ''}${formatPercent(data.monthly_change)}</div>
-                    </div>
-                `;
-            } catch {
-                container.innerHTML = '<span style="color: #ef4444;">Failed to load</span>';
-            }
-        }
+    const container = document.getElementById('sentimentInfo');
+    container.innerHTML = 'Loading...';
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/social-sentiment/${ticker}`);
+        const data = await response.json();
+        
+        const dailyColor = data.daily.sentiment === 'BULLISH' ? '#10b981' : 
+                          data.daily.sentiment === 'BEARISH' ? '#ef4444' : '#f59e0b';
+        const weeklyColor = data.weekly.sentiment === 'BULLISH' ? '#10b981' : 
+                           data.weekly.sentiment === 'BEARISH' ? '#ef4444' : '#f59e0b';
+        const changeClass = data.weekly_change > 0 ? 'change-positive' : 'change-negative';
+        
+        container.innerHTML = `
+            <div class="sentiment-grid">
+                <div class="sentiment-period">
+                    <div class="sentiment-period-title">DAILY</div>
+                    <div class="sentiment-score" style="color: ${dailyColor};">${data.daily.sentiment}</div>
+                    <div style="font-size: 0.85em; color: #b0b8c1; margin-top: 0.3rem;">${data.daily.mentions} mentions</div>
+                </div>
+                <div class="sentiment-period">
+                    <div class="sentiment-period-title">WEEKLY</div>
+                    <div class="sentiment-score" style="color: ${weeklyColor};">${data.weekly.sentiment}</div>
+                    <div style="font-size: 0.85em; color: #b0b8c1; margin-top: 0.3rem;">${data.weekly.mentions} mentions</div>
+                </div>
+            </div>
+            <div class="sentiment-changes" style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                <div class="sentiment-period-title">CHANGES</div>
+                <div class="${changeClass}" style="font-size: 0.9em; margin-top: 0.5rem;">
+                    WoW: ${data.weekly_change > 0 ? '+' : ''}${data.weekly_change.toFixed(2)}%
+                </div>
+                <div style="font-size: 0.75em; color: #6b7280; margin-top: 0.3rem;">
+                    MoM: NaN%
+                </div>
+            </div>
+        `; // ✅ CLOSING BACKTICK HERE
+        
+    } catch (error) {
+        console.error('Error loading sentiment:', error);
+        container.innerHTML = `<div style="color: #ef4444;">Error loading sentiment data</div>`;
+    }
+}
 
-        async function loadStockNews(ticker) {
+            async function loadStockNews(ticker) {
             const container = document.getElementById('sidebarNews');
             container.innerHTML = 'Loading...';
             try {
