@@ -256,7 +256,7 @@
                 const signalClass = s.Signal === 'BUY' ? 'rec-buy' : s.Signal === 'SELL' ? 'rec-neutral' : 'rec-good';
                 return `
                     <div class="stock-card" onclick="researchStock('${s.Symbol}')">
-                        <div class="stock-score-badge">${formatNumber(s.Score || 50)}</div>
+                       
                         <div style="display: flex; justify-content: space-between;">
                             <div>
                                 <div class="stock-ticker">${s.Symbol}</div>
