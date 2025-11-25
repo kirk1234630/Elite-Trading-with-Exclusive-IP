@@ -672,7 +672,7 @@ def get_social_sentiment(ticker):
                 twitter_score = twitter_daily.get('score', 0)
                 daily_score = (reddit_score + twitter_score) / 2 if (reddit_score or twitter_score) else 0
                 
-                daily_sentiment = 'BULLISH' if daily_score > 0.3 else 'BEARISH' if daily_score < -0.3 else 'NEUTRAL'
+                daily_sentiment = 'BULLISH' if daily_score > 0.15 else 'BEARISH' if daily_score < -0.15 else 'NEUTRAL'
                 
                 # Weekly calculation (sum of all mentions in past 7 days)
                 weekly_mentions = sum(item.get('mention', 0) for item in reddit_data[-7:]) + \
@@ -681,7 +681,7 @@ def get_social_sentiment(ticker):
                 weekly_score = (sum(item.get('score', 0) for item in reddit_data[-7:]) + \
                                sum(item.get('score', 0) for item in twitter_data[-7:])) / max(len(reddit_data[-7:]) + len(twitter_data[-7:]), 1)
                 
-                weekly_sentiment = 'BULLISH' if weekly_score > 0.3 else 'BEARISH' if weekly_score < -0.3 else 'NEUTRAL'
+                weekly_sentiment = 'BULLISH' if weekly_score > 0.15 else 'BEARISH' if weekly_score < -0.15 else 'NEUTRAL'
                 
                 # Calculate changes
                 week_prev_mentions = sum(item.get('mention', 0) for item in reddit_data[-14:-7]) + \
