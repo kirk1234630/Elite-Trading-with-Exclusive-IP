@@ -488,7 +488,7 @@ def get_perplexity_sonar_analysis(ticker, stock_data=None):
         context = f"\nScore: {csv_stock['inst33']}, Signal: {csv_stock['signal']}" if csv_stock else ""
         price_info = f"\nPrice: ${stock_data.get('Last', 'N/A')}, Change: {stock_data.get('Change', 'N/A')}%" if stock_data else ""
         
-        prompt = f"""Analyze {ticker} for day trading. Scrape Barchart, Quiver, GuruFocus, Reddit WSB.{price_info}{context}
+        prompt = f"""Analyze {ticker} for day trading. Scrape Barchart, Market Chameleon, Seeking Alpha, Bloombery, WJS, Barron, MarketWatch, Stocktwits, OptionStrat, Quiver Quantitative, Swaggy Stocks, GuruFocus, Reddit WSB.{price_info}{context}
         
 Provide 3 bullets:
 1. Edge: Bullish/Bearish % + catalyst
