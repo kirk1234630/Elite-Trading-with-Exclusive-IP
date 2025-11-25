@@ -98,6 +98,115 @@ def load_tickers():
     return [stock['symbol'] for stock in TOP_50_STOCKS]
 
 def load_earnings():
+    """Hardcoded earnings through March 31, 2026 - NO API CALLS"""
+    return [
+        # November 2025
+        {'symbol': 'NVDA', 'date': '2025-11-20', 'epsEstimate': 0.81, 'company': 'NVIDIA Corporation', 'time': 'After Market'},
+        {'symbol': 'PROSN', 'date': '2025-11-24', 'epsEstimate': None, 'company': 'Prosus N.V.', 'time': 'Before Market'},
+        {'symbol': 'AMAT', 'date': '2025-11-24', 'epsEstimate': 2.30, 'company': 'Applied Materials', 'time': 'After Market'},
+        {'symbol': 'A', 'date': '2025-11-24', 'epsEstimate': 1.59, 'company': 'Agilent Technologies', 'time': 'After Market'},
+        {'symbol': 'KEYS', 'date': '2025-11-24', 'epsEstimate': 1.91, 'company': 'Keysight Technologies', 'time': 'After Market'},
+        {'symbol': 'ZM', 'date': '2025-11-24', 'epsEstimate': 1.52, 'company': 'Zoom Video', 'time': 'After Market'},
+        {'symbol': 'WWD', 'date': '2025-11-24', 'epsEstimate': 2.09, 'company': 'Woodward Inc', 'time': 'After Market'},
+        {'symbol': 'BABA', 'date': '2025-11-25', 'epsEstimate': 2.10, 'company': 'Alibaba Group', 'time': 'Before Market'},
+        {'symbol': 'ADI', 'date': '2025-11-25', 'epsEstimate': 1.70, 'company': 'Analog Devices', 'time': 'Before Market'},
+        {'symbol': 'NTNX', 'date': '2025-11-25', 'epsEstimate': 0.25, 'company': 'Nutanix', 'time': 'After Market'},
+        {'symbol': 'BURL', 'date': '2025-11-25', 'epsEstimate': 1.20, 'company': 'Burlington Stores', 'time': 'Before Market'},
+        {'symbol': 'BBY', 'date': '2025-11-25', 'epsEstimate': 1.55, 'company': 'Best Buy', 'time': 'Before Market'},
+        {'symbol': 'DE', 'date': '2025-11-26', 'epsEstimate': 4.75, 'company': 'Deere & Company', 'time': 'Before Market'},
+        {'symbol': 'LI', 'date': '2025-11-26', 'epsEstimate': 0.35, 'company': 'Li Auto', 'time': 'Before Market'},
+        {'symbol': 'DELL', 'date': '2025-11-26', 'epsEstimate': 2.05, 'company': 'Dell Technologies', 'time': 'After Market'},
+        {'symbol': 'HPQ', 'date': '2025-11-26', 'epsEstimate': 0.92, 'company': 'HP Inc', 'time': 'After Market'},
+        {'symbol': 'KR', 'date': '2025-11-27', 'epsEstimate': 0.98, 'company': 'Kroger Co', 'time': 'Before Market'},
+        {'symbol': 'MEITUAN', 'date': '2025-11-28', 'epsEstimate': None, 'company': 'Meituan', 'time': 'After Market'},
+        
+        # December 2025
+        {'symbol': 'CRM', 'date': '2025-12-03', 'epsEstimate': 2.45, 'company': 'Salesforce', 'time': 'After Market'},
+        {'symbol': 'CRWD', 'date': '2025-12-03', 'epsEstimate': 1.02, 'company': 'CrowdStrike', 'time': 'After Market'},
+        {'symbol': 'OKTA', 'date': '2025-12-05', 'epsEstimate': 0.72, 'company': 'Okta', 'time': 'After Market'},
+        {'symbol': 'VEEV', 'date': '2025-12-05', 'epsEstimate': 1.48, 'company': 'Veeva Systems', 'time': 'After Market'},
+        {'symbol': 'AVGO', 'date': '2025-12-12', 'epsEstimate': 1.42, 'company': 'Broadcom', 'time': 'After Market'},
+        {'symbol': 'ORCL', 'date': '2025-12-12', 'epsEstimate': 1.50, 'company': 'Oracle Corporation', 'time': 'After Market'},
+        {'symbol': 'ADBE', 'date': '2025-12-13', 'epsEstimate': 4.65, 'company': 'Adobe Inc', 'time': 'After Market'},
+        {'symbol': 'LULU', 'date': '2025-12-13', 'epsEstimate': 2.73, 'company': 'Lululemon', 'time': 'After Market'},
+        
+        # January 2026
+        {'symbol': 'WBA', 'date': '2026-01-08', 'epsEstimate': 0.51, 'company': 'Walgreens Boots', 'time': 'Before Market'},
+        {'symbol': 'LEN', 'date': '2026-01-09', 'epsEstimate': 4.32, 'company': 'Lennar Corporation', 'time': 'Before Market'},
+        {'symbol': 'DAL', 'date': '2026-01-10', 'epsEstimate': 1.85, 'company': 'Delta Air Lines', 'time': 'Before Market'},
+        {'symbol': 'INFY', 'date': '2026-01-15', 'epsEstimate': 0.21, 'company': 'Infosys', 'time': 'Before Market'},
+        {'symbol': 'JPM', 'date': '2026-01-15', 'epsEstimate': 4.10, 'company': 'JPMorgan Chase', 'time': 'Before Market'},
+        {'symbol': 'C', 'date': '2026-01-15', 'epsEstimate': 1.95, 'company': 'Citigroup', 'time': 'Before Market'},
+        {'symbol': 'WFC', 'date': '2026-01-15', 'epsEstimate': 1.42, 'company': 'Wells Fargo', 'time': 'Before Market'},
+        {'symbol': 'BAC', 'date': '2026-01-16', 'epsEstimate': 0.82, 'company': 'Bank of America', 'time': 'Before Market'},
+        {'symbol': 'MS', 'date': '2026-01-16', 'epsEstimate': 2.15, 'company': 'Morgan Stanley', 'time': 'Before Market'},
+        {'symbol': 'GS', 'date': '2026-01-16', 'epsEstimate': 8.92, 'company': 'Goldman Sachs', 'time': 'Before Market'},
+        {'symbol': 'NFLX', 'date': '2026-01-21', 'epsEstimate': 4.23, 'company': 'Netflix', 'time': 'After Market'},
+        {'symbol': 'TSM', 'date': '2026-01-16', 'epsEstimate': 2.05, 'company': 'Taiwan Semiconductor', 'time': 'Before Market'},
+        {'symbol': 'ASML', 'date': '2026-01-22', 'epsEstimate': 6.20, 'company': 'ASML Holding', 'time': 'Before Market'},
+        {'symbol': 'INTC', 'date': '2026-01-23', 'epsEstimate': 0.15, 'company': 'Intel Corporation', 'time': 'After Market'},
+        {'symbol': 'TXN', 'date': '2026-01-23', 'epsEstimate': 1.82, 'company': 'Texas Instruments', 'time': 'After Market'},
+        {'symbol': 'LRCX', 'date': '2026-01-23', 'epsEstimate': 10.50, 'company': 'Lam Research', 'time': 'After Market'},
+        {'symbol': 'KLAC', 'date': '2026-01-29', 'epsEstimate': 7.15, 'company': 'KLA Corporation', 'time': 'After Market'},
+        {'symbol': 'V', 'date': '2026-01-29', 'epsEstimate': 2.65, 'company': 'Visa Inc', 'time': 'After Market'},
+        {'symbol': 'MA', 'date': '2026-01-30', 'epsEstimate': 3.58, 'company': 'Mastercard', 'time': 'Before Market'},
+        {'symbol': 'AAPL', 'date': '2026-01-29', 'epsEstimate': 2.35, 'company': 'Apple Inc', 'time': 'After Market'},
+        {'symbol': 'MSFT', 'date': '2026-01-28', 'epsEstimate': 3.20, 'company': 'Microsoft Corporation', 'time': 'After Market'},
+        {'symbol': 'TSLA', 'date': '2026-01-29', 'epsEstimate': 1.15, 'company': 'Tesla Inc', 'time': 'After Market'},
+        {'symbol': 'META', 'date': '2026-01-30', 'epsEstimate': 6.75, 'company': 'Meta Platforms', 'time': 'After Market'},
+        
+        # February 2026
+        {'symbol': 'AMZN', 'date': '2026-02-05', 'epsEstimate': 1.48, 'company': 'Amazon.com', 'time': 'After Market'},
+        {'symbol': 'GOOGL', 'date': '2026-02-04', 'epsEstimate': 2.15, 'company': 'Alphabet Inc Class A', 'time': 'After Market'},
+        {'symbol': 'GOOG', 'date': '2026-02-04', 'epsEstimate': 2.15, 'company': 'Alphabet Inc Class C', 'time': 'After Market'},
+        {'symbol': 'AMD', 'date': '2026-02-03', 'epsEstimate': 1.09, 'company': 'Advanced Micro Devices', 'time': 'After Market'},
+        {'symbol': 'QCOM', 'date': '2026-02-04', 'epsEstimate': 2.95, 'company': 'Qualcomm', 'time': 'After Market'},
+        {'symbol': 'MU', 'date': '2026-02-12', 'epsEstimate': 1.15, 'company': 'Micron Technology', 'time': 'After Market'},
+        {'symbol': 'NIO', 'date': '2026-02-06', 'epsEstimate': -0.32, 'company': 'NIO Inc', 'time': 'Before Market'},
+        {'symbol': 'XPEV', 'date': '2026-02-24', 'epsEstimate': -0.15, 'company': 'XPeng Inc', 'time': 'Before Market'},
+        {'symbol': 'DIS', 'date': '2026-02-10', 'epsEstimate': 1.45, 'company': 'Walt Disney', 'time': 'After Market'},
+        {'symbol': 'PYPL', 'date': '2026-02-05', 'epsEstimate': 1.52, 'company': 'PayPal Holdings', 'time': 'After Market'},
+        {'symbol': 'SQ', 'date': '2026-02-19', 'epsEstimate': 0.92, 'company': 'Block Inc (Square)', 'time': 'After Market'},
+        {'symbol': 'SHOP', 'date': '2026-02-12', 'epsEstimate': 0.32, 'company': 'Shopify', 'time': 'Before Market'},
+        {'symbol': 'SPOT', 'date': '2026-02-05', 'epsEstimate': 1.45, 'company': 'Spotify', 'time': 'Before Market'},
+        {'symbol': 'UBER', 'date': '2026-02-11', 'epsEstimate': 0.55, 'company': 'Uber Technologies', 'time': 'After Market'},
+        {'symbol': 'ABNB', 'date': '2026-02-12', 'epsEstimate': 0.65, 'company': 'Airbnb', 'time': 'After Market'},
+        {'symbol': 'COIN', 'date': '2026-02-13', 'epsEstimate': 1.85, 'company': 'Coinbase Global', 'time': 'After Market'},
+        {'symbol': 'NVDA', 'date': '2026-02-25', 'epsEstimate': 0.99, 'company': 'NVIDIA Corporation', 'time': 'After Market'},
+        {'symbol': 'HD', 'date': '2026-02-24', 'epsEstimate': 3.65, 'company': 'Home Depot', 'time': 'Before Market'},
+        {'symbol': 'LOW', 'date': '2026-02-25', 'epsEstimate': 2.15, 'company': "Lowe's Companies", 'time': 'Before Market'},
+        {'symbol': 'TJX', 'date': '2026-02-25', 'epsEstimate': 1.08, 'company': 'TJX Companies', 'time': 'Before Market'},
+        {'symbol': 'TGT', 'date': '2026-02-26', 'epsEstimate': 2.42, 'company': 'Target Corporation', 'time': 'Before Market'},
+        
+        # March 2026
+        {'symbol': 'COST', 'date': '2026-03-05', 'epsEstimate': 4.05, 'company': 'Costco Wholesale', 'time': 'After Market'},
+        {'symbol': 'WMT', 'date': '2026-03-06', 'epsEstimate': 0.68, 'company': 'Walmart Inc', 'time': 'Before Market'},
+        {'symbol': 'NKE', 'date': '2026-03-19', 'epsEstimate': 0.95, 'company': 'Nike Inc', 'time': 'After Market'},
+        {'symbol': 'FDX', 'date': '2026-03-19', 'epsEstimate': 4.85, 'company': 'FedEx Corporation', 'time': 'After Market'},
+        {'symbol': 'GIS', 'date': '2026-03-19', 'epsEstimate': 1.15, 'company': 'General Mills', 'time': 'Before Market'},
+        {'symbol': 'KMB', 'date': '2026-03-24', 'epsEstimate': 1.82, 'company': 'Kimberly-Clark', 'time': 'Before Market'},
+        {'symbol': 'PG', 'date': '2026-03-20', 'epsEstimate': 1.85, 'company': 'Procter & Gamble', 'time': 'Before Market'},
+        {'symbol': 'KO', 'date': '2026-03-24', 'epsEstimate': 0.72, 'company': 'Coca-Cola Company', 'time': 'Before Market'},
+        {'symbol': 'PEP', 'date': '2026-03-26', 'epsEstimate': 1.82, 'company': 'PepsiCo', 'time': 'Before Market'},
+        {'symbol': 'MCD', 'date': '2026-03-27', 'epsEstimate': 2.75, 'company': "McDonald's", 'time': 'Before Market'},
+        {'symbol': 'SBUX', 'date': '2026-03-31', 'epsEstimate': 0.88, 'company': 'Starbucks', 'time': 'After Market'},
+        {'symbol': 'CMG', 'date': '2026-03-25', 'epsEstimate': 15.20, 'company': 'Chipotle Mexican Grill', 'time': 'After Market'},
+        {'symbol': 'YUM', 'date': '2026-03-26', 'epsEstimate': 1.52, 'company': 'Yum! Brands', 'time': 'Before Market'},
+        {'symbol': 'MRK', 'date': '2026-03-02', 'epsEstimate': 2.15, 'company': 'Merck & Co', 'time': 'Before Market'},
+        {'symbol': 'PFE', 'date': '2026-03-03', 'epsEstimate': 0.68, 'company': 'Pfizer Inc', 'time': 'Before Market'},
+        {'symbol': 'LLY', 'date': '2026-03-04', 'epsEstimate': 3.82, 'company': 'Eli Lilly', 'time': 'Before Market'},
+        {'symbol': 'JNJ', 'date': '2026-03-24', 'epsEstimate': 2.75, 'company': 'Johnson & Johnson', 'time': 'Before Market'},
+        {'symbol': 'ABT', 'date': '2026-03-20', 'epsEstimate': 1.28, 'company': 'Abbott Laboratories', 'time': 'Before Market'},
+        {'symbol': 'TMO', 'date': '2026-03-26', 'epsEstimate': 5.45, 'company': 'Thermo Fisher', 'time': 'Before Market'},
+        {'symbol': 'DHR', 'date': '2026-03-24', 'epsEstimate': 2.85, 'company': 'Danaher Corporation', 'time': 'Before Market'},
+        {'symbol': 'UNH', 'date': '2026-03-14', 'epsEstimate': 7.15, 'company': 'UnitedHealth Group', 'time': 'Before Market'},
+        {'symbol': 'CVS', 'date': '2026-03-03', 'epsEstimate': 1.82, 'company': 'CVS Health', 'time': 'Before Market'},
+        {'symbol': 'XOM', 'date': '2026-03-31', 'epsEstimate': 2.35, 'company': 'Exxon Mobil', 'time': 'Before Market'},
+        {'symbol': 'CVX', 'date': '2026-03-31', 'epsEstimate': 2.95, 'company': 'Chevron Corporation', 'time': 'Before Market'},
+        {'symbol': 'COP', 'date': '2026-03-05', 'epsEstimate': 1.48, 'company': 'ConocoPhillips', 'time': 'Before Market'},
+    ]
+
+def load_earnings():
     """Fetch live earnings: Finnhub (primary), Alpha Vantage (supplement), Perplexity (enrichment)"""
     print("📅 Loading earnings calendar...")
     
@@ -109,27 +218,7 @@ def load_earnings():
     
     earnings_data = []
     
-    # SOURCE 1: Finnhub
-    if FINNHUB_KEY:
-        print("🔄 Fetching from Finnhub API...")
-        try:
-            from_date = datetime.now().strftime('%Y-%m-%d')
-            to_date = (datetime.now() + timedelta(days=90)).strftime('%Y-%m-%d')
-            url = f'https://finnhub.io/api/v1/calendar/earnings?from={from_date}&to={to_date}&token={FINNHUB_KEY}'
-            response = requests.get(url, timeout=10)
-            if response.status_code == 200:
-                data = response.json()
-                finnhub_earnings = data.get('earningsCalendar', [])
-                earnings_data.extend(finnhub_earnings[:100])
-                print(f"✅ Finnhub: {len(finnhub_earnings)} earnings")
-                dell = [e for e in finnhub_earnings if e.get('symbol') == 'DELL']
-                baba = [e for e in finnhub_earnings if e.get('symbol') == 'BABA']
-                if dell:
-                    print(f"✅ DELL found: {dell[0].get('date')}")
-                if baba:
-                    print(f"✅ BABA found: {baba[0].get('date')}")
-        except Exception as e:
-            print(f"❌ Finnhub error: {e}")
+   
     
     # SOURCE 2: Alpha Vantage
     if ALPHAVANTAGE_KEY and len(earnings_data) < 20:
