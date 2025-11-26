@@ -383,19 +383,19 @@
             loadOptionsOpportunities(ticker);
         }
 
-        async function loadStockResearchData(ticker) {
-            try {
-                const response = await fetch(`${API_BASE}/api/stock-research/${ticker}`);
-                const data = await response.json();
-                
-                // AI Analysis
+          // AI Analysis
                 document.getElementById('aiEdge').textContent = data.ai_analysis?.edge || 'Analysis unavailable';
                 document.getElementById('aiTrade').textContent = data.ai_analysis?.trade || 'No setup identified';
                 document.getElementById('aiRisk').textContent = data.ai_analysis?.risk || 'Unknown risk';
                 document.getElementById('aiEdge').className = '';
                 document.getElementById('aiTrade').className = '';
                 document.getElementById('aiRisk').className = '';
+        async function loadStockResearchData(ticker) {
+            try {
+                const response = await fetch(`${API_BASE}/api/stock-research/${ticker}`);
+                const data = await response.json();
                 
+                             
                 // Insider
                 const insider = data;  // Direct response from /api/insider-transactions
 const sentimentColor = insider.insider_sentiment === 'BULLISH' ? '#10b981' : 
