@@ -6,12 +6,26 @@ import json
 from datetime import datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
-import gc
+import logging
 from apscheduler.schedulers.background import BackgroundScheduler
 import atexit
+import warnings
+
+# ======================== LOGGING SETUP ========================
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-CORS(app)
+CORS(app)  # Configure origins in production: CORS(app, origins=['https://yourdomain.com'])
+
+# ======================== CONSTANTS ========================
+CHANGE_5D_MULTIPLIER = 1.2
+CHANGE_30D_MULTIPLIER = 1.5
+RSI_BASE = 50
+RSI_CHANGE_MULTIPLIER = 2
+DEFAULT_IV = 0.35
+REQUEST_TIMEOUT = 5
+PRICE_CACHE_MINUTES = 5
 
 # ======================== API KEYS ========================
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
@@ -20,25 +34,33 @@ MASSIVE_KEY = os.environ.get('MASSIVE_API_KEY', '')
 FRED_KEY = os.environ.get('FRED_API_KEY', '')
 PERPLEXITY_KEY = os.environ.get('PERPLEXITY_API_KEY', '')
 
+# Validate critical API keys
+if not FINNHUB_KEY:
+    warnings.warn("⚠️ FINNHUB_API_KEY not set - price fetching will fail")
+if not FRED_KEY:
+    warnings.warn("⚠️ FRED_API_KEY not set - using fallback macro data")
+
+logger.info(f"APIs configured: Finnhub={bool(FINNHUB_KEY)}, FRED={bool(FRED_KEY)}, Perplexity={bool(PERPLEXITY_KEY)}")
+
 # ======================== CACHE ========================
 price_cache = {}
-recommendations_cache = {'data': [], 'timestamp': None}
-news_cache = {'market_news': [], 'last_updated': None}
+recommendations_cache = {'data': [], 'timestamp': datetime.now()}
+news_cache = {'market_news': [], 'last_updated': datetime.now()}
 sentiment_cache = {}
-macro_cache = {'data': {}, 'timestamp': None}
+macro_cache = {'data': {}, 'timestamp': datetime.now()}
 insider_cache = {}
-earnings_cache = {'data': [], 'timestamp': None}
+earnings_cache = {'data': [], 'timestamp': datetime.now()}
 ai_insights_cache = {}
 research_cache = {}
 
-# ======================== TTL ========================
-RECOMMENDATIONS_TTL = 300
-SENTIMENT_TTL = 86400
-MACRO_TTL = 604800  # 7 days for FRED
-INSIDER_TTL = 86400
-EARNINGS_TTL = 2592000
-AI_INSIGHTS_TTL = 3600
-RESEARCH_TTL = 1800
+# ======================== TTL (Time To Live) ========================
+RECOMMENDATIONS_TTL = 300  # 5 minutes
+SENTIMENT_TTL = 86400  # 24 hours
+MACRO_TTL = 604800  # 7 days
+INSIDER_TTL = 86400  # 24 hours
+EARNINGS_TTL = 2592000  # 30 days
+AI_INSIGHTS_TTL = 3600  # 1 hour
+RESEARCH_TTL = 1800  # 30 minutes
 
 # ======================== TOP 50 STOCKS DATA ========================
 TOP_50_STOCKS = [
@@ -92,8 +114,10 @@ TOP_50_STOCKS = [
     {'symbol': 'MA', 'inst33': 67, 'overall_score': 8, 'signal': 'BUY', 'key_metric': 'Mastercard - stable'},
     {'symbol': 'NKE', 'inst33': 45, 'overall_score': 3, 'signal': 'SELL', 'key_metric': 'Nike - demand softness'},
     {'symbol': 'LULU', 'inst33': 59, 'overall_score': 7, 'signal': 'BUY', 'key_metric': 'Lululemon - premium brand'},
-    {'symbol': 'CMG', 'inst33': 63, 'overall_score': 8, 'signal': 'BUY', 'key_metric': 'Chipotle - same-store growth'},
 ]
+
+# Create O(1) lookup dictionary
+STOCKS_BY_SYMBOL = {s['symbol']: s for s in TOP_50_STOCKS}
 
 def load_tickers():
     return [stock['symbol'] for stock in TOP_50_STOCKS]
@@ -116,13 +140,13 @@ def load_earnings():
 TICKERS = load_tickers()
 UPCOMING_EARNINGS = load_earnings()
 
-print(f"✅ Loaded {len(TICKERS)} tickers")
+logger.info(f"✅ Loaded {len(TICKERS)} tickers and {len(UPCOMING_EARNINGS)} earnings dates")
 
 # ======================== PRICE FETCHING ========================
 
 def get_stock_price_waterfall(ticker):
-    """Get price from Polygon or Finnhub"""
-    cache_key = f"{ticker}_{int(time.time() / 60)}"
+    """Get price from Finnhub with improved caching"""
+    cache_key = f"{ticker}_{int(time.time() / (60 * PRICE_CACHE_MINUTES))}"
     if cache_key in price_cache:
         return price_cache[cache_key]
     
@@ -131,7 +155,7 @@ def get_stock_price_waterfall(ticker):
     try:
         if FINNHUB_KEY:
             url = f'https://finnhub.io/api/v1/quote?symbol={ticker}&token={FINNHUB_KEY}'
-            response = requests.get(url, timeout=3)
+            response = requests.get(url, timeout=REQUEST_TIMEOUT)
             if response.status_code == 200:
                 data = response.json()
                 if data.get('c', 0) > 0:
@@ -140,13 +164,13 @@ def get_stock_price_waterfall(ticker):
                     result['source'] = 'Finnhub'
                     price_cache[cache_key] = result
                     return result
-    except:
-        pass
+    except Exception as e:
+        logger.error(f"Error fetching price for {ticker}: {e}")
     
     return result
 
 def fetch_prices_concurrent(tickers):
-    """Fetch all prices in parallel"""
+    """Fetch all prices in parallel with optimizations"""
     results = []
     batch_size = 15
     
@@ -157,24 +181,31 @@ def fetch_prices_concurrent(tickers):
             for future in as_completed(future_to_ticker):
                 ticker = future_to_ticker[future]
                 try:
-                    price_data = future.result(timeout=5)
-                    csv_stock = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker), None)
+                    price_data = future.result(timeout=REQUEST_TIMEOUT)
+                    csv_stock = STOCKS_BY_SYMBOL.get(ticker)  # O(1) lookup
+                    
+                    # Calculate once, reuse
+                    change = round(price_data['change'], 2)
+                    change_5d = round(change * CHANGE_5D_MULTIPLIER, 2)
+                    change_30d = round(change * CHANGE_30D_MULTIPLIER, 2)
+                    rsi = round(RSI_BASE + (change * RSI_CHANGE_MULTIPLIER), 2)
                     
                     results.append({
                         'Symbol': ticker,
                         'Last': round(price_data['price'], 2),
-                        'Change': round(price_data['change'], 2),
-                        'Change1D': round(price_data['change'], 2),
-                        'Change5D': round(price_data['change'] * 1.2, 2),
-                        'Change30D': round(price_data['change'] * 1.5, 2),
-                        'RSI': round(50 + (price_data['change'] * 2), 2),
+                        'Change': change,
+                        'Change1D': change,
+                        'Change5D': change_5d,
+                        'Change30D': change_30d,
+                        'RSI': rsi,
                         'Score': csv_stock['inst33'] if csv_stock else 50.0,
                         'Signal': csv_stock['signal'] if csv_stock else 'HOLD',
                         'KeyMetric': csv_stock['key_metric'] if csv_stock else '',
-                        'IV': 0.35
+                        'IV': DEFAULT_IV
                     })
                 except Exception as e:
-                    print(f"Error fetching {ticker}: {e}")
+                    logger.error(f"Error processing {ticker}: {e}")
+        
         time.sleep(0.1)
     
     return sorted(results, key=lambda x: x.get('Score', 0), reverse=True)
@@ -182,8 +213,9 @@ def fetch_prices_concurrent(tickers):
 # ======================== FRED MACRO DATA ========================
 
 def fetch_fred_macro_data():
-    """Fetch FRED data"""
+    """Fetch FRED data with error logging"""
     if not FRED_KEY:
+        logger.info("Using fallback macro data (no FRED_API_KEY)")
         return get_fallback_macro_data()
     
     macro_data = {
@@ -204,7 +236,7 @@ def fetch_fred_macro_data():
         try:
             url = f'https://api.stlouisfed.org/fred/series/observations'
             params = {'series_id': series_id, 'api_key': FRED_KEY, 'limit': 1, 'sort_order': 'desc'}
-            response = requests.get(url, params=params, timeout=5)
+            response = requests.get(url, params=params, timeout=REQUEST_TIMEOUT)
             if response.status_code == 200:
                 data = response.json()
                 if data.get('observations'):
@@ -214,8 +246,8 @@ def fetch_fred_macro_data():
                         'value': float(latest.get('value', 0)),
                         'unit': metadata['unit']
                     }
-        except:
-            pass
+        except Exception as e:
+            logger.error(f"Error fetching FRED series {series_id}: {e}")
         time.sleep(0.1)
     
     return macro_data
@@ -236,8 +268,13 @@ def get_fallback_macro_data():
 # ======================== SCHEDULER ========================
 
 scheduler = BackgroundScheduler()
-scheduler.add_job(func=lambda: macro_cache.update({'data': fetch_fred_macro_data(), 'timestamp': datetime.now()}), 
-                 trigger="cron", day_of_week="0", hour=9, minute=0)
+scheduler.add_job(
+    func=lambda: macro_cache.update({'data': fetch_fred_macro_data(), 'timestamp': datetime.now()}),
+    trigger="cron",
+    day_of_week="0",
+    hour=9,
+    minute=0
+)
 scheduler.start()
 atexit.register(lambda: scheduler.shutdown())
 
@@ -249,20 +286,22 @@ def get_recommendations():
     try:
         if recommendations_cache['data'] and recommendations_cache['timestamp']:
             if (datetime.now() - recommendations_cache['timestamp']).total_seconds() < RECOMMENDATIONS_TTL:
+                logger.info("Serving cached recommendations")
                 return jsonify(recommendations_cache['data'])
         
+        logger.info("Fetching fresh recommendations")
         stocks = fetch_prices_concurrent(TICKERS)
         recommendations_cache['data'] = stocks
         recommendations_cache['timestamp'] = datetime.now()
         return jsonify(stocks)
     except Exception as e:
+        logger.error(f"Error in get_recommendations: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/newsletter/weekly', methods=['GET'])
 def get_weekly_newsletter():
     """Hardcoded newsletter with complete tier breakdown"""
     
-    # HARDCODED NEWSLETTER DATA - Update this weekly
     HARDCODED_NEWSLETTER = {
         'metadata': {
             'version': 'v4.3',
@@ -346,78 +385,8 @@ def get_weekly_newsletter():
         }
     }
     
+    logger.info("Serving hardcoded newsletter")
     return jsonify(HARDCODED_NEWSLETTER), 200
-
-
-
-def get_weekly_newsletter():
-    """Full newsletter with tier breakdown"""
-    try:
-        stocks = recommendations_cache.get('data', [])
-        if not stocks:
-            stocks = fetch_prices_concurrent(TICKERS)
-        
-        tier_1a = [s for s in stocks if s.get('Signal') in ['STRONG_BUY']]
-        tier_1b = [s for s in stocks if s.get('Signal') in ['BUY']]
-        tier_2 = [s for s in stocks if s.get('Signal') in ['HOLD']]
-        tier_2b = [s for s in stocks if s.get('Signal') in ['BUY_CALL', 'SELL_CALL']]
-        tier_3 = [s for s in stocks if s.get('Signal') in ['SELL']]
-        iv_sell = [s for s in stocks if s.get('Signal') in ['SELL_CALL']]
-        
-        newsletter = {
-            'metadata': {
-                'version': 'v4.3',
-                'week': 48,
-                'date_range': 'November 25-29, 2025',
-                'hedge_funds': 'Millennium Capital | Citadel | Renaissance Technologies'
-            },
-            'executive_summary': {
-                'probability_of_profit': '90.5',
-                'expected_return': '0.21',
-                'max_risk': '-5',
-                'tier_breakdown': {
-                    'TIER 1-A': len(tier_1a),
-                    'TIER 1-B': len(tier_1b),
-                    'TIER 2': len(tier_2),
-                    'TIER 2B': len(tier_2b),
-                    'TIER 3': len(tier_3),
-                    'IV-SELL': len(iv_sell)
-                },
-                'total_stocks': len(stocks)
-            },
-            'ai_commentary': {
-                'summary': 'Bullish momentum continues with strong institutional support.',
-                'outlook': 'BULLISH'
-            },
-            'tiers': {
-                'TIER 1-A': tier_1a[:5],
-                'TIER 1-B': tier_1b[:5],
-                'TIER 2': tier_2[:5],
-                'TIER 2B': tier_2b[:5],
-                'TIER 3': tier_3[:5],
-                'IV-SELL': iv_sell[:5]
-            },
-            'monte_carlo': {
-                'expected_return': '0.21%',
-                'probability_profit': '90.5%',
-                'best_case_95': '12.5%',
-                'worst_case_5': '-8.3%',
-                'var_95': '-5.2%'
-            },
-            'upcoming_catalysts': [
-                {'symbol': 'NVDA', 'date': '2025-11-20', 'event': 'Earnings', 'impact': 'CRITICAL'},
-                {'symbol': 'BBY', 'date': '2025-11-25', 'event': 'Earnings', 'impact': 'HIGH'},
-            ],
-            'action_plan': {
-                'immediate_buys': [s['Symbol'] for s in tier_1a[:3]],
-                'strong_buys': [s['Symbol'] for s in tier_1b[:3]],
-                'options_plays': [s['Symbol'] for s in iv_sell[:3]]
-            }
-        }
-        
-        return jsonify(newsletter), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
 
 @app.route('/api/stock-research/<ticker>', methods=['GET'])
 def get_stock_research(ticker):
@@ -427,19 +396,20 @@ def get_stock_research(ticker):
     
     if cache_key in research_cache:
         if (datetime.now() - research_cache[cache_key]['timestamp']).total_seconds() < RESEARCH_TTL:
+            logger.info(f"Serving cached research for {ticker}")
             return jsonify(research_cache[cache_key]['data']), 200
     
     try:
         price_data = get_stock_price_waterfall(ticker)
-        stock_info = next((s for s in TOP_50_STOCKS if s['symbol'] == ticker), {})
+        stock_info = STOCKS_BY_SYMBOL.get(ticker, {})
         earnings_info = next((e for e in UPCOMING_EARNINGS if e['symbol'] == ticker), {})
         
         research = {
             'ticker': ticker,
             'price': round(price_data['price'], 2),
             'change_1d': round(price_data['change'], 2),
-            'change_5d': round(price_data['change'] * 1.2, 2),
-            'change_30d': round(price_data['change'] * 1.5, 2),
+            'change_5d': round(price_data['change'] * CHANGE_5D_MULTIPLIER, 2),
+            'change_30d': round(price_data['change'] * CHANGE_30D_MULTIPLIER, 2),
             'score': stock_info.get('inst33', 50),
             'signal': stock_info.get('signal', 'HOLD'),
             'key_metric': stock_info.get('key_metric', 'N/A'),
@@ -465,22 +435,27 @@ def get_stock_research(ticker):
         }
         
         research_cache[cache_key] = {'data': research, 'timestamp': datetime.now()}
+        logger.info(f"Generated fresh research for {ticker}")
         return jsonify(research), 200
     except Exception as e:
+        logger.error(f"Error in stock_research for {ticker}: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/macro-indicators', methods=['GET'])
 def get_macro_indicators():
-    """FRED data"""
+    """FRED macro data"""
     try:
         if macro_cache['data'] and macro_cache['timestamp']:
             if (datetime.now() - macro_cache['timestamp']).total_seconds() < MACRO_TTL:
+                logger.info("Serving cached macro data")
                 return jsonify(macro_cache['data']), 200
         
+        logger.info("Fetching fresh macro data")
         macro_cache['data'] = fetch_fred_macro_data()
         macro_cache['timestamp'] = datetime.now()
         return jsonify(macro_cache['data']), 200
-    except:
+    except Exception as e:
+        logger.error(f"Error in macro_indicators: {e}")
         return jsonify(get_fallback_macro_data()), 200
 
 @app.route('/api/options-opportunities/<ticker>', methods=['GET'])
@@ -499,8 +474,10 @@ def get_options_opportunities(ticker):
             {'type': 'Butterfly Spread', 'recommendation': 'GOOD', 'setup': f'Low cost defined risk', 'max_profit': round(price * 0.04, 2), 'max_loss': round(price * 0.01, 2), 'probability_of_profit': '50%'}
         ]
         
+        logger.info(f"Generated options strategies for {ticker}")
         return jsonify({'ticker': ticker, 'strategies': strategies}), 200
     except Exception as e:
+        logger.error(f"Error in options_opportunities for {ticker}: {e}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/health', methods=['GET'])
@@ -508,9 +485,24 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'tickers_loaded': len(TICKERS),
-        'earnings_loaded': len(UPCOMING_EARNINGS)
+        'earnings_loaded': len(UPCOMING_EARNINGS),
+        'apis_configured': {
+            'finnhub': bool(FINNHUB_KEY),
+            'fred': bool(FRED_KEY),
+            'perplexity': bool(PERPLEXITY_KEY)
+        },
+        'cache_status': {
+            'recommendations': len(recommendations_cache.get('data', [])),
+            'research': len(research_cache),
+            'price': len(price_cache)
+        }
     }), 200
+
+# ======================== MAIN ========================
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 10000))
+    logger.info(f"🚀 Starting Elite Trading API on port {port}")
+    logger.info(f"📊 Loaded {len(TICKERS)} tickers")
+    logger.info(f"📅 Loaded {len(UPCOMING_EARNINGS)} earnings dates")
     app.run(host='0.0.0.0', port=port, debug=False)
