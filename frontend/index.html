@@ -111,31 +111,57 @@
                 <button class="btn-large btn-refresh" id="refreshBtn" onclick="loadAllStocks()">
                     <i class="fas fa-sync"></i> <span id="btnText">REFRESH STOCKS</span>
                 </button>
-                <button class="btn-large btn-newsletter" onclick="showNewsletter()">
-                    <i class="fas fa-newspaper"></i> RECOMMENDATION BRIEF 
-                </button>
+               
+
+              <button class="btn-large btn-newsletter" onclick="showSimpleBrief()">
+    <i class="fas fa-newspaper"></i> MARKET BRIEF 
+</button>
+
             </div>
 
             <div class="stock-grid" id="stockGrid">Loading top 50 stocks...</div>
         </div>
     </div>
 
-<!-- WEEKLY NEWSLETTER PAGE (FULL VERSION) -->
-<div id="weeklyNewsletterPage" class="page">
+<!-- SIMPLE MARKET BRIEF PAGE -->
+<div id="briefPage" class="page">
     <div class="container">
-        <!-- Header Banner -->
         <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
-            <h1 style="font-size: 2.8em; font-weight: 900;">📈 ELITE QUANTITATIVE TRADING NEWSLETTER</h1>
-            <p style="font-size: 1.3em; margin-top: 0.5rem;" id="newsletterVersion">v4.2</p>
-            <p style="font-size: 1.1em; opacity: 0.9;">Week <span id="weekNum">48</span> | <span id="dateRange">November 25-29, 2025</span></p>
-            <p style="font-size: 0.9em; opacity: 0.8; margin-top: 0.5rem;" id="hedgeFunds">Millennium Capital | Citadel | Renaissance Technologies</p>
+            <h1 style="font-size: 2.8em; font-weight: 900;">📈 Elite Market Brief</h1>
+            <p style="font-size: 1.1em;"><span id="briefDate"></span></p>
         </div>
 
-        <!-- Critical Updates Section -->
-        <div id="criticalUpdatesSection" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; display: none;">
-            <h2 style="color: white; margin-bottom: 1rem;">⚠️ CRITICAL UPDATES FROM PREVIOUS ANALYSIS</h2>
-            <div id="criticalUpdatesContent"></div>
+        <!-- FRED Economic Indicators -->
+        <div class="sidebar-card">
+            <h3><i class="fas fa-chart-line"></i> FRED Economic Indicators</h3>
+            <div id="fredHighlights" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">Loading...</div>
         </div>
+
+        <!-- Top 10 Stocks -->
+        <div class="sidebar-card">
+            <h3 style="color: #10b981;"><i class="fas fa-gem"></i> TOP 10 STOCKS BY SCORE</h3>
+            <table class="newsletter-table">
+                <thead>
+                    <tr>
+                        <th>Ticker</th>
+                        <th>Price</th>
+                        <th>Change</th>
+                        <th>Score</th>
+                        <th>Signal</th>
+                    </tr>
+                </thead>
+                <tbody id="topStocksTable"></tbody>
+            </table>
+        </div>
+
+        <button class="btn-large btn-refresh" onclick="goHome()" style="width: 100%; margin-top: 2rem;">
+            <i class="fas fa-arrow-left"></i> BACK TO DASHBOARD
+        </button>
+    </div>
+</div>
+
+
+    
 
         <!-- Critical Warnings Section (DQ-style) -->
         <div id="criticalWarningsSection" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; display: none;">
