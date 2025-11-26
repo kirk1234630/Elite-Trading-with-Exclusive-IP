@@ -278,7 +278,7 @@
         };
 
         function getChartSymbol(ticker) {
-            return EXCHANGE_MAP[ticker] || `NASDAQ:${ticker}`;
+            return EXCHANGE_MAP[ticker] || `:${ticker}`;
         }
 
         function formatNumber(num) {
