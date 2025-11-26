@@ -364,6 +364,72 @@
             document.getElementById('stockGrid').innerHTML = grid;
         }
 
+        // Add this new function after researchStock()
+async function loadMultiTimeframeMetrics(ticker) {
+    const container = document.getElementById('multiTimeframeMetrics');
+    
+    try {
+        const oneDay = await fetchPriceChange(ticker, 1);
+        const fiveDay = await fetchPriceChange(ticker, 5);
+        const thirtyDay = await fetchPriceChange(ticker, 30);
+
+        const metricsHTML = `
+            <div style="background: rgba(0, 212, 255, 0.1); border: 1px solid #444; padding: 0.8rem; border-radius: 8px; text-align: center;">
+                <div style="color: #b0b8c1; font-size: 0.7em; font-weight: 700;">1 DAY</div>
+                <div style="color: ${oneDay >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.2em; font-weight: 900; margin-top: 0.3rem;">
+                    ${oneDay >= 0 ? '↑' : '↓'} ${Math.abs(oneDay).toFixed(2)}%
+                </div>
+            </div>
+            <div style="background: rgba(0, 212, 255, 0.1); border: 1px solid #444; padding: 0.8rem; border-radius: 8px; text-align: center;">
+                <div style="color: #b0b8c1; font-size: 0.7em; font-weight: 700;">5 DAY</div>
+                <div style="color: ${fiveDay >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.2em; font-weight: 900; margin-top: 0.3rem;">
+                    ${fiveDay >= 0 ? '↑' : '↓'} ${Math.abs(fiveDay).toFixed(2)}%
+                </div>
+            </div>
+            <div style="background: rgba(0, 212, 255, 0.1); border: 1px solid #444; padding: 0.8rem; border-radius: 8px; text-align: center;">
+                <div style="color: #b0b8c1; font-size: 0.7em; font-weight: 700;">30 DAY</div>
+                <div style="color: ${thirtyDay >= 0 ? '#10b981' : '#ef4444'}; font-size: 1.2em; font-weight: 900; margin-top: 0.3rem;">
+                    ${thirtyDay >= 0 ? '↑' : '↓'} ${Math.abs(thirtyDay).toFixed(2)}%
+                </div>
+            </div>
+        `;
+        container.innerHTML = metricsHTML;
+    } catch (error) {
+        console.error('Error loading metrics:', error);
+    }
+}
+
+// Helper to fetch price changes
+async function fetchPriceChange(ticker, days) {
+    try {
+        const url = `https://query1.finance.yahoo.com/v7/finance/chart/${ticker}?interval=1d&range=${days}d`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error('API error');
+        
+        const data = await response.json();
+        const quotes = data.chart.result[0].quote;
+
+        if (quotes.close.length >= 2) {
+            const oldestClose = quotes.close[0];
+            const latestClose = quotes.close[quotes.close.length - 1];
+            const changePercent = ((latestClose - oldestClose) / oldestClose) * 100;
+            return changePercent;
+        }
+        return 0;
+    } catch (error) {
+        console.warn(`Could not fetch ${days}D data for ${ticker}`);
+        return 0;
+    }
+}
+
+// Update researchStock() to call this new function:
+async function researchStock(ticker) {
+    // ... existing code ...
+    await loadMultiTimeframeMetrics(ticker); // ADD THIS LINE
+    loadAIAnalysisSonar(ticker, stock);
+    // ... rest of code ...
+}
+
         // ======================== RESEARCH PAGE ========================
         async function researchStock(ticker) {
             ticker = ticker.toUpperCase();
