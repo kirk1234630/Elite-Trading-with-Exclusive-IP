@@ -15,6 +15,7 @@ import atexit
 app = Flask(__name__)
 CORS(app)
 
+
 # ======================== NEWSLETTER INTEGRATION ========================
 try:
     from newsletter_api import newsletter_bp
@@ -22,10 +23,22 @@ try:
     print("✅ Newsletter blueprint registered successfully")
 except ImportError as e:
     print(f"⚠️ Newsletter API import failed: {e}")
-    print("Newsletter features will be unavailable")
+    print("⚠️ Newsletter features will be unavailable")
+    # Create a dummy blueprint to prevent 404 errors
+    from flask import Blueprint
+    newsletter_bp = Blueprint('newsletter_dummy', __name__, url_prefix='/api/newsletter')
+    
+    @newsletter_bp.route('/generate', methods=['POST'])
+    def generate_newsletter_dummy():
+        return jsonify({'success': False, 'error': 'Newsletter system not configured'}), 503
+    
+    @newsletter_bp.route('/status', methods=['GET'])
+    def newsletter_status_dummy():
+        return jsonify({'success': False, 'status': 'unavailable'}), 503
+    
+    app.register_blueprint(newsletter_bp)
 except Exception as e:
     print(f"⚠️ Newsletter blueprint registration failed: {e}")
-
 
 # ======================== API KEYS ========================
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
