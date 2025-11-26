@@ -8,6 +8,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import time
 import gc
 from apscheduler.schedulers.background import BackgroundScheduler
+from bs4 import BeautifulSoup
 import atexit
 
 app = Flask(__name__)
