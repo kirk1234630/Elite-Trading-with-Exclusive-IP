@@ -24,14 +24,12 @@
         .btn-large { padding: 1rem 2rem; border: none; border-radius: 12px; font-size: 1.1em; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.8rem; justify-content: center; transition: all 0.3s; }
         .btn-refresh { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
         .btn-newsletter { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); color: white; }
-
         .action-buttons { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
 
         .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
         .stock-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; position: relative; }
         .stock-card:hover { border-color: #00d4ff; transform: translateY(-5px); }
         
-        .stock-score-badge { position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); padding: 0.4rem 0.8rem; border-radius: 8px; font-weight: 900; font-size: 0.9em; }
         .stock-ticker { font-size: 2.2em; font-weight: 900; }
         .stock-price { font-size: 1.8em; color: #00d4ff; font-weight: 900; }
         .stock-key-metric { margin-top: 0.8rem; padding: 0.6rem; background: rgba(0, 212, 255, 0.1); border-radius: 8px; font-size: 0.85em; color: #b0b8c1; border-left: 3px solid #00d4ff; }
@@ -45,19 +43,8 @@
         .sidebar-card { background: rgba(26, 26, 64, 0.95); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; margin-bottom: 1.5rem; }
         .sidebar-card h3 { color: #00d4ff; margin-bottom: 1rem; font-size: 1.1em; }
         
-        .chart-card { 
-            background: rgba(26, 26, 64, 0.9); 
-            border: 2px solid #444; 
-            border-radius: 15px; 
-            padding: 1rem;
-            min-height: 300px;
-            height: 300px;
-            margin-bottom: 1.5rem; 
-        }
-        .chart-box { 
-            height: 280px;
-            width: 100%; 
-        }
+        .chart-card { background: rgba(26, 26, 64, 0.9); border: 2px solid #444; border-radius: 15px; padding: 1rem; min-height: 300px; height: 300px; margin-bottom: 1.5rem; }
+        .chart-box { height: 280px; width: 100%; }
 
         .ai-source-badge { display: inline-block; background: rgba(124, 58, 237, 0.2); border: 1px solid #7c3aed; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.75em; margin: 0.2rem; color: #7c3aed; }
 
@@ -69,7 +56,6 @@
         .rec-buy { background: #10b981; color: white; }
         .rec-good { background: #f59e0b; color: white; }
         .rec-neutral { background: #6b7280; color: white; }
-        .rec-best { background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; }
         .strategy-setup { color: #b0b8c1; font-size: 0.85em; margin: 0.5rem 0; }
         .strategy-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 0.8rem; }
         .stat-item { background: rgba(0, 212, 255, 0.1); padding: 0.5rem; border-radius: 6px; text-align: center; }
@@ -78,19 +64,8 @@
 
         .sentiment-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 0.8rem; }
         .sentiment-period { background: rgba(0, 212, 255, 0.05); border: 1px solid #444; border-radius: 8px; padding: 0.8rem; }
-        .sentiment-period-title { 
-            color: #7c3aed; 
-            font-size: 0.85em;
-            font-weight: 700; 
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .sentiment-score { 
-            color: #00d4ff; 
-            font-size: 1.5em;
-            font-weight: 900; 
-        }
+        .sentiment-period-title { color: #7c3aed; font-size: 0.85em; font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em; }
+        .sentiment-score { color: #00d4ff; font-size: 1.5em; font-weight: 900; }
         .sentiment-change { font-size: 0.85em; margin-top: 0.3rem; }
         .change-positive { color: #10b981; }
         .change-negative { color: #ef4444; }
@@ -254,16 +229,23 @@
             'UBER': 'NYSE:UBER', 'KO': 'NYSE:KO', 'MRK': 'NYSE:MRK'
         };
 
+        // ======================== HARDCODED EARNINGS FROM SERVER.PY ========================
+        const HARDCODED_EARNINGS = {
+            "NVDA": {"date": "2025-11-20", "eps_est": "0.81", "company": "NVIDIA", "time": "After Market"},
+            "AMAT": {"date": "2025-11-24", "eps_est": "2.30", "company": "Applied Materials", "time": "After Market"},
+            "A": {"date": "2025-11-24", "eps_est": "1.59", "company": "Agilent", "time": "After Market"},
+            "KEYS": {"date": "2025-11-24", "eps_est": "1.91", "company": "Keysight", "time": "After Market"},
+            "ZM": {"date": "2025-11-24", "eps_est": "1.52", "company": "Zoom", "time": "After Market"},
+            "BBY": {"date": "2025-11-25", "eps_est": "1.55", "company": "Best Buy", "time": "Before Market"},
+            "DE": {"date": "2025-11-26", "eps_est": "4.75", "company": "Deere", "time": "Before Market"}
+        };
+
         function getChartSymbol(ticker) {
             return EXCHANGE_MAP[ticker] || `NASDAQ:${ticker}`;
         }
 
         function formatNumber(num) {
             return parseFloat(num || 0).toFixed(2);
-        }
-
-        function formatPercent(num) {
-            return parseFloat(num || 0).toFixed(2) + '%';
         }
 
         async function loadAllStocks() {
@@ -459,31 +441,45 @@
             }
         }
 
-        async function loadEarningsData(ticker) {
+        // ======================== EARNINGS: USE HARDCODED DATA FROM SERVER.PY ========================
+        function loadEarningsData(ticker) {
             const container = document.getElementById('earningsInfo');
+            
+            // First check hardcoded earnings
+            if (HARDCODED_EARNINGS[ticker]) {
+                const e = HARDCODED_EARNINGS[ticker];
+                container.innerHTML = `
+                    <strong style="color: #00d4ff;">📅 Date:</strong> ${e.date}<br>
+                    <strong style="color: #7c3aed;">Company:</strong> ${e.company}<br>
+                    <strong style="color: #10b981;">EPS Estimate:</strong> $${e.eps_est}<br>
+                    <strong style="color: #b0b8c1;">Time:</strong> ${e.time}
+                `;
+                return;
+            }
+            
+            // Fallback to API
             container.innerHTML = 'Loading earnings...';
-            try {
-                const response = await fetch(`${API_BASE}/api/earnings/${ticker}`);
-                if (response.ok) {
-                    const data = await response.json();
+            fetch(`${API_BASE}/api/earnings/${ticker}`)
+                .then(r => r.json())
+                .then(data => {
                     if (data.symbol) {
-                        const daysUntil = data.daysUntil || 0;
                         container.innerHTML = `
                             <strong style="color: #00d4ff;">📅 Date:</strong> ${data.date}<br>
-                            <strong style="color: #7c3aed;">Countdown:</strong> ${daysUntil} days<br>
+                            <strong style="color: #7c3aed;">Countdown:</strong> ${data.daysUntil || '?'} days<br>
                             <strong style="color: #10b981;">EPS Est:</strong> $${data.epsEstimate.toFixed(2)}<br>
                             <strong style="color: #b0b8c1;">Time:</strong> ${data.time}
                         `;
-                        return;
+                    } else {
+                        throw new Error('No data');
                     }
-                }
-                throw new Error('No data');
-            } catch (error) {
-                console.log(`Earnings not found for ${ticker}`);
-                container.innerHTML = '<span style="color: #9ca3af;">📅 Not available</span>';
-            }
+                })
+                .catch(error => {
+                    console.log(`Earnings not found for ${ticker}`);
+                    container.innerHTML = '<span style="color: #9ca3af;">📅 Not available</span>';
+                });
         }
 
+        // ======================== INSIDER TRANSACTIONS: USE FINNHUB WITH BUY/SELL COUNTS ========================
         async function loadInsiderData(ticker) {
             const container = document.getElementById('insiderInfo');
             container.innerHTML = 'Loading...';
@@ -493,19 +489,32 @@
                 
                 const data = await response.json();
                 
-                let sentiment = data.sentiment;
-                if (typeof data.sentiment === 'object') {
-                    sentiment = data.sentiment.toUpperCase();
-                }
+                // Extract from Finnhub insider API response
+                const buys = data.buy_count || 0;
+                const sells = data.sell_count || 0;
+                const sentiment = data.insider_sentiment || 'NEUTRAL';
                 
-                const color = sentiment === 'BULLISH' ? '#10b981' : 
-                              sentiment === 'BEARISH' ? '#ef4444' : '#f59e0b';
+                // Color-code based on sentiment
+                const sentimentColor = sentiment === 'BULLISH' ? '#10b981' : 
+                                       sentiment === 'BEARISH' ? '#ef4444' : '#f59e0b';
+                
+                // Calculate trend (more buys = bullish)
+                const trend = buys > sells ? '↑ BUYING' : sells > buys ? '↓ SELLING' : '→ BALANCED';
+                const trendColor = buys > sells ? '#10b981' : sells > buys ? '#ef4444' : '#f59e0b';
                 
                 container.innerHTML = `
-                    <strong style="color: ${color};">Sentiment:</strong> ${sentiment}<br>
-                    <strong style="color: #10b981;">Net Change:</strong> ${data.net_change > 0 ? '+' : ''}${data.net_change.toFixed(2)}<br>
-                    <strong style="color: #b0b8c1;">Transactions:</strong> ${data.total_transactions}<br>
-                    <div style="font-size: 0.75em; color: #7c3aed; margin-top: 0.5rem;">Source: ${data.source}</div>
+                    <strong style="color: ${sentimentColor}; font-size: 1.05em;">
+                        ${sentiment === 'BULLISH' ? '🟢' : sentiment === 'BEARISH' ? '🔴' : '🟡'} 
+                        ${sentiment}
+                    </strong><br>
+                    <div style="margin-top: 0.5rem; font-size: 0.9em;">
+                        <strong style="color: #00d4ff;">Recent Activity (30 days):</strong><br>
+                        <span style="color: #10b981; font-weight: 700;">Buys: ${buys}</span> | 
+                        <span style="color: #ef4444; font-weight: 700;">Sells: ${sells}</span><br>
+                        <span style="color: ${trendColor}; font-weight: 700; margin-top: 0.3rem; display: inline-block;">
+                            Trend: ${trend}
+                        </span>
+                    </div>
                 `;
             } catch (error) {
                 console.log(`Insider data error for ${ticker}:`, error);
@@ -603,7 +612,7 @@
                     return;
                 }
                 container.innerHTML = data.strategies.slice(0, 6).map(strategy => {
-                    const recClass = strategy.recommendation === 'BEST' ? 'rec-best' : 
+                    const recClass = strategy.recommendation === 'BEST' ? 'rec-buy' : 
                                    strategy.recommendation === 'BUY' ? 'rec-buy' : 
                                    strategy.recommendation === 'GOOD' ? 'rec-good' : 'rec-neutral';
                     return `
