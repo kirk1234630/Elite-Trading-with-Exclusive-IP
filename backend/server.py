@@ -16,8 +16,16 @@ app = Flask(__name__)
 CORS(app)
 
 # ======================== NEWSLETTER INTEGRATION ========================
-from newsletter_api import newsletter_bp
-app.register_blueprint(newsletter_bp)  # ✅ Register AFTER app is created
+try:
+    from newsletter_api import newsletter_bp
+    app.register_blueprint(newsletter_bp)
+    print("✅ Newsletter blueprint registered successfully")
+except ImportError as e:
+    print(f"⚠️ Newsletter API import failed: {e}")
+    print("Newsletter features will be unavailable")
+except Exception as e:
+    print(f"⚠️ Newsletter blueprint registration failed: {e}")
+
 
 # ======================== API KEYS ========================
 FINNHUB_KEY = os.environ.get('FINNHUB_API_KEY', '')
