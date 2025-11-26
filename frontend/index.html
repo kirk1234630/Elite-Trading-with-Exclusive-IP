@@ -397,19 +397,19 @@
                 document.getElementById('aiRisk').className = '';
                 
                 // Insider
-                const insider = data.insider || {};
-                const sentimentColor = insider.sentiment === 'BULLISH' ? '#10b981' : 
-                                      insider.sentiment === 'BEARISH' ? '#ef4444' : '#f59e0b';
-                document.getElementById('insiderInfo').innerHTML = `
-                    <strong style="color: ${sentimentColor}; font-size: 1.05em;">
-                        ${insider.sentiment === 'BULLISH' ? '🟢' : insider.sentiment === 'BEARISH' ? '🔴' : '🟡'} 
-                        ${insider.sentiment}
-                    </strong><br>
-                    <div style="margin-top: 0.5rem; font-size: 0.9em;">
-                        <span style="color: #10b981; font-weight: 700;">Buys: ${insider.buy_count || 0}</span> | 
-                        <span style="color: #ef4444; font-weight: 700;">Sells: ${insider.sell_count || 0}</span>
-                    </div>
-                `;
+                const insider = data;  // Direct response from /api/insider-transactions
+const sentimentColor = insider.insider_sentiment === 'BULLISH' ? '#10b981' : 
+                      insider.insider_sentiment === 'BEARISH' ? '#ef4444' : '#f59e0b';
+document.getElementById('insiderInfo').innerHTML = `
+    <strong style="color: ${sentimentColor}; font-size: 1.05em;">
+        ${insider.insider_sentiment === 'BULLISH' ? '🟢' : insider.insider_sentiment === 'BEARISH' ? '🔴' : '🟡'} 
+        ${insider.insider_sentiment}
+    </strong><br>
+    <div style="margin-top: 0.5rem; font-size: 0.9em;">
+        <span style="color: #10b981; font-weight: 700;">Buys: ${insider.buy_count || 0}</span> | 
+        <span style="color: #ef4444; font-weight: 700;">Sells: ${insider.sell_count || 0}</span>
+    </div>
+`;
                 
                 // Sentiment
                 const sentiment = data.sentiment || {};
@@ -435,6 +435,7 @@
                 `;
                 
                 // Load live news
+         
                 loadStockNews(ticker);
                 
             } catch (error) {
