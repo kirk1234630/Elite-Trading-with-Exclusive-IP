@@ -645,7 +645,174 @@
             }
         }
 
+        async function loadWeeklyNewsletter() 
         async function loadWeeklyNewsletter() {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('weeklyNewsletterPage').classList.add('active');
+    
+    try {
+        const response = await fetch(`${API_BASE}/api/newsletter/weekly`);
+        const data = await response.json();
+        
+        // Update header metadata
+        document.getElementById('newsletterVersion').textContent = data.metadata.version;
+        document.getElementById('weekNum').textContent = data.metadata.week;
+        document.getElementById('dateRange').textContent = data.metadata.date_range;
+        document.getElementById('probProfit').textContent = data.executive_summary.probability_of_profit;
+        document.getElementById('expectedReturn').textContent = data.executive_summary.expected_return;
+        document.getElementById('maxRisk').textContent = data.executive_summary.max_risk;
+        
+        let html = '';
+        
+        // Tier breakdown cards
+        html += '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">';
+        
+        const tierColors = {
+            'TIER 1-A': {bg: 'rgba(16, 185, 129, 0.1)', color: '#10b981', icon: '🔥'},
+            'TIER 1-B': {bg: 'rgba(245, 158, 11, 0.1)', color: '#f59e0b', icon: '⭐'},
+            'TIER 2': {bg: 'rgba(0, 212, 255, 0.1)', color: '#00d4ff', icon: '📊'},
+            'TIER 2B': {bg: 'rgba(124, 58, 237, 0.1)', color: '#7c3aed', icon: '📈'},
+            'TIER 3': {bg: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', icon: '⚠️'},
+            'IV-SELL': {bg: 'rgba(156, 163, 175, 0.1)', color: '#9ca3af', icon: '💰'}
+        };
+        
+        Object.entries(data.executive_summary.tier_breakdown).forEach(([tier, count]) => {
+            const style = tierColors[tier];
+            html += `<div style="background: ${style.bg}; padding: 1rem; border-radius: 10px; text-align: center;">
+                <div style="color: #9ca3af; font-size: 0.9em;">${style.icon} ${tier}</div>
+                <div style="color: ${style.color}; font-size: 2.5em; font-weight: 900;">${count}</div>
+            </div>`;
+        });
+        html += '</div>';
+        
+        // AI Commentary
+        html += `<div style="background: rgba(124, 58, 237, 0.1); border: 2px solid #7c3aed; border-radius: 15px; padding: 1.5rem; margin-bottom: 1.5rem;">
+            <h3 style="color: #7c3aed; margin-bottom: 1rem;">🤖 AI MARKET ANALYSIS</h3>
+            <div style="color: #b0b8c1; line-height: 1.8;">
+                <p><strong style="color: #00d4ff;">Summary:</strong> ${data.ai_commentary.summary}</p>
+                <p style="margin-top: 0.5rem;"><strong style="color: ${data.ai_commentary.outlook === 'BULLISH' ? '#10b981' : '#ef4444'};">Outlook:</strong> ${data.ai_commentary.outlook}</p>
+            </div>
+        </div>`;
+        
+        // Render each tier with stocks
+        Object.entries(data.tiers).forEach(([tierName, stocks]) => {
+            if (stocks.length === 0) return;
+            
+            const style = tierColors[tierName];
+            html += `<div style="background: rgba(26, 26, 64, 0.95); border: 2px solid ${style.color}; border-radius: 15px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h2 style="color: ${style.color}; margin-bottom: 1rem; text-align: center;">${style.icon} ${tierName} (${stocks.length} stocks)</h2>
+                <table class="newsletter-table">
+                    <thead>
+                        <tr>
+                            <th>Symbol</th>
+                            <th>Price</th>
+                            <th>Change</th>
+                            <th>Score</th>
+                            <th>Signal</th>
+                            <th>Key Catalyst</th>
+                        </tr>
+                    </thead>
+                    <tbody>`;
+            
+            stocks.forEach(stock => {
+                const signalClass = stock.Signal.includes('BUY') ? 'rec-buy' : 
+                                   stock.Signal === 'HOLD' ? 'rec-good' : 'rec-neutral';
+                const changeColor = stock.Change > 0 ? '#10b981' : '#ef4444';
+                
+                html += `<tr>
+                    <td class="ticker-cell" onclick="researchStock('${stock.Symbol}')" style="cursor: pointer;">${stock.Symbol}</td>
+                    <td class="number-cell">$${stock.Last.toFixed(2)}</td>
+                    <td class="number-cell" style="color: ${changeColor}; font-weight: 700;">${stock.Change > 0 ? '+' : ''}${stock.Change.toFixed(2)}%</td>
+                    <td class="number-cell">${stock.Score}</td>
+                    <td><span class="strategy-rec ${signalClass}">${stock.Signal}</span></td>
+                    <td>${stock.KeyMetric}</td>
+                </tr>`;
+            });
+            
+            html += '</tbody></table></div>';
+        });
+        
+        // Upcoming Catalysts
+        html += `<div style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 15px; padding: 1.5rem; margin-bottom: 1.5rem;">
+            <h3 style="color: #ef4444; margin-bottom: 1rem;">📅 UPCOMING CATALYSTS</h3>
+            <table class="newsletter-table">
+                <thead><tr><th>Symbol</th><th>Date</th><th>Event</th><th>Impact</th></tr></thead>
+                <tbody>`;
+        
+        data.upcoming_catalysts.forEach(catalyst => {
+            const impactColor = catalyst.impact === 'CRITICAL' ? '#ef4444' : 
+                              catalyst.impact === 'HIGH' ? '#f59e0b' : '#00d4ff';
+            html += `<tr>
+                <td class="ticker-cell" onclick="researchStock('${catalyst.symbol}')" style="cursor: pointer;">${catalyst.symbol}</td>
+                <td>${catalyst.date}</td>
+                <td>${catalyst.event}</td>
+                <td><span style="color: ${impactColor}; font-weight: 700;">${catalyst.impact}</span></td>
+            </tr>`;
+        });
+        
+        html += '</tbody></table></div>';
+        
+        // Monte Carlo Analysis
+        html += `<div style="background: rgba(16, 185, 129, 0.1); border: 2px solid #10b981; border-radius: 15px; padding: 1.5rem; margin-bottom: 1.5rem;">
+            <h3 style="color: #10b981; margin-bottom: 1rem;">🎲 MONTE CARLO SIMULATION RESULTS</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem;">
+                <div style="background: rgba(0, 212, 255, 0.1); padding: 1rem; border-radius: 8px;">
+                    <div style="color: #9ca3af; font-size: 0.85em;">Expected Return</div>
+                    <div style="color: #00d4ff; font-size: 1.8em; font-weight: 900;">${data.monte_carlo.expected_return}</div>
+                </div>
+                <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 8px;">
+                    <div style="color: #9ca3af; font-size: 0.85em;">Probability of Profit</div>
+                    <div style="color: #10b981; font-size: 1.8em; font-weight: 900;">${data.monte_carlo.probability_profit}</div>
+                </div>
+                <div style="background: rgba(124, 58, 237, 0.1); padding: 1rem; border-radius: 8px;">
+                    <div style="color: #9ca3af; font-size: 0.85em;">Best Case (95%)</div>
+                    <div style="color: #7c3aed; font-size: 1.8em; font-weight: 900;">+${data.monte_carlo.best_case_95}</div>
+                </div>
+                <div style="background: rgba(239, 68, 68, 0.1); padding: 1rem; border-radius: 8px;">
+                    <div style="color: #9ca3af; font-size: 0.85em;">Worst Case (5%)</div>
+                    <div style="color: #ef4444; font-size: 1.8em; font-weight: 900;">${data.monte_carlo.worst_case_5}</div>
+                </div>
+                <div style="background: rgba(245, 158, 11, 0.1); padding: 1rem; border-radius: 8px;">
+                    <div style="color: #9ca3af; font-size: 0.85em;">VaR (95%)</div>
+                    <div style="color: #f59e0b; font-size: 1.8em; font-weight: 900;">${data.monte_carlo.var_95}</div>
+                </div>
+            </div>
+        </div>`;
+        
+        // Action Plan
+        html += `<div style="background: rgba(26, 26, 64, 0.95); border: 2px solid #00d4ff; border-radius: 15px; padding: 1.5rem;">
+            <h3 style="color: #00d4ff; margin-bottom: 1rem;">🎯 THIS WEEK'S ACTION PLAN</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                <div>
+                    <div style="color: #10b981; font-weight: 700; margin-bottom: 0.5rem;">🔥 IMMEDIATE BUYS</div>
+                    <div style="color: #b0b8c1;">${data.action_plan.immediate_buys.map(s => `<span class="ticker-cell" onclick="researchStock('${s}')" style="cursor: pointer; margin-right: 0.5rem;">${s}</span>`).join('')}</div>
+                </div>
+                <div>
+                    <div style="color: #f59e0b; font-weight: 700; margin-bottom: 0.5rem;">⭐ STRONG BUYS</div>
+                    <div style="color: #b0b8c1;">${data.action_plan.strong_buys.map(s => `<span class="ticker-cell" onclick="researchStock('${s}')" style="cursor: pointer; margin-right: 0.5rem;">${s}</span>`).join('')}</div>
+                </div>
+                <div>
+                    <div style="color: #7c3aed; font-weight: 700; margin-bottom: 0.5rem;">💰 OPTIONS PLAYS</div>
+                    <div style="color: #b0b8c1;">${data.action_plan.options_plays.map(s => `<span class="ticker-cell" onclick="researchStock('${s}')" style="cursor: pointer; margin-right: 0.5rem;">${s}</span>`).join('')}</div>
+                </div>
+            </div>
+        </div>`;
+        
+        document.getElementById('newsletterContent').innerHTML = html;
+        
+    } catch (error) {
+        console.error('Newsletter error:', error);
+        document.getElementById('newsletterContent').innerHTML = 
+            '<div style="text-align: center; padding: 2rem; color: #ef4444;">Error loading newsletter. Check console.</div>';
+    }
+}
+
+        
+        
+        
+        
+        
+        {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('weeklyNewsletterPage').classList.add('active');
             
