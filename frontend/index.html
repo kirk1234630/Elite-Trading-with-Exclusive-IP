@@ -1,4 +1,3 @@
-Most recent working version: 
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,7 +31,7 @@ Most recent working version:
         .stock-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; position: relative; }
         .stock-card:hover { border-color: #00d4ff; transform: translateY(-5px); }
         
-        .stock-score-badge { position: absolute; middle: 1rem; right: 1rem; background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); padding: 0.4rem 0.8rem; border-radius: 8px; font-weight: 900; font-size: 0.9em; }
+        .stock-score-badge { position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); padding: 0.4rem 0.8rem; border-radius: 8px; font-weight: 900; font-size: 0.9em; }
         .stock-ticker { font-size: 2.2em; font-weight: 900; }
         .stock-price { font-size: 1.8em; color: #00d4ff; font-weight: 900; }
         .stock-key-metric { margin-top: 0.8rem; padding: 0.6rem; background: rgba(0, 212, 255, 0.1); border-radius: 8px; font-size: 0.85em; color: #b0b8c1; border-left: 3px solid #00d4ff; }
@@ -78,9 +77,9 @@ Most recent working version:
         .news-headline { font-weight: 600; color: #00d4ff; font-size: 0.9em; margin-bottom: 0.4rem; }
         .news-link { color: #7c3aed; text-decoration: none; font-weight: 600; font-size: 0.85em; }
 
-        .newsletter-table { width: 100%; border-collapse: collapse; margin: 1.5rem 0; }
-        .newsletter-table th { background: rgba(124, 58, 237, 0.3); color: #00d4ff; padding: 1rem; text-align: left; font-weight: 700; border: 1px solid #444; }
-        .newsletter-table td { padding: 0.8rem 1rem; border: 1px solid #444; color: #b0b8c1; }
+        .table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        .table th { background: rgba(124, 58, 237, 0.3); color: #00d4ff; padding: 1rem; text-align: left; font-weight: 700; border: 1px solid #444; }
+        .table td { padding: 0.8rem 1rem; border: 1px solid #444; color: #b0b8c1; }
         .ticker-cell { font-weight: 700; color: white; font-size: 1.1em; }
         .number-cell { text-align: right; font-family: monospace; }
 
@@ -105,7 +104,7 @@ Most recent working version:
         <div class="container">
             <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
                 <h1 style="font-size: 2.8em; font-weight: 900;"> Top 50 Stock and Option Weekly Recommendation</h1>
-                <p style="font-size: 1.1em;">AI Analysis • Real-Time Data • Multi-Factor Propietary Model </p>
+                <p style="font-size: 1.1em;">AI Analysis • Real-Time Data • Multi-Factor Proprietary Model </p>
             </div>
 
             <div class="action-buttons">
@@ -121,462 +120,24 @@ Most recent working version:
         </div>
     </div>
 
-<!-- WEEKLY NEWSLETTER PAGE (FULL VERSION) -->
-<div id="weeklyNewsletterPage" class="page">
-    <div class="container">
-        <!-- Header Banner -->
-        <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
-            <h1 style="font-size: 2.8em; font-weight: 900;">📈 ELITE QUANTITATIVE TRADING NEWSLETTER</h1>
-            <p style="font-size: 1.3em; margin-top: 0.5rem;" id="newsletterVersion">v4.2</p>
-            <p style="font-size: 1.1em; opacity: 0.9;">Week <span id="weekNum">48</span> | <span id="dateRange">November 25-29, 2025</span></p>
-            <p style="font-size: 0.9em; opacity: 0.8; margin-top: 0.5rem;" id="hedgeFunds">Millennium Capital | Citadel | Renaissance Technologies</p>
-        </div>
-
-        <!-- Critical Updates Section -->
-        <div id="criticalUpdatesSection" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; display: none;">
-            <h2 style="color: white; margin-bottom: 1rem;">⚠️ CRITICAL UPDATES FROM PREVIOUS ANALYSIS</h2>
-            <div id="criticalUpdatesContent"></div>
-        </div>
-
-        <!-- Critical Warnings Section (DQ-style) -->
-        <div id="criticalWarningsSection" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border-radius: 15px; padding: 1.5rem; margin-bottom: 2rem; display: none;">
-            <h2 style="color: white; margin-bottom: 1rem;">🚨 CRITICAL WARNING - TAKE ACTION NOW</h2>
-            <div id="criticalWarningsContent"></div>
-        </div>
-
-        <!-- Executive Summary -->
-        <div style="background: rgba(26, 26, 64, 0.95); border: 2px solid #00d4ff; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: #00d4ff; margin-bottom: 1rem;">📊 EXECUTIVE SUMMARY</h2>
-            <p style="color: #b0b8c1; margin-bottom: 1.5rem;">This is an institutional-grade trading analysis using the same systems employed by Millennium Capital, Citadel, and Renaissance Technologies.</p>
-            
-            <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid #10b981; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                <div style="font-size: 1.2em; color: #10b981; font-weight: 700;">Bottom Line:</div>
-                <div style="font-size: 1.5em; color: white; font-weight: 900; margin-top: 0.5rem;">
-                    <span id="probProfit">90.5</span>% probability of making money | +<span id="expectedReturn">0.21</span>% expected return | Maximum risk hedged to <span id="maxRisk">-5</span>% loss
-                </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">
-                <div style="background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 10px; text-align: center;">
-                    <div style="color: #9ca3af; font-size: 0.9em;">TIER 1-A (BUY NOW)</div>
-                    <div style="color: #10b981; font-size: 2.5em; font-weight: 900;" id="tier1aCount">0</div>
-                </div>
-                <div style="background: rgba(245, 158, 11, 0.1); padding: 1rem; border-radius: 10px; text-align: center;">
-                    <div style="color: #9ca3af; font-size: 0.9em;">TIER 1-B (STRONG BUY)</div>
-                    <div style="color: #f59e0b; font-size: 2.5em; font-weight: 900;" id="tier1bCount">0</div>
-                </div>
-                <div style="background: rgba(0, 212, 255, 0.1); padding: 1rem; border-radius: 10px; text-align: center;">
-                    <div style="color: #9ca3af; font-size: 0.9em;">TIER 2 (HOLD/BUY)</div>
-                    <div style="color: #00d4ff; font-size: 2.5em; font-weight: 900;" id="tier2Count">0</div>
-                </div>
-                <div style="background: rgba(156, 163, 175, 0.1); padding: 1rem; border-radius: 10px; text-align: center;">
-                    <div style="color: #9ca3af; font-size: 0.9em;">TOTAL ANALYZED</div>
-                    <div style="color: #9ca3af; font-size: 2.5em; font-weight: 900;" id="totalStocksCount">0</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- AI Market Commentary -->
-        <div style="background: rgba(26, 26, 64, 0.95); border: 2px solid #7c3aed; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: #7c3aed; margin-bottom: 1rem;">🤖 AI MARKET COMMENTARY (Perplexity Sonar)</h2>
-            <div id="aiCommentary" style="color: #b0b8c1; line-height: 1.8;">Loading AI analysis...</div>
-            <div style="margin-top: 1rem; display: flex; gap: 1rem; align-items: center;">
-                <span style="color: #9ca3af;">Market Outlook:</span>
-                <span id="marketOutlook" style="padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700;">NEUTRAL</span>
-            </div>
-        </div>
-
-        <!-- WoW Performance Table -->
-        <div style="background: rgba(26, 26, 64, 0.95); border: 2px solid #00d4ff; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: #00d4ff; margin-bottom: 1rem;">📈 WEEK-OVER-WEEK PERFORMANCE (Monday Open → Friday Close)</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                <!-- Top Gainers -->
-                <div>
-                    <h3 style="color: #10b981; margin-bottom: 1rem;">🔥 TOP GAINERS</h3>
-                    <table class="newsletter-table">
-                        <thead><tr><th>Symbol</th><th>Mon Open</th><th>Fri Close</th><th>WoW %</th></tr></thead>
-                        <tbody id="topGainersTable"></tbody>
-                    </table>
-                </div>
-                <!-- Top Losers -->
-                <div>
-                    <h3 style="color: #ef4444; margin-bottom: 1rem;">📉 TOP LOSERS</h3>
-                    <table class="newsletter-table">
-                        <thead><tr><th>Symbol</th><th>Mon Open</th><th>Fri Close</th><th>WoW %</th></tr></thead>
-                        <tbody id="topLosersTable"></tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- TIER 1-A: BUY NOW -->
-        <div style="background: rgba(26, 26, 64, 0.9); border: 3px solid #10b981; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: #10b981; margin-bottom: 1.5rem;">🏆 TIER 1-A: ABSOLUTE STRONGEST CONVICTION - BUY NOW</h2>
-            <div id="tier1aContent">Loading...</div>
-        </div>
-
-        <!-- TIER 1-B: STRONG BUY -->
-        <div style="background: rgba(26, 26, 64, 0.9); border: 3px solid #f59e0b; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: #f59e0b; margin-bottom: 1.5rem;">🎯 TIER 1-B: STRONG BUY</h2>
-            <div id="tier1bContent">Loading...</div>
-        </div>
-
-        <!-- TIER 2: HOLD/BUY -->
-        <div style="background: rgba(26, 26, 64, 0.9); border: 2px solid #00d4ff; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: #00d4ff; margin-bottom: 1.5rem;">📊 TIER 2: SOLID HOLD POSITIONS</h2>
-            <div id="tier2Content">Loading...</div>
-        </div>
-
-        <!-- TIER 2B: WATCH -->
-        <div style="background: rgba(26, 26, 64, 0.9); border: 2px solid #9ca3af; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: #9ca3af; margin-bottom: 1.5rem;">⏯️ TIER 2B: WATCH LIST</h2>
-            <div id="tier2bContent">Loading...</div>
-        </div>
-
-        <!-- TIER 3: AVOID -->
-        <div style="background: rgba(26, 26, 64, 0.9); border: 2px solid #ef4444; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: #ef4444; margin-bottom: 1.5rem;">🚫 TIER 3: AVOID</h2>
-            <div id="tier3Content">Loading...</div>
-        </div>
-
-        <!-- IV-SELL: Options Premium -->
-        <div style="background: rgba(26, 26, 64, 0.9); border: 2px solid #9333ea; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: #9333ea; margin-bottom: 1.5rem;">💰 IV-SELL: PREMIUM STRATEGIES (Options)</h2>
-            <div id="ivSellContent">Loading...</div>
-        </div>
-
-        <!-- Monte Carlo Results -->
-        <div style="background: rgba(26, 26, 64, 0.95); border: 2px solid #7c3aed; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: #7c3aed; margin-bottom: 1rem;">📊 MONTE CARLO RESULTS (10,000 SIMULATIONS)</h2>
-            <table class="newsletter-table">
-                <thead><tr><th>Metric</th><th>Result</th></tr></thead>
-                <tbody id="monteCarloTable"></tbody>
-            </table>
-        </div>
-
-        <!-- Critical Catalysts -->
-        <div style="background: rgba(26, 26, 64, 0.95); border: 2px solid #f59e0b; border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: #f59e0b; margin-bottom: 1rem;">📅 CRITICAL CATALYSTS - NEXT 60 DAYS</h2>
-            <div id="catalystsContent">Loading...</div>
-        </div>
-
-        <!-- Action Plan -->
-        <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); border-radius: 15px; padding: 2rem; margin-bottom: 2rem;">
-            <h2 style="color: white; margin-bottom: 1rem;">📋 MONDAY MORNING ACTION PLAN - 9:30 AM</h2>
-            <div id="actionPlanContent" style="color: white;">Loading...</div>
-        </div>
-
-        <!-- Back Button -->
-        <button class="btn-large btn-refresh" onclick="goHome()" style="width: 100%; margin-top: 2rem;">
-            <i class="fas fa-arrow-left"></i> BACK TO DASHBOARD
-        </button>
-    </div>
-</div>
-
-<script>
-// ==================== NEWSLETTER JAVASCRIPT ====================
-
-async function loadWeeklyNewsletter() {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('weeklyNewsletterPage').classList.add('active');
-    
-    try {
-        const response = await fetch(`${API_BASE}/api/newsletter/weekly`);
-        const data = await response.json();
-        
-        console.log('Newsletter data:', data);
-        
-        // Metadata
-        document.getElementById('newsletterVersion').textContent = data.metadata.version;
-        document.getElementById('weekNum').textContent = data.metadata.week;
-        document.getElementById('dateRange').textContent = data.metadata.date_range;
-        document.getElementById('hedgeFunds').textContent = data.metadata.hedge_funds;
-        
-        // Executive Summary
-        document.getElementById('probProfit').textContent = data.executive_summary.probability_of_profit;
-        document.getElementById('expectedReturn').textContent = data.executive_summary.expected_return;
-        document.getElementById('maxRisk').textContent = data.executive_summary.max_risk;
-        document.getElementById('tier1aCount').textContent = data.executive_summary.tier_breakdown['TIER 1-A'];
-        document.getElementById('tier1bCount').textContent = data.executive_summary.tier_breakdown['TIER 1-B'];
-        document.getElementById('tier2Count').textContent = data.executive_summary.tier_breakdown['TIER 2'];
-        document.getElementById('totalStocksCount').textContent = data.executive_summary.total_stocks;
-        
-        // Critical Updates
-        if (data.critical_updates && data.critical_updates.length > 0) {
-            document.getElementById('criticalUpdatesSection').style.display = 'block';
-            document.getElementById('criticalUpdatesContent').innerHTML = data.critical_updates.map(u => `
-                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem;">
-                    <strong>${u.symbol} RECLASSIFICATION:</strong><br>
-                    ❌ WAS: ${u.was_tier}<br>
-                    ✅ NOW: ${u.now_tier} - $${u.price}<br>
-                    <strong>REASON:</strong> ${u.reason}
-                </div>
-            `).join('');
-        }
-        
-        // Critical Warnings
-        if (data.critical_warnings && data.critical_warnings.length > 0) {
-            document.getElementById('criticalWarningsSection').style.display = 'block';
-            document.getElementById('criticalWarningsContent').innerHTML = data.critical_warnings.map(w => `
-                <div style="background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; margin-bottom: 0.5rem;">
-                    <strong style="font-size: 1.3em;">${w.symbol}: ${w.action}</strong><br>
-                    ${w.reason}<br>
-                    <strong>Estimated Impact:</strong> ${w.estimated_impact}
-                </div>
-            `).join('');
-        }
-        
-        // AI Commentary
-        if (data.ai_commentary) {
-            document.getElementById('aiCommentary').textContent = data.ai_commentary.summary;
-            const outlookEl = document.getElementById('marketOutlook');
-            outlookEl.textContent = data.ai_commentary.outlook;
-            outlookEl.style.background = data.ai_commentary.outlook === 'BULLISH' ? '#10b981' : 
-                                         data.ai_commentary.outlook === 'BEARISH' ? '#ef4444' : '#f59e0b';
-        }
-        
-        // WoW Performance
-        if (data.wow_performance) {
-            document.getElementById('topGainersTable').innerHTML = data.wow_performance.top_gainers.map(s => `
-                <tr>
-                    <td class="ticker-cell">${s.symbol}</td>
-                    <td class="number-cell">$${s.monday_open}</td>
-                    <td class="number-cell">$${s.friday_close}</td>
-                    <td class="number-cell" style="color: #10b981; font-weight: 700;">+${s.wow_change}%</td>
-                </tr>
-            `).join('') || '<tr><td colspan="4">No data available</td></tr>';
-            
-            document.getElementById('topLosersTable').innerHTML = data.wow_performance.top_losers.map(s => `
-                <tr>
-                    <td class="ticker-cell">${s.symbol}</td>
-                    <td class="number-cell">$${s.monday_open}</td>
-                    <td class="number-cell">$${s.friday_close}</td>
-                    <td class="number-cell" style="color: #ef4444; font-weight: 700;">${s.wow_change}%</td>
-                </tr>
-            `).join('') || '<tr><td colspan="4">No data available</td></tr>';
-        }
-        
-        // Tier sections
-        displayTierSection('tier1aContent', data.tiers['TIER 1-A'], '#10b981');
-        displayTierSection('tier1bContent', data.tiers['TIER 1-B'], '#f59e0b');
-        displayTierSection('tier2Content', data.tiers['TIER 2'], '#00d4ff');
-        displayTierSection('tier2bContent', data.tiers['TIER 2B'], '#9ca3af');
-        displayTierSection('tier3Content', data.tiers['TIER 3'], '#ef4444');
-        displayTierSection('ivSellContent', data.tiers['IV-SELL'], '#9333ea');
-        
-        // Monte Carlo
-        if (data.monte_carlo) {
-            document.getElementById('monteCarloTable').innerHTML = `
-                <tr><td>Expected Return</td><td style="color: #10b981; font-weight: 700;">+${data.monte_carlo.expected_return}%</td></tr>
-                <tr><td>Probability of Profit</td><td style="color: #10b981; font-weight: 700;">${data.monte_carlo.probability_profit}%</td></tr>
-                <tr><td>Best Case (95th %ile)</td><td style="color: #00d4ff;">+${data.monte_carlo.best_case_95}%</td></tr>
-                <tr><td>Worst Case (5th %ile)</td><td style="color: #ef4444;">${data.monte_carlo.worst_case_5}%</td></tr>
-                <tr><td>Value at Risk (95% confidence)</td><td>${data.monte_carlo.var_95}%</td></tr>
-            `;
-        }
-        
-        // Catalysts
-        if (data.upcoming_catalysts) {
-            document.getElementById('catalystsContent').innerHTML = data.upcoming_catalysts.map(c => `
-                <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(0, 212, 255, 0.05); border-radius: 8px; margin-bottom: 0.5rem;">
-                    <span><strong>${c.symbol}</strong> - ${c.event}</span>
-                    <span style="color: ${c.impact === 'CRITICAL' ? '#ef4444' : c.impact === 'HIGH' ? '#f59e0b' : '#9ca3af'};">${c.date} (${c.impact})</span>
-                </div>
-            `).join('');
-        }
-        
-        // Action Plan
-        if (data.action_plan) {
-            let actionHtml = '<h3>IMMEDIATE BUYS (Tier 1-A + 1-B):</h3><ul style="margin: 1rem 0;">';
-            data.action_plan.immediate_buys.forEach(s => {
-                actionHtml += `<li>☐ ${s.symbol}: Buy at $${s.entry} limit (${s.position_size} portfolio)</li>`;
-            });
-            data.action_plan.strong_buys.forEach(s => {
-                actionHtml += `<li>☐ ${s.symbol}: Buy at $${s.entry} limit (${s.position_size} portfolio)</li>`;
-            });
-            actionHtml += '</ul>';
-            
-            if (data.action_plan.options_plays && data.action_plan.options_plays.length > 0) {
-                actionHtml += '<h3>OPTIONS STRATEGIES:</h3><ul style="margin: 1rem 0;">';
-                data.action_plan.options_plays.forEach(s => {
-                    actionHtml += `<li>☐ ${s.symbol}: IV ${s.iv}% - Premium selling opportunity</li>`;
-                });
-                actionHtml += '</ul>';
-            }
-            
-            document.getElementById('actionPlanContent').innerHTML = actionHtml;
-        }
-        
-    } catch (error) {
-        console.error('Newsletter error:', error);
-        alert('Error loading newsletter. Check console for details.');
-    }
-}
-
-function displayTierSection(containerId, stocks, color) {
-    const container = document.getElementById(containerId);
-    
-    if (!stocks || stocks.length === 0) {
-        container.innerHTML = '<p style="color: #9ca3af; text-align: center; padding: 2rem;">No stocks in this tier</p>';
-        return;
-    }
-    
-    const html = stocks.map((stock, idx) => `
-        <div style="background: rgba(0, 212, 255, 0.05); border: 1px solid #444; border-left: 4px solid ${color}; border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem; cursor: pointer;" onclick="researchStock('${stock.symbol}')">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <div>
-                    <span style="color: #9ca3af; font-size: 0.9em; margin-right: 0.5rem;">#${idx + 1}</span>
-                    <span style="font-size: 1.8em; font-weight: 900; color: white;">${stock.symbol}</span>
-                    <span style="color: ${color}; font-size: 1.5em; margin-left: 1rem;">$${stock.price}</span>
-                </div>
-                <div style="text-align: right;">
-                    <div style="background: ${color}; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.95em; color: white;">${stock.action}</div>
-                    <div style="color: ${stock.change_5d > 0 ? '#10b981' : '#ef4444'}; font-weight: 700; margin-top: 0.5rem; font-size: 1.1em;">
-                        ${stock.change_5d > 0 ? '↑' : '↓'} ${Math.abs(stock.change_5d)}% (5D)
-                    </div>
-                </div>
-            </div>
-            
-            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.8rem; margin-bottom: 1rem;">
-                <div style="background: rgba(16, 185, 129, 0.1); padding: 0.6rem; border-radius: 6px; text-align: center;">
-                    <div style="color: #9ca3af; font-size: 0.75em;">Entry</div>
-                    <div style="color: #10b981; font-weight: 700;">$${stock.entry}</div>
-                </div>
-                <div style="background: rgba(239, 68, 68, 0.1); padding: 0.6rem; border-radius: 6px; text-align: center;">
-                    <div style="color: #9ca3af; font-size: 0.75em;">Stop</div>
-                    <div style="color: #ef4444; font-weight: 700;">$${stock.stop}</div>
-                </div>
-                <div style="background: rgba(0, 212, 255, 0.1); padding: 0.6rem; border-radius: 6px; text-align: center;">
-                    <div style="color: #9ca3af; font-size: 0.75em;">Target</div>
-                    <div style="color: #00d4ff; font-weight: 700;">$${stock.target} (+${stock.target_pct}%)</div>
-                </div>
-                <div style="background: rgba(124, 58, 237, 0.1); padding: 0.6rem; border-radius: 6px; text-align: center;">
-                    <div style="color: #9ca3af; font-size: 0.75em;">Score</div>
-                    <div style="color: #7c3aed; font-weight: 700;">${stock.score}/100</div>
-                </div>
-                <div style="background: rgba(245, 158, 11, 0.1); padding: 0.6rem; border-radius: 6px; text-align: center;">
-                    <div style="color: #9ca3af; font-size: 0.75em;">Confidence</div>
-                    <div style="color: #f59e0b; font-weight: 700;">${stock.confidence}/10</div>
-                </div>
-            </div>
-            
-            <div style="background: rgba(124, 58, 237, 0.1); border-left: 3px solid #7c3aed; padding: 0.8rem; border-radius: 6px;">
-                <strong style="color: #7c3aed;">Why:</strong> 
-                <span style="color: #b0b8c1;">${stock.why}</span>
-            </div>
-            
-            <div style="margin-top: 0.8rem; color: #9ca3af; font-size: 0.85em;">
-                <span>RSI: ${stock.rsi}</span> | 
-                <span>IV: ${stock.iv}%</span> | 
-                <span>Position: ${stock.position_size}</span>
-            </div>
-        </div>
-    `).join('');
-    
-    container.innerHTML = html;
-}
-
-// Add button to home page action buttons
-// Replace your existing newsletter button with:
-// <button class="btn-large btn-newsletter" onclick="loadWeeklyNewsletter()">
-//     <i class="fas fa-newspaper"></i> WEEKLY NEWSLETTER
-// </button>
-</script>
-
-<!-- ADDITIONAL CSS (Add to your <style> section) -->
-<style>
-/* Newsletter-specific styles */
-.newsletter-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1rem 0;
-}
-
-.newsletter-table th {
-    background: rgba(124, 58, 237, 0.3);
-    color: #00d4ff;
-    padding: 1rem;
-    text-align: left;
-    font-weight: 700;
-    border: 1px solid #444;
-}
-
-.newsletter-table td {
-    padding: 0.8rem 1rem;
-    border: 1px solid #444;
-    color: #b0b8c1;
-}
-
-.newsletter-table tr:hover {
-    background: rgba(0, 212, 255, 0.05);
-}
-
-.ticker-cell {
-    font-weight: 700;
-    color: white !important;
-    font-size: 1.1em;
-}
-
-.number-cell {
-    text-align: right;
-    font-family: monospace;
-}
-
-@media (max-width: 768px) {
-    .newsletter-table th,
-    .newsletter-table td {
-        padding: 0.5rem;
-        font-size: 0.85em;
-    }
-}
-</style>
-
-
-    
-    <!-- NEWSLETTER PAGE -->
-    <div id="newsletterPage" class="page">
-        <div class="container">
-            <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
-                <h1 style="font-size: 2.8em; font-weight: 900;">📈 Elite Market Brief</h1>
-                <p style="font-size: 1.1em;"><span id="Date"></span></p>
-            </div>
-
-            <div class="sidebar-card">
-                <h3><i class="fas fa-chart-line"></i> FRED Economic Indicators</h3>
-                <div id="fredHighlights" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">Loading...</div>
-            </div>
-
-            <div class="sidebar-card">
-                <h3 style="color: #10b981;"><i class="fas fa-gem"></i> TOP 10 BUYS BY SCORE</h3>
-                <table class="table">
-                    <thead><tr><th>Ticker</th><th>Price</th><th>Change</th><th>Score</th><th>Key Metric</th></tr></thead>
-                    <tbody id="valueTable"></tbody>
-                </table>
-            </div>
-
-            <button class="btn-large btn-refresh" onclick="goHome()" style="width: 100%; margin-top: 2rem;">
-                <i class="fas fa-arrow-left"></i> BACK TO DASHBOARD
-            </button>
-        </div>
-    </div>
-
     <!-- RESEARCH PAGE -->
     <div id="researchPage" class="page">
         <div class="container">
             <div class="research-layout">
-                <div class="left-sidebar">
-                    <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem;">
-                        <div style="font-size: 1.8em; font-weight: 900; color: white;" id="sidebarTicker">LOADING</div>
-                        <div style="font-size: 2em; color: #00d4ff; font-weight: 900;" id="sidebarPrice">$0.00</div>
-                        <div style="font-size: 0.9em; color: #b0b8c1; margin-top: 0.5rem;">Score: <span id="sidebarScore" style="color: #00d4ff; font-weight: 700;">--</span></div>
+                <!-- SIDEBAR -->
+                <div style="position: sticky; top: 100px; height: fit-content;">
+                    <div class="sidebar-card" style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border: none; text-align: center;">
+                        <div style="font-size: 2.2em; font-weight: 900; color: white;" id="sidebarTicker">LOADING</div>
+                        <div style="font-size: 2em; color: #fff; font-weight: 900; margin-top: 0.5rem;" id="sidebarPrice">$0.00</div>
+                        <div style="font-size: 0.95em; color: rgba(255,255,255,0.9); margin-top: 0.5rem;">Score: <span id="sidebarScore" style="color: #00ff00; font-weight: 700;">--</span></div>
                     </div>
 
                     <div class="sidebar-card">
                         <h3>🤖 AI ANALYSIS (Perplexity Sonar)</h3>
                         <div style="color: #b0b8c1; line-height: 1.8; font-size: 0.9em;">
-                            <strong style="color: #00d4ff;">Edge:</strong><br><span id="aiEdge" class="ai-loading">Scraping Barchart, Quiver, GuruFocus, Reddit WSB...</span><br><br>
-                            <strong style="color: #10b981;">Trade:</strong><br><span id="aiTrade" class="ai-loading">Analyzing 5+ sources...</span><br><br>
-                            <strong style="color: #ef4444;">Risk:</strong><br><span id="aiRisk" class="ai-loading">Evaluating...</span><br><br>
+                            <strong style="color: #00d4ff;">Bullish Edge:</strong><br><span id="aiEdge" class="ai-loading">Scraping Barchart, Quiver, GuruFocus, Reddit WSB...</span><br><br>
+                            <strong style="color: #10b981;">Trading Setup:</strong><br><span id="aiTrade" class="ai-loading">Analyzing with Perplexity Sonar...</span><br><br>
+                            <strong style="color: #ef4444;">Risk Management:</strong><br><span id="aiRisk" class="ai-loading">Correlating with your CSV data...</span><br><br>
                             <div id="aiSources" style="margin-top: 1rem;"></div>
                         </div>
                     </div>
@@ -598,17 +159,18 @@ function displayTierSection(containerId, stocks, color) {
 
                     <div class="sidebar-card">
                         <h3>📰 LATEST NEWS</h3>
-                        <div id="sidebarNews">Loading...</div>
+                        <div id="sidebarNews" style="max-height: 300px; overflow-y: auto;">Loading...</div>
                     </div>
                 </div>
 
-                <div class="main-content">
+                <!-- MAIN CONTENT -->
+                <div>
                     <div class="chart-card">
                         <div id="chartMain" class="chart-box"></div>
                     </div>
 
                     <div class="options-opportunities">
-                        <h3><i class="fas fa-chart-bar"></i> OPTIONS OPPORTUNITIES</h3>
+                        <h3 style="margin-bottom: 1rem;">💰 OPTIONS OPPORTUNITIES</h3>
                         <div id="optionsOpportunities">Loading...</div>
                     </div>
 
@@ -620,35 +182,55 @@ function displayTierSection(containerId, stocks, color) {
         </div>
     </div>
 
+    <!-- NEWSLETTER PAGE -->
+    <div id="newsletterPage" class="page">
+        <div class="container">
+            <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 2.8em; font-weight: 900;">📰 Elite Market Brief</h1>
+                <p style="font-size: 1.1em;"><span id="nlDate"></span></p>
+            </div>
+
+            <div class="sidebar-card">
+                <h3><i class="fas fa-chart-line"></i> FRED Economic Indicators</h3>
+                <div id="fredHighlights" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">Loading...</div>
+            </div>
+
+            <div class="sidebar-card">
+                <h3 style="color: #10b981;"><i class="fas fa-gem"></i> TOP 10 BUYS BY SCORE</h3>
+                <table class="table">
+                    <thead><tr><th>Ticker</th><th>Price</th><th>Change</th><th>Score</th><th>Key Metric</th></tr></thead>
+                    <tbody id="valueTable"></tbody>
+                </table>
+            </div>
+
+            <button class="btn-large btn-refresh" onclick="goHome()" style="width: 100%; margin-top: 2rem;">
+                <i class="fas fa-arrow-left"></i> BACK TO DASHBOARD
+            </button>
+        </div>
+    </div>
+
     <script>
         const API_BASE = 'https://elite-trading-with-exclusive-ip.onrender.com';
         let allStocks = [];
 
         const EXCHANGE_MAP = {
-            'SNOW': 'NYSE:SNOW', 'COIN': 'NASDAQ:COIN', 'RBLX': 'NYSE:RBLX', 'ABNB': 'NASDAQ:ABNB',
-            'DASH': 'NASDAQ:DASH', 'UPST': 'NASDAQ:UPST', 'RIOT': 'NASDAQ:RIOT', 'MARA': 'NASDAQ:MARA',
-            'SQ': 'NYSE:SQ', 'PLTR': 'NYSE:PLTR', 'ASML': 'NASDAQ:ASML', 'TSM': 'NYSE:TSM',
-            'IBM': 'NYSE:IBM', 'HPE': 'NYSE:HPE', 'DELL': 'NYSE:DELL', 'VMW': 'NYSE:VMW',
-            'UBER': 'NYSE:UBER', 'KO': 'NYSE:KO', 'MRK': 'NYSE:MRK'
+            'SNOW': 'NYSE:SNOW', 'COIN': 'NASDAQ:COIN', 'RBLX': 'NYSE:RBLX',
+            'ABNB': 'NASDAQ:ABNB', 'DASH': 'NASDAQ:DASH', 'UPST': 'NASDAQ:UPST',
+            'RIOT': 'NASDAQ:RIOT', 'MARA': 'NASDAQ:MARA', 'SQ': 'NYSE:SQ',
+            'PLTR': 'NYSE:PLTR', 'ASML': 'NASDAQ:ASML', 'TSM': 'NYSE:TSM',
         };
 
-        function getChartSymbol(ticker) {
-            return EXCHANGE_MAP[ticker] || `:${ticker}`;
-        }
-
-        function formatNumber(num) {
-            return parseFloat(num).toFixed(2);
-        }
-
-        function formatPercent(num) {
-            return parseFloat(num).toFixed(2) + '%';
+        function formatNumber(num) { return parseFloat(num || 0).toFixed(2); }
+        function goHome() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('homePage').classList.add('active');
         }
 
         async function loadAllStocks() {
             const btn = document.getElementById('refreshBtn');
             const btnText = document.getElementById('btnText');
             btn.disabled = true;
-            btnText.textContent = 'Loading Top 50...';
+            btnText.textContent = 'Loading...';
 
             try {
                 const response = await fetch(`${API_BASE}/api/recommendations`);
@@ -669,7 +251,7 @@ function displayTierSection(containerId, stocks, color) {
                 const signalClass = s.Signal === 'BUY' ? 'rec-buy' : s.Signal === 'SELL' ? 'rec-neutral' : 'rec-good';
                 return `
                     <div class="stock-card" onclick="researchStock('${s.Symbol}')">
-                       
+                        <div class="stock-score-badge">${formatNumber(s.Score || 50)}</div>
                         <div style="display: flex; justify-content: space-between;">
                             <div>
                                 <div class="stock-ticker">${s.Symbol}</div>
@@ -700,26 +282,7 @@ function displayTierSection(containerId, stocks, color) {
             let stock = allStocks.find(s => s.Symbol === ticker);
             
             if (!stock) {
-                try {
-                    const priceResp = await fetch(`${API_BASE}/api/stock-price/${ticker}`);
-                    if (priceResp.ok) {
-                        const priceData = await priceResp.json();
-                        stock = {
-                            Symbol: ticker,
-                            Last: priceData.price || 0,
-                            Change: priceData.change || 0,
-                            RSI: 50,
-                            Signal: priceData.signal || 'HOLD',
-                            Score: priceData.score || 50
-                        };
-                    }
-                } catch (e) {
-                    console.log(`Dynamic fetch for ${ticker}`);
-                }
-                
-                if (!stock) {
-                    stock = {Symbol: ticker, Last: 0, Change: 0, RSI: 50, Signal: 'HOLD', Score: 50};
-                }
+                stock = {Symbol: ticker, Last: 0, Change: 0, RSI: 50, Signal: 'HOLD', Score: 50};
             }
             
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -748,21 +311,18 @@ function displayTierSection(containerId, stocks, color) {
             tradeEl.className = 'ai-loading';
             riskEl.className = 'ai-loading';
             
-            edgeEl.textContent = 'Scraping Barchart, Quiver, GuruFocus, Reddit WSB...';
-            tradeEl.textContent = 'Analyzing with Perplexity Sonar...';
-            riskEl.textContent = 'Correlating with your CSV data...';
-            
             try {
                 const response = await fetch(`${API_BASE}/api/ai-insights/${ticker}`);
+                if (!response.ok) throw new Error('API failed');
                 const data = await response.json();
                 
                 edgeEl.className = '';
                 tradeEl.className = '';
                 riskEl.className = '';
                 
-                edgeEl.textContent = data.edge || 'Analysis unavailable';
-                tradeEl.textContent = data.trade || 'No setup identified';
-                riskEl.textContent = data.risk || 'Unknown risk';
+                edgeEl.textContent = data.edge || 'N/A';
+                tradeEl.textContent = data.trade || 'N/A';
+                riskEl.textContent = data.risk || 'N/A';
                 
                 if (data.sources && data.sources.length > 0) {
                     sourcesEl.innerHTML = '<strong style="color: #7c3aed;">Data Sources:</strong><br>' + 
@@ -775,10 +335,10 @@ function displayTierSection(containerId, stocks, color) {
                 edgeEl.className = '';
                 tradeEl.className = '';
                 riskEl.className = '';
-                edgeEl.textContent = 'Perplexity API not configured or rate limited';
-                tradeEl.textContent = 'Add PERPLEXITY_API_KEY to environment';
-                riskEl.textContent = 'Get free key: perplexity.ai/settings/api';
-                sourcesEl.innerHTML = '';
+                edgeEl.textContent = 'N/A';
+                tradeEl.textContent = 'N/A';
+                riskEl.textContent = 'N/A';
+                sourcesEl.innerHTML = '<span style="color: #ef4444; font-size: 0.8em;">⚠️ PERPLEXITY_API_KEY not configured. Get free key: perplexity.ai/settings/api</span>';
             }
         }
 
@@ -789,7 +349,7 @@ function displayTierSection(containerId, stocks, color) {
                     "container_id": "chartMain",
                     "width": "100%",
                     "height": "100%",
-                    "symbol": getChartSymbol(ticker),
+                    "symbol": ticker,
                     "interval": "D",
                     "timezone": "America/Los_Angeles",
                     "theme": "dark",
@@ -806,167 +366,190 @@ function displayTierSection(containerId, stocks, color) {
 
         async function loadEarningsData(ticker) {
             const container = document.getElementById('earningsInfo');
-            container.innerHTML = 'Loading...';
             try {
                 const response = await fetch(`${API_BASE}/api/earnings-calendar`);
+                if (!response.ok) throw new Error('API failed');
                 const data = await response.json();
-                const earnings = data.earnings?.find(e => e.symbol === ticker);
+                const earnings = data.find(e => e.symbol === ticker);
                 if (earnings) {
-                    container.innerHTML = `<strong style="color: #00d4ff;">Date:</strong> ${earnings.date || 'TBA'}<br><strong style="color: #10b981;">EPS Est:</strong> $${earnings.epsEstimate || 'N/A'}`;
+                    container.innerHTML = `<strong style="color: #00d4ff;">📅 Date:</strong> ${earnings.date || 'TBA'}<br><strong style="color: #10b981;">EPS Est:</strong> $${earnings.epsEstimate || 'N/A'}<br><strong style="color: #7c3aed;">Time:</strong> ${earnings.time || 'N/A'}`;
                 } else {
-                    container.innerHTML = '<span style="color: #9ca3af;">No upcoming earnings</span>';
+                    container.innerHTML = '<span style="color: #9ca3af;">📅 N/A</span>';
                 }
             } catch {
-                container.innerHTML = '<span style="color: #ef4444;">Failed to load</span>';
+                container.innerHTML = '<span style="color: #9ca3af;">📅 N/A</span>';
             }
         }
 
         async function loadInsiderData(ticker) {
             const container = document.getElementById('insiderInfo');
-            container.innerHTML = 'Loading...';
             try {
                 const response = await fetch(`${API_BASE}/api/insider-transactions/${ticker}`);
+                if (!response.ok) throw new Error('API failed');
                 const data = await response.json();
-                if (data.total_transactions > 0) {
-                    const color = data.insider_sentiment === 'BULLISH' ? '#10b981' : data.insider_sentiment === 'BEARISH' ? '#ef4444' : '#f59e0b';
-                    container.innerHTML = `<strong style="color: ${color};">Sentiment:</strong> ${data.insider_sentiment}<br><strong style="color: #10b981;">Buys:</strong> ${data.buy_count}<br><strong style="color: #ef4444;">Sells:</strong> ${data.sell_count}`;
+                
+                // Check if real data (not simulated)
+                if (data.source && !data.source.includes('Simulated')) {
+                    const color = data.sentiment === 'BULLISH' ? '#10b981' : data.sentiment === 'BEARISH' ? '#ef4444' : '#f59e0b';
+                    container.innerHTML = `<strong style="color: ${color};">Sentiment:</strong> ${data.sentiment}<br><strong>Net Change:</strong> ${data.net_change > 0 ? '+' : ''}${data.net_change}<br><strong>Transactions:</strong> ${data.total_transactions}`;
                 } else {
-                    container.innerHTML = '<span style="color: #9ca3af;">No activity</span>';
+                    container.innerHTML = '<span style="color: #9ca3af;">👔 N/A</span>';
                 }
             } catch {
-                container.innerHTML = '<span style="color: #ef4444;">Failed to load</span>';
+                container.innerHTML = '<span style="color: #9ca3af;">👔 N/A</span>';
             }
         }
 
         async function loadSentimentDataEnhanced(ticker) {
             const container = document.getElementById('sentimentInfo');
-            container.innerHTML = 'Loading...';
             try {
                 const response = await fetch(`${API_BASE}/api/social-sentiment/${ticker}`);
+                if (!response.ok) throw new Error('API failed');
                 const data = await response.json();
-                const dailyColor = data.daily.sentiment === 'BULLISH' ? '#10b981' : data.daily.sentiment === 'BEARISH' ? '#ef4444' : '#f59e0b';
-                const weeklyColor = data.weekly.sentiment === 'BULLISH' ? '#10b981' : data.weekly.sentiment === 'BEARISH' ? '#ef4444' : '#f59e0b';
-                const changeClass = data.weekly_change > 0 ? 'change-positive' : 'change-negative';
+                
+                const dayColor = data.DayScore > 70 ? '#10b981' : data.DayScore < 40 ? '#ef4444' : '#f59e0b';
+                const weekColor = data.WeekScore > 70 ? '#10b981' : data.WeekScore < 40 ? '#ef4444' : '#f59e0b';
+                
                 container.innerHTML = `
                     <div class="sentiment-grid">
                         <div class="sentiment-period">
-                            <div class="sentiment-period-title">DAILY</div>
-                            <div class="sentiment-score" style="color: ${dailyColor};">${data.daily.sentiment}</div>
-                            <div style="font-size: 0.85em; color: #b0b8c1; margin-top: 0.3rem;">${data.daily.mentions} mentions</div>
+                            <div class="sentiment-period-title">24H Sentiment</div>
+                            <div class="sentiment-score" style="color: ${dayColor};">${data.DayScore}</div>
+                            <div class="sentiment-change" style="color: ${data.DayChange >= 0 ? '#10b981' : '#ef4444'};">
+                                ${data.DayChange >= 0 ? '↑' : '↓'} ${Math.abs(data.DayChange)}%
+                            </div>
                         </div>
                         <div class="sentiment-period">
-                            <div class="sentiment-period-title">WEEKLY</div>
-                            <div class="sentiment-score" style="color: ${weeklyColor};">${data.weekly.sentiment}</div>
-                            <div style="font-size: 0.85em; color: #b0b8c1; margin-top: 0.3rem;">${data.weekly.mentions} mentions</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 1rem; padding: 0.8rem; background: rgba(0, 212, 255, 0.05); border-radius: 8px;">
+                            <div class="sentiment-period-title">7D Sentiment</div>
+                            <div class="sentiment-score" style="color: ${weekColor};">${data.WeekScore}</div>
+                            <div class="sentiment-change" style="color: ${data.WeekChange >= 0 ? '#10b981' : '#ef4444'};">
+                                ${data.WeekChange >= 0 ? '↑' : '↓'} ${Math.abs(data.WeekChange)}%
+                            </div>
                         </div>
                     </div>
                 `;
             } catch {
-                container.innerHTML = '<span style="color: #ef4444;">Failed to load</span>';
+                container.innerHTML = '<div style="color: #9ca3af; text-align: center; padding: 1rem;">📱 N/A</div>';
             }
         }
 
         async function loadStockNews(ticker) {
             const container = document.getElementById('sidebarNews');
-            container.innerHTML = 'Loading...';
             try {
                 const response = await fetch(`${API_BASE}/api/stock-news/${ticker}`);
+                if (!response.ok) throw new Error('API failed');
                 const data = await response.json();
+                
                 if (data.articles && data.articles.length > 0) {
-                    container.innerHTML = data.articles.slice(0, 3).map(article => `
+                    container.innerHTML = data.articles.slice(0, 5).map(n => `
                         <div class="news-item">
-                            <div class="news-headline">${article.headline}</div>
-                            <div style="margin-top: 0.5rem;"><a href="${article.url}" target="_blank" class="news-link">Read More →</a></div>
+                            <div class="news-headline">${n.headline}</div>
+                            <div style="font-size: 0.75em; color: #7c3aed; margin-top: 0.3rem;">${n.source} • ${n.date}</div>
                         </div>
                     `).join('');
                 } else {
-                    container.innerHTML = '<span style="color: #9ca3af;">No recent news</span>';
+                    container.innerHTML = '<span style="color: #9ca3af;">📰 N/A</span>';
                 }
             } catch {
-                container.innerHTML = '<span style="color: #ef4444;">Failed to load</span>';
+                container.innerHTML = '<span style="color: #9ca3af;">📰 N/A</span>';
             }
         }
 
         async function loadOptionsOpportunities(ticker) {
             const container = document.getElementById('optionsOpportunities');
-            container.innerHTML = 'Loading...';
             try {
                 const response = await fetch(`${API_BASE}/api/options-opportunities/${ticker}`);
+                if (!response.ok) throw new Error('API failed');
                 const data = await response.json();
-                container.innerHTML = data.strategies.map(strategy => {
-                    const recClass = strategy.recommendation === 'BUY' ? 'rec-buy' : strategy.recommendation === 'BEST' ? 'rec-best' : strategy.recommendation === 'GOOD' ? 'rec-good' : 'rec-neutral';
-                    return `
-                        <div class="strategy-card">
-                            <div class="strategy-header">
-                                <div class="strategy-type">${strategy.type}</div>
-                                <div class="strategy-rec ${recClass}">${strategy.recommendation}</div>
+                
+                if (data.strategies && data.strategies.length > 0) {
+                    const html = data.strategies.map(s => {
+                        const recClass = s.recommendation === 'BEST' ? 'rec-best' : s.recommendation === 'BUY' ? 'rec-buy' : 'rec-good';
+                        return `
+                            <div class="strategy-card">
+                                <div class="strategy-header">
+                                    <div class="strategy-type">${s.type}</div>
+                                    <span class="strategy-rec ${recClass}">${s.recommendation || 'HOLD'}</span>
+                                </div>
+                                <div class="strategy-setup">${s.setup || 'Setup'}</div>
+                                <div class="strategy-stats">
+                                    <div class="stat-item">
+                                        <div class="stat-label">Max Profit</div>
+                                        <div class="stat-value" style="color: #10b981;">$${formatNumber(s.max_profit)}</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">Max Loss</div>
+                                        <div class="stat-value" style="color: #ef4444;">$${formatNumber(s.max_loss)}</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-label">Win Rate</div>
+                                        <div class="stat-value">${s.probability_of_profit}</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="strategy-setup">${strategy.setup}</div>
-                            <div class="strategy-stats">
-                                <div class="stat-item"><div class="stat-label">Max Profit</div><div class="stat-value" style="color: #10b981;">$${formatNumber(strategy.max_profit)}</div></div>
-                                <div class="stat-item"><div class="stat-label">Max Loss</div><div class="stat-value" style="color: #ef4444;">$${formatNumber(strategy.max_loss)}</div></div>
-                                <div class="stat-item"><div class="stat-label">Prob. Profit</div><div class="stat-value">${strategy.probability_of_profit}</div></div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                        `;
+                    }).join('');
+                    container.innerHTML = html;
+                } else {
+                    container.innerHTML = '<span style="color: #9ca3af;">💰 N/A</span>';
+                }
             } catch {
-                container.innerHTML = '<span style="color: #ef4444;">Failed to load</span>';
+                container.innerHTML = '<span style="color: #9ca3af;">💰 N/A</span>';
             }
         }
 
         async function showNewsletter() {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById('newsletterPage').classList.add('active');
-            document.getElementById('newsletterDate').textContent = new Date().toLocaleDateString('en-US', {weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'});
-            loadFREDHighlights();
+            document.getElementById('nlDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
             
-            const topBuys = allStocks.filter(s => s.Signal === 'BUY').slice(0, 10);
-            document.getElementById('valueTable').innerHTML = topBuys.map(s => `
-                <tr onclick="researchStock('${s.Symbol}')" style="cursor: pointer;">
-                    <td class="ticker-cell">${s.Symbol}</td>
-                    <td class="number-cell">$${formatNumber(s.Last)}</td>
-                    <td class="number-cell" style="color: ${s.Change > 0 ? '#10b981' : '#ef4444'};">${formatNumber(s.Change)}%</td>
-                    <td class="number-cell" style="color: #00d4ff; font-weight: 900;">${formatNumber(s.Score || 50)}</td>
-                    <td style="font-size: 0.85em;">${s.KeyMetric || 'Standard analysis'}</td>
-                </tr>
-            `).join('') || '<tr><td colspan="5" style="text-align: center; padding: 2rem;">No BUY signals</td></tr>';
+            Promise.all([
+                loadFREDHighlights(),
+                loadTopStocks()
+            ]).catch(console.error);
         }
 
         async function loadFREDHighlights() {
             const container = document.getElementById('fredHighlights');
-            container.innerHTML = 'Loading...';
             try {
                 const response = await fetch(`${API_BASE}/api/macro-indicators`);
+                if (!response.ok) throw new Error('API failed');
                 const data = await response.json();
-                const indicators = [
-                    {name: 'Weekly Econ Index', value: data.indicators.WEI?.value || '2.15', unit: data.indicators.WEI?.unit || '%'},
-                    {name: 'Initial Claims', value: data.indicators.ICSA?.value || '220K', unit: data.indicators.ICSA?.unit || ''},
-                    {name: 'Fed Funds Rate', value: data.indicators.DFF?.value || '4.33', unit: data.indicators.DFF?.unit || '%'},
-                    {name: 'Oil (WTI)', value: data.indicators.DCOILWTICO?.value || '72.50', unit: data.indicators.DCOILWTICO?.unit || ''},
-                    {name: '10Y-2Y Spread', value: data.indicators.T10Y2Y?.value || '0.15', unit: data.indicators.T10Y2Y?.unit || '%'}
-                ];
-                container.innerHTML = indicators.map(ind => `
+                
+                const indicators = data.indicators || {};
+                const html = Object.values(indicators).map(ind => `
                     <div style="background: rgba(0, 212, 255, 0.1); border: 1px solid #444; padding: 1rem; border-radius: 8px; text-align: center;">
-                        <div style="color: #b0b8c1; font-size: 0.85em;">${ind.name}</div>
-                        <div style="color: #00d4ff; font-size: 1.5em; font-weight: 900; margin-top: 0.3rem;">${formatNumber(ind.value)}${ind.unit}</div>
+                        <div style="color: #b0b8c1; font-size: 0.85em;">${ind.name || 'N/A'}</div>
+                        <div style="color: #00d4ff; font-size: 1.5em; font-weight: 900; margin-top: 0.3rem;">${formatNumber(ind.value)}${ind.unit || ''}</div>
                     </div>
                 `).join('');
+                container.innerHTML = html || '<p style="color: #9ca3af;">No macro data available</p>';
             } catch {
-                container.innerHTML = '<p style="color: #ef4444;">Failed to load</p>';
+                container.innerHTML = '<p style="color: #ef4444;">Failed to load macro data</p>';
             }
         }
 
-        function goHome() {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('homePage').classList.add('active');
+        async function loadTopStocks() {
+            try {
+                const topBuys = allStocks.filter(s => s.Signal === 'BUY').slice(0, 10);
+                document.getElementById('valueTable').innerHTML = topBuys.map(s => `
+                    <tr onclick="researchStock('${s.Symbol}')" style="cursor: pointer;">
+                        <td class="ticker-cell">${s.Symbol}</td>
+                        <td class="number-cell">$${formatNumber(s.Last)}</td>
+                        <td class="number-cell" style="color: ${s.Change >= 0 ? '#10b981' : '#ef4444'}; font-weight: 700;">
+                            ${s.Change >= 0 ? '+' : ''}${formatNumber(s.Change)}%
+                        </td>
+                        <td class="number-cell" style="color: #00d4ff; font-weight: 900;">${formatNumber(s.Score || 50)}</td>
+                        <td style="font-size: 0.85em;">${s.KeyMetric || 'Standard analysis'}</td>
+                    </tr>
+                `).join('') || '<tr><td colspan="5" style="text-align: center; padding: 2rem; color: #9ca3af;">No BUY signals</td></tr>';
+            } catch {
+                document.getElementById('valueTable').innerHTML = '<tr><td colspan="5" style="color: #ef4444;">Error loading stocks</td></tr>';
+            }
         }
 
         function searchStock() {
-            const ticker = document.getElementById('searchInput').value.toUpperCase().trim();
+            const ticker = document.getElementById('searchInput').value.trim().toUpperCase();
             if (ticker) {
                 researchStock(ticker);
                 document.getElementById('searchInput').value = '';
