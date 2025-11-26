@@ -155,7 +155,42 @@
 
         .ai-loading { animation: pulse 1.5s ease-in-out infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+/* NEWS SECTION WITH SCROLLBAR */
+.news-scroll-container {
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+}
 
+.news-scroll-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.news-scroll-container::-webkit-scrollbar-track {
+    background: rgba(0, 212, 255, 0.1);
+    border-radius: 10px;
+}
+
+.news-scroll-container::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
+    border-radius: 10px;
+}
+
+.news-scroll-container::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #7c3aed 0%, #00d4ff 100%);
+}
+
+.news-source {
+    font-size: 0.75em;
+    color: #7c3aed;
+    font-weight: 600;
+    margin-bottom: 0.3rem;
+}
+
+.news-time {
+    font-size: 0.75em;
+    color: #9ca3af;
+}
         @media (max-width: 1200px) { .research-layout { grid-template-columns: 1fr; } }
     </style>
 </head>
@@ -280,6 +315,14 @@
     <script>
         const API_BASE = 'https://elite-trading-with-exclusive-ip.onrender.com';
         const FINNHUB_API_KEY = 'ctbu1gpr01qn3qtjcv3gctbu1gpr01qn3qtjcv40'; // Your Finnhub API key
+        unction formatTimeAgo(timestamp) {
+    const now = Date.now() / 1000;
+    const diff = now - timestamp;
+    if (diff < 3600) return `${Math.floor(diff / 60)}m ago`;
+    if (diff < 86400) return `${Math.floor(diff / 3600)}h ago`;
+    return `${Math.floor(diff / 86400)}d ago`;
+}
+        
         let allStocks = [];
 
         const EXCHANGE_MAP = {
