@@ -3,6 +3,343 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elite Stock Tracker</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <script src="https://s3.tradingview.com/tv.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: linear-gradient(135deg, #1a1a3e 0%, #16213e 50%, #0f3460 100%); color: #fff; font-family: -apple-system, sans-serif; }
+        .header { background: rgba(20, 20, 50, 0.95); border-bottom: 2px solid #00d4ff; padding: 1.2rem 2rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .logo { font-size: 1.8em; font-weight: 900; background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; cursor: pointer; }
+        .search-bar { flex: 1; max-width: 500px; margin: 0 2rem; display: flex; align-items: center; background: rgba(30, 30, 60, 0.8); border: 2px solid #444; border-radius: 10px; padding: 0.8rem 1rem; }
+        .search-bar input { flex: 1; background: transparent; border: none; color: #fff; outline: none; }
+        .search-bar button { background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border: none; color: white; padding: 0.7rem 1.5rem; border-radius: 8px; cursor: pointer; font-weight: 700; }
+        .container { max-width: 1600px; margin: 0 auto; padding: 2rem; }
+        .page { display: none; }
+        .page.active { display: block; }
+        .btn-large { padding: 1rem 2rem; border: none; border-radius: 12px; font-size: 1.1em; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 0.8rem; }
+        .btn-refresh { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .btn-brief { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .btn-newsletter { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); }
+        .action-buttons { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
+        .stock-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.5rem; }
+        .stock-card { background: linear-gradient(145deg, #1a1a40 0%, #242850 100%); border: 2px solid #333; border-radius: 15px; padding: 1.5rem; cursor: pointer; transition: all 0.3s; }
+        .stock-card:hover { border-color: #00d4ff; transform: translateY(-5px); }
+        .stock-ticker { font-size: 2.2em; font-weight: 900; }
+        .stock-price { font-size: 1.8em; color: #00d4ff; font-weight: 900; }
+        .key-metric-box { background: rgba(0, 212, 255, 0.1); border-left: 3px solid #00d4ff; padding: 0.8rem; border-radius: 6px; margin: 0.8rem 0; font-size: 0.9em; color: #b0b8c1; }
+        .stock-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.8rem; margin: 1rem 0; }
+        .metric-mini { background: rgba(0, 212, 255, 0.1); border: 1px solid #444; padding: 0.6rem; border-radius: 8px; text-align: center; }
+        .metric-mini-label { font-size: 0.7em; color: #b0b8c1; }
+        .metric-mini-value { font-size: 0.95em; color: #00d4ff; font-weight: 700; }
+        .strategy-rec { padding: 0.4rem 0.8rem; border-radius: 6px; font-size: 0.85em; font-weight: 700; }
+        .rec-buy { background: #10b981; }
+        .rec-good { background: #f59e0b; }
+        .rec-neutral { background: #6b7280; }
+        .research-layout { display: grid; grid-template-columns: 300px 1fr; gap: 2rem; }
+        .sidebar { display: flex; flex-direction: column; gap: 1.5rem; }
+        .sidebar-card { background: rgba(26, 26, 64, 0.95); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; }
+        .sidebar-card h3 { color: #00d4ff; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo" onclick="goHome()">⚡ Elite Trading</div>
+        <div class="search-bar">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Search ticker..." onkeypress="if(event.key==='Enter') searchStock()">
+            <button onclick="searchStock()">ANALYZE</button>
+        </div>
+    </div>
+
+    <!-- HOME PAGE -->
+    <div id="homePage" class="page active">
+        <div class="container">
+            <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 2.8em; font-weight: 900;">📈 Top 50 Stock Recommendations</h1>
+                <p style="font-size: 1.1em;">AI Analysis • Real-Time Data • Multi-Factor Proprietary Model</p>
+            </div>
+            <div class="action-buttons">
+                <button class="btn-large btn-refresh" onclick="loadAllStocks()"><i class="fas fa-sync"></i> REFRESH</button>
+                <button class="btn-large btn-brief" onclick="loadMarketBrief()"><i class="fas fa-bolt"></i> MARKET BRIEF</button>
+                <button class="btn-large btn-newsletter" onclick="loadWeeklyNewsletter()"><i class="fas fa-newspaper"></i> NEWSLETTER</button>
+            </div>
+            <div class="stock-grid" id="stockGrid">Click REFRESH...</div>
+        </div>
+    </div>
+
+    <!-- MARKET BRIEF PAGE -->
+    <div id="briefPage" class="page">
+        <div class="container">
+            <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 2.8em; font-weight: 900;">📊 Market Brief</h1>
+            </div>
+            <div style="background: rgba(26, 26, 64, 0.95); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h3 style="color: #00d4ff; margin-bottom: 1rem;">📈 FRED Economic Indicators</h3>
+                <div id="fredHighlights" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem;">Loading...</div>
+            </div>
+            <div style="background: rgba(26, 26, 64, 0.95); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                <h3 style="color: #10b981;">💎 TOP 10 STOCKS BY SCORE</h3>
+                <div id="briefStocksTable">Loading...</div>
+            </div>
+            <button class="btn-large btn-refresh" onclick="goHome()" style="width: 100%;"><i class="fas fa-arrow-left"></i> BACK</button>
+        </div>
+    </div>
+
+    <!-- NEWSLETTER PAGE -->
+    <div id="weeklyNewsletterPage" class="page">
+        <div class="container">
+            <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 20px; padding: 3rem 2rem; text-align: center; margin-bottom: 2rem;">
+                <h1 style="font-size: 2.8em; font-weight: 900;">📈 ELITE TRADING NEWSLETTER</h1>
+                <p id="newsletterVersion" style="font-size: 1.3em; margin-top: 0.5rem;">v4.3</p>
+            </div>
+            <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid #10b981; border-radius: 10px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                <div style="font-size: 1.2em; color: #10b981; font-weight: 700;">Bottom Line:</div>
+                <div style="font-size: 1.5em; color: white; font-weight: 900; margin-top: 0.5rem;"><span id="probProfit">90.5</span>% probability of making money</div>
+            </div>
+            <div id="newsletterContent">Loading...</div>
+            <button class="btn-large btn-refresh" onclick="goHome()" style="width: 100%; margin-top: 2rem;"><i class="fas fa-arrow-left"></i> BACK</button>
+        </div>
+    </div>
+
+    <!-- RESEARCH PAGE -->
+    <div id="researchPage" class="page">
+        <div class="container">
+            <button class="btn-large btn-refresh" onclick="goHome()" style="margin-bottom: 1.5rem;"><i class="fas fa-arrow-left"></i> BACK</button>
+            
+            <div class="research-layout">
+                <div class="sidebar">
+                    <div style="background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%); border-radius: 12px; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 2em; font-weight: 900;" id="researchTicker">AAPL</div>
+                        <div style="font-size: 2em; color: #00d4ff; font-weight: 900;" id="researchPrice">$150.00</div>
+                        <div style="font-size: 0.9em; color: #b0b8c1; margin-top: 0.5rem;">Score: <span id="researchScore" style="color: #00d4ff; font-weight: 700;">--</span></div>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <h3>📊 PRICE METRICS</h3>
+                        <div style="color: #b0b8c1; font-size: 0.9em; line-height: 1.8;">
+                            <strong style="color: #00d4ff;">1D:</strong> <span id="research1d">--</span><br>
+                            <strong style="color: #00d4ff;">5D:</strong> <span id="research5d">--</span><br>
+                            <strong style="color: #00d4ff;">30D:</strong> <span id="research30d">--</span>
+                        </div>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <h3>📅 EARNINGS</h3>
+                        <div id="researchEarnings" style="color: #b0b8c1; font-size: 0.9em;">Not scheduled</div>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <h3>👔 INSIDER ACTIVITY</h3>
+                        <div id="researchInsider" style="color: #b0b8c1; font-size: 0.9em;">Loading...</div>
+                    </div>
+
+                    <div class="sidebar-card">
+                        <h3>📱 SENTIMENT</h3>
+                        <div id="researchSentiment" style="color: #b0b8c1; font-size: 0.9em;">Loading...</div>
+                    </div>
+                </div>
+
+                <div>
+                    <div style="background: rgba(26, 26, 64, 0.95); border: 2px solid #444; border-radius: 15px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                        <h3 style="color: #00d4ff; margin-bottom: 1rem;">💡 KEY INSIGHT</h3>
+                        <div id="researchKeyMetric" style="color: #b0b8c1; font-size: 0.95em; line-height: 1.6;">Loading...</div>
+                    </div>
+
+                    <div style="background: rgba(26, 26, 64, 0.95); border: 2px solid #00d4ff; border-radius: 15px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                        <h3 style="color: #00d4ff; margin-bottom: 1rem;">🤖 AI ANALYSIS</h3>
+                        <div id="researchAI" style="color: #b0b8c1; font-size: 0.9em; line-height: 1.6;">Loading...</div>
+                    </div>
+
+                    <div style="background: rgba(26, 26, 64, 0.95); border: 2px solid #00d4ff; border-radius: 15px; padding: 1.5rem;">
+                        <h3 style="color: #00d4ff; margin-bottom: 1rem;">💰 OPTIONS STRATEGIES</h3>
+                        <div id="researchOptions" style="color: #b0b8c1; font-size: 0.9em;">Loading...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'https://elite-trading-with-exclusive-ip.onrender.com';
+        let allStocks = [];
+
+        function formatNumber(num) { return parseFloat(num || 0).toFixed(2); }
+        function formatPercent(num) { const val = parseFloat(num || 0); return (val > 0 ? '+' : '') + val.toFixed(2) + '%'; }
+
+        async function loadAllStocks() {
+            try {
+                const response = await fetch(`${API_BASE}/api/recommendations`);
+                allStocks = await response.json();
+                displayStockGrid();
+            } catch (error) {
+                document.getElementById('stockGrid').innerHTML = '<div style="color: #ef4444;">Failed to load. Check backend.</div>';
+            }
+        }
+
+        function displayStockGrid() {
+            const grid = allStocks.map(s => `
+                <div class="stock-card" onclick="researchStock('${s.Symbol}')">
+                    <div style="display: flex; justify-content: space-between;">
+                        <div>
+                            <div class="stock-ticker">${s.Symbol}</div>
+                            <div class="stock-price">$${formatNumber(s.Last)}</div>
+                        </div>
+                        <div style="text-align: right;">
+                            <div style="font-size: 1.2em; color: ${s.Change1D > 0 ? '#10b981' : '#ef4444'}; font-weight: 700;">
+                                ${s.Change1D > 0 ? '↑' : '↓'} ${Math.abs(formatNumber(s.Change1D))}%
+                            </div>
+                        </div>
+                    </div>
+                    <div class="key-metric-box">
+                        <strong style="color: #00d4ff;">💡 Why:</strong> ${s.KeyMetric}
+                    </div>
+                    <div class="stock-metrics">
+                        <div class="metric-mini">
+                            <div class="metric-mini-label">1D</div>
+                            <div class="metric-mini-value" style="color: ${s.Change1D > 0 ? '#10b981' : '#ef4444'};">${formatPercent(s.Change1D)}</div>
+                        </div>
+                        <div class="metric-mini">
+                            <div class="metric-mini-label">5D</div>
+                            <div class="metric-mini-value" style="color: ${s.Change5D > 0 ? '#10b981' : '#ef4444'};">${formatPercent(s.Change5D)}</div>
+                        </div>
+                        <div class="metric-mini">
+                            <div class="metric-mini-label">30D</div>
+                            <div class="metric-mini-value" style="color: ${s.Change30D > 0 ? '#10b981' : '#ef4444'};">${formatPercent(s.Change30D)}</div>
+                        </div>
+                        <div class="metric-mini">
+                            <div class="metric-mini-label">Score</div>
+                            <div class="metric-mini-value">${formatNumber(s.Score)}</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 1rem;">
+                        <span class="strategy-rec ${s.Signal === 'BUY' ? 'rec-buy' : s.Signal === 'SELL' ? 'rec-neutral' : 'rec-good'}">${s.Signal}</span>
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('stockGrid').innerHTML = grid;
+        }
+
+        async function loadMarketBrief() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('briefPage').classList.add('active');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/macro-indicators`);
+                const data = await response.json();
+                const indicators = [
+                    { name: 'Weekly Index', value: data.indicators?.WEI?.value || '2.15', unit: '%' },
+                    { name: 'Initial Claims', value: data.indicators?.ICSA?.value || '220K', unit: '' },
+                    { name: 'Fed Rate', value: data.indicators?.DFF?.value || '4.33', unit: '%' },
+                    { name: 'Oil (WTI)', value: data.indicators?.DCOILWTICO?.value || '72.50', unit: '' },
+                    { name: '10Y-2Y Spread', value: data.indicators?.T10Y2Y?.value || '0.15', unit: '%' }
+                ];
+                document.getElementById('fredHighlights').innerHTML = indicators.map(ind => `
+                    <div style="background: rgba(0, 212, 255, 0.1); border: 1px solid #444; padding: 1rem; border-radius: 8px; text-align: center;">
+                        <div style="color: #b0b8c1; font-size: 0.85em;">${ind.name}</div>
+                        <div style="color: #00d4ff; font-size: 1.5em; font-weight: 900; margin-top: 0.3rem;">${ind.value}${ind.unit}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('fredHighlights').innerHTML = '<div style="color: #ef4444;">Failed to load</div>';
+            }
+
+            if (allStocks.length === 0) await loadAllStocks();
+            const top10 = allStocks.sort((a, b) => (b.Score || 0) - (a.Score || 0)).slice(0, 10);
+            document.getElementById('briefStocksTable').innerHTML = top10.map((s, idx) => `
+                <div style="display: flex; justify-content: space-between; padding: 0.8rem; background: rgba(0, 212, 255, 0.05); border-radius: 8px; margin-bottom: 0.5rem; cursor: pointer;" onclick="researchStock('${s.Symbol}')">
+                    <div>
+                        <div style="font-weight: 700;">#${idx + 1} ${s.Symbol}</div>
+                        <div style="font-size: 0.75em; color: #9ca3af;">${s.KeyMetric}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="color: #00d4ff;">$${formatNumber(s.Last)}</div>
+                        <div style="color: ${parseFloat(s.Change1D) > 0 ? '#10b981' : '#ef4444'}; font-size: 0.85em;">${formatPercent(s.Change1D)}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function loadWeeklyNewsletter() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('weeklyNewsletterPage').classList.add('active');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/newsletter/weekly`);
+                const data = await response.json();
+                document.getElementById('probProfit').textContent = data.executive_summary.probability_of_profit;
+
+                let html = '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">';
+                Object.entries(data.executive_summary.tier_breakdown).forEach(([tier, count]) => {
+                    html += `<div style="background: rgba(0, 212, 255, 0.1); padding: 1rem; border-radius: 10px; text-align: center;">
+                        <div style="color: #9ca3af; font-size: 0.9em;">${tier}</div>
+                        <div style="color: #00d4ff; font-size: 2.5em; font-weight: 900;">${count}</div>
+                    </div>`;
+                });
+                html += '</div><div style="text-align: center; padding: 2rem; color: #9ca3af;">✅ Newsletter data populated</div>';
+                document.getElementById('newsletterContent').innerHTML = html;
+            } catch (error) {
+                document.getElementById('newsletterContent').innerHTML = '<div style="text-align: center; color: #ef4444;">Error loading</div>';
+            }
+        }
+
+        async function researchStock(ticker) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('researchPage').classList.add('active');
+
+            try {
+                const response = await fetch(`${API_BASE}/api/stock-research/${ticker}`);
+                const data = await response.json();
+
+                document.getElementById('researchTicker').textContent = ticker;
+                document.getElementById('researchPrice').textContent = `$${formatNumber(data.price)}`;
+                document.getElementById('researchScore').textContent = formatNumber(data.score);
+                document.getElementById('research1d').textContent = formatPercent(data.change_1d);
+                document.getElementById('research5d').textContent = formatPercent(data.change_5d);
+                document.getElementById('research30d').textContent = formatPercent(data.change_30d);
+                document.getElementById('researchKeyMetric').innerHTML = `<strong>${data.key_metric}</strong>`;
+                document.getElementById('researchEarnings').textContent = `${data.earnings.date} - EPS: ${data.earnings.eps_estimate}`;
+                document.getElementById('researchInsider').textContent = `${data.insider.sentiment} - Buys: ${data.insider.buy_count}, Sells: ${data.insider.sell_count}`;
+                document.getElementById('researchSentiment').textContent = `Daily: ${data.sentiment.daily.sentiment}, Weekly: ${data.sentiment.weekly.sentiment}`;
+                document.getElementById('researchAI').innerHTML = `<div><strong>Edge:</strong> ${data.ai_analysis.edge}</div><div style="margin-top: 0.5rem;"><strong>Trade:</strong> ${data.ai_analysis.trade}</div>`;
+
+                // Options
+                const optionsResponse = await fetch(`${API_BASE}/api/options-opportunities/${ticker}`);
+                const optionsData = await optionsResponse.json();
+                document.getElementById('researchOptions').innerHTML = optionsData.strategies.slice(0, 3).map(s => `
+                    <div style="background: rgba(0, 212, 255, 0.05); padding: 0.8rem; border-radius: 8px; margin-bottom: 0.5rem;">
+                        <div style="font-weight: 700; color: #00d4ff;">${s.type}</div>
+                        <div style="font-size: 0.85em; margin-top: 0.3rem;">Profit: $${s.max_profit} | Loss: $${s.max_loss}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        function searchStock() {
+            const ticker = document.getElementById('searchInput').value.toUpperCase().trim();
+            if (ticker) {
+                researchStock(ticker);
+                document.getElementById('searchInput').value = '';
+            }
+        }
+
+        function goHome() {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('homePage').classList.add('active');
+        }
+
+        window.addEventListener('load', () => loadAllStocks());
+    </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Elite Stock Tracker - AI Powered with Sonar</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://s3.tradingview.com/tv.js"></script>
