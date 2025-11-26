@@ -171,8 +171,6 @@
                     <div class="sidebar-card">
                         <h3>📰 LATEST NEWS</h3>
                         <div id="sidebarNews">Loading...</div>
-                        // AFTER
-
                     </div>
                 </div>
 
@@ -391,8 +389,7 @@
                 `;
                 
                 // News placeholder
-                                
-loadStockNews(ticker);
+                document.getElementById('sidebarNews').innerHTML = '<span style="color: #9ca3af;">No recent news</span>';
                 
             } catch (error) {
                 console.error('Research data error:', error);
