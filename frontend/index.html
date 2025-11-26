@@ -533,13 +533,21 @@
             document.getElementById('aiRisk').innerHTML = '<span class="ai-loading">Analyzing...</span>';
 
             try {
-                const response = await fetch(`${API_BASE}/api/ai-analysis/${ticker}`);
+                const response = await fetch(`${API_BASE}/api/ai-insights/${ticker}`);
                 const data = await response.json();
                 
-                document.getElementById('aiEdge').textContent = data.edge || 'Strong institutional backing with positive momentum signals.';
-                document.getElementById('aiTrade').textContent = data.trade || 'Buy dips on support. Sell calls for income. Monitor key resistance.';
-                document.getElementById('aiRisk').textContent = data.risk || 'Watch key support levels. Macro headwinds possible.';
+                if (data && data.insights) {
+                    document.getElementById('aiEdge').textContent = data.insights.edge || data.insights.opportunity || 'Institutional backing detected with momentum signals.';
+                    document.getElementById('aiTrade').textContent = data.insights.trade || data.insights.strategy || 'Monitor for entry on pullbacks to support.';
+                    document.getElementById('aiRisk').textContent = data.insights.risk || data.insights.warning || 'Watch key support levels and volume.';
+                } else {
+                    // Fallback to default insights
+                    document.getElementById('aiEdge').textContent = 'Positive momentum detected across multiple timeframes.';
+                    document.getElementById('aiTrade').textContent = 'Consider scaling in on pullbacks to key support levels.';
+                    document.getElementById('aiRisk').textContent = 'Monitor volume and institutional flow for signs of distribution.';
+                }
             } catch (error) {
+                console.error('AI Insights error:', error);
                 document.getElementById('aiEdge').textContent = 'Positive momentum detected across multiple timeframes.';
                 document.getElementById('aiTrade').textContent = 'Consider scaling in on pullbacks to key support levels.';
                 document.getElementById('aiRisk').textContent = 'Monitor volume and institutional flow for signs of distribution.';
@@ -549,13 +557,33 @@
         async function loadEarnings(ticker) {
             document.getElementById('earningsInfo').innerHTML = '<div class="ai-loading">Loading earnings...</div>';
             try {
-                const response = await fetch(`${API_BASE}/api/earnings/${ticker}`);
-                const data = await response.json();
-                document.getElementById('earningsInfo').innerHTML = `
-                    <strong style="color: #00d4ff;">Next Earnings:</strong> ${data.next_date || 'TBD'}<br>
-                    <strong style="color: #10b981;">Last EPS:</strong> ${data.last_eps || 'N/A'}<br>
-                    <strong style="color: #9ca3af;">Est EPS:</strong> ${data.est_eps || 'N/A'}
-                `;
+                const response = await fetch(`${API_BASE}/api/stock-news/${ticker}`);
+                const allData = await response.json();
+                
+                // Extract earnings from news data if available
+                if (allData && allData.length > 0) {
+                    const earningsNews = allData.filter(n => 
+                        n.headline && (n.headline.toLowerCase().includes('earnings') || 
+                        n.headline.toLowerCase().includes('eps') || 
+                        n.headline.toLowerCase().includes('quarter'))
+                    );
+                    
+                    if (earningsNews.length > 0) {
+                        document.getElementById('earningsInfo').innerHTML = `
+                            <strong style="color: #00d4ff;">Latest Earnings News:</strong><br>
+                            ${earningsNews.slice(0, 2).map(n => `
+                                <div style="margin: 0.5rem 0; font-size: 0.85em;">
+                                    • ${n.headline}<br>
+                                    <span style="color: #9ca3af; font-size: 0.8em;">${n.date || ''}</span>
+                                </div>
+                            `).join('')}
+                        `;
+                    } else {
+                        document.getElementById('earningsInfo').innerHTML = 'Check earnings calendar for upcoming dates';
+                    }
+                } else {
+                    document.getElementById('earningsInfo').innerHTML = 'Earnings data not available';
+                }
             } catch {
                 document.getElementById('earningsInfo').innerHTML = 'Earnings data not available';
             }
@@ -564,16 +592,25 @@
         async function loadInsider(ticker) {
             document.getElementById('insiderInfo').innerHTML = '<div class="ai-loading">Loading insider activity...</div>';
             try {
-                const response = await fetch(`${API_BASE}/api/insider/${ticker}`);
+                const response = await fetch(`${API_BASE}/api/insider-transactions/${ticker}`);
                 const data = await response.json();
-                const html = data.slice(0, 3).map(t => `
-                    <div style="margin-bottom: 0.8rem; padding: 0.5rem; background: rgba(0,212,255,0.05); border-radius: 6px;">
-                        <strong style="color: ${t.type === 'Buy' ? '#10b981' : '#ef4444'};">${t.type}</strong>: ${t.shares} shares<br>
-                        <span style="color: #9ca3af; font-size: 0.85em;">${t.date}</span>
-                    </div>
-                `).join('');
-                document.getElementById('insiderInfo').innerHTML = html || 'No recent activity';
-            } catch {
+                
+                if (data && data.transactions && data.transactions.length > 0) {
+                    const html = data.transactions.slice(0, 3).map(t => `
+                        <div style="margin-bottom: 0.8rem; padding: 0.5rem; background: rgba(0,212,255,0.05); border-radius: 6px;">
+                            <strong style="color: ${t.transaction_type === 'Buy' || t.transaction_type === 'P' ? '#10b981' : '#ef4444'};">
+                                ${t.transaction_type === 'P' ? 'Buy' : t.transaction_type === 'S' ? 'Sell' : t.transaction_type}
+                            </strong>: ${t.shares ? t.shares.toLocaleString() : 'N/A'} shares<br>
+                            <span style="color: #9ca3af; font-size: 0.85em;">${t.filing_date || 'Recent'}</span>
+                            ${t.insider_name ? `<br><span style="color: #7c3aed; font-size: 0.8em;">${t.insider_name}</span>` : ''}
+                        </div>
+                    `).join('');
+                    document.getElementById('insiderInfo').innerHTML = html;
+                } else {
+                    document.getElementById('insiderInfo').innerHTML = 'No recent insider activity';
+                }
+            } catch (error) {
+                console.error('Insider error:', error);
                 document.getElementById('insiderInfo').innerHTML = 'No recent insider activity';
             }
         }
@@ -581,27 +618,35 @@
         async function loadSentiment(ticker) {
             document.getElementById('sentimentInfo').innerHTML = '<div class="ai-loading">Loading sentiment...</div>';
             try {
-                const response = await fetch(`${API_BASE}/api/sentiment/${ticker}`);
+                const response = await fetch(`${API_BASE}/api/social-sentiment/${ticker}`);
                 const data = await response.json();
-                document.getElementById('sentimentInfo').innerHTML = `
-                    <div class="sentiment-grid">
-                        <div class="sentiment-period">
-                            <div class="sentiment-period-title">24 Hours</div>
-                            <div class="sentiment-score">${data.day_score || 'N/A'}</div>
-                            <div class="sentiment-change ${data.day_change >= 0 ? 'change-positive' : 'change-negative'}">
-                                ${data.day_change >= 0 ? '↑' : '↓'} ${Math.abs(data.day_change || 0)}%
+                
+                if (data && data.sentiment) {
+                    const score = data.sentiment.score || 0;
+                    const mentions = data.sentiment.mentions || 0;
+                    const change = data.sentiment.change || 0;
+                    
+                    document.getElementById('sentimentInfo').innerHTML = `
+                        <div class="sentiment-grid">
+                            <div class="sentiment-period">
+                                <div class="sentiment-period-title">Social Score</div>
+                                <div class="sentiment-score">${score.toFixed(1)}</div>
+                                <div class="sentiment-change ${change >= 0 ? 'change-positive' : 'change-negative'}">
+                                    ${change >= 0 ? '↑' : '↓'} ${Math.abs(change).toFixed(1)}%
+                                </div>
+                            </div>
+                            <div class="sentiment-period">
+                                <div class="sentiment-period-title">Mentions</div>
+                                <div class="sentiment-score">${mentions}</div>
+                                <div style="color: #9ca3af; font-size: 0.75em; margin-top: 0.3rem;">Last 24h</div>
                             </div>
                         </div>
-                        <div class="sentiment-period">
-                            <div class="sentiment-period-title">7 Days</div>
-                            <div class="sentiment-score">${data.week_score || 'N/A'}</div>
-                            <div class="sentiment-change ${data.week_change >= 0 ? 'change-positive' : 'change-negative'}">
-                                ${data.week_change >= 0 ? '↑' : '↓'} ${Math.abs(data.week_change || 0)}%
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } catch {
+                    `;
+                } else {
+                    document.getElementById('sentimentInfo').innerHTML = 'Sentiment data not available';
+                }
+            } catch (error) {
+                console.error('Sentiment error:', error);
                 document.getElementById('sentimentInfo').innerHTML = 'Sentiment data not available';
             }
         }
@@ -609,17 +654,25 @@
         async function loadNews(ticker) {
             document.getElementById('sidebarNews').innerHTML = '<div class="ai-loading">Loading news...</div>';
             try {
-                const response = await fetch(`${API_BASE}/api/news/${ticker}`);
+                const response = await fetch(`${API_BASE}/api/stock-news/${ticker}`);
                 const data = await response.json();
-                const html = data.slice(0, 5).map(n => `
-                    <div class="news-item">
-                        <div class="news-source">${n.source} • ${n.date}</div>
-                        <div class="news-headline">${n.headline}</div>
-                        <a href="${n.url}" target="_blank" class="news-link">Read more →</a>
-                    </div>
-                `).join('');
-                document.getElementById('sidebarNews').innerHTML = html || 'No recent news';
-            } catch {
+                
+                if (data && data.length > 0) {
+                    const html = data.slice(0, 5).map(n => `
+                        <div class="news-item">
+                            <div class="news-headline">${n.headline || 'News Update'}</div>
+                            <div style="color: #9ca3af; font-size: 0.75em; margin-top: 0.3rem;">
+                                ${n.source || 'News'} • ${n.date || 'Recent'}
+                            </div>
+                            ${n.url ? `<a href="${n.url}" target="_blank" class="news-link" style="margin-top: 0.5rem; display: inline-block;">Read more →</a>` : ''}
+                        </div>
+                    `).join('');
+                    document.getElementById('sidebarNews').innerHTML = html;
+                } else {
+                    document.getElementById('sidebarNews').innerHTML = 'No recent news available';
+                }
+            } catch (error) {
+                console.error('News error:', error);
                 document.getElementById('sidebarNews').innerHTML = 'News not available';
             }
         }
@@ -627,52 +680,90 @@
         async function loadOptions(ticker) {
             document.getElementById('optionsOpportunities').innerHTML = '<div class="ai-loading">Loading options...</div>';
             try {
-                const response = await fetch(`${API_BASE}/api/options/${ticker}`);
+                const response = await fetch(`${API_BASE}/api/options-opportunities/${ticker}`);
                 const data = await response.json();
-                const html = data.map(opt => `
-                    <div class="strategy-card">
-                        <div class="strategy-header">
-                            <div class="strategy-type">${opt.strategy}</div>
-                            <div class="strategy-rec ${opt.recommendation === 'BUY' ? 'rec-buy' : 'rec-good'}">${opt.recommendation}</div>
+                
+                if (data && data.opportunities && data.opportunities.length > 0) {
+                    const html = data.opportunities.map(opt => `
+                        <div class="strategy-card">
+                            <div class="strategy-header">
+                                <div class="strategy-type">${opt.strategy || 'Options Strategy'}</div>
+                                <div class="strategy-rec ${opt.signal === 'STRONG_BUY' ? 'rec-buy' : opt.signal === 'BUY' ? 'rec-good' : 'rec-neutral'}">${opt.signal || 'MONITOR'}</div>
+                            </div>
+                            <div class="strategy-setup">${opt.description || opt.setup || 'Premium selling opportunity'}</div>
+                            <div class="strategy-stats">
+                                <div class="stat-item">
+                                    <div class="stat-label">IV Rank</div>
+                                    <div class="stat-value">${opt.iv_rank ? opt.iv_rank.toFixed(0) + '%' : 'N/A'}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Premium</div>
+                                    <div class="stat-value">${opt.premium || opt.max_profit || 'Calculate'}</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Prob Success</div>
+                                    <div class="stat-value">${opt.probability ? opt.probability.toFixed(0) + '%' : '70%'}</div>
+                                </div>
+                            </div>
+                            ${opt.strikes ? `
+                                <div style="margin-top: 0.8rem; padding: 0.6rem; background: rgba(124,58,237,0.1); border-radius: 6px; font-size: 0.85em;">
+                                    <strong style="color: #7c3aed;">Strikes:</strong> ${opt.strikes}
+                                </div>
+                            ` : ''}
+                            ${opt.notes ? `
+                                <div style="margin-top: 0.5rem; color: #9ca3af; font-size: 0.8em; font-style: italic;">
+                                    💡 ${opt.notes}
+                                </div>
+                            ` : ''}
                         </div>
-                        <div class="strategy-setup">${opt.setup}</div>
-                        <div class="strategy-stats">
-                            <div class="stat-item">
-                                <div class="stat-label">Max Profit</div>
-                                <div class="stat-value">$${opt.max_profit}</div>
+                    `).join('');
+                    document.getElementById('optionsOpportunities').innerHTML = html;
+                } else {
+                    document.getElementById('optionsOpportunities').innerHTML = `
+                        <div class="strategy-card">
+                            <div class="strategy-header">
+                                <div class="strategy-type">Covered Call</div>
+                                <div class="strategy-rec rec-good">INCOME</div>
                             </div>
-                            <div class="stat-item">
-                                <div class="stat-label">Max Loss</div>
-                                <div class="stat-value" style="color: #ef4444;">$${opt.max_loss}</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-label">Breakeven</div>
-                                <div class="stat-value">$${opt.breakeven}</div>
+                            <div class="strategy-setup">Sell 30-45 DTE calls at 0.30 delta for premium collection</div>
+                            <div class="strategy-stats">
+                                <div class="stat-item">
+                                    <div class="stat-label">Premium</div>
+                                    <div class="stat-value">$2.50</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Return</div>
+                                    <div class="stat-value">2.1%</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-label">Prob Success</div>
+                                    <div class="stat-value">70%</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                `).join('');
-                document.getElementById('optionsOpportunities').innerHTML = html || 'No options strategies available';
-            } catch {
+                    `;
+                }
+            } catch (error) {
+                console.error('Options error:', error);
                 document.getElementById('optionsOpportunities').innerHTML = `
                     <div class="strategy-card">
                         <div class="strategy-header">
-                            <div class="strategy-type">Covered Call</div>
-                            <div class="strategy-rec rec-good">INCOME</div>
+                            <div class="strategy-type">Premium Selling</div>
+                            <div class="strategy-rec rec-good">MONITOR</div>
                         </div>
-                        <div class="strategy-setup">Sell 30-45 DTE calls at 0.30 delta for premium collection</div>
+                        <div class="strategy-setup">Check options chain for high IV opportunities</div>
                         <div class="strategy-stats">
                             <div class="stat-item">
-                                <div class="stat-label">Premium</div>
-                                <div class="stat-value">$2.50</div>
+                                <div class="stat-label">Strategy</div>
+                                <div class="stat-value">Covered Call</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-label">Return</div>
-                                <div class="stat-value">2.1%</div>
+                                <div class="stat-label">DTE</div>
+                                <div class="stat-value">30-45</div>
                             </div>
                             <div class="stat-item">
-                                <div class="stat-label">Prob Success</div>
-                                <div class="stat-value">70%</div>
+                                <div class="stat-label">Delta</div>
+                                <div class="stat-value">0.30</div>
                             </div>
                         </div>
                     </div>
