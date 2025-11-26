@@ -463,8 +463,8 @@ document.getElementById('insiderInfo').innerHTML = `
                 
                 const data = await response.json();
                 
-                if (data.news && data.news.length > 0) {
-                    const newsHTML = data.news.slice(0, 10).map(article => `
+                if (data.articles && data.news.length > 0) {
+                    const newsHTML = data.articles.slice(0, 10).map(article => `
                         <div class="news-item" style="transition: all 0.3s; cursor: pointer;" onmouseover="this.style.borderLeftColor='#7c3aed'" onmouseout="this.style.borderLeftColor='#00d4ff'">
                             <div class="news-source">${article.source || 'Unknown Source'}</div>
                             <div class="news-headline">${article.headline}</div>
